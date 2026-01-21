@@ -184,6 +184,8 @@
     <Content Include="Views\Shared\_MainLayout.cshtml" />
     <Content Include="Views\RGDC\Index.cshtml" />
     <Content Include="Views\Shared\_LoginLayout.cshtml" />
+    <Content Include="Views\Shared\_adminLayout.cshtml" />
+    <Content Include="Views\RGDC\adminDashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
