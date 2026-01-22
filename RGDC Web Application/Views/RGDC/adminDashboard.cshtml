@@ -11,6 +11,7 @@
         <div class="col m4 l4">
             <span class="right">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Print Report"> <i class="material-icons brown-text lighten-1">print</i></a></div>
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
@@ -74,7 +75,7 @@
 
         @*appointment req*@
         <div class="col m6 l6" style="padding-left:0">
-            <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT REQUESTS <span class="badge left p-0" style="margin:0">(N)</span></span>
+            <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT REQUESTS <span class="new badge left" style="margin:0 0.25rem 0 0">(N)</span></span>
             <div class="card grey lighten-2">
                 <div class="card-content containerOverflow">
                     @*individual appointment req*@
@@ -85,7 +86,7 @@
                                 <div class="col m2 l2"><img src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
                                 @*user name and preferred dentist*@
                                 <div class="col m3 l3">
-                                    <p class="bold">Name</p>
+                                    <p class="bold">Name<i class="material-icons tiny green-text" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
                                     <p>Dentist</p>
                                 </div>
                                 @*procedure*@
@@ -94,7 +95,7 @@
                                 <div class="col m3 l3"><p>MM/DD/YY 00:00AM</p></div>
                                 @*yes or no btn*@
                                 <div class="col m1 l1">
-                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" id="checkBtn" data-position="right" data-tooltip="Confirm">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" id="checkBtn" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem">
                                         <i class="material-icons tiny">check</i>
                                     </a>
                                     <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" id="denyBtn" data-position="right" data-tooltip="Deny">
@@ -120,7 +121,7 @@
                                 <div class="col m2 l2"><img src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
                                 @*user name and preferred dentist*@
                                 <div class="col m3 l3">
-                                    <p class="bold">Name</p>
+                                    <p class="bold">Name<i class="material-icons tiny green-text" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
                                     <p>Dentist</p>
                                 </div>
                                 @*procedure*@
