@@ -14,13 +14,28 @@ a:hover {
     text-decoration: none;
 }
 
-#smallBtn{
+.smallBtn{
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     border-radius: 15px;
+}
+.smallBtn:hover{
+    background-color: #8d6e63 !important;
+
+}
+
+.smallBtn:hover i {
+    color:#fff !important;
 }
 
 .dashContainer{
     margin:0 1rem 0 1rem;
+}
+
+#checkBtn:hover {
+    background-color: #4caf50 !important;
+}
+#denyBtn:hover {
+    background-color: #d32f2f !important;
 }
 
 .equalSpace {
