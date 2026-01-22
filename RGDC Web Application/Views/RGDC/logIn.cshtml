@@ -1,0 +1,57 @@
+﻿@{
+    Layout = "~/Views/Shared/_logInSignInLayout.cshtml";
+}
+
+<div class="split-container">
+   
+    <div class="left-side">
+        
+    </div>
+
+    <div class="right-side" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+
+        <img src="@Url.Content("~/Content/images/dentalAppLogo.png")" alt="Logo" style="width: 350px; height: auto; margin-bottom: 30px;" />
+
+        <div style="width: 80%; max-width: 500px;">
+            <form>
+                <div class="input-field">
+                    <input id="email" type="email" placeholder="Email">
+                </div>
+
+                <div class="input-field">
+                    <input id="password" type="password" placeholder="Password">
+                </div>
+
+                <div class="forgot-password-container">
+                    <a href="/Account/ForgotPassword" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <div class="checkbox-container">
+                    <label>
+                        <input type="checkbox" class="filled-in" />
+                        <span>I Agree to the terms and conditions</span>
+                    </label>
+                </div>
+
+                <button class="btnLogin" type="submit">
+                    Log In
+                </button>
+
+                <div class="login-divider">
+                    <span>or sign in with</span>
+                </div>
+
+                <div class="social-login-container">
+                    <a href="/Account/GoogleLogin" class="google-btn">
+                        <img src="~/Content/images/google.png" alt="Google" />
+                    </a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+
+</div>
+
+

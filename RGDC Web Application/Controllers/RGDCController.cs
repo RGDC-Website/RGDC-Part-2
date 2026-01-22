@@ -17,5 +17,10 @@ namespace RGDC_Web_Application.Controllers
         {
             return View();
         }
+
+        public ActionResult logIn()
+        {
+            return View();
+        }
     }
 }
