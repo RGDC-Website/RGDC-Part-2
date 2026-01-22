@@ -18,6 +18,7 @@ a:hover {
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     border-radius: 15px;
 }
+
 .smallBtn:hover{
     background-color: #8d6e63 !important;
 
@@ -25,6 +26,12 @@ a:hover {
 
 .smallBtn:hover i {
     color:#fff !important;
+}
+
+.containerOverflow{
+    max-height: 20rem;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .dashContainer{
