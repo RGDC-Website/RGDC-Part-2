@@ -15,7 +15,7 @@
 <body>
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
-        <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh;">
+        <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
@@ -59,7 +59,7 @@
         </div>
 
         @*content*@
-        <div class="col s12 m9 l9">
+        <div class="col s12 m9 l9" style="margin-left: 25%">
             @RenderBody()
         </div>
     </div>
