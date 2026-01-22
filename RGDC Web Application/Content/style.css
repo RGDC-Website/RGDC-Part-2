@@ -1,2 +1,47 @@
-﻿body {
+﻿.navText {
+    font-size: 1.5rem;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+    padding-left: 1rem;
+}
+
+a{
+    border-radius: 15px
+}
+
+a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    text-decoration: none;
+}
+
+#smallBtn{
+    padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+    border-radius: 15px;
+}
+
+.dashContainer{
+    margin:0 1rem 0 1rem;
+}
+
+.equalSpace {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.bold{
+    font-weight:bold;
+}
+
+.overviewCard{
+/*    margin: 0 1rem 0 1rem;*/
+}
+
+.p-0 {
+    padding: 0 !important;
+}
+.p-1{
+    padding: 1rem !important;
+}
+.m-0{
+    margin: 0 !important;
 }
