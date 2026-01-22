@@ -67,3 +67,128 @@ a:hover {
 .m-0{
     margin: 0 !important;
 }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.split-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.left-side {
+    flex: 1;
+    background-color: #967863;
+}
+
+.right-side {
+    flex: 1;
+    background-color: #ffffff;
+}
+
+.input-field input[type=email],
+.input-field input[type=password] {
+    border: 1px solid #967863 !important;
+    border-radius: 15px !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    height: 3rem !important;
+}
+
+.input-field input:focus {
+    border: 2px solid #967863 !important;
+    box-shadow: none !important;
+}
+
+.btnLogin {
+    color: white;
+    background-color: #967863;
+    width: 100%;
+    height: 3rem;
+    border-radius: 15px;
+    margin-top: 10px;
+    border: none;
+}
+
+.btnLogin:active {
+        background-color: #836754;
+}
+
+.forgot-password-container {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.forgot-link {
+    color: #967863;
+    text-decoration: underline; 
+    font-size: 0.9rem;
+    transition: color 0.3s;
+    font-style: italic;
+}
+
+.forgot-link:hover {
+        color: #795548;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.checkbox-container [type="checkbox"].filled-in:checked + span:not(.lever):after {
+    border: 2px solid #967863;
+    border-radius: 5px;
+    background-color: #967863;
+}
+
+.checkbox-container span {
+    color: #333; 
+    font-size: 0.9rem;
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: #9e9e9e;
+    font-size: 0.9rem;
+}
+
+.login-divider::before, .login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.login-divider:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.login-divider:not(:empty)::after {
+    margin-left: .5em;
+}
+
+.social-login-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.google-btn img {
+    width: 40px; 
+    height: auto;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.google-btn img:hover {
+    transform: scale(1.1);
+}

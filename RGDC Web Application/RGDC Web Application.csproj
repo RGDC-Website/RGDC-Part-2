@@ -143,6 +143,8 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <Content Include="Content\images\dentalAppLogo.png" />
+    <Content Include="Content\images\google.png" />
     <Content Include="Content\style.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -186,6 +188,8 @@
     <Content Include="Views\Shared\_LoginLayout.cshtml" />
     <Content Include="Views\Shared\_adminLayout.cshtml" />
     <Content Include="Views\RGDC\adminDashboard.cshtml" />
+    <Content Include="Views\RGDC\logIn.cshtml" />
+    <Content Include="Views\Shared\_logInSignInLayout.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
