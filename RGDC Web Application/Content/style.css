@@ -29,6 +29,7 @@ a:hover {
 }
 
 .containerOverflow{
+    min-height: 12rem;
     max-height: 20rem;
     overflow-y: auto;
     overflow-x: hidden;
