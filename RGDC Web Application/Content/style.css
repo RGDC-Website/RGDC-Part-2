@@ -88,7 +88,8 @@ html, body {
 }
 
 .input-field input[type=email],
-.input-field input[type=password] {
+.input-field input[type=password],
+.input-field input[type=text] {
     border: 1px solid #967863 !important;
     border-radius: 15px !important;
     padding: 0 15px !important;
@@ -101,7 +102,7 @@ html, body {
     box-shadow: none !important;
 }
 
-.btnLogin {
+.logSignBtn {
     color: white;
     background-color: #967863;
     width: 100%;
@@ -111,7 +112,7 @@ html, body {
     border: none;
 }
 
-.btnLogin:active {
+.logSignBtn:active {
         background-color: #836754;
 }
 
@@ -188,4 +189,10 @@ html, body {
 
 .google-btn img:hover {
     transform: scale(1.1);
+}
+
+.signup-title {
+    font-weight: bold;
+    color: #967863;
+    margin-bottom:50px;
 }

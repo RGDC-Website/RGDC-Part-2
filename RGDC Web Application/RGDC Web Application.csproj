@@ -190,6 +190,7 @@
     <Content Include="Views\RGDC\adminDashboard.cshtml" />
     <Content Include="Views\RGDC\logIn.cshtml" />
     <Content Include="Views\Shared\_logInSignInLayout.cshtml" />
+    <Content Include="Views\RGDC\signUp.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
