@@ -16,24 +16,20 @@
             <h2 class="signup-title">Sign Up</h2>
 
             <form>
-                @*Name*@
-                <div class="input-field">
-                    <input id="name" type="text" placeholder="Name">
-                </div>
 
                 @*Email*@
                 <div class="input-field">
-                    <input id="email" type="email" placeholder="Email">
+                    <input id="email" ng-model="signUp_email" type="email" placeholder="Email">
                 </div>
 
                 @*Password*@
                 <div class="input-field">
-                    <input id="password" type="password" placeholder="Password">
+                    <input id="password" ng-model="signUp_password" type="password" placeholder="Password">
                 </div>
 
                 @*Confrim password*@
                 <div class="input-field">
-                    <input id="password" type="password" placeholder="Confirm password">
+                    <input id="password" ng-model="signUp_confPassword" type="password" placeholder="Confirm password">
                 </div>
 
                 @*Already have an account*@
@@ -114,18 +110,12 @@
                     @*Gender*@
                     <div class="col s3">
                         <p class="custom-label">Gender</p>
-                        <div class="gender-container">
-                            @*Male*@
-                            <label class="gender-radio gender-radio-male">
-                                <input name="gender" type="radio" value="Male" />
-                                <span>Male</span>
-                            </label>
-                            @*Female*@
-                            <label class="gender-radio">
-                                <input name="gender" type="radio" value="Female" />
-                                <span>Female</span>
-                            </label>
-                        </div>
+                        <select class="browser-default custom-input">
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="1">Male</option>
+                            <option value="2">Female</option>
+                            <option value="3">Others</option>
+                        </select>
                     </div>
                     @*Birthdate*@
                     <div class="col s3">
