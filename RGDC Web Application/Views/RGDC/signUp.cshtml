@@ -3,7 +3,7 @@
 }
 
 <div class="split-container">
-   
+
     <div class="right-side" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
 
         <img src="@Url.Content("~/Content/images/dentalAppLogo.png")" alt="Logo" style="width: 500px; height: auto; margin-bottom: 30px;" />
@@ -50,7 +50,7 @@
                 </div>
 
                 @*Sign up BTN*@
-                <button class="logSignBtn" type="submit">
+                <button class="logSignBtn modal-trigger" data-target="patientInformationForm" type="submit">
                     Sign Up
                 </button>
 
@@ -68,6 +68,925 @@
         </div>
 
     </div>
+
+    @*Patient information form*@
+    <div id="patientInformationForm" class="modal">
+        <div class="modal-content">
+            <h5 class="modal-form-title">Patient Information Form</h5>
+
+            <form>
+                <div class="row">
+                    <div class="col s4">
+                        @*Photo upload*@
+                        <div class="row s4 center-align photo-upload-container">
+                            <div class="col s12">
+                                <div class="photo-box">
+                                    <i class="material-icons photo-placeholder-icon">image</i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s8">
+                        <div class="row">
+                            @*First name*@
+                            <div class="col s6">
+                                <p class="custom-label">First Name</p>
+                                <input type="text" class="custom-input">
+                            </div>
+                            @*MIddle name*@
+                            <div class="col s6">
+                                <p class="custom-label">Middle Name</p>
+                                <input type="text" class="custom-input">
+                            </div>
+                        </div>
+                        <div class="row">
+                            @*Last name*@
+                            <div class="col s12">
+                                <p class="custom-label">Last Name</p>
+                                <input type="text" class="custom-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @*Gender*@
+                    <div class="col s3">
+                        <p class="custom-label">Gender</p>
+                        <div class="gender-container">
+                            @*Male*@
+                            <label class="gender-radio gender-radio-male">
+                                <input name="gender" type="radio" value="Male" />
+                                <span>Male</span>
+                            </label>
+                            @*Female*@
+                            <label class="gender-radio">
+                                <input name="gender" type="radio" value="Female" />
+                                <span>Female</span>
+                            </label>
+                        </div>
+                    </div>
+                    @*Birthdate*@
+                    <div class="col s3">
+                        <p class="custom-label">Birth Date</p>
+                        <div class="datepicker-wrapper">
+                            <input id="birthDate" type="text" class="datepicker custom-input">
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        </div>
+                    </div>
+                    <div class="col s3">
+                        @*Civil status*@
+                        <p class="custom-label">Civil Status</p>
+                        <select class="browser-default custom-input">
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="1">Single</option>
+                            <option value="2">Married</option>
+                            <option value="3">Widowed</option>
+                        </select>
+                    </div>
+                    <div class="col s3">
+                        @*Contact number*@
+                        <p class="custom-label">Contact Number</p>
+                        <input id="contactNumber" type="text" class="custom-input">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        @*Address*@
+                        <p class="custom-label">Address</p>
+                        <input id="address" type="text" class="custom-input">
+                    </div>
+                </div>
+
+                <div class="row">
+                    @*Current physician*@
+                    <div class="col s4">
+                        <p class="custom-label">Current Physician</p>
+                        <input type="text" class="custom-input">
+                    </div>
+                    @*Refferal*@
+                    <div class="col s4">
+                        <p class="custom-label">Referral (if any)</p>
+                        <input type="text" class="custom-input">
+                    </div>
+                    @*Last visit*@
+                    <div class="col s4">
+                        <p class="custom-label">Last Visit</p>
+                        <div class="datepicker-wrapper">
+                            <input id="lastVisit" type="text" class="datepicker custom-input">
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        </div>
+                    </div>
+
+                </div>
+
+                @*Agreementz*@
+                <div class="row agreement-section center-align">
+                    <label class="agreement-label">
+                        <input type="checkbox" class="filled-in" />
+                        <span class="agreement-text">I have read and agree to the 
+                        <a href="#" data-target="termsConditions" class="agreement-link modal-trigger">Terms and Conditions</a> and 
+                        <a href="#" data-target="dataPrivacy" class="agreement-link modal-trigger">Data Privacy Policy</a></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        @*Submit or cancel*@
+        <div class="modal-footer patient-modal-footer">
+            <a href="#!" class="modal-close btn btn-cancel">Cancel</a>
+            <button type="submit" class="btn btn-next">Submit</button>
+        </div>
+    </div>
+
+    @*Termz and condz*@
+    <div id="termsConditions" class="modal">
+        <div class="modal-content center-align">
+            <h4 class="modal-form-title-alt">Terms and Conditions</h4>
+            <h5 class="modal-form-title">Reyes-Guansing Dental Clinic (RGDC) Dental Management System</h5>
+
+            <div class="terms-scroll-container preserve-format">
+                Last Updated: December 17, 2025
+                Effective Date: [Date]
+
+                1. ACCEPTANCE OF TERMS
+                Welcome to the Reyes-Guansing Dental Clinic (RGDC) Dental Management System. These Terms and Conditions ("Terms", "T&C", or "Agreement") constitute a legally binding agreement between you ("User", "You", or "Your") and Reyes-Guansing Dental Clinic ("RGDC", "We", "Us", or "Our") governing your access to and use of the RGDC Dental Management System website and all associated services (collectively, the "System" or "Services").
+                By creating an account, you explicitly agree to be bound by these Terms and Conditions. During the account registration process, you must check the acknowledgment box confirming that you have read, understood, and agree to these Terms before your account can be created. Your agreement is timestamped and stored for legal compliance purposes. If you do not agree to these Terms, you must not create an account or use the System.
+                For Minor Patients: If you are creating an account for a patient under 18 years of age, you represent and warrant that you are the parent or legal guardian of the minor and have the authority to agree to these Terms on their behalf. You accept full responsibility for the minor's use of the System.
+                Continued Use: Your continued access to and use of the System after the effective date of any updates to these Terms constitutes your acceptance of such changes. It is your responsibility to review these Terms periodically.
+
+                2. DEFINITIONS AND USER TYPES
+                2.1 System Definitions
+                System: The RGDC Dental Management System, including the website interface, database, APIs, integrations, and all associated services and features.
+                Account: Your unique user profile within the System, protected by login credentials and associated with a specific user type.
+                Records: All data stored within the System including but not limited to patient information, dental records, treatment histories, appointments, billing information, and system logs.
+                Branch: Any physical location of Reyes-Guansing Dental Clinic operating under the RGDC network.
+                2.2 User Types and Access Privileges
+                The System recognizes four distinct user types, each with defined access privileges and responsibilities:
+                Owner
+                Access Level: Full administrative control over all System functions and data
+                Privileges: Create, modify, and delete all user accounts; access all patient records across all branches; configure system settings and security parameters; manage branch operations; view comprehensive audit trails and reports; suspend or delete accounts that violate these Terms
+                Responsibilities: Ensure System security and compliance; oversee proper use by all users; maintain confidentiality of administrative credentials; make final decisions on policy violations
+                Dentist
+                Access Level: Clinical record management and patient account oversight
+                Privileges: Create and manage patient accounts; access and modify dental records for assigned patients; document treatments and clinical notes; schedule and manage appointments; view and update treatment plans; access patient history for clinical decision-making
+                Responsibilities: Ensure accuracy of clinical documentation; maintain patient confidentiality; use System only for legitimate clinical purposes; report any suspected security breaches
+                Staff
+                Access Level: Administrative support functions
+                Privileges: Schedule and manage appointments; update patient contact information; process billing and payments; generate reports; manage clinic calendars; send notifications to patients; perform data entry tasks
+                Responsibilities: Maintain accuracy of administrative data; protect patient information; assist patients with account-related questions; follow clinic policies and procedures
+                Patient
+                Access Level: Limited access to personal information only
+                Privileges: View personal dental records and treatment history; access appointment schedules; update personal contact information; view billing statements; receive notifications and reminders; communicate with clinic staff
+                Responsibilities: Provide accurate personal and medical information; maintain confidentiality of login credentials; report any unauthorized account access; notify clinic of changes to contact information or medical history
+                2.3 Cross-Branch Access
+                Access to patient records across different RGDC branches is controlled by role-based permissions. Unless explicitly authorized by an Owner, users are typically limited to accessing records within their assigned branch to maintain appropriate data segregation and security.
+
+                3. ACCOUNT REGISTRATION AND REQUIREMENTS
+                3.1 Account Creation
+                To use the RGDC Dental Management System, you must create an account by providing accurate, complete, and current information including:
+                Full legal name
+                Valid email address
+                Contact phone number
+                Date of birth
+                Residential address
+                Emergency contact information (for patient accounts)
+                Any other information required during the registration process
+                For Patient Accounts: Your account will be created by an authorized RGDC Dentist or Staff member during your first visit or through the online registration portal. You will be required to set a secure password upon first login.
+                For Staff Accounts: Accounts are created by authorized Owners or designated administrators with appropriate role assignments.
+                3.2 Account Verification
+                Upon account creation, you may be required to verify your email address by clicking a verification link sent to the email you provided. Unverified accounts may have limited functionality until verification is completed.
+                3.3 Mandatory Agreement to Terms
+                As specified in Section 1, you must explicitly agree to these Terms and Conditions by checking the acknowledgment box during registration. This requirement addresses the clinic's commitment that "every patient kailangan may consent" to avoid potential legal disputes and ensures all users acknowledge their responsibilities regarding data storage and processing within the System.
+                3.4 Password Requirements and Security
+                You must create a strong password that meets the following minimum requirements:
+                At least 8 characters in length
+                Contains at least one uppercase letter
+                Contains at least one lowercase letter
+                Contains at least one number
+                Contains at least one special character (#, $, %, etc.)
+                You are solely responsible for maintaining the confidentiality of your password and account credentials. You must:
+                Never share your password with others
+                Change your password immediately if you suspect unauthorized access
+                Log out of your account when using shared or public computers
+                Notify RGDC immediately of any suspected security breach
+                3.5 Account Accuracy
+                You agree to provide accurate, current, and complete information during registration and to promptly update such information to maintain its accuracy. RGDC reserves the right to suspend or terminate accounts that contain false, inaccurate, or incomplete information.
+
+                4. SYSTEM FEATURES AND FUNCTIONALITY
+                4.1 Core System Features
+                The RGDC Dental Management System provides the following core features based on user type:
+                For All Users:
+                Secure login and authentication
+                Password reset functionality
+                Account settings management
+                Notification preferences
+                For Owners:
+                Complete user management across all branches
+                System configuration and settings
+                Comprehensive reporting and analytics
+                Audit trail access
+                Security monitoring and controls
+                For Dentists:
+                Patient record management
+                Treatment planning and documentation
+                Appointment scheduling
+                Clinical notes and progress tracking
+                Prescription management
+                Access to patient dental history
+                For Staff:
+                Appointment booking and calendar management
+                Patient registration and data entry
+                Billing and payment processing
+                Report generation
+                Email and SMS notification management
+                For Patients:
+                View personal dental records
+                Access appointment history and schedules
+                Update contact information
+                View treatment plans and recommendations
+                Receive appointment reminders
+                Access billing statements
+                4.2 Google Calendar API Integration
+                The System integrates with Google Calendar API to provide appointment synchronization features. By enabling this integration, you authorize the System to:
+                Create calendar events for your dental appointments
+                Update existing appointment events when changes occur
+                Delete calendar events when appointments are cancelled
+                Access your Google Calendar to prevent scheduling conflicts
+                You can enable or disable this integration at any time through your account settings. Disabling integration will not affect your appointments within the RGDC System but will stop synchronization with your Google Calendar.
+                4.3 Gmail API Integration
+                The System uses Gmail API to send automated email notifications for:
+                Appointment confirmations and reminders
+                Treatment updates and follow-up instructions
+                Password reset requests
+                System announcements and policy updates
+                Billing statements and payment receipts
+                Security alerts and account notifications
+                By creating an account, you consent to receive these automated emails. You can manage notification preferences in your account settings, though certain critical notifications (security alerts, legal notices) cannot be disabled.
+                4.4 Record Archival Period
+                When any record is deleted from the System—whether patient records, appointments, treatment notes, or user accounts—it enters a 30-day archival period before permanent deletion. During this period:
+                The record is marked as "deleted" but remains in the System database
+                The record is not visible through normal System operations
+                Authorized Owners can restore the record if deletion was made in error
+                The record cannot be modified during the archival period
+                After 30 days, the record is permanently and irreversibly deleted from all systems and backups
+                This archival period provides protection against accidental deletion and allows reasonable time for data recovery requests.
+                4.5 Patient Record Deletion
+                Patient records can be deleted under the following circumstances:
+                Patient requests account closure and record deletion
+                Owner determines records should be removed for policy violations
+                Legal requirements mandate record deletion
+                However, deletion requests are subject to:
+                The 30-day archival period described in Section 4.4
+                Legal record retention requirements (minimum 10 years for medical records)
+                Ongoing legal proceedings or disputes requiring record preservation
+                RGDC reserves the right to retain records beyond deletion requests when legally required or when deletion would compromise patient safety or clinic operations.
+                4.6 Appointment Management
+                The System provides comprehensive appointment scheduling features:
+                Real-time availability checking across dentists and branches
+                Automated conflict detection
+                Appointment reminders via email (24 hours and 1 hour before appointment)
+                Rescheduling and cancellation options
+                Waitlist management for fully booked time slots
+                Cancellation Policy: Patients should cancel or reschedule appointments at least 24 hours in advance when possible. Repeated missed appointments without notice may result in limitations on future booking privileges.
+                4.7 Treatment Record Management
+                Dentists document all treatments within the System, creating comprehensive records that include:
+                Clinical examinations and findings
+                Diagnoses and treatment plans
+                Procedures performed
+                Materials used
+                Post-treatment instructions
+                Follow-up recommendations
+                These records enter the 30-day archival period if deleted but are generally retained for the legally required minimum of 10 years to support continuity of care and emergency reference.
+                4.8 Security Features
+                The System implements multiple security measures to protect user accounts and patient data:
+                Password Encryption: All passwords are encrypted using industry-standard bcrypt hashing algorithms before storage. Passwords are never stored in plain text, and even system administrators cannot view your actual password.
+                Role-Based Access Control (RBAC): Access to data and System functions is strictly controlled based on user type. Users can only access information and perform actions appropriate to their assigned role.
+                Account Lockout: After 5 consecutive failed login attempts, your account is automatically locked for security purposes. You must contact RGDC support or wait 30 minutes for automatic unlock. This prevents brute force password attacks.
+                Session Timeout: User sessions automatically expire after 30 minutes of inactivity, requiring re-authentication. This protects against unauthorized access when devices are left unattended.
+                Audit Trails: All significant actions within the System are logged with user identity, timestamp, IP address, and action details. These logs are retained for security monitoring and compliance purposes as detailed in Section 4.12.
+                Two-Factor Authentication (Optional): Users may enable two-factor authentication for enhanced account security, requiring both password and a verification code from their mobile device.
+                4.9 Communication Features
+                The System facilitates communication between users through:
+                Automated email notifications for appointments and updates
+                Internal messaging between patients and clinic staff (where available)
+                Bulk announcements from clinic administration
+                Emergency contact notifications
+                All communications through the System are subject to monitoring for security and quality assurance purposes.
+                4.10 Billing and Payment Features
+                The System tracks billing information including:
+                Treatment costs and service fees
+                Payment history and outstanding balances
+                Insurance claims and coverage details
+                Payment receipts and statements
+                Patients can view their billing history and statements through their account dashboard. Actual payment processing may be handled separately and is subject to the clinic's payment policies.
+                4.11 Reporting and Analytics
+                Owners and authorized users can generate various reports:
+                Appointment statistics and trends
+                Patient demographics and visit frequencies
+                Treatment outcomes and success rates
+                Financial reports and revenue analysis
+                System usage and performance metrics
+                Reports containing patient information are subject to the same confidentiality and access control requirements as the underlying data.
+                4.12 Audit Trails and Compliance Logging
+                The System maintains comprehensive audit trails for compliance with healthcare regulations and data privacy laws:
+                Logged Activities:
+                All user login and logout events
+                Patient record access (viewing, editing, creation)
+                Appointment creation, modification, and deletion
+                Treatment record documentation
+                User account changes and administrative actions
+                System configuration changes
+                Security events and alerts
+                Audit Trail Retention: Audit logs are retained for a minimum of 3 years for compliance purposes and may be retained longer if required by legal proceedings or regulatory investigations.
+                Audit Trail Access: Only Owners and authorized system administrators can access audit trails. Audit logs cannot be modified or deleted by any user, ensuring integrity for compliance and legal purposes.
+
+                5. ACCEPTABLE USE POLICY
+                5.1 Permitted Uses
+                You may use the RGDC Dental Management System solely for the following legitimate purposes:
+                Receiving or providing dental healthcare services
+                Managing dental appointments and treatment schedules
+                Accessing personal dental records and health information
+                Performing authorized administrative tasks related to clinic operations
+                Communicating with RGDC regarding appointments, treatments, or account matters
+                5.2 Prohibited Activities
+                You agree NOT to engage in any of the following prohibited activities:
+                Unauthorized Access and Security Violations:
+                Attempting to access accounts, records, or system areas you are not authorized to access
+                Sharing your login credentials with others or using another person's credentials
+                Attempting to circumvent security measures, access controls, or authentication mechanisms
+                Probing, scanning, or testing System vulnerabilities without written authorization
+                Attempting to interfere with the proper functioning of the System
+                Data Misuse:
+                Accessing, copying, or using patient data for purposes unrelated to legitimate healthcare or clinic operations
+                Downloading bulk patient data without authorization
+                Using patient information for marketing, research, or commercial purposes without proper consent and approval
+                Sharing confidential patient information with unauthorized third parties
+                Creating unauthorized copies of patient records or system data
+                System Abuse:
+                Introducing viruses, malware, or malicious code into the System
+                Attempting denial-of-service attacks or overwhelming System resources
+                Using automated scripts or bots to access the System without authorization
+                Reverse engineering, decompiling, or attempting to extract source code
+                Creating fake or duplicate accounts
+                Fraudulent Activities:
+                Providing false information during registration or in patient records
+                Impersonating another person or user
+                Creating fraudulent billing entries or manipulating financial records
+                Using the System to commit insurance fraud
+                Harassment and Abuse:
+                Harassing, threatening, or abusing other users or RGDC staff
+                Using the System to send spam or unsolicited communications
+                Posting inappropriate, offensive, or illegal content
+                Legal Violations:
+                Using the System for any illegal purpose or in violation of Philippine law
+                Violating intellectual property rights
+                Using the System in ways that violate the Philippine Data Privacy Act or other regulations
+                5.3 Consequences of Violations
+                Violation of this Acceptable Use Policy may result in:
+                Immediate suspension of your account and access privileges
+                Permanent termination of your account
+                Notification to law enforcement authorities for illegal activities
+                Legal action to recover damages
+                Disciplinary action for RGDC employees or contractors
+                Criminal prosecution where applicable
+                RGDC reserves the right to investigate suspected violations, monitor system usage, and take appropriate action to protect the System, its users, and patient data.
+
+                6. SYSTEM LIMITATIONS AND DISCLAIMERS
+                6.1 Internet Connectivity Requirements
+                The RGDC Dental Management System is a web-based application that requires stable internet connectivity for proper functionality. The System is designed for real-time data synchronization across multiple branches, and network disruptions may temporarily impact:
+                Access to patient records and system features
+                Real-time appointment updates and calendar synchronization
+                Email notification delivery
+                Data synchronization between branches
+                Report generation and system performance
+                User Responsibility: You are responsible for maintaining adequate internet connectivity to access the System. RGDC is not liable for issues arising from poor internet connections, ISP outages, or network infrastructure problems beyond our control.
+                6.2 System Availability
+                While RGDC strives to maintain continuous System availability, we do not guarantee uninterrupted access. The System may be temporarily unavailable due to:
+                Scheduled maintenance and system upgrades
+                Emergency security patches and updates
+                Server maintenance or hardware failures
+                Network outages or connectivity issues
+                Cyber attacks or security incidents
+                Force majeure events (natural disasters, power outages, etc.)
+                Scheduled Maintenance: RGDC will attempt to schedule maintenance during low-usage periods and provide advance notice when possible. However, emergency maintenance may be performed without prior notice if necessary for security or system integrity.
+                6.3 Data Accuracy Disclaimer
+                While the System implements validation checks and security measures, RGDC does not guarantee the accuracy, completeness, or reliability of data entered by users. Users are responsible for:
+                Verifying the accuracy of information they enter or view
+                Reporting errors or discrepancies immediately
+                Exercising professional judgment in clinical decision-making
+                Not relying solely on System data for critical medical decisions
+                No Medical Advice: The System is a record-keeping and management tool. It does not provide medical advice, diagnoses, or treatment recommendations. All clinical decisions remain the responsibility of licensed dental professionals.
+                6.4 Third-Party Service Limitations
+                The System's integration with Google Calendar API and Gmail API depends on the availability and proper functioning of these third-party services. RGDC is not responsible for:
+                Outages or disruptions to Google services
+                Changes to third-party APIs that affect System functionality
+                Data handling practices of third-party service providers
+                Failures in appointment synchronization due to third-party issues
+                Undelivered emails due to spam filters or email service problems
+                6.5 Limitation of Liability
+                TO THE MAXIMUM EXTENT PERMITTED BY PHILIPPINE LAW:
+                RGDC, its owners, employees, dentists, staff, and service providers shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from:
+                Use or inability to use the System
+                Unauthorized access to or alteration of your data
+                System errors, bugs, or technical malfunctions
+                Data loss or corruption
+                Temporary unavailability of services
+                Reliance on information provided through the System
+                Decisions made based on System data
+                Maximum Liability: RGDC's total liability for any claims arising from these Terms or use of the System shall not exceed the amount paid by you (if any) for System access during the 12 months preceding the claim, or PHP 10,000, whichever is less.
+                Exceptions: This limitation does not apply to liability that cannot be excluded under Philippine law, including liability for gross negligence, willful misconduct, or violations of the Philippine Data Privacy Act.
+                6.6 Disclaimer of Warranties
+                THE SYSTEM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+                Warranties of merchantability or fitness for a particular purpose
+                Warranties of accuracy, reliability, or completeness of content
+                Warranties of uninterrupted or error-free operation
+                Warranties that all security vulnerabilities have been identified or corrected
+                RGDC makes no warranty that the System will meet your specific requirements or that defects will be corrected within any particular timeframe.
+                6.7 User Responsibility for Data Protection
+                While the System implements comprehensive security measures as described in Section 4.8, users share responsibility for data protection by:
+                Maintaining password confidentiality and not sharing credentials
+                Logging out after each session, especially on shared computers
+                Reporting suspected security breaches immediately
+                Following organizational security policies and procedures
+                Exercising caution when accessing the System on public networks
+                Keeping contact information current for security notifications
+                6.8 Backup Responsibility
+                While RGDC maintains regular system backups, users are encouraged to maintain their own copies of critical information. RGDC is not liable for permanent data loss in catastrophic scenarios despite backup procedures.
+
+                7. INTELLECTUAL PROPERTY RIGHTS
+                7.1 System Ownership
+                The RGDC Dental Management System, including its software, source code, design, features, functionality, user interface, graphics, logos, and all related intellectual property, is owned by or licensed to Reyes-Guansing Dental Clinic and is protected by Philippine and international copyright, trademark, and other intellectual property laws.
+                7.2 Limited License
+                Subject to your compliance with these Terms, RGDC grants you a limited, non-exclusive, non-transferable, revocable license to access and use the System solely for its intended purposes as described in Section 5.1. This license does not include any right to:
+                Copy, modify, or create derivative works of the System
+                Reverse engineer, decompile, or disassemble the System
+                Remove or alter any copyright, trademark, or proprietary notices
+                Use the System for competitive purposes or to develop competing products
+                Sublicense, sell, rent, lease, or transfer your access rights
+                7.3 User-Generated Content
+                You retain ownership of any personal information, dental records, or content you provide to the System. However, by using the System, you grant RGDC a non-exclusive license to store, process, and use this content as necessary to provide services, comply with legal obligations, and improve System functionality.
+                7.4 Feedback and Suggestions
+                If you provide feedback, suggestions, or ideas for improving the System, you grant RGDC an unrestricted, perpetual, royalty-free right to use, implement, and commercialize such feedback without compensation or attribution.
+                7.5 Trademark Usage
+                The RGDC name, logo, and related trademarks are the property of Reyes-Guansing Dental Clinic. You may not use these trademarks without prior written permission except as necessary to identify the clinic in normal communications.
+
+                8. PRIVACY AND DATA PROTECTION
+                8.1 Privacy Policy Incorporation
+                Your use of the System is also governed by the RGDC Privacy Policy, which is incorporated into these Terms by reference. The Privacy Policy explains how we collect, use, store, and protect your personal information in compliance with the Philippine Data Privacy Act of 2012 (Republic Act No. 10173).
+                8.2 Consent to Data Processing
+                By agreeing to these Terms, you explicitly consent to:
+                Collection and processing of your personal and sensitive personal information as described in the Privacy Policy
+                Storage of your dental records, treatment information, and health data within the System
+                Use of your information for the purposes outlined in Sections 4 and in the Privacy Policy
+                Sharing of your information with authorized RGDC personnel and integrated third-party services as described in the Privacy Policy
+                This explicit consent requirement addresses the clinic's commitment that "every patient kailangan may consent" to ensure legal protection and prevent disputes.
+                8.3 Data Subject Rights
+                You have rights under the Philippine Data Privacy Act including:
+                Right to access your personal information
+                Right to correct inaccurate data
+                Right to object to certain processing activities
+                Right to request deletion (subject to legal retention requirements)
+                Right to data portability
+                Right to file complaints with the National Privacy Commission
+                For details on exercising these rights, refer to the Privacy Policy.
+                8.4 Confidentiality Obligations
+                All users with access to patient information agree to maintain strict confidentiality and:
+                Access patient data only when necessary for legitimate purposes
+                Not disclose patient information to unauthorized persons
+                Comply with RGDC's data privacy policies and procedures
+                Report suspected privacy breaches immediately
+                Violation of confidentiality obligations may result in account termination, disciplinary action, and legal consequences.
+
+                9. ACCOUNT SUSPENSION AND TERMINATION
+                9.1 Voluntary Account Termination
+                You may request to close your account at any time by:
+                Submitting a written request to RGDC administration
+                Contacting the Data Privacy Officer
+                Using the account deletion feature (if available in your account settings)
+                Upon receiving your termination request:
+                Your account access will be immediately disabled
+                Your data will enter the 30-day archival period as described in Section 4.4
+                After 30 days, your data will be permanently deleted, except where legal retention requirements mandate longer retention (minimum 10 years for medical records)
+                You will receive confirmation of account closure via email
+                9.2 Involuntary Account Suspension
+                RGDC reserves the right to suspend your account immediately, without prior notice, if:
+                You violate any provision of these Terms and Conditions
+                You engage in prohibited activities as described in Section 5.2
+                Your account shows signs of unauthorized access or compromise
+                We receive legal orders requiring account suspension
+                Your account is used fraudulently or for illegal purposes
+                You repeatedly fail to pay outstanding balances (for patient accounts)
+                During suspension:
+                You will not be able to access the System
+                Your data remains in the System and is not deleted
+                RGDC will investigate the circumstances leading to suspension
+                You may be required to verify your identity or address concerns before reinstatement
+                9.3 Account Termination by RGDC
+                RGDC may permanently terminate your account if:
+                Violations of these Terms are severe or repeated
+                Suspension investigations reveal serious policy breaches
+                You fail to correct violations after being given opportunity to do so
+                Continued account access poses security risks to the System or other users
+                You engage in harassment, fraud, or illegal activities
+                Owner Authority: As specified in Section 2.2, Owners have the authority to suspend or delete accounts that violate policies. Termination decisions are final, though you may appeal through the contact procedures in Section 14.
+                9.4 Effect of Termination
+                Upon account termination:
+                All access rights immediately cease
+                The 30-day archival period begins for deletable data
+                Medical records are retained for the legally required minimum period regardless of account status
+                You remain liable for any outstanding obligations or damages incurred before termination
+                Provisions of these Terms that by their nature should survive (intellectual property rights, limitation of liability, dispute resolution) continue to apply
+                9.5 No Refunds
+                Account suspension or termination, whether voluntary or involuntary, does not entitle you to refunds for any services already provided or payments already made.
+
+                10. MODIFICATIONS TO TERMS AND CONDITIONS
+                10.1 Right to Modify
+                RGDC reserves the right to update, modify, revise, or replace any provision of these Terms and Conditions at any time to reflect:
+                Changes in System features or functionality
+                Updates to legal or regulatory requirements
+                Improvements to security or privacy protections
+                Changes in business practices or clinic policies
+                Corrections of errors or clarifications of existing terms
+                10.2 Version Control
+                The System maintains version control of these Terms and Conditions. Each version is:
+                Timestamped with an "Effective Date" and "Last Updated" date
+                Stored in the System for historical reference
+                Available for review by users upon request
+                10.3 Notification of Significant Changes
+                When significant changes are made that materially affect your rights or obligations, RGDC will notify you through:
+                Email notification sent to your registered email address using the Gmail API integration
+                Prominent notice displayed on your dashboard upon next login
+                System announcement or banner notification
+                Notification Timeline: You will typically receive notification at least 30 days before significant changes take effect, though shorter notice periods may apply for urgent security updates or legally required changes.
+                10.4 Notification of Minor Changes
+                For minor, non-material changes such as:
+                Formatting or organizational improvements
+                Clarifications that don't change substantive meaning
+                Updates to contact information
+                Corrections of typographical errors
+                RGDC may update these Terms without direct notification. However, the "Last Updated" date at the top of the document will always reflect the most recent modification.
+                10.5 Acceptance of Changes
+                Continued Use Constitutes Acceptance: As stated in Section 1, your continued use of the System after the effective date of updated Terms constitutes your acceptance of and agreement to be bound by the modified Terms.
+                If you do not agree with the modified Terms, you must:
+                Discontinue use of the System immediately
+                Request account closure as described in Section 9.1
+                Contact RGDC to discuss your concerns
+                10.6 Right to Reject Changes
+                If you disagree with significant changes to these Terms, you have the right to:
+                Reject the changes by closing your account before the effective date
+                Request copies of your records (subject to applicable fees and retention requirements)
+                File a complaint as described in Section 11
+                However, rejection of updated Terms requires discontinuation of System use, as continued use indicates acceptance.
+                10.7 Review Responsibility
+                You are responsible for reviewing these Terms periodically to stay informed of updates. RGDC recommends reviewing the Terms at least quarterly or whenever you receive notification of changes.
+
+                11. DISPUTE RESOLUTION
+                11.1 Governing Law
+                These Terms and Conditions are governed by and construed in accordance with the laws of the Republic of the Philippines, without regard to conflict of law principles. Any disputes arising from these Terms or your use of the System shall be subject to the exclusive jurisdiction of the courts of [City/Region], Philippines.
+                11.2 Informal Resolution
+                Before initiating formal legal proceedings, you agree to first attempt to resolve any dispute informally by:
+                Contacting RGDC's customer service or administration
+                Clearly describing the nature of the dispute and desired resolution
+                Providing RGDC with a reasonable opportunity (typically 30 days) to address your concerns
+                RGDC is committed to resolving disputes fairly and efficiently through good-faith negotiation.
+                11.3 Mediation
+                If informal resolution is unsuccessful, the parties agree to attempt mediation before pursuing litigation. Mediation will be:
+                Conducted by a mutually agreed upon mediator or mediation service
+                Held in [City], Philippines or via virtual meeting if agreed
+                Conducted in English or Tagalog as agreed by the parties
+                Non-binding, with each party retaining the right to pursue litigation if mediation fails
+                Mediation costs will be shared equally unless otherwise agreed.
+                11.4 Arbitration (Optional)
+                By mutual written agreement, disputes may be submitted to binding arbitration under the rules of the Philippine Dispute Resolution Center, Inc. or similar arbitration body. Unless otherwise agreed:
+                Arbitration will be conducted in [City], Philippines
+                The arbitrator's decision will be final and binding
+                Each party will bear their own costs unless the arbitrator rules otherwise
+                11.5 Litigation
+                If informal resolution, mediation, and arbitration (if attempted) are unsuccessful, disputes may be brought before the appropriate courts of [City/Region], Philippines. You agree to submit to the personal jurisdiction of these courts.
+                11.6 Class Action Waiver
+                To the extent permitted by law, you agree that disputes will be resolved on an individual basis only. You waive any right to participate in class action lawsuits or class-wide arbitration against RGDC.
+                11.7 Time Limitation on Claims
+                You must file any claim related to these Terms or your use of the System within one (1) year from the date the claim arose. Claims filed after this period are barred.
+                11.8 Equitable Relief
+                Notwithstanding the above dispute resolution procedures, RGDC may seek immediate equitable relief (such as injunctions) from any court of competent jurisdiction to prevent irreparable harm, intellectual property violations, or security breaches, without first pursuing informal resolution or mediation.
+
+                12. INDEMNIFICATION
+                12.1 Your Indemnification Obligation
+                You agree to indemnify, defend, and hold harmless RGDC, its owners, directors, officers, employees, dentists, staff, contractors, agents, licensors, and service providers (collectively, the "Indemnified Parties") from and against any and all claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising from or related to:
+                Your violation of these Terms and Conditions
+                Your violation of any applicable laws or regulations
+                Your violation of the Philippine Data Privacy Act or other data protection laws
+                Your unauthorized use of the System or access to restricted areas
+                Your infringement of intellectual property rights
+                Content or information you submit to the System
+                Your negligence or willful misconduct
+                Claims by third parties related to your use of the System
+                Data breaches resulting from your failure to maintain password confidentiality
+                12.2 RGDC's Right to Defend
+                RGDC reserves the right, at its own expense, to assume exclusive defense and control of any matter subject to indemnification by you. You agree to cooperate fully with RGDC's defense of such claims.
+                12.3 Notification Requirement
+                You must promptly notify RGDC of any claims or potential claims that may trigger your indemnification obligation, allowing RGDC to participate in defense or settlement negotiations.
+
+                13. MISCELLANEOUS PROVISIONS
+                13.1 Entire Agreement
+                These Terms and Conditions, together with the Privacy Policy and any other policies or guidelines referenced herein, constitute the entire agreement between you and RGDC regarding use of the System and supersede all prior or contemporaneous communications, agreements, and understandings, whether written or oral.
+                13.2 Severability
+                If any provision of these Terms is found to be invalid, illegal, or unenforceable by a court of competent jurisdiction, such provision shall be modified to the minimum extent necessary to make it valid and enforceable, or if modification is not possible, shall be severed from these Terms. The remaining provisions shall continue in full force and effect.
+                13.3 Waiver
+                RGDC's failure to enforce any right or provision of these Terms shall not constitute a waiver of that right or provision. No waiver of any provision shall be deemed a further or continuing waiver of such provision or any other provision.
+                13.4 Assignment
+                You may not assign, transfer, or delegate your rights or obligations under these Terms without RGDC's prior written consent. RGDC may assign these Terms, in whole or in part, to any successor entity in connection with a merger, acquisition, corporate reorganization, or sale of substantially all assets, provided the assignee agrees to honor these Terms.
+                13.5 Force Majeure
+                RGDC shall not be liable for any failure or delay in performing obligations under these Terms due to circumstances beyond its reasonable control, including but not limited to:
+                Natural disasters (earthquakes, typhoons, floods, fires)
+                Pandemics or public health emergencies
+                War, terrorism, or civil unrest
+                Government actions, regulations, or orders
+                Strikes or labor disputes
+                Power outages or telecommunications failures
+                Cyber attacks or malicious third-party actions
+                During force majeure events, RGDC's obligations are suspended for the duration of the event, and performance timelines are extended accordingly.
+                13.6 No Third-Party Beneficiaries
+                These Terms are for the benefit of you and RGDC only. No provision of these Terms creates any third-party beneficiary rights in any other person or entity.
+                13.7 Headings
+                Section headings are for convenience only and do not affect the interpretation of these Terms.
+                13.8 Language
+                These Terms are drafted in English. If translated into other languages, the English version shall prevail in case of any discrepancies.
+                13.9 Survival
+                Provisions of these Terms that by their nature should survive termination shall survive, including but not limited to: intellectual property rights, limitation of liability, indemnification, dispute resolution, and data retention obligations.
+                13.10 Independent Contractor Relationship
+                Nothing in these Terms creates a partnership, joint venture, employment, or agency relationship between you and RGDC. You are an independent user of the System and have no authority to bind RGDC or make representations on its behalf.
+
+                14. CONTACT INFORMATION
+                If you have questions, concerns, or requests regarding these Terms and Conditions, or need to report violations or security issues, please contact:
+                Reyes-Guansing Dental Clinic
+                Legal and Compliance Department
+                [Complete Clinic Address]
+                [City, Province, ZIP Code]
+                General Inquiries:
+                Email: legal@rgdc.com.ph
+                Phone: [Primary Contact Number]
+                Business Hours: [Days and Hours of Operation]
+                Technical Support:
+                Email: support@rgdc.com.ph
+                Phone: [Technical Support Number]
+                Data Privacy Officer (for privacy-related concerns):
+                Email: privacy@rgdc.com.ph
+                Phone: [DPO Contact Number]
+                Emergency Security Issues:
+                Email: security@rgdc.com.ph
+                Phone: [24/7 Security Hotline if available]
+                Response Timeframe: We strive to respond to all inquiries within 3-5 business days. Urgent security matters receive immediate attention.
+                Written Notices: Formal written notices under these Terms should be sent via registered mail to the address above, marked "Attention: Legal Department."
+
+                15. ACKNOWLEDGMENT AND ACCEPTANCE
+                BY CHECKING THE "I AGREE" BOX DURING ACCOUNT REGISTRATION AND CLICKING THE "CREATE ACCOUNT" BUTTON, YOU ACKNOWLEDGE AND CONFIRM THAT:
+                ✓ You have carefully read and fully understand these Terms and Conditions in their entirety
+                ✓ You agree to be legally bound by all provisions of these Terms
+                ✓ You understand your rights, responsibilities, and obligations as a System user
+                ✓ You consent to the collection, processing, and storage of your personal data as described in these Terms and the Privacy Policy
+                ✓ You agree to comply with the Acceptable Use Policy and all other requirements
+                ✓ You understand that violations may result in account suspension or termination
+                ✓ You understand the System limitations and disclaimers of warranty
+                ✓ For minor patients: You are the parent or legal guardian with authority to consent on behalf of the minor
+                ✓ You have had the opportunity to seek independent legal advice regarding these Terms if desired
+                Your acceptance is timestamped and stored for legal compliance and audit purposes.
+
+                16. EFFECTIVE DATE AND UPDATES
+                Effective Date: These Terms and Conditions are effective as of December 17, 2025.
+                Last Updated: This document was last updated on December 17, 2025.
+                Previous Versions: Historical versions of these Terms are maintained by RGDC and are available upon request for users who wish to review changes over time.
+                Periodic Review: RGDC conducts periodic reviews of these Terms to ensure they remain current, accurate, and compliant with applicable laws. Users are encouraged to review these Terms regularly.
+
+                © 2025 Reyes-Guansing Dental Clinic. All Rights Reserved.
+
+                These Terms and Conditions are designed to comply with Philippine law including the Philippine Data Privacy Act of 2012 (Republic Act No. 10173), Civil Code provisions, Electronic Commerce Act (Republic Act No. 8792), and other applicable regulations. For questions about specific legal provisions or requirements, please consult with qualified legal counsel.
+                This document serves as a legally binding agreement between users and Reyes-Guansing Dental Clinic. By using the RGDC Dental Management System, you signify your acceptance of these terms.
+
+
+            </div>
+
+        </div>
+        @*Agreel*@
+        <div class="modal-footer patient-modal-footer">
+            <a href="#!" class="modal-close btn btn-next">I Agree</a>
+        </div>
+    </div>
+
+    @*Data privacy*@
+    <div id="dataPrivacy" class="modal">
+        <div class="modal-content center-align">
+            <h4 class="modal-form-title-alt">Terms and Conditions</h4>
+            <h5 class="modal-form-title">Reyes-Guansing Dental Clinic (RGDC) Dental Management System</h5>
+
+            <div class="terms-scroll-container preserve-format">
+                1. INTRODUCTION
+                Welcome to the Reyes-Guansing Dental Clinic (RGDC) Dental Management System. This Privacy Policy explains how we collect, use, store, share, and protect your personal information when you use our website and services. We are committed to protecting your privacy and ensuring the security of your sensitive health information in compliance with the Philippine Data Privacy Act of 2012 (Republic Act No. 10173).
+                By creating an account and using the RGDC Dental Management System, you acknowledge that you have read, understood, and agree to the practices described in this Privacy Policy. If you do not agree with this policy, please do not use our services.
+
+                2. INFORMATION WE COLLECT
+                2.1 Personal Information
+                We collect the following personal information to provide dental healthcare services and manage your account:
+                Full name, date of birth, age, and gender
+                Contact information including email address, phone number, and home address
+                Emergency contact details for urgent situations
+                Government-issued identification numbers when required for insurance claims or legal purposes
+                2.2 Sensitive Personal Information
+                As a healthcare provider, we collect and process sensitive personal information necessary for delivering quality dental care:
+                Complete dental history including previous treatments, procedures, and outcomes
+                Comprehensive medical records relevant to dental treatment
+                Treatment plans, clinical diagnoses, and progress notes created by dentists
+                Dental charts, x-rays, photographs, and other diagnostic images
+                Current and past medication history including dosages and frequencies
+                Known allergies to medications, materials, or substances
+                Insurance information and billing records for payment processing
+                2.3 Account and System Information
+                To maintain system security and functionality, we automatically collect:
+                Username and encrypted password for account access
+                Account creation date and assigned user role (Owner, Dentist, Staff, or Patient)
+                Login timestamps and session duration for security monitoring
+                IP addresses and device information to prevent unauthorized access
+                Appointment history, scheduling preferences, and attendance records
+                System interaction logs for troubleshooting and service improvement
+
+                3. HOW WE COLLECT YOUR INFORMATION
+                We collect your information through multiple methods designed to provide comprehensive dental care:
+                Direct Input: You provide information voluntarily during account registration, profile updates, appointment booking, and when communicating with our staff.
+                Clinical Documentation: Our licensed dentists and authorized staff record information during in-person consultations, examinations, treatments, and follow-up visits.
+                System Integration: We utilize Google Calendar API to synchronize appointment schedules and Gmail API to send email notifications, confirmations, and reminders.
+                Automated System Logs: Our system automatically generates audit trails that record user activities, access patterns, and system events for security monitoring and regulatory compliance.
+
+                4. HOW WE USE YOUR INFORMATION
+                Your personal and sensitive information is used exclusively for the following legitimate purposes:
+                Healthcare Delivery: Providing comprehensive dental healthcare services, maintaining accurate treatment records, developing personalized treatment plans, tracking treatment progress, and ensuring continuity of care across multiple visits and clinic branches.
+                Appointment Management: Scheduling dental appointments, sending automated reminders via email, coordinating schedules across multiple dentists and branches, managing waitlists, and reducing missed appointments through proactive communication.
+                Communication: Sending appointment confirmations and changes, providing treatment updates and post-procedure care instructions, sharing important clinic announcements and policy changes, requesting feedback on services, and responding to your inquiries and concerns.
+                Administrative Operations: Processing billing and insurance claims accurately, maintaining organized financial records, managing inventory and supplies, coordinating staff schedules, and supporting efficient clinic operations across all branches.
+                Legal and Regulatory Compliance: Meeting healthcare documentation requirements, responding to valid legal requests and court orders, maintaining records for the mandated retention period, supporting medical-legal cases when necessary, and ensuring compliance with Department of Health regulations.
+                Security and Fraud Prevention: Protecting your account from unauthorized access, detecting and preventing fraudulent activities, investigating security incidents, monitoring system integrity, and enforcing our Terms and Conditions.
+                Service Improvement: Analyzing usage patterns to enhance system functionality, identifying areas for operational improvement, developing new features based on user needs, and ensuring the platform meets evolving healthcare standards.
+
+                5. DATA SHARING AND DISCLOSURE
+                Reyes-Guansing Dental Clinic respects your privacy and does not sell, rent, or trade your personal information to third parties for commercial purposes. Your information may only be shared under the following strictly limited circumstances:
+                Within the Clinic Network: Your information is accessible to authorized RGDC personnel across our clinic branches who have a legitimate need to access your records to provide healthcare services. This includes dentists who treat you, administrative staff who manage your appointments and billing, and clinic owners who oversee operations. All personnel are bound by professional confidentiality obligations and data privacy training requirements.
+                Trusted Service Providers: We utilize reputable third-party services essential for system functionality, specifically Google Calendar API for appointment synchronization and Gmail API for email communications. These providers operate under strict confidentiality agreements and are contractually obligated to protect your information. They can only access information necessary to perform their specific services and cannot use your data for their own purposes.
+                Legal and Regulatory Requirements: We may disclose your information when required by Philippine law, valid court orders, subpoenas, or government regulations. This includes responding to Department of Health inquiries, cooperating with law enforcement investigations involving legitimate healthcare matters, and complying with National Privacy Commission directives. We will notify you of such disclosures unless legally prohibited.
+                Protection of Rights and Safety: We may share information when necessary to protect the legal rights of the clinic, prevent fraud or abuse of our services, respond to emergency situations where your health or safety is at risk, enforce our Terms and Conditions, or protect the rights and safety of other patients, staff, or the public.
+                With Your Explicit Consent: When you provide clear, informed consent, we may share your information for specific purposes such as referring you to dental specialists outside our clinic, coordinating care with your other healthcare providers, processing insurance claims with your insurer, or sharing information with family members you designate.
+                Business Transfers: In the unlikely event that RGDC is involved in a merger, acquisition, or sale of assets, your information may be transferred to the acquiring entity, which will be required to honor this Privacy Policy and maintain the same level of data protection.
+
+                6. DATA RETENTION PERIODS
+                RGDC maintains your information for different periods based on legal requirements, healthcare standards, and operational needs:
+                Active Patient Records: While you remain an active patient receiving ongoing dental care, your complete records are maintained indefinitely to ensure continuity of care, track treatment history, and provide reference for future procedures.
+                Inactive Patient Records: Following your last visit or account closure, records are retained for a minimum of 10 years in accordance with healthcare regulations and professional standards. This extended retention period allows dentists to reference your dental history in case of dental emergencies, complications from previous treatments, legal disputes, or if you return for care after an extended absence.
+                Deleted Records Archival Period: When you request account deletion, your data is not immediately and permanently deleted. Instead, it enters a 30-day archival period during which the data remains in our secure systems but is marked for deletion and inaccessible through normal system operations. This grace period allows recovery if you change your mind or if the deletion request was made in error. After 30 days, the data is permanently and irreversibly deleted from all systems and backups.
+                Legal Hold Periods: If your records become subject to legal proceedings, regulatory investigations, pending insurance claims, or government audits, they will be retained beyond normal periods as required by law, court order, or regulatory directive, regardless of deletion requests.
+                System Logs and Audit Trails: Security logs, access records, and audit trails containing your user activities are retained for a minimum of 3 years to support security investigations, comply with data privacy regulations, and maintain accountability for system access.
+
+                7. YOUR PRIVACY RIGHTS
+                Under the Philippine Data Privacy Act of 2012 (Republic Act No. 10173), you have the following rights regarding your personal information:
+                Right to Be Informed: You have the right to receive clear, transparent information about how we collect, use, and process your personal data. This Privacy Policy fulfills that obligation, and we also provide specific notices during account registration and when collecting sensitive information.
+                Right to Access: You can view, download, and review your personal information, dental records, treatment history, and appointment records through your patient dashboard at any time. For information not available through your account, you may submit a formal access request to our Data Privacy Officer.
+                Right to Rectification: If you discover that your personal information is inaccurate, incomplete, or outdated, you can request corrections through your account settings or by contacting our administrative staff. We will verify and update your information promptly, notifying any third parties with whom the information was shared if necessary.
+                Right to Erasure or Blocking: You may request deletion or blocking of your personal data when it is no longer necessary for the purposes for which it was collected, when you withdraw consent (where consent was the basis for processing), or when processing is unlawful. However, this right is subject to our legal obligation to retain medical records for 10 years for healthcare compliance, patient safety, and potential legal requirements.
+                Right to Object: You can object to the processing of your personal data for specific purposes such as direct marketing or automated decision-making. While we cannot stop processing information essential for providing healthcare services or meeting legal obligations, we will honor objections to non-essential processing activities.
+                Right to Data Portability: Upon request, we will provide copies of your dental records and personal information in a structured, commonly used, and machine-readable electronic format (such as PDF or CSV) that allows you to transfer the data to another healthcare provider or system.
+                Right to Withdraw Consent: For data processing activities based on your consent rather than legal obligation, you may withdraw your consent at any time. However, withdrawal does not affect the lawfulness of processing that occurred before withdrawal, and we may need to continue processing certain information to fulfill our legal and professional obligations.
+                Right to File a Complaint: If you believe your data privacy rights have been violated, you have the right to file a complaint with RGDC's Data Privacy Officer and/or directly with the National Privacy Commission. We are committed to resolving your concerns promptly and transparently.
+                Right to Damages: Under Republic Act No. 10173, you may be entitled to compensation if you suffer damage due to inaccurate, incomplete, outdated, false, unlawfully obtained, or unauthorized use of your personal data.
+                To exercise any of these rights, please contact our Data Privacy Officer using the contact information provided in Section 13 of this Privacy Policy. We will respond to your request within the timeframes required by law, typically within 15 business days for straightforward requests.
+
+                8. DATA SECURITY MEASURES
+                RGDC implements comprehensive technical, organizational, and physical security measures to protect your sensitive personal information from unauthorized access, disclosure, alteration, and destruction:
+                Encryption and Data Protection: All user passwords are encrypted using industry-standard bcrypt or similar hashing algorithms, making them unreadable even to system administrators. All data transmitted between your device and our servers is protected using HTTPS/TLS encryption protocols. Sensitive personal information stored in our databases is encrypted at rest using AES-256 or equivalent encryption standards.
+                Access Controls: We implement strict role-based access control (RBAC) systems that limit data access based on job function. Owners have full administrative control, Dentists can access clinical records for their patients, Staff can access administrative functions, and Patients can only view their own information. Access to sensitive functions requires additional authentication. All access to patient records is logged in our audit trail system.
+                Authentication Security: The system enforces strong password requirements including minimum length, complexity rules, and prohibition of commonly used passwords. User accounts are automatically locked after 5 consecutive failed login attempts to prevent brute force attacks. We offer optional multi-factor authentication for enhanced security. Sessions automatically timeout after periods of inactivity, requiring re-authentication.
+                Audit Trails and Monitoring: Every action involving patient data—including viewing, editing, adding, or deleting records—is automatically logged with the user's identity, timestamp, IP address, and action type. These comprehensive audit trails are regularly reviewed for suspicious activities and are maintained for compliance purposes. Anomalous access patterns trigger automatic security alerts.
+                Network Security: Our systems are protected by enterprise-grade firewalls that filter all incoming and outgoing network traffic. We employ intrusion detection and prevention systems (IDS/IPS) that monitor for malicious activities. Regular vulnerability scans and penetration testing identify and address security weaknesses. All systems are updated with the latest security patches.
+                Data Backup and Recovery: Patient data is automatically backed up daily to secure, geographically distributed servers to prevent data loss from hardware failures, natural disasters, or cyber attacks. Backups are encrypted and access-controlled. We maintain comprehensive disaster recovery plans to restore services quickly. Backup integrity is regularly tested.
+                Physical Security: Our servers and network infrastructure are housed in secure data centers with restricted physical access, 24/7 surveillance, environmental controls, and redundant power supplies. Only authorized IT personnel can access server rooms. Workstations in clinic branches are positioned to prevent unauthorized viewing of patient information.
+                Employee Training and Policies: All RGDC employees, contractors, and third-party service providers with access to patient information undergo mandatory data privacy and security training. Staff sign confidentiality agreements and are subject to disciplinary action for violations. Access privileges are immediately revoked when employees leave or change roles.
+                Incident Response: We maintain a formal security incident response plan that defines procedures for detecting, containing, investigating, and remediating security breaches. In the event of a data breach affecting your personal information, we will notify you and the National Privacy Commission within 72 hours as required by law, provide details about the breach, and offer guidance on protective measures.
+                Security Limitations: Despite our comprehensive security measures, no system connected to the internet is completely secure from all possible threats. While we cannot guarantee absolute security, we commit to maintaining industry-leading security practices, continuously improving our defenses, and promptly addressing any security incidents that occur.
+
+                9. COOKIES AND TRACKING TECHNOLOGIES
+                The RGDC Dental Management System uses cookies and similar tracking technologies to enhance your experience and maintain system functionality:
+                Session Cookies: These essential cookies maintain your login session, allowing you to navigate between pages without repeatedly logging in. Session cookies are automatically deleted when you close your browser and do not track your activities across other websites.
+                Preference Cookies: We use cookies to remember your settings and preferences such as language selection, date format, dashboard layout, and notification preferences. These cookies improve your user experience by maintaining your customized settings between sessions.
+                Security Cookies: Security-focused cookies help us detect fraudulent activities, prevent unauthorized access, implement account lockout mechanisms after failed login attempts, and verify that requests are coming from legitimate users rather than automated bots.
+                Analytics Cookies: We may use cookies to collect aggregated, non-personally identifiable information about how users interact with our system. This includes tracking which features are most used, identifying pages with errors, monitoring system performance, and understanding navigation patterns. This information helps us improve the system's functionality and user experience.
+                Third-Party Cookies: Our integration with Google Calendar and Gmail may result in cookies from Google being placed on your device to facilitate appointment synchronization and email notifications. These third-party cookies are governed by Google's privacy policies, which we encourage you to review.
+                Managing Cookies: You can control and manage cookies through your web browser settings. Most browsers allow you to refuse cookies, delete existing cookies, or receive warnings before cookies are stored. However, disabling cookies may limit certain features of the RGDC system, such as automatic login, personalized settings, and appointment synchronization. Essential cookies required for core system functionality cannot be disabled without affecting your ability to use the system.
+                Do Not Track Signals: Our system does not currently respond to "Do Not Track" signals from web browsers, as there is no industry-wide standard for how such signals should be interpreted and implemented.
+
+                10. THIRD-PARTY SERVICES AND LINKS
+                The RGDC Dental Management System integrates with third-party services to provide enhanced functionality:
+                Google Calendar API: We use Google Calendar API to synchronize your dental appointments with your personal Google Calendar, allowing you to manage your schedule across multiple devices and receive reminders through your preferred calendar application. When you enable this integration, we share your appointment date, time, and clinic location with Google's services.
+                Gmail API: We utilize Gmail API to send automated email notifications including appointment confirmations, reminders, treatment updates, system announcements, and password reset requests. This integration allows for reliable, timely delivery of important communications.
+                Third-Party Privacy Policies: These third-party services operate under their own privacy policies and terms of service. While we carefully select reputable service providers and require them to maintain appropriate security measures, we are not responsible for their privacy practices. We encourage you to review:
+                Google Privacy Policy: https://policies.google.com/privacy
+                Google Terms of Service: https://policies.google.com/terms
+                Data Minimization with Third Parties: We share only the minimum information necessary for these services to function. Third parties do not receive access to your complete medical records, treatment details, or other sensitive health information beyond what is essential for their specific service.
+                External Links: Our website may contain links to external resources such as insurance provider portals, dental product information, or educational content. These external websites are not operated by RGDC and are not covered by this Privacy Policy. We are not responsible for the content, privacy practices, or security of external websites. When you click on external links, you leave our system and should review the privacy policies of those sites.
+                Service Provider Agreements: All third-party service providers with access to patient information operate under contractual agreements that require them to maintain confidentiality, implement appropriate security measures, use data only for authorized purposes, comply with Philippine data privacy laws, and immediately report any security incidents.
+
+                11. CHILDREN'S PRIVACY
+                The RGDC Dental Management System provides dental healthcare services to patients of all ages, including minors (individuals under 18 years of age in the Philippines):
+                Parental Consent Required: For patients under 18 years of age, we require a parent or legal guardian to create and manage the account. During registration, the parent or guardian must provide their own contact information and explicitly consent to the collection and processing of their child's personal and health information.
+                Guardian Responsibilities: Parents and legal guardians are responsible for:
+                Providing accurate information about their child
+                Managing their child's account settings and preferences
+                Reviewing their child's dental records and treatment plans
+                Authorizing appointments and treatments
+                Ensuring their child's account credentials remain secure
+                Updating information as their child grows and circumstances change
+                Access to Minor's Information: Parents and legal guardians have full access to their child's dental records, appointment history, and all other account information through their linked guardian account. This access continues until the child reaches 18 years of age, at which point the account can be transitioned to the now-adult patient's independent control.
+                Limited Independent Use: Minors may be given supervised access to view their own appointment schedules and basic information, but cannot make changes to records, schedule appointments independently, or access billing information without parental oversight.
+                Protecting Children's Information: We implement the same rigorous security measures to protect children's information as we do for adult patients. We do not use children's information for marketing purposes or share it with third parties except as described in this Privacy Policy and with parental consent.
+                Transition to Adult Status: When a patient reaches 18 years of age, we can assist in transitioning the account from parental control to the patient's independent control. This process requires verification of the patient's identity and age, and the patient must agree to our Terms and Conditions and Privacy Policy independently.
+
+                12. INTERNATIONAL DATA TRANSFERS
+                While RGDC primarily operates within the Philippines, certain aspects of our system may involve international data transfers:
+                Cloud Infrastructure: Our system may utilize cloud hosting services with data centers located in various countries. When your information is stored or processed outside the Philippines, we ensure that service providers maintain data protection standards equivalent to or exceeding Philippine requirements under Republic Act No. 10173.
+                Third-Party Services: Google Calendar and Gmail services are provided by Google LLC, a US-based company with global infrastructure. When you enable integration with these services, your appointment information and email address may be processed on servers located outside the Philippines.
+                Data Protection Safeguards: For any international data transfers, we implement appropriate safeguards including:
+                Contractual clauses requiring equivalent data protection standards
+                Encryption of data in transit and at rest
+                Access controls limiting who can view or process data
+                Regular audits of service provider security practices
+                Compliance with international data protection frameworks
+                Your Rights Remain Protected: Regardless of where your data is physically stored or processed, you retain all privacy rights granted under Philippine law, including the right to access, correct, and delete your information, and the right to file complaints with the National Privacy Commission.
+
+                13. CHANGES TO THIS PRIVACY POLICY
+                RGDC reserves the right to update, modify, or replace this Privacy Policy at any time to reflect changes in our practices, legal requirements, technological developments, or system enhancements. We are committed to keeping you informed about how we protect your privacy:
+                Notification of Changes: When we make significant changes that materially affect how we collect, use, or protect your personal information, we will notify you through:
+                Email notification sent to the address associated with your account using our Gmail API integration
+                Prominent notice displayed on your dashboard when you log into the system
+                An updated "Last Updated" date at the top of this Privacy Policy
+                Minor Updates: For minor, non-material changes such as clarifications, formatting improvements, or updated contact information, we may update this policy without direct notification. However, the "Last Updated" date will always reflect the most recent changes.
+                Review Period: After notification of significant changes, you will have a reasonable period (typically 30 days) to review the updated policy before it takes effect. During this period, your continued use of the system under the previous policy terms will remain valid.
+                Acceptance of Changes: By continuing to use the RGDC Dental Management System after the effective date of the updated Privacy Policy, you acknowledge that you have read, understood, and agree to be bound by the revised terms. Your continued use constitutes acceptance of the changes.
+                Right to Object: If you disagree with significant changes to this Privacy Policy, you have the right to:
+                Contact us to discuss your concerns
+                Request account closure and deletion of your data, subject to our legal record retention obligations
+                File a complaint with our Data Privacy Officer or the National Privacy Commission
+                Version Control: We maintain historical versions of our Privacy Policy for reference. You may request access to previous versions by contacting our Data Privacy Officer.
+                Regular Reviews: We conduct periodic reviews of this Privacy Policy to ensure it remains current, accurate, and compliant with evolving data privacy laws and healthcare regulations.
+
+                14. CONTACT INFORMATION
+                If you have questions, concerns, requests, or complaints regarding this Privacy Policy, our data handling practices, or your privacy rights, please contact us using the following information:
+                Reyes-Guansing Dental Clinic
+                Data Privacy Officer
+                [Complete Clinic Address]
+                [City, Province, ZIP Code]
+                Email: privacy@rgdc.com.ph
+                Phone: [Primary Contact Number]
+                Business Hours: [Days and Hours of Operation]
+                Alternative Contact:
+                Clinic Administrator
+                Email: admin@rgdc.com.ph
+                Phone: [Secondary Contact Number]
+                For Website Technical Issues:
+                IT Support Team
+                Email: support@rgdc.com.ph
+                Response Timeframe: We strive to respond to all privacy-related inquiries within 5 business days of receipt. Complex requests requiring investigation or legal review may take up to 15 business days, and we will keep you informed of our progress.
+                Filing Complaints with Regulatory Authorities: If you believe your data privacy rights have been violated and are not satisfied with our response, you may file a complaint with:
+                National Privacy Commission (NPC)
+                5th Floor, Philippine International Convention Center (PICC), Vicente Sotto St., Pasay City, Metro Manila
+                Email: info@privacy.gov.ph
+                Complaints Email: complaints@privacy.gov.ph
+                Hotline: (+632) 8234-2228
+                Website: https://www.privacy.gov.ph
+                Office Hours: Monday to Friday, 8:00 AM - 5:00 PM
+                15. ACKNOWLEDGMENT AND CONSENT
+                By checking the "I Agree" box during account registration and clicking the "Create Account" button, you acknowledge and confirm that:
+                ✓ You have read and understood this entire Privacy Policy
+                ✓ You understand how RGDC collects, uses, stores, and protects your personal and sensitive health information
+                ✓ You consent to the collection and processing of your personal data as described in this policy
+                ✓ You understand your rights under the Philippine Data Privacy Act of 2012
+                ✓ You agree to receive email communications from RGDC regarding your appointments, treatments, and account
+                ✓ For minor patients: You are the parent or legal guardian with authority to provide consent on behalf of the minor
+                ✓ You understand that you can withdraw certain consents, exercise your privacy rights, or request account closure at any time subject to legal retention requirements
+                Your consent is timestamped and stored securely for legal compliance and audit purposes.
+
+                16. EFFECTIVE DATE
+                This Privacy Policy is effective as of December 17, 2025  and was last updated on December 17, 2025.
+                This document supersedes all previous versions of the RGDC Dental Management System Privacy Policy. The terms of this Privacy Policy will govern your use of the system from the effective date forward.
+
+                © 2025 Reyes-Guansing Dental Clinic. All Rights Reserved.
+
+                This Privacy Policy is designed to comply with the Philippine Data Privacy Act of 2012 (Republic Act No. 10173) and its Implementing Rules and Regulations. For questions about specific provisions or legal requirements, please consult with qualified legal counsel.
+
+            </div>
+
+            @*Agreel*@
+            <div class="modal-footer patient-modal-footer">
+                <a href="#!" class="modal-close btn btn-next">I Agree</a>
+            </div>
+        </div>
 
 
 </div>

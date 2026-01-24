@@ -3,16 +3,42 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="~/Content/style.css">
     <link rel="stylesheet" href="@Url.Content("~/Content/style.css")" />
 </head>
 <body>
     <div class="row" style="margin: 0;">
         @RenderBody()
     </div>
+
+    @*Pop up modalz*@
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems, {
+                opacity: 0.5,      
+                preventScrolling: true 
+            });
+        });
+    </script>
+
+    @*Calendar*@
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Date picker
+            var dateElems = document.querySelectorAll('.datepicker');
+            M.Datepicker.init(dateElems, {
+                format: 'mm/dd/yyyy',
+                autoClose: true
+            });
+        });
+    </script>
 
 </body>
 </html>
