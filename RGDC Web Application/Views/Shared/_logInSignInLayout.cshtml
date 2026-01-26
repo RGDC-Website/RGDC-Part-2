@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="~/Content/style.css">
     <link rel="stylesheet" href="@Url.Content("~/Content/style.css")" />
 </head>
-<body>
+<body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
         @RenderBody()
     </div>
@@ -31,11 +31,16 @@
     @*Calendar*@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var today = new Date();
+
             // Date picker
             var dateElems = document.querySelectorAll('.datepicker');
             M.Datepicker.init(dateElems, {
                 format: 'mm/dd/yyyy',
-                autoClose: true
+                maxDate: today,
+                yearRange: [1920, today.getFullYear()],
+                autoClose: true,
+                showClearBtn:true
             });
         });
     </script>

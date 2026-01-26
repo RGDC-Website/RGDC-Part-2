@@ -16,12 +16,26 @@
             <form>
                 @*Email*@
                 <div class="input-field">
-                    <input id="email" ng-model="login_email" type="email" placeholder="Email">
+                    <p class="custom-label">Email <span class="required-mark">*</span></p>
+                    <input id="email"
+                           ng-model="login_email"
+                           type="email"
+                           placeholder="juandelacruz@gmail.com"
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
+                           required>
                 </div>
 
                 @*Password*@
                 <div class="input-field">
-                    <input id="password" ng-model="login_password" type="password" placeholder="Password">
+                    <p class="custom-label">Password <span class="required-mark">*</span></p>
+                    <input id="password"
+                           ng-model="login_password"
+                           type="password"
+                           placeholder="Password"
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
+                           required>
                 </div>
 
                 @*Forgot password?*@
@@ -32,7 +46,7 @@
                 @*Agree to termz and condz*@
                 <div class="checkbox-container">
                     <label>
-                        <input type="checkbox" class="filled-in" />
+                        <input type="checkbox" class="filled-in" required/>
                         <span>I Agree to the terms and conditions</span>
                     </label>
                 </div>

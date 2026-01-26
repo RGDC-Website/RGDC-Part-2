@@ -447,3 +447,15 @@ select.browser-default.custom-input {
     color: black;
     font-size: 1rem;
 }
+
+.lbl-required::after {
+    content: " *";
+    color: #F44336;
+    font-weight: bold;
+}
+
+.required-mark {
+    color: #F44336; /* Materialize Red */
+    margin-left: 4px; /* Space between text and star */
+    font-weight: bold;
+}
