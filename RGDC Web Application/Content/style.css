@@ -73,6 +73,26 @@ a:hover {
     background-color: #d32f2f !important;
 }
 
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #8d6e63 !important; /* brown lighten-1 */
+    color: white !important;
+    border: 1px solid #8d6e63 !important;
+    border-radius: 4px;
+}
+
+/* Change the hover color for other numbers */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #bcaaa4 !important; /* brown lighten-4 */
+    color: #5d4037 !important; /* darker brown text */
+    border: 1px solid #bcaaa4 !important;
+}
+
+/* Fix the 'Previous' and 'Next' buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #8d6e63 !important; /* Default text color brown */
+}
+
 .equalSpace {
     display: flex;
     justify-content: space-evenly;
