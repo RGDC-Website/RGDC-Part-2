@@ -20,47 +20,80 @@
                 @*Email*@
                 <div class="input-field lbl-required">
                     <input id="email"
+                           ng-focus="active='email'"
+                           ng-blur="active = ''"
                            ng-model="signUp_email"
                            type="email"
                            placeholder="Email *"
                            maxlength="150"
                            oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
+                           ng-change="checkEmail()"
+                           ng-class="{ 'input-valid': isEmailFieldValid(), 'input-invalid': signUp_email && !isEmailFieldValid() }"
                            required>
+
+                    <span class="helper-text" style="color: #d32f2f;" ng-show="!emailValid && signUp_email">
+                        Enter a valid email address (e.g. "juandlc@gmail.com")
+                    </span>
+                    <span class="helper-text" style="color: #388e3c;" ng-show="emailValid">
+                        Email is valid
+                    </span>
+                    <div style="text-align:left; margin-top:6px;" ng-show="(active=='email') && signUp_email">
+                        <small>Email format checks:</small>
+                        <ul style="list-style:none; padding-left:0; margin:4px 0 0 0; font-size:0.85rem; text-align:left;">
+                            <li ng-class="{'requirement-complete': emailChecks.noSpace, 'requirement-pending': !emailChecks.noSpace}">No spaces</li>
+                            <li ng-class="{'requirement-complete': emailChecks.hasAt, 'requirement-pending': !emailChecks.hasAt}">Contains "@@"</li>
+                            <li ng-class="{'requirement-complete': emailChecks.hasDotAfterAt, 'requirement-pending': !emailChecks.hasDotAfterAt}">Contains . after "@@"</li>
+                        </ul>
+                    </div>
                 </div>
 
                 @* Password Field *@
                 <div class="input-field">
                     <input id="password"
+                           ng-focus="active='password'"
+                           ng-blur="active = ''"
                            ng-model="signUp_password"
                            type="password"
                            placeholder="Password"
                            maxlength="50"
                            ng-change="checkPasswordStrength()"
+                           ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
                            required>
 
-                    @* Strength Indicator - Only shows when user starts typing *@
-                    <!--<span class="helper-text"
-                          ng-class="strengthColor"
-                          ng-show="signUp_password.length > 0"
-                          style="font-weight:bold; font-size: 12px;">
-                        Strength: {{ passwordStrength }}
-                    </span>-->
+                    <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
+                        Strength: <strong>{{ passwordStrength }}</strong>
+                    </span>
+
+                    <div class="password-requirements" ng-show="(active=='password') && signUp_password">
+                        <small>Password must include:</small>
+                        <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
+                            <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
+                        </ul>
+                    </div>
                 </div>
 
                 @* Confirm Password Field *@
                 <div class="input-field">
                     <input id="confPassword"
+                           ng-focus="active='confPassword'"
+                           ng-blur="active = ''"
                            ng-model="signUp_confPassword"
                            type="password"
                            placeholder="Confirm password"
                            maxlength="50"
+                           ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
                            required>
 
-                    @* Mismatch Error - Shows instantly if they don't match *@
-                    <!--<span class="helper-text red-text"
-                          ng-show="signUp_password !== signUp_confPassword && signUp_confPassword.length > 0">
-                        Passwords do not match!
-                    </span>-->
+                    <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
+                        Passwords do not match
+                    </span>
+                    <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
+                        Passwords matched
+                    </span>
                 </div>
 
                 @*Already have an account*@
@@ -80,7 +113,7 @@
                 <button class="logSignBtn modal-trigger"
                         data-target="patientInformationForm"
                         type="submit"
-                        ng-disabled="signUp_password !== signUp_confPassword || passwordStrength == 'Weak'">
+                        ng-disabled="!isFormValid()">
                     Sign Up
                 </button>
 
@@ -126,6 +159,7 @@
                                        class="custom-input" 
                                        maxlength="150" 
                                        oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
+                                       placeholder="Juan"
                                        required>
                             </div>
                             @*MIddle name*@
@@ -135,6 +169,7 @@
                                        class="custom-input" 
                                        maxlength="150" 
                                        oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
+                                       placeholder="Mercado"
                                        required>
                             </div>
                         </div>
@@ -145,6 +180,7 @@
                                 <input type="text" class="custom-input" 
                                        maxlength="150" 
                                        oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
+                                       placeholder="Dela Cruz"
                                        required>
                             </div>
                         </div>
@@ -195,6 +231,7 @@
                                placeholder="09XX-XXX-XXXX" 
                                maxlength="13" 
                                oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                               ng-class="{ 'input-valid': isContactFieldValid(), 'input-invalid': signUp_contactNumber && !isContactFieldValid() }"
                                required>
                     </div>
                 </div>
@@ -209,6 +246,7 @@
                                class="custom-input"
                                maxlength="250" 
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')" 
+                               ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
                                required>
                     </div>
                 </div>
@@ -221,7 +259,8 @@
                                ng-model="signUp_currentPhysician"
                                class="custom-input" 
                                maxlength="150" 
-                               oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')">
+                               oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                               ng-class="{ 'input-valid': isCurrentPhysicianValid(), 'input-invalid': signUp_currentPhysician && !isCurrentPhysicianValid() }">
                     </div>
                     @*Refferal*@
                     <div class="col s4">
@@ -240,6 +279,7 @@
                                type="text" 
                                class="datepicker custom-input"
                                readonly
+                               ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
                                required>
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
