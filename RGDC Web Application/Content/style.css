@@ -14,6 +14,33 @@ a:hover {
     text-decoration: none;
 }
 
+.tabs {
+    overflow-x: hidden !important;
+}
+.tabs .indicator {
+    background-color: #8d6e63 !important;
+}
+.tabs .tab a.active {
+    color: #8d6e63 !important;
+    font-weight: bold;
+}
+.tabs .tab a,
+.tabs .tab a.active,
+.tabs .tab a:focus,
+.tabs .tab a:focus.active {
+    background-color: transparent !important;
+    outline: none !important;
+}
+
+.nav-extended .nav-content {
+    height: auto !important;
+}
+
+.center-tabs {
+    display: flex !important;
+    justify-content: center !important;
+}
+
 .smallBtn{
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     border-radius: 15px;
@@ -58,12 +85,19 @@ a:hover {
 .p-0 {
     padding: 0 !important;
 }
+.px-1{
+    padding: 0 1rem 0 1rem !important;
+}
 .p-1{
     padding: 1rem !important;
+}
+.mb-1 {
+    margin-bottom: 1rem !important;
 }
 .m-0{
     margin: 0 !important;
 }
+
 
 html, body {
     height: 100%;
