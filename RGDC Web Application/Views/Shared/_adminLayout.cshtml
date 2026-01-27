@@ -65,9 +65,8 @@
     </div>
 
 
-
-    @*Arrow filter (desccending ascending)*@
     <script>
+        //Arrow filter (descending and ascending)
         document.addEventListener('click', function (event) {
             if (event.target.classList.contains('sort-arrow')) {
                 const clicked = event.target;
@@ -88,6 +87,7 @@
             }
         });
 
+        //Tooltip
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {
@@ -95,6 +95,7 @@
             });
         });
 
+        //Dropdown
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.dropdown-trigger');
             var instances = M.Dropdown.init(elems);

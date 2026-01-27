@@ -266,10 +266,6 @@
     </Content>
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_MainLayout.cshtml" />
-    <Content Include="Views\RGDC\Index.cshtml" />
-    <Content Include="Views\Shared\_LoginLayout.cshtml" />
     <Content Include="Views\Shared\_adminLayout.cshtml" />
     <Content Include="Views\RGDC\adminDashboard.cshtml" />
     <Content Include="Views\RGDC\logIn.cshtml" />
