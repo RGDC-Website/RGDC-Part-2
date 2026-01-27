@@ -28,7 +28,12 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
-        public ActionResult patients()
+        public ActionResult adminPatientsTab()
+        {
+            return View();
+        }
+
+        public ActionResult patientDashboard()
         {
             return View();
         }

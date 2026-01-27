@@ -275,7 +275,9 @@
     <Content Include="Views\RGDC\logIn.cshtml" />
     <Content Include="Views\Shared\_logInSignInLayout.cshtml" />
     <Content Include="Views\RGDC\signUp.cshtml" />
-    <Content Include="Views\RGDC\patients.cshtml" />
+    <Content Include="Views\RGDC\adminPatientsTab.cshtml" />
+    <Content Include="Views\Shared\_patientLayout.cshtml" />
+    <Content Include="Views\RGDC\patientDashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
