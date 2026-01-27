@@ -181,39 +181,53 @@
                         </div>
                     </div>
                     @*Forms*@
-                <div id="forms" class="row m-0">
-                    <table id="patientForms" class="hover">
-                        @*table headers*@
-                        <thead>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Form</th>
-                                <th colspan="2">Dentist</th>
-                                @*<th></th>*@
-                            </tr>
-                        </thead>
-                        @*table content*@
-                        <tbody>
-                            <tr>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td><a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="right" data-tooltip="View Form"><i class="material-icons brown-text lighten-1">remove_red_eye</i></td>
-                            </tr>
-                        </tbody>
-                        @*table footer*@
-                        <tfoot>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Form</th>
-                                <th>Dentist</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+                    <div id="forms" class="row m-0">
+                        <table id="patientForms" class="hover">
+                            @*table headers*@
+                            <thead>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th>Form</th>
+                                    <th colspan="2">Dentist</th>
+                                    @*<th></th>*@
+                                </tr>
+                            </thead>
+                            @*table content*@
+                            <tbody>
+                                <tr>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    @*view button*@
+                                    <td><a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="right" data-tooltip="View Form"><i class="material-icons brown-text lighten-1">remove_red_eye</i></td>
+                                </tr>
+                            </tbody>
+                            @*table footer*@
+                            <tfoot>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th>Form</th>
+                                    <th>Dentist</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                     @*post op*@
-                    <div id="postOp" class="row m-0">postop</div>
+                    <div id="postOp" class="row m-0">
+                        <div class="row">
+                            <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
+                                <div class="card-content brown-text lighten-1">
+                                    @*post op title*@
+                                    <span class="card-title bold">Post OP</span>
+                                    <div class="divider"></div>
+                                    @*post op content*@
+                                    <p>Lorem Ipsum.</p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @*appointments*@
                     <div id="appt" class="row m-0">appt</div>
                 </div>
