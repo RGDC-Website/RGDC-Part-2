@@ -181,7 +181,37 @@
                         </div>
                     </div>
                     @*Forms*@
-                    <div id="forms" class="row m-0">forms</div>
+                <div id="forms" class="row m-0">
+                    <table id="patientForms" class="hover">
+                        @*table headers*@
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Form</th>
+                                <th colspan="2">Dentist</th>
+                                @*<th></th>*@
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td><a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="right" data-tooltip="View Form"><i class="material-icons brown-text lighten-1">remove_red_eye</i></td>
+                            </tr>
+                        </tbody>
+                        @*table footer*@
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Form</th>
+                                <th>Dentist</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
                     @*post op*@
                     <div id="postOp" class="row m-0">postop</div>
                     @*appointments*@
