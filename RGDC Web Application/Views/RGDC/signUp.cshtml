@@ -21,7 +21,7 @@
                 <div class="input-field lbl-required">
                     <input id="email" 
                            ng-model="signUp_email" 
-                           type="email" 
+                           type="text" 
                            placeholder="Email *" 
                            maxlength="150" 
                            oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')" 
@@ -74,12 +74,13 @@
                 </div>
 
                 @*Sign up BTN*@
-                <button class="logSignBtn modal-trigger" 
-                        data-target="patientInformationForm"
-                        type="submit"
-                        ng-disabled="signUp_password !== signUp_confPassword || passwordStrength == 'Weak'">
-                    Sign Up
-                </button>
+            <button class="logSignBtn modal-trigger"
+                    data-target="patientInformationForm"
+                    type="button"
+                    ng-disabled="signUp_password !== signUp_confPassword || passwordStrength == 'Weak'"
+                    ng-click="signUpUser()">
+                Sign Up
+            </button>
 
                 <div class="login-divider">
                     <span>or sign up with</span>
@@ -98,7 +99,7 @@
 
     @*Patient information form*@
     <div id="patientInformationForm" class="modal">
-        <div class="modal-content">
+        <div>
             <h5 class="modal-form-title">Patient Information Form</h5>
 
             <form>

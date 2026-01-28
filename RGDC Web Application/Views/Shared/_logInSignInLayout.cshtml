@@ -16,18 +16,6 @@
     <div class="row" style="margin: 0;">
         @RenderBody()
     </div>
-
-    @*Pop up modalz*@
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var elems = document.querySelectorAll('.modal');
-            var instances = M.Modal.init(elems, {
-                opacity: 0.5,      
-                preventScrolling: true 
-            });
-        });
-    </script>
-
     @*Calendar*@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -40,10 +28,14 @@
                 maxDate: today,
                 yearRange: [1920, today.getFullYear()],
                 autoClose: true,
-                showClearBtn:true
+                showClearBtn: true
             });
         });
     </script>
-
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/RGDCscripts/Module.js"></script>
+    <script src="~/Scripts/RGDCscripts/Service.js"></script>
+    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
 </body>
 </html>
