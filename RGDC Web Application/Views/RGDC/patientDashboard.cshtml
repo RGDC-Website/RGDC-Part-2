@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = "~/Views/Shared/_adminLayout.cshtml";
+    Layout = "~/Views/Shared/_patientLayout.cshtml";
 }
 
 <div class="dashContainer">
@@ -11,62 +11,8 @@
         <div class="col m4 l4">
             <span class="right">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Print Report"> <i class="material-icons brown-text lighten-1">print</i></a></div>
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
-        </div>
-    </div>
-
-    @*overview*@
-    <div class="row" style="padding: 0 1rem 0 1rem">
-        <p class="bold brown-text lighten-1" style="margin-bottom: 0">OVERVIEW</p>
-
-        @*overview cards*@
-        <div class="row">
-            @*total no. of patients*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2">
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            <div class="col m6 l6"><p class="center">TOTAL NUMBER OF PATIENTS</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @*new patients this month*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2">
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            <div class="col m6 l6"><p class="center">NEW PATIENTS THIS MONTH</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @*patients done this week*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2 overviewCard">
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            <div class="col m6 l6"><p class="center">PATIENTS DONE THIS WEEK</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @*unpaid patients*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2 overviewCard">
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            <div class="col m6 l6"><p class="center">UNPAID PATIENTS</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -136,55 +82,6 @@
         </div>
     </div>
 
-    @*analytics*@
-    <div class="row" style="padding: 0 1rem 0 1rem">
-        <p class="bold brown-text lighten-1" style="margin-bottom: 0">ANALYTICS</p>
 
-        @*analytics cards*@
-        <div class="row">
-            @*patients*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2 p-1">
-                    <div class="card-title brown-text lighten-1">Patients</div>
-                    <div class="card-content brown-text lighten-1">
-                        @*insert chart*@
-                    </div>
-                </div>
-            </div>
-            @*procedures this week*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2 p-1">
-                    <div class="card-title brown-text lighten-1">Procedures this week</div>
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @*procedures by revenue*@
-            <div class="col m3 l3 ">
-                <div class="card grey lighten-2 p-1">
-                    <div class="card-title brown-text lighten-1">Procedures by revenue</div>
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @*paid/unpaid*@
-            <div class="col m3 l3">
-                <div class="card grey lighten-2 p-1">
-                    <div class="card-title brown-text lighten-1">Paid/Unpaid</div>
-                    <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
