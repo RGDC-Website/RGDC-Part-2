@@ -11,6 +11,10 @@
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <link rel="stylesheet" href="~/Content/style.css">
+
+    @*datatable*@
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
+    <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
 <body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
@@ -97,6 +101,13 @@
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.dropdown-trigger');
             var instances = M.Dropdown.init(elems);
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var el = document.querySelectorAll('.tabs');
+            var instance = M.Tabs.init(el, {
+                swipeable: false 
+            });
         });
     </script>
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>

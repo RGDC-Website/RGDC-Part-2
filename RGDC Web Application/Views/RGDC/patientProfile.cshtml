@@ -1,0 +1,153 @@
+﻿@{
+    Layout = "~/Views/Shared/_patientLayout.cshtml";
+}
+
+<div class="dashContainer">
+    @*top buttons*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*back button*@
+        <div class="col m8 l8 valign-wrapper">
+            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Back"><i class="material-icons brown-text lighten-1 left">arrow_back</i></a>
+        </div>
+
+        @*refresh and logout buttons*@
+        <div class="col m4 l4">
+            <span class="right m-0">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+    @*content*@
+    <div class="row" style="padding: 0 1rem 0 1rem">
+
+        @*left column*@
+        <div class="col m4 l4" style="padding-left:0">
+            @*user name, img, visit*@
+            <div class="card grey lighten-2">
+                <div class="card-content">
+                    @*user pfp and name*@
+                    <div class="row center">
+                        @*lagyan nalang ng src for image source*@
+                        <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:9rem" />
+                    </div>
+
+                    @*user name and role*@
+                    <div class="row center">
+                        <h5 class="bold brown-text lighten-1">Name</h5>
+                        <h6 class="bold brown-text lighten-1">ID: 000000</h6>
+                    </div>
+
+                    @*last and next visit*@
+                    <div class="row center">
+                        <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
+                        <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
+                    </div>
+                </div>
+            </div>
+            @*user info*@
+            <div class="card grey lighten-2">
+                <div class="card-content">
+                    <div class="row m-0">
+                        <div class="col m6 l6">
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">AGE</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">GENDER</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">EMAIL ADDRESS</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">ADDRESS</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">RELIGION</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">REFERRAL</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">INSURANCE</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                        </div>
+                        <div class="col m6 l6">
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">BIRTHDAY</p>
+                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">CONTACT NUMBER</p>
+                                <p class="brown-text lighten-1">+00 0000000000</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">CIVIL STATUS</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">OCCUPATION</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">NATIONALITY</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">GUARDIAN</p>
+                                <p class="brown-text lighten-1">n</p>
+                            </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">ACCOUNT CREATION</p>
+                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @*right column*@
+        <div class="col m8 l8" style="padding-right: 0">
+            <div class="card grey lighten-2">
+                <nav class="nav-extended grey lighten-2 z-depth-0">
+                    <div class="nav-content p-1">
+                        <ul class="tabs tabs-transparent center-tabs">
+                            <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
+                            <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
+                            <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
+                            <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
+                            <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
+                            <li class="tab px-1"><a class="brown-text p-0" href="#appt">Appointments</a></li>
+                        </ul>
+                    </div>
+                </nav>
+                <div class="card-content containerOverflow">
+                    @*medical history*@
+                    <div id="med" class="row m-0">med his</div>
+                    @*Progress Notes*@
+                    <div id="prog" class="row m-0">prog notes</div>
+                    @*Dental Chart*@
+                    <div id="dent" class="row m-0">dent chart</div>
+                    @*Forms*@
+                    <div id="forms" class="row m-0">forms</div>
+                    @*post op*@
+                    <div id="postOp" class="row m-0">postop</div>
+                    @*appointments*@
+                    <div id="appt" class="row m-0">appt</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+

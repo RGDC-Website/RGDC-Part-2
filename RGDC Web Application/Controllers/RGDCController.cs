@@ -306,6 +306,10 @@ namespace RGDC_Web_Application.Controllers
                 userAuthorization = Session["UserAuthorization"].ToString(),
             }, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult patientProfile()
+        {
+            return View();
+        }
     }
 
 }
