@@ -8,21 +8,19 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Compiled and minified JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <link rel="stylesheet" href="~/Content/style.css">
     <link rel="stylesheet" href="@Url.Content("~/Content/style.css")" />
+
 </head>
 <body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
         @RenderBody()
     </div>
 
-    @*Pop up modalz*@
-    <!-- Angular and application scripts -->
-    <script src="@Url.Content("~/Scripts/angular.min.js")"></script>
-    <script src="@Url.Content("~/Scripts/RGDCscripts/Module.js")"></script>
-    <script src="@Url.Content("~/Scripts/RGDCscripts/Service.js")"></script>
-    <script src="@Url.Content("~/Scripts/RGDCscripts/Controller.js")"></script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

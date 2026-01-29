@@ -197,11 +197,11 @@
     <Compile Include="Models\Map\tblPaymentMap.cs" />
     <Compile Include="Models\Map\tblPatientMap.cs" />
     <Compile Include="Models\Map\tblOwnerMap.cs" />
-    <Compile Include="Models\Map\tblGenderMap.cs" />
+    <Compile Include="Models\Map\tblBranchMap.cs" />
     <Compile Include="Models\Map\tblFormatMap.cs" />
     <Compile Include="Models\Map\tblFormMap.cs" />
     <Compile Include="Models\Map\tblDentistMap.cs" />
-    <Compile Include="Models\Map\tblBranchMap.cs" />
+    <Compile Include="Models\Map\tblGenderMap.cs" />
     <Compile Include="Models\Map\tblAppointmentMap.cs" />
     <Compile Include="Models\Map\tblAccountMap.cs" />
     <Compile Include="Models\tblTreatmentPlanModel.cs" />
@@ -211,11 +211,11 @@
     <Compile Include="Models\tblPaymentModel.cs" />
     <Compile Include="Models\tblPatientModel.cs" />
     <Compile Include="Models\tblOwnerModel.cs" />
-    <Compile Include="Models\tblGenderModel.cs" />
+    <Compile Include="Models\tblBranchModel.cs" />
     <Compile Include="Models\tblFormatModel.cs" />
     <Compile Include="Models\tblFormModel.cs" />
     <Compile Include="Models\tblDentistModel.cs" />
-    <Compile Include="Models\tblBranchModel.cs" />
+    <Compile Include="Models\tblGenderModel.cs" />
     <Compile Include="Models\tblAppointmentModel.cs" />
     <Compile Include="Models\tblAccountModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

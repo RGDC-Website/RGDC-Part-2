@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <link rel="stylesheet" href="~/Content/style.css">
 </head>
-<body>
+<body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
         <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -90,7 +90,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {
-                    exitDelay: -5
+                exitDelay: -5
             });
         });
 
@@ -99,6 +99,10 @@
             var instances = M.Dropdown.init(elems);
         });
     </script>
-
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/angular.min.js"></script>
+    <script src="~/Scripts/RGDCscripts/Module.js"></script>
+    <script src="~/Scripts/RGDCscripts/Service.js"></script>
+    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
 </body>
 </html>
