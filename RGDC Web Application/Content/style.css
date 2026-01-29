@@ -73,6 +73,10 @@ a:hover {
     background-color: #d32f2f !important;
 }
 
+.redBtn:hover {
+    background-color: #d32f2f !important;
+}
+
 .equalSpace {
     display: flex;
     justify-content: space-evenly;
