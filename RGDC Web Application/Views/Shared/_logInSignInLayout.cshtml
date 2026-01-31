@@ -17,19 +17,19 @@
         @RenderBody()
     </div>
 
-    @*Pop up modalz*@
     <!-- Angular and application scripts -->
     <script src="@Url.Content("~/Scripts/angular.min.js")"></script>
     <script src="@Url.Content("~/Scripts/RGDCscripts/Module.js")"></script>
     <script src="@Url.Content("~/Scripts/RGDCscripts/Service.js")"></script>
     <script src="@Url.Content("~/Scripts/RGDCscripts/Controller.js")"></script>
 
+    @*Pop up modalz*@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.modal');
             var instances = M.Modal.init(elems, {
-                opacity: 0.5,      
-                preventScrolling: true 
+                opacity: 0.5,
+                preventScrolling: true
             });
         });
     </script>
@@ -46,7 +46,7 @@
                 maxDate: today,
                 yearRange: [1920, today.getFullYear()],
                 autoClose: true,
-                showClearBtn:true
+                showClearBtn: true
             });
         });
     </script>

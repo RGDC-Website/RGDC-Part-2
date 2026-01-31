@@ -93,6 +93,16 @@
             }
         });
 
+
+        @*Pop up modalz*@
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.modal');
+            M.Modal.init(elems, {
+                startingTop: '4%', // Start slightly lower
+                endingTop: '10%'   // End at a visible spot
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {

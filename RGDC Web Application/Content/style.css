@@ -302,8 +302,17 @@ html, body {
     max-width: fit-content;
     background-color: #e5e5e5;
     max-height: fit-content;
-
 }
+
+    .modal.modal-fixed-footer {
+        top: 5% !important; /* Move it slightly down from the top edge */
+        height: 90% !important; /* Ensure it stays 90% of screen height */
+    }
+
+        .modal.modal-fixed-footer .modal-content {
+            height: calc(100% - 56px) !important; /* Subtract footer height */
+            overflow-y: auto !important; /* Force the vertical scrollbar */
+        }
 
 .modal .modal-content {
     padding: 15px 25px 5px 25px !important;
@@ -773,6 +782,12 @@ select.browser-default.custom-input {
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+    pointer-events: auto !important;
+}
+
+.view-only-mode {
+    pointer-events: none;
+    opacity: 0.8;
 }
 
 .last-update {
@@ -834,5 +849,51 @@ select.browser-default.custom-input {
 
 .password-modal .modal-content {
     padding: 20px !important;
+}
+
+.medical-questions li {
+    position: relative;
+    margin-bottom: 12px;
+    padding-right: 30px;
+    line-height: 1.5;
+}
+
+.placeholder-text {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-weight: bold;
+    color: #967863;
+    margin-right:10px;
+}
+
+.medical-history-modal {
+    width: 85% !important;
+    max-height: 90% !important;
+}
+
+.line-input {
+    border: none !important;
+    border-bottom: 1px solid #967863 !important;
+    margin-left: 10px;
+    padding: 2px 5px !important;
+}
+
+.flex-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.yn-group label {
+    margin-left: 15px;
+}
+
+.condition-grid label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #333;
 }
 

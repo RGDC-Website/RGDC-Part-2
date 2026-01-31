@@ -20,7 +20,7 @@
     </div>
 
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;" >
+    <div class="row" style="padding: 0 1rem 0 1rem;">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -38,7 +38,7 @@
                         <h5 class="bold brown-text lighten-1">Name</h5>
                         <h6 class="bold brown-text lighten-1">ID: 000000</h6>
 
-                    @*last and next visit*@
+                        @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
                         <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
                     </div>
@@ -131,18 +131,24 @@
 
                     @*medical history*@
                     <div id="med" class="containerOverflow-2 row m-0">
-                        <div class="medical-history-container">
+                        <div class="medical-history-container view-only-mode">
                             <div class="form-header">
                                 @*previous physician info*@
                                 <div class="physician-info">
-                                    <p class="medInfo">Name of previous physician:</p>
-                                    <p>Physician's Office:</p>
-                                    <p>Physician's Contacts:</p>
+                                    <p class="medInfo">Name of previous physician: 
+                                        <span style="font-weight:bold">---</span>
+                                    </p>
+                                    <p>Physician's Office:
+                                        <span style="font-weight:bold">---</span>
+                                    </p>
+                                    <p>Physician's Contacts:
+                                        <span style="font-weight:bold">---</span>
+                                    </p>
                                 </div>
-                                @*update button and last updated*@ 
+                                @*update button and last updated*@
                                 <div class="col">
                                     <div class="row">
-                                        <button class="update-btn right">UPDATE</button>
+                                        <button class="update-btn right modal-trigger" data-target="modal-medical-history">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
                                         <p class="last-update">Last Update: Day Month, Year | Time</p>
@@ -150,19 +156,37 @@
                                 </div>
 
                             </div>
-                            <hr class="form-divider">
+                            <hr class="form-divider" style="margin-bottom:10px;">
 
                             @*medical history*@
                             <ol class="medical-questions">
-                                <li>Are you in good health?</li>
-                                <li>Are you under medical treatment now?</li>
-                                <li>Have you ever had a serious illness or surgical operation?</li>
-                                <li>Have you ever been hospitalized?</li>
-                                <li>Are you taking prescription/non-prescription medication?</li>
-                                <li>Are you taking tobacco products?</li>
-                                <li>Do you use alcohol, cocaine, or other dangerous drugs?</li>
-                                <li>Allergies:</li>
-                                <li>Bleeding Time:</li>
+                                <li>Are you in good health? 
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Are you under medical treatment now?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Have you ever had a serious illness or surgical operation?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Have you ever been hospitalized?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Are you taking prescription/non-prescription medication?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Are you taking tobacco products?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Do you use alcohol, cocaine, or other dangerous drugs?
+                                    <span class="placeholder-text">YES/NO</span>
+                                </li>
+                                <li>Allergies:
+                                    <span class="placeholder-text">---</span>
+                                </li>
+                                <li>Bleeding Time:
+                                    <span class="placeholder-text">---</span>
+                                </li>
 
                                 <li>
                                     For women only:
@@ -173,8 +197,12 @@
                                     </div>
                                 </li>
 
-                                <li>Blood type:</li>
-                                <li>Blood pressure:</li>
+                                <li>Blood type:
+                                    <span class="placeholder-text">---</span>
+                                </li>
+                                <li>Blood pressure:
+                                    <span class="placeholder-text">---</span>
+                                </li>
                                 <li>Do you have or have had any of the following?</li>
                             </ol>
 
@@ -225,7 +253,7 @@
 
                             @*signature*@
                             <div class="signature-container">
-                                <div class="signature-pad" style="margin-top: 20px;" >
+                                <div class="signature-pad" style="margin-top: 20px;">
                                     <i class="material-icons">image</i>
                                 </div>
                                 <div class="signature-line"></div>
@@ -248,7 +276,7 @@
                                     <th>Paid</th>
                                     <th>Balance</th>
                                 </tr>
-                            </thead>  
+                            </thead>
                             @*table content*@
                             <tbody>
                                 <tr>
@@ -279,7 +307,7 @@
                     @*Dental Chart*@
                     <div id="dent" class="row m-0 containerOverflow-2">
                         <div class="row m-0 center">
-                            <img src="https://placehold.co/2550x3300" style="max-height: 47rem"/>
+                            <img src="https://placehold.co/2550x3300" style="max-height: 47rem" />
                         </div>
                     </div>
                     @*Forms*@
@@ -335,7 +363,4 @@
             </div>
         </div>
     </div>
-
-
 </div>
-
