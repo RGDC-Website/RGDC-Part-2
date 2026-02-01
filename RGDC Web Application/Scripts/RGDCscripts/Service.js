@@ -13,7 +13,7 @@
     this.signUp = function (accDetails) {
         return $http({
             method: 'POST',
-            url: '/RGDC/signUp',
+            url: '/RGDC/signUpAcc',
             data: accDetails
         });
     };

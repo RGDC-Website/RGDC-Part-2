@@ -101,14 +101,6 @@
                     <a href="~/RGDC/logIn" class="forgot-link">Already have an account?</a>
                 </div>
 
-                @*Agree to termz and condz*@
-                <div class="checkbox-container">
-                    <label>
-                        <input type="checkbox" class="filled-in" required />
-                        <span>I Agree to the terms and conditions</span>
-                    </label>
-                </div>
-
                 @*Sign up BTN*@
                 <button class="logSignBtn"
                         data-target="patientInformationForm"
@@ -131,6 +123,33 @@
             </form>
         </div>
 
+    </div>
+
+    @*Google Password*@
+    <div id="modal-password" class="modal password-modal">
+        <div class="modal-content">
+            <h5 class="modal-form-title">Set Google Account Password</h5>
+
+            <div class="row">
+                <div class="col s12">
+                    @*set password*@
+                    <p class="custom-label">Set Password <span class="required-mark">*</span></p>
+                    <input type="password" class="custom-input" placeholder="Enter password">
+                </div>
+
+                <div class="col s12">
+                    @*confirm pass*@
+                    <p class="custom-label">Confirm Password <span class="required-mark">*</span></p>
+                    <input type="password" class="custom-input" placeholder="Confirm password">
+                </div>
+            </div>
+        </div>
+
+        @*cancel or save*@
+        <div class="modal-footer patient-modal-footer">
+            <a href="#!" class="modal-close btn btn-cancel">Cancel</a>
+            <button type="button" class="btn btn-next">Save</button>
+        </div>
     </div>
 
     @*Patient information form*@
@@ -204,9 +223,9 @@
                     <div class="col s3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
-                            <input id="birthDate" 
-                                   ng-model="signUp_birthDate" 
-                                   type="text" 
+                            <input id="birthDate"
+                                   ng-model="signUp_birthDate"
+                                   type="text"
                                    class="datepicker custom-input"
                                    readonly
                                    required>
@@ -228,11 +247,11 @@
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input id="contactNumber"
                                ng-model="signUp_contactNumber"
-                               type="text" 
-                               class="custom-input" 
-                               placeholder="09XX-XXX-XXXX" 
-                               maxlength="13" 
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '')" 
+                               type="text"
+                               class="custom-input"
+                               placeholder="09XX-XXX-XXXX"
+                               maxlength="13"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                ng-class="{ 'input-valid': isContactFieldValid(), 'input-invalid': signUp_contactNumber && !isContactFieldValid() }"
                                required>
                     </div>
@@ -242,12 +261,12 @@
                     <div class="col s12">
                         @*Address*@
                         <p class="custom-label">Address <span class="required-mark">*</span></p>
-                        <input id="address" 
+                        <input id="address"
                                type="text"
                                ng-model="signUp_address"
                                class="custom-input"
-                               maxlength="250" 
-                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')" 
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
                                required>
                     </div>
@@ -259,40 +278,40 @@
                         <p class="custom-label">Current Physician</p>
                         <input type="text"
                                ng-model="signUp_currentPhysician"
-                               class="custom-input" 
-                               maxlength="150" 
+                               class="custom-input"
+                               maxlength="150"
                                oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                ng-class="{ 'input-valid': isCurrentPhysicianValid(), 'input-invalid': signUp_currentPhysician && !isCurrentPhysicianValid() }">
                     </div>
                     @*Refferal*@
                     <div class="col s4">
                         <p class="custom-label">Referral (if any)</p>
-                        <input type="text" 
+                        <input type="text"
                                class="custom-input"
-                               maxlength="50" 
+                               maxlength="50"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
                     </div>
                     @*Last visit*@
-                <div class="col s4">
-                    <p class="custom-label">Last Visit</p>
-                    <div class="datepicker-wrapper">
-                        <input id="lastVisit"
-                               ng-model="signUp_lastVisit"
-                               type="text" 
-                               class="datepicker custom-input"
-                               readonly
-                               ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    <div class="col s4">
+                        <p class="custom-label">Last Visit</p>
+                        <div class="datepicker-wrapper">
+                            <input id="lastVisit"
+                                   ng-model="signUp_lastVisit"
+                                   type="text"
+                                   class="datepicker custom-input"
+                                   readonly
+                                   ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
+                                   required>
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        </div>
                     </div>
-                </div>
 
                 </div>
 
                 @*Agreementz*@
                 <div class="row agreement-section center-align">
                     <label class="agreement-label">
-                        <input type="checkbox" class="filled-in" required />
+                        <input type="checkbox" class="filled-in" ng-model="signUp_agreement" required />
                         <span class="agreement-text">
                             I have read and agree to the
                             <a href="#" data-target="termsConditions" class="agreement-link modal-trigger">Terms and Conditions</a> and
@@ -311,17 +330,16 @@
         </div>
     </div>
 
+
+
     @*Termz and condz*@
     <div id="termsConditions" class="modal">
         <div class="modal-content center-align">
             <br>
             <h4 class="modal-form-title-alt">Terms and Conditions</h4>
-            <h5 class="modal-form-title" style="color:black">Reyes-Guansing Dental Clinic (RGDC)<br> Dental Management System</h5>
+            <h5 class="modal-form-title">Reyes-Guansing Dental Clinic (RGDC)<br> Dental Management System</h5>
 
             <div class="terms-scroll-container preserve-format">
-                Last Updated: December 17, 2025<br />
-                Effective Date: [Date]<br /><br />
-
                 1. ACCEPTANCE OF TERMS<br />
                 Welcome to the Reyes-Guansing Dental Clinic (RGDC) Dental Management System. <br />These Terms and Conditions ("Terms", "T&C", or "Agreement") constitute a legally binding agreement between you ("User", "You", or "Your") and Reyes-Guansing Dental Clinic ("RGDC", "We", "Us", or "Our") governing your access to and use of the RGDC Dental Management System website and all associated services (collectively, the "System" or "Services").
                 By creating an account, you explicitly agree to be bound by these Terms and Conditions. During the account registration process, you must check the acknowledgment box confirming that you have read, understood, and agree to these Terms before your account can be created. Your agreement is timestamped and stored for legal compliance purposes. If you do not agree to these Terms, you must not create an account or use the System.
@@ -891,7 +909,7 @@
     <div id="dataPrivacy" class="modal">
         <div class="modal-content center-align">
             <h4 class="modal-form-title-alt">Terms and Conditions</h4>
-            <h5 class="modal-form-title">Reyes-Guansing Dental Clinic (RGDC) Dental Management System</h5>
+            <h5 class="modal-form-title">Reyes-Guansing Dental Clinic (RGDC)<br> Dental Management System</h5>
 
             <div class="terms-scroll-container preserve-format">
                 1. INTRODUCTION<br><br>

@@ -14,7 +14,9 @@
 
     @*datatable*@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
+
 </head>
 <body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
@@ -91,6 +93,16 @@
             }
         });
 
+
+        @*Pop up modalz*@
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.modal');
+            M.Modal.init(elems, {
+                startingTop: '4%', // Start slightly lower
+                endingTop: '10%'   // End at a visible spot
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {
@@ -109,6 +121,13 @@
                 swipeable: false 
             });
         });
+
+        @*patient finance table*@
+        new DataTable('#patientFinance');
+        @*patient profile table - progress notes*@
+        new DataTable('#progressNotes');
+        @*patient profile table - forms*@
+        new DataTable('#patientForms');
     </script>
     <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>

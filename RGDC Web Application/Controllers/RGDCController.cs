@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using System.Security.Cryptography;
+using System.Text;
+
 
 namespace RGDC_Web_Application.Controllers
 {
@@ -52,26 +55,26 @@ namespace RGDC_Web_Application.Controllers
         [HttpPost]
         public JsonResult CheckEmail(string email)
         {
-            try { 
-            using (var db = new RGDCContext()){
+            try {
+                using (var db = new RGDCContext()) {
                     if (db == null)
                     {
                         return Json(new { exists = false, error = "DB context is null" });
                     }
                     bool exist = db.tbl_account.Any(u => u.email == email);
 
-                return Json(new
-                {
-                    exists = exist
-                }, JsonRequestBehavior.AllowGet);
+                    return Json(new
+                    {
+                        exists = exist
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
-        }
-            catch (Exception ex){
+            catch (Exception ex) {
                 return Json(new
                 {
                     exists = false,
                     error = ex.Message
-            }, JsonRequestBehavior.AllowGet);
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -93,7 +96,7 @@ namespace RGDC_Web_Application.Controllers
         }
 
         [HttpPost]
-        public void signUp(tblAccountModel accDetails)
+        public void signUpAcc(tblAccountModel accDetails)
         {
             try
             {
@@ -110,16 +113,16 @@ namespace RGDC_Web_Application.Controllers
                         contactNumber = accDetails.contactNumber,
                         address = accDetails.address,
                         civilStatus = accDetails.civilStatus,
-                        password = accDetails.password,
+                        password = passwordHash(accDetails.password),
                         lastLogin = DateTime.Now,
                         accCreatedAt = DateTime.Now,
                         accUpdatedAt = DateTime.Now
                     };
-                addUser.tbl_account.Add(newData);
-                addUser.SaveChanges();
+                    addUser.tbl_account.Add(newData);
+                    addUser.SaveChanges();
+                }
             }
-            }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ArgumentException($"There is an error {ex.Message}");
             }
@@ -137,8 +140,9 @@ namespace RGDC_Web_Application.Controllers
 
                 using (var db = new RGDCContext())
                 {
+                    var hashedPassword = passwordHash(password);
                     var user = db.tbl_account.FirstOrDefault(u =>
-                        u.email == email && u.password == password);
+                        u.email == email && u.password == hashedPassword);
 
                     if (user != null)
                     {
@@ -213,12 +217,12 @@ namespace RGDC_Web_Application.Controllers
 
                 var content = new FormUrlEncodedContent(values);
                 var response = await client.PostAsync("https://oauth2.googleapis.com/token", content);
-                    
+
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorBody = await response.Content.ReadAsStringAsync();
                     return Content(errorBody);
-                }   
+                }
                 var jsonResponse = await response.Content.ReadAsStringAsync();
 
                 var serializer = new Newtonsoft.Json.JsonSerializer();
@@ -247,7 +251,7 @@ namespace RGDC_Web_Application.Controllers
                     using (var db = new RGDCContext())
                     {
                         string email = Session["UserEmail"] as string;
-                        bool exist = db.tbl_account.Any(u => u.email == email);     
+                        bool exist = db.tbl_account.Any(u => u.email == email);
                         if (exist)
                         {
                             var user = db.tbl_account.FirstOrDefault(u => u.email == email);
@@ -267,6 +271,9 @@ namespace RGDC_Web_Application.Controllers
                                 {
                                     return RedirectToAction("adminDashboard", "RGDC");
                                 }
+                            } else
+                            {
+                                return RedirectToAction("signUp", "RGDC");
                             }
                         }
                     }
@@ -311,10 +318,31 @@ namespace RGDC_Web_Application.Controllers
                 userAuthorization = Session["UserAuthorization"].ToString(),
             }, JsonRequestBehavior.AllowGet);
         }
+
+        public string passwordHash(string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
         public ActionResult patientProfile()
         {
             return View();
         }
+        public ActionResult patientFinance()
+        {
+            return View();
+        }
     }
-
 }
+
+      
+    
