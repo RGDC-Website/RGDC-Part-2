@@ -34,14 +34,16 @@
                     </div>
 
                     @*user name and role*@
-                    <div class="row center">
-                        <h5 class="bold brown-text lighten-1">Name</h5>
-                        <h6 class="bold brown-text lighten-1">ID: 000000</h6>
+                <div class="row center">
+                    <h5 class="bold brown-text lighten-1">Name</h5>
+                    <h6 class="bold brown-text lighten-1">ID: 000000</h6>
 
-                        @*last and next visit*@
-                        <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
-                        <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
-                    </div>
+                    @*last and next visit*@
+                    <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
+                    <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
+
+                    <button class="edit-btn right modal-trigger" data-target="modal-patient-info">EDIT</button>
+                </div>
                 </div>
             </div>
             @*user info*@
@@ -131,7 +133,7 @@
 
                     @*medical history*@
                     <div id="med" class="containerOverflow-2 row m-0">
-                        <div class="medical-history-container view-only-mode">
+                        <div class="medical-history-container">
                             <div class="form-header">
                                 @*previous physician info*@
                                 <div class="physician-info">
@@ -148,7 +150,7 @@
                                 @*update button and last updated*@
                                 <div class="col">
                                     <div class="row">
-                                        <button class="update-btn right modal-trigger" data-target="modal-medical-history">UPDATE</button>
+                                        <button class="update-btn right modal-trigger">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
                                         <p class="last-update">Last Update: Day Month, Year | Time</p>
@@ -190,7 +192,7 @@
 
                                 <li>
                                     For women only:
-                                    <div class="women-only-options">
+                                    <div class="women-only-options view-only">
                                         <label><input name="preg" type="radio" class="with-gap" /><span>Are you pregnant?</span></label>
                                         <label><input name="nurs" type="radio" class="with-gap" /><span>Are you nursing?</span></label>
                                         <label><input name="pill" type="radio" class="with-gap" /><span>Are you taking birth control pills?</span></label>
@@ -206,7 +208,7 @@
                                 <li>Do you have or have had any of the following?</li>
                             </ol>
 
-                            <div class="checkbox-grid">
+                            <div class="checkbox-grid view-only">
                                 <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
@@ -362,5 +364,115 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+@*Patient info*@
+<div id="modal-patient-info" class="modal modal-fixed-footer patient-info-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Patient Information</h5>
+
+        <div class="row">
+            @*Firstname*@
+            <div class="col s4">
+                <label class="custom-label">First Name
+                    <input type="text" class="custom-input" placeholder="First Name">
+                </label>
+            </div>
+
+            @*Middlename*@
+            <div class="col s4">
+                <label class="custom-label">Middle Name
+                    <input type="text" class="custom-input" placeholder="Middle Name">
+                </label>
+            </div>  
+
+            @*Lastname*@
+            <div class="col s4">
+                <label class="custom-label">Last Name
+                    <input type="text" class="custom-input" placeholder="Last Name">
+                </label>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col s6">
+                @*Gender*@
+                <label class="custom-label">
+                    Gender
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="1">Male</option>
+                        <option value="2">Female</option>
+                        <option value="3">Others</option>
+                    </select>
+                </label>
+
+                @*Birthday*@
+                <label class="custom-label">Birthday
+                    <input type="text" class="custom-input" placeholder="Birthday">
+                </label>
+
+                @*Address*@
+                <label class="custom-label">Address 
+                    <input type="text" class="custom-input" placeholder="Address">
+                </label>
+
+                @*Nationality*@
+                <label class="custom-label">Nationality 
+                    <input type="text" class="custom-input" placeholder="Nationality">
+                </label>
+
+                @*Guardian*@
+                <label class="custom-label">Guardian 
+                    <input type="text" class="custom-input" placeholder="Guardian">
+                </label>
+
+                @*Email*@
+                <label class="custom-label">Email Address 
+                    <input type="text" class="custom-input" placeholder="Email Address">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Civil stat*@
+                <label class="custom-label">Civil Status
+                    <input type="text" class="custom-input" placeholder="Civil Status">
+                </label>
+
+                @*Occupation*@
+                <label class="custom-label">Occupation
+                    <input type="text" class="custom-input" placeholder="Occupation">
+                </label>
+
+                @*Religion*@
+                <label class="custom-label">Religion 
+                    <input type="text" class="custom-input" placeholder="Religion">
+                </label>
+
+                @*Medical Insurance*@
+                <label class="custom-label">Medical Insurance 
+                    <input type="text" class="custom-input" placeholder="Medical Insurance">
+                </label>
+
+                @*Guardian Contact #*@
+                <label class="custom-label">Guardian's Contact Number 
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number ">
+                </label>
+
+                @*Contact #*@
+                <label class="custom-label">Contact Number
+                    <input type="text" class="custom-input" placeholder="Contact Number">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD NEW ACCOUNT PICTURE</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
     </div>
 </div>
