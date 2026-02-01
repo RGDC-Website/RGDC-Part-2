@@ -54,6 +54,7 @@ namespace RGDC_Web_Application.Controllers
         }
 
         public ActionResult staffDashboard()
+        public ActionResult dentistDashboard()
         {
             return View();
         }
@@ -63,6 +64,12 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
         public ActionResult staffFinance()
+        public ActionResult dentistPatientsTab()
+        {
+            return View();
+        }
+
+        public ActionResult dentistFinance()
         {
             return View();
         }
