@@ -5,12 +5,12 @@ using System.Web;
 
 namespace RGDC_Web_Application.Models
 {
-    public class tblBranchModel
+    public class tblGenderModel
     {
-        public int branchID { get; set; }
+        public int genderID { get; set; }
         public string description { get; set; }
-        public DateTime branchCreatedAt { get; set; }
-        public DateTime branchUpdatedAt { get; set; }
+        public DateTime genderCreatedAt { get; set; }
+        public DateTime genderUpdatedAt { get; set; }
 
 
     }

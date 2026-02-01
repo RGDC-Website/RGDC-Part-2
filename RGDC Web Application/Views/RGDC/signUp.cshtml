@@ -23,7 +23,7 @@
                            ng-focus="active='email'"
                            ng-blur="active = ''"
                            ng-model="signUp_email"
-                           type="email"
+                           type="text"
                            placeholder="Email *"
                            maxlength="150"
                            oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
@@ -98,7 +98,7 @@
 
                 @*Already have an account*@
                 <div class="forgot-password-container">
-                    <a href="#" class="forgot-link">Already have an account?</a>
+                    <a href="~/RGDC/logIn" class="forgot-link">Already have an account?</a>
                 </div>
 
                 @*Agree to termz and condz*@
@@ -110,9 +110,10 @@
                 </div>
 
                 @*Sign up BTN*@
-                <button class="logSignBtn modal-trigger"
+                <button class="logSignBtn"
                         data-target="patientInformationForm"
-                        type="submit"
+                        type="button"
+                        ng-click="signUpInitial()"
                         ng-disabled="!isFormValid()">
                     Sign Up
                 </button>
@@ -122,11 +123,11 @@
                 </div>
 
                 @*Google sign up*@
-                <div class="social-login-container">
-                    <a href="#" class="google-btn modal-trigger" data-target="modal-password">
-                        <img src="~/Content/images/google.png" alt="Google" />
-                    </a>
-                </div>
+            <div class="social-login-container">
+                <a href="@Url.Action("ExternalLogin", "RGDC", new { provider = "Google" })" class="google-btn">
+                    <img src="~/Content/images/google.png" alt="Google" />
+                </a>
+            </div>
             </form>
         </div>
 
@@ -161,7 +162,7 @@
 
     @*Patient information form*@
     <div id="patientInformationForm" class="modal">
-        <div class="modal-content">
+        <div>
             <h5 class="modal-form-title">Patient Information Form</h5>
 
             <form>
@@ -182,20 +183,22 @@
                             @*First name*@
                             <div class="col s6">
                                 <p class="custom-label">First Name <span class="required-mark">*</span></p>
-                                <input type="text"
-                                       class="custom-input"
-                                       maxlength="150"
-                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                <input type="text" 
+                                       class="custom-input" 
+                                       ng-model="signUp_firstName"
+                                       maxlength="150" 
+                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
                                        placeholder="Juan"
                                        required>
                             </div>
                             @*MIddle name*@
                             <div class="col s6">
                                 <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
-                                <input type="text"
-                                       class="custom-input"
-                                       maxlength="150"
-                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                <input type="text" 
+                                       class="custom-input" 
+                                       ng-model="signUp_middleName"
+                                       maxlength="150" 
+                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
                                        placeholder="Mercado"
                                        required>
                             </div>
@@ -204,9 +207,10 @@
                             @*Last name*@
                             <div class="col s12">
                                 <p class="custom-label">Last Name <span class="required-mark">*</span></p>
-                                <input type="text" class="custom-input"
-                                       maxlength="150"
-                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                <input type="text" class="custom-input" 
+                                       ng-model="signUp_lastName"
+                                       maxlength="150" 
+                                       oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" 
                                        placeholder="Dela Cruz"
                                        required>
                             </div>
@@ -216,13 +220,11 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s3">
+                    <div class="col s3" ng-init="getGender()">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                        <select class="browser-default custom-input" required>
+                        <select class="browser-default custom-input" ng-model="signUp_genderID" required>
                             <option value="" disabled selected>Select Gender</option>
-                            <option value="1">Male</option>
-                            <option value="2">Female</option>
-                            <option value="3">Others</option>
+                            <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
                         </select>
                     </div>
                     @*Birthdate*@
@@ -241,7 +243,7 @@
                     <div class="col s3">
                         @*Civil status*@
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                        <select class="browser-default custom-input" required>
+                        <select class="browser-default custom-input" ng-model="signUp_civilStatus" required>
                             <option value="" disabled selected>Select Status</option>
                             <option value="1">Single</option>
                             <option value="2">Married</option>
@@ -331,8 +333,8 @@
 
         @*Submit or cancel*@
         <div class="modal-footer patient-modal-footer">
-            <a href="#!" class="modal-close btn btn-cancel">Cancel</a>
-            <button type="submit" class="btn btn-next">Submit</button>
+            <a href="#!" class="modal-close btn btn-cancel" ng-click="signUpRemove()">Cancel</a>
+            <button type="submit" class="btn btn-next" ng-click="signUp()">Submit</button>
         </div>
     </div>
 

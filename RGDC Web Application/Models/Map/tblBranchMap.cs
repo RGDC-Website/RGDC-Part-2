@@ -7,12 +7,12 @@ using System.Web;
 
 namespace RGDC_Web_Application.Models.Map
 {
-    public class tblGenderMap : EntityTypeConfiguration<tblGenderModel>
+    public class tblBranchMap : EntityTypeConfiguration<tblBranchModel>
     {
-        public tblGenderMap()
+        public tblBranchMap()
         {
-            HasKey(t => t.genderID);
-            ToTable("tbl_gender");
+            HasKey(t => t.branchID);
+            ToTable("tbl_branch");
         }
     }
 }

@@ -52,14 +52,14 @@
                 </div>
 
                 @*Log in BTN*@
-                <button class="logSignBtn" type="submit">
+                <button class="logSignBtn" type="submit" ng-click="login()">
                     Log In
                 </button>
 
                 @*Dont have an account?*@
                 <div class="signup-footer">
                     <span>Don't have an Account yet? </span>
-                    <a href="#" class="signup-link">Sign Up</a>
+                    <a href="~/Views/RGDC/signUp.cshtml" class="signup-link">Sign Up</a>
                 </div>
 
                 <div class="login-divider">
@@ -67,11 +67,11 @@
                 </div>
 
                 @*Google log in*@
-                <div class="social-login-container">
-                    <a href="#" class="google-btn">
-                        <img src="~/Content/images/google.png" alt="Google" />
-                    </a>
-                </div>
+            <div class="social-login-container">
+                <a href="@Url.Action("ExternalLogin", "RGDC", new { provider = "Google" })" class="google-btn">
+                    <img src="~/Content/images/google.png" alt="Google" />
+                </a>
+            </div>
             </form>
         </div>
 

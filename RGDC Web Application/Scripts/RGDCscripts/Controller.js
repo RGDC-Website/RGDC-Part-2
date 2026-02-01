@@ -1,11 +1,13 @@
 ﻿app.controller("RGDCWebApplicationController", function ($scope, RGDCWebApplicationService) {
 
+    $scope.currentUserName = "";
     const STRENGTH = {
         WEAK: 'Weak',
         FAIR: 'Fair',
         GOOD: 'Good',
         STRONG: 'Strong'
     };
+    $scope.showPatientForm = false;
 
     $scope.hasSpecialChar = function (pwd) {
         if (!pwd) return false;
@@ -125,10 +127,6 @@
         return $scope.signUp_confPassword && $scope.passwordsMatch;
     };
 
-    $scope.isFirstNameValid = function () {
-
-    }
-
     $scope.isBirthDateFieldValid = function () {
         return !!$scope.signUp_birthDate;
     };
@@ -152,4 +150,156 @@
         return !!$scope.signUp_lastVisit;
     };
 
+
+    $scope.signUpInitial = function () {
+
+        var getEmail = RGDCWebApplicationService.checkEmail($scope.signUp_email);
+        getEmail.then(function (returnedData) {
+            if (!returnedData.data.exists) {
+                var modal = document.getElementById("patientInformationForm");
+                if (modal) {
+                    modal.style.display = "block";
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Email is already in use",
+                        text: "Enter another email address",
+                    });
+                    return;
+                }
+            }
+        });
+    };
+
+    $scope.signUpRemove = function () {
+        var modal = document.getElementById("patientInformationForm");
+        if (modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    $scope.getGender = function (){
+        var genders = RGDCWebApplicationService.getGender();
+        genders.then(function (returnedData) {
+            $scope.genderArray = returnedData.data;
+            });
+    }
+
+    $scope.signUp = function () {
+
+        var birthDate = new Date($scope.signUp_birthDate);
+        birthDate.setHours(0, 0, 0, 0); // 00:00:00
+
+        if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
+            var accountData = {
+                firstName: $scope.signUp_firstName,
+                middleName: $scope.signUp_middleName,
+                lastName: $scope.signUp_lastName,
+                genderID: $scope.signUp_genderID,
+                birthDate: birthDate,
+                email: $scope.signUp_email,
+                contactNumber: $scope.signUp_contactNumber,
+                address: $scope.signUp_address,
+                civilStatus: $scope.signUp_civilStatus,
+                password: $scope.signUp_password,
+                lastLogin: new Date(),
+                accCreatedAt: new Date(),
+                accUpdatedAt: new Date(),
+            } 
+            } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Incomplete Inputs",
+                        text: "Ensure all fields are filled up with valid information.",
+                    });
+            return;
+        var signUp = RGDCWebApplicationService.signUp(accountData);
+        signUp.then(function () {
+            window.location.href = "/RGDC/logIn";
+        });
+        }    
+    }
+
+    $scope.login = function () {
+
+        if (!$scope.login_email || $scope.login_email.trim() === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Input",
+                text: "Email is required",
+            });
+            return;
+        }
+
+        if (!$scope.login_password || $scope.login_password.trim() === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Input",
+                text: "Password is required",
+            });
+            return;
+        }
+
+        if (!$scope.hasValidEmail($scope.login_email)) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Email",
+                text: "Enter a valid email address",
+            });
+            return;
+        }
+
+        var loginData = {
+            email: $scope.login_email,
+            password: $scope.login_password
+        };
+
+        var loginRequest = RGDCWebApplicationService.login(loginData);
+        loginRequest.then(function (returnedData) {
+            if (returnedData.data && returnedData.data.success) {
+                $scope.currentUserFirstName = returnedData.data.firstName || "";
+                $scope.currentUserAuthorization = String(returnedData.data.authorization || "");
+
+                Swal.fire({
+                    title: "Login Successful!",
+                    text: "Welcome back, " + returnedData.data.firstName + "!",
+                    icon: "success"
+                }).then(() => {
+                    // Redirect to home page after successful login
+                    if ($scope.currentUserAuthorization === "3") {
+                        window.location.href = "/RGDC/patientDashboard";
+                    } else {
+                        window.location.href = "/RGDC/adminDashboard";
+                    }
+
+                });
+            } else {
+                $scope.loginError = returnedData.data ? returnedData.data.message : "Invalid email or password";
+                $scope.loginErrorType = "password";
+                Swal.fire({
+                    icon: "error",
+                    title: "Login Failed",
+                    text: returnedData.data ? returnedData.data.message : "Invalid email or password",
+                });
+            }
+        }, function (error) {
+            $scope.loginError = "An error occurred during login";
+            $scope.loginErrorType = "password";
+            Swal.fire({
+                icon: "error",
+                title: "Login Failed",
+                text: error.data && error.data.message ? error.data.message : "An error occurred during login",
+            });
+        });
+    }
+
+    $scope.getSessionVariables = function () {
+        var session = RGDCWebApplicationService.getSessionVariable();
+        session.then(function (returnedData) {
+            $scope.currentUserName = returnedData.data.userName || "";
+            $scope.currentUserID = returnedData.data.userID || "";
+            $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
+            console.log($scope.currentUserName)
+        });
+    }
 });
