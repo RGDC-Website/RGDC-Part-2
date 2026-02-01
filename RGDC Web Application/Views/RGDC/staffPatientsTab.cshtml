@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/_staffLayout.cshtml";
+}
+
+
+<div class="dashContainer">
+    @*top part (welcome, refresh, logout)*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*user name*@
+        <div class="col m8 l8"><h4 class="bold">Patients</h4></div>
+        @*refresh and logout buttons*@
+        <div class="col m4 l4">
+            <span class="right">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+    <div class="row m-0">
+        <a class="waves-effect waves-light btn left brown lighten-4 medBtn"><i class="material-icons left">group_add</i>Add Patient</a>
+    </div>
+
+    @*patients*@
+    <table id="staffPatientsTabTable" class="hover">
+        <thead>
+            <tr class="brown-text lighten-1">
+                <th>Patient Name</th>
+                <th>Last Visit</th>
+                <th colspan="2">Appointments Scheduled</th>
+            </tr>
+        </thead>
+        @*table content*@
+        <tbody>
+            <tr>
+                <td>Name</td>
+                <td>Month DD, YYYY</td>
+                <td>X Appointment Scheduled</td>
+                <td>
+                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit Account"><i class="material-icons brown-text lighten-1">edit</i></a>
+                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="View Patient Record"  style="margin-right: 0.5rem !important">
+                        <i class="material-icons brown-text lighten-1">remove_red_eye</i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="brown-text lighten-1">
+                <th>Patient Name</th>
+                <th>Last Visit</th>
+                <th>Appointments Scheduled</th>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>

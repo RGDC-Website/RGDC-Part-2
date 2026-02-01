@@ -53,11 +53,17 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
+        public ActionResult staffDashboard()
         public ActionResult dentistDashboard()
         {
             return View();
         }
 
+        public ActionResult staffPatientsTab()
+        {
+            return View();
+        }
+        public ActionResult staffFinance()
         public ActionResult dentistPatientsTab()
         {
             return View();

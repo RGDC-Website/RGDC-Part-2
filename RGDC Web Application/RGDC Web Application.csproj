@@ -287,6 +287,10 @@
     <Content Include="Views\RGDC\patientProfile.cshtml" />
     <Content Include="Views\RGDC\adminFinance.cshtml" />
     <Content Include="Views\RGDC\patientFinance.cshtml" />
+    <Content Include="Views\Shared\_staffLayout.cshtml" />
+    <Content Include="Views\RGDC\staffDashboard.cshtml" />
+    <Content Include="Views\RGDC\staffPatientsTab.cshtml" />
+    <Content Include="Views\RGDC\staffFinance.cshtml" />
     <Content Include="Views\Shared\_dentistLayout.cshtml" />
     <Content Include="Views\RGDC\dentistDashboard.cshtml" />
     <Content Include="Views\RGDC\dentistPatientsTab.cshtml" />
