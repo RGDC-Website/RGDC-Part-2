@@ -62,6 +62,10 @@ namespace RGDC_Web_Application.Controllers
         {
             return View();
         }
+        public ActionResult staffFinance()
+        {
+            return View();
+        }
         [HttpPost]
         public JsonResult CheckEmail(string email)
         {

@@ -290,6 +290,7 @@
     <Content Include="Views\Shared\_staffLayout.cshtml" />
     <Content Include="Views\RGDC\staffDashboard.cshtml" />
     <Content Include="Views\RGDC\staffPatientsTab.cshtml" />
+    <Content Include="Views\RGDC\staffFinance.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
