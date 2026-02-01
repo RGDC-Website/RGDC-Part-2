@@ -3,9 +3,9 @@
 }
 
 <div class="split-container">
-   
+
     <div class="left-side">
-        
+
     </div>
 
     <div class="right-side" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
@@ -40,13 +40,13 @@
 
                 @*Forgot password?*@
                 <div class="forgot-password-container">
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    <a href="#" class="forgot-link modal-trigger" data-target="modal-password">Forgot password?</a>
                 </div>
 
                 @*Agree to termz and condz*@
                 <div class="checkbox-container">
                     <label>
-                        <input type="checkbox" class="filled-in" required/>
+                        <input type="checkbox" class="filled-in" required />
                         <span>I Agree to the terms and conditions</span>
                     </label>
                 </div>
@@ -77,7 +77,47 @@
 
     </div>
 
-
 </div>
+
+@*Forgot Password*@
+<div id="modal-password" class="modal password-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title">Reset Your Password</h5>
+        <p class="signup-footer" style="text-align: left; margin-bottom: -5px;">
+            Please check your email for a captcha code.
+        </p>
+
+        <div class="row">
+            @* otp Section *@
+            <div class="col s12">
+                <p class="custom-label">OTP Code <span class="required-mark">*</span></p>
+                <input type="text" class="custom-input" placeholder="Enter code" style="margin-top: 0 !important;">
+                @* Resend Link *@
+                <div style="text-align: right; margin-top: 5px; margin-bottom: -20px;">
+                    <a href="#!" class="forgot-link">Didn't receive a code? Resend</a>
+                </div>
+            </div>
+
+            @* New Password Field *@
+            <div class="col s12">
+                <p class="custom-label">New Password <span class="required-mark">*</span></p>
+                <input type="password" class="custom-input" placeholder="Enter new password">
+            </div>
+
+            @* Confirm Password Field *@
+            <div class="col s12">
+                <p class="custom-label">Confirm New Password <span class="required-mark">*</span></p>
+                <input type="password" class="custom-input" placeholder="Re-type new password">
+            </div>
+        </div>
+    </div>
+
+    @*cancel and reset*@
+    <div class="modal-footer patient-modal-footer">
+        <a href="#!" class="modal-close btn btn-cancel">Cancel</a>
+        <button type="button" class="btn btn-next">Reset</button>
+    </div>
+</div>
+
 
 

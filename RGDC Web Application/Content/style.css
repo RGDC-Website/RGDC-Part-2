@@ -62,6 +62,31 @@ a:hover {
     overflow-x: hidden;
 }
 
+.containerOverflow-2 {
+    min-height: 12rem;
+    max-height: 46.3rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+    .containerOverflow-2::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .containerOverflow-2::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .containerOverflow-2::-webkit-scrollbar-thumb {
+        background: #967863;
+        border-radius: 10px;
+    }
+
+        .containerOverflow-2::-webkit-scrollbar-thumb:hover {
+            background: #836754;
+        }
+
 .dashContainer{
     margin:0 1rem 0 1rem;
 }
@@ -90,6 +115,9 @@ a:hover {
 }
 .p-1{
     padding: 1rem !important;
+}
+.p-2{
+    padding: 2rem !important;
 }
 .mb-1 {
     margin-bottom: 1rem !important;
@@ -274,8 +302,17 @@ html, body {
     max-width: fit-content;
     background-color: #e5e5e5;
     max-height: fit-content;
-
 }
+
+    .modal.modal-fixed-footer {
+        top: 5% !important; /* Move it slightly down from the top edge */
+        height: 90% !important; /* Ensure it stays 90% of screen height */
+    }
+
+        .modal.modal-fixed-footer .modal-content {
+            height: calc(100% - 56px) !important; /* Subtract footer height */
+            overflow-y: auto !important; /* Force the vertical scrollbar */
+        }
 
 .modal .modal-content {
     padding: 15px 25px 5px 25px !important;
@@ -663,3 +700,200 @@ select.browser-default.custom-input {
     padding-top: 10px;
     margin-top: auto; 
 }
+
+.medical-history-container {
+    padding: 20px;
+    color: ##967863;
+    position: relative;
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 20px;
+    grid-row-gap: 8px;
+    color: #967863;
+}
+
+    .checkbox-grid label {
+        display: flex;
+        align-items: center;
+        color: #8D6E63 !important;
+    }
+
+.other-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    grid-column: span 1; 
+}
+
+.other-input {
+    border-bottom: 1px solid #8D6E63 !important;
+    height: 20px !important;
+    margin: 0 !important;
+}
+
+.signature-container {
+    width: 250px;
+    text-align: center;
+    margin-top: 35px;
+    margin-left:19rem;
+}
+
+.signature-pad {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    height: 100px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .signature-pad i {
+        color: #eeeeee;
+        font-size: 4rem;
+    }
+
+.signature-line {
+    border-bottom: 1px solid #967863;
+    margin: 10px 0 5px 0;
+}
+
+.signature-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #967863;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items:flex-start;
+    color: #7d6b5d;
+}
+
+.update-btn {
+    background-color: #967863;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto !important;
+}
+
+.view-only-mode {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.last-update {
+    font-size: 0.75rem;
+    color: #a0a0a0;
+    margin-top: 5px;
+}
+
+.medical-questions {
+    padding-left: 20px;
+    color: #967863;
+    line-height: 2;
+}
+
+    .medical-questions li {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+.women-only-options {
+    display: inline-flex;
+    gap: 25px;
+    margin-left: 15px;
+}
+
+    .women-only-options span {
+        font-size: 0.9rem;
+        color: #7d6b5d;
+    }
+
+[type="radio"]:checked + span:after,
+[type="radio"].with-gap:checked + span:before,
+[type="radio"].with-gap:checked + span:after {
+    border: 2px solid #967863 !important;
+}
+
+[type="radio"]:checked + span:after,
+[type="radio"].with-gap:checked + span:after {
+    background-color: #967863 !important;
+}
+
+.form-divider {
+    border: 0;
+    border-top: 1.5px solid #967863;
+    margin: -5px 0;
+}
+
+#modal-password.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important; 
+    width: 400px !important;
+    max-width: 90% !important;
+    height: auto !important;
+    max-height: 80vh;
+    position: fixed !important;
+    margin: 0 !important;
+}
+
+.password-modal .modal-content {
+    padding: 20px !important;
+}
+
+.medical-questions li {
+    position: relative;
+    margin-bottom: 12px;
+    padding-right: 30px;
+    line-height: 1.5;
+}
+
+.placeholder-text {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-weight: bold;
+    color: #967863;
+    margin-right:10px;
+}
+
+.medical-history-modal {
+    width: 85% !important;
+    max-height: 90% !important;
+}
+
+.line-input {
+    border: none !important;
+    border-bottom: 1px solid #967863 !important;
+    margin-left: 10px;
+    padding: 2px 5px !important;
+}
+
+.flex-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.yn-group label {
+    margin-left: 15px;
+}
+
+.condition-grid label {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #333;
+}
+
