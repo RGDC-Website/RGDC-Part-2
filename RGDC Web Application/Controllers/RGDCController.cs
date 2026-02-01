@@ -52,6 +52,21 @@ namespace RGDC_Web_Application.Controllers
         {
             return View();
         }
+
+        public ActionResult dentistDashboard()
+        {
+            return View();
+        }
+
+        public ActionResult dentistPatientsTab()
+        {
+            return View();
+        }
+
+        public ActionResult dentistFinance()
+        {
+            return View();
+        }
         [HttpPost]
         public JsonResult CheckEmail(string email)
         {

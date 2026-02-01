@@ -49,6 +49,13 @@ a:hover {
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     border-radius: 15px;
 }
+.medBtn {
+    color: #795548 !important;
+}
+.medBtn:hover {
+    background-color: #795548 !important;
+    color: white !important;
+}
 
 .smallBtn:hover{
     background-color: #8d6e63 !important;
@@ -132,6 +139,10 @@ a:hover {
 }
 .m-0{
     margin: 0 !important;
+}
+
+.dt-length select {
+    display: inline-block !important;
 }
 
 
