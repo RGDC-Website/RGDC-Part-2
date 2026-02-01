@@ -290,6 +290,7 @@
     <Content Include="Views\Shared\_dentistLayout.cshtml" />
     <Content Include="Views\RGDC\dentistDashboard.cshtml" />
     <Content Include="Views\RGDC\dentistPatientsTab.cshtml" />
+    <Content Include="Views\RGDC\dentistFinance.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
