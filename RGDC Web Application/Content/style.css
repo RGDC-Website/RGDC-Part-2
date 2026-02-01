@@ -962,3 +962,53 @@ select.browser-default.custom-input {
     max-height: 85% !important;
     overflow: hidden; 
 }
+
+.med-his-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    max-width: 900px !important;
+    padding: 0 20px 0 20px !important;
+}
+
+    .med-his-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
+
+    .med-his-modal::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .med-his-modal::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .med-his-modal::-webkit-scrollbar-thumb {
+        background: #967863;
+        border-radius: 10px;
+    }
+
+        .med-his-modal::-webkit-scrollbar-thumb:hover {
+            background: #836754;
+        }
+
+#med-his-modal.modal {
+    top: 50% !important;
+    left: 50% !important;
+    height: 80% !important;
+    max-height: 90% !important;
+    overflow: hidden;
+}
+
+.footer-center2 {
+    background-color: #e0e0e0 !important;
+    border: none !important;
+    margin-bottom: 45px !important;
+}
