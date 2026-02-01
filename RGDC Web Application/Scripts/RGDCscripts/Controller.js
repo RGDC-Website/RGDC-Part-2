@@ -157,7 +157,7 @@
         getEmail.then(function (returnedData) {
             if (!returnedData.data.exists) {
                 var modal = document.getElementById("patientInformationForm");
-                if (modal) {
+                if (modal ) {
                     modal.style.display = "block";
                 } else {
                     Swal.fire({
@@ -186,38 +186,50 @@
     }
 
     $scope.signUp = function () {
-
+       
+        try {
         var birthDate = new Date($scope.signUp_birthDate);
-        birthDate.setHours(0, 0, 0, 0); // 00:00:00
+            birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-        if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
-            var accountData = {
-                firstName: $scope.signUp_firstName,
-                middleName: $scope.signUp_middleName,
-                lastName: $scope.signUp_lastName,
-                genderID: $scope.signUp_genderID,
-                birthDate: birthDate,
-                email: $scope.signUp_email,
-                contactNumber: $scope.signUp_contactNumber,
-                address: $scope.signUp_address,
-                civilStatus: $scope.signUp_civilStatus,
-                password: $scope.signUp_password,
-                lastLogin: new Date(),
-                accCreatedAt: new Date(),
-                accUpdatedAt: new Date(),
-            } 
-            } else {
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
+                var accountData = {
+                    firstName: $scope.signUp_firstName,
+                    middleName: $scope.signUp_middleName,
+                    lastName: $scope.signUp_lastName,
+                    genderID: $scope.signUp_genderID,
+                    birthDate: birthDate,
+                    email: $scope.signUp_email,
+                    contactNumber: $scope.signUp_contactNumber,
+                    address: $scope.signUp_address,
+                    civilStatus: $scope.signUp_civilStatus,
+                    password: $scope.signUp_password,
+                    lastLogin: new Date(),
+                    accCreatedAt: new Date(),
+                    accUpdatedAt: new Date(),
+                }
+                if ($scope.signUp_agreement == true) {
+                    var signUp = RGDCWebApplicationService.signUp(accountData);
+                    signUp.then(function () {
+                         window.location.href = "/RGDC/logIn";
+                    });
+                } else {
                     Swal.fire({
                         icon: "error",
-                        title: "Incomplete Inputs",
-                        text: "Ensure all fields are filled up with valid information.",
+                        title: "Read and Accept the Following:",
+                        text: "Terms and Conditions & Data Privacy Policy",
                     });
-            return;
-        var signUp = RGDCWebApplicationService.signUp(accountData);
-        signUp.then(function () {
-            window.location.href = "/RGDC/logIn";
-        });
-        }    
+                }                
+            }
+            else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Incomplete Inputs",
+                    text: "Ensure all fields are filled up with valid information.",
+                });
+            }
+        } catch (e) {
+                console.log(e.message)
+        }
     }
 
     $scope.login = function () {
