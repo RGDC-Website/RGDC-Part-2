@@ -285,6 +285,7 @@
     <Content Include="Views\Shared\_patientLayout.cshtml" />
     <Content Include="Views\RGDC\patientDashboard.cshtml" />
     <Content Include="Views\RGDC\patientProfile.cshtml" />
+    <Content Include="Views\RGDC\adminFinance.cshtml" />
     <Content Include="Views\RGDC\patientFinance.cshtml" />
   </ItemGroup>
   <ItemGroup>
