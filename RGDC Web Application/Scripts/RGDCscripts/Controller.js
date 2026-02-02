@@ -17,6 +17,7 @@
     $scope.passwordStrength = '';
     $scope.strengthColor = '';
     $scope.passwordsMatch = true;
+    $scope.signUp_emailLocked = false;
 
     $scope.checkPasswordStrength = function () {
         const pwd = $scope.signUp_password || '';
@@ -314,4 +315,72 @@
             console.log($scope.currentUserName)
         });
     }
+
+    $scope.checkAuthEmail = function () {
+        var authEmail = RGDCWebApplicationService.getAuthEmail();
+        authEmail.then(function (response) {
+            console.log(response.data.email)
+                if (response.data.email) {
+                    $scope.signUp_email = response.data.email;
+                    $scope.signUp_emailLocked = true;
+                }
+            });
+    };
+
+    $scope.sendOTP = function () {
+        if (!$scope.forgot_email) {
+            Swal.fire({
+                icon: "error",
+                title: "Email is Required",
+                text: "Input your Email",
+            });
+            return;
+        }
+        var forgot_email = {
+            email: $scope.forgot_email
+        }
+
+        var sendOTP = RGDCWebApplicationService.sendOTP(forgot_email);
+        sendOTP.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "OTP Sent",
+                    text: "Check your Inbox."
+                });
+            } else {
+            Swal.fire({
+                icon: "error",
+                title: "OTP not Sent",
+                text: response.data.message,
+            });
+            }
+
+        });
+    };
+
+    $scope.resetPassword = function () {
+
+        if ($scope.forgot_newPassword !== $scope.forgot_confirmPassword) {
+            Swal.fire({
+                icon: "error",
+                title: "Passwords does not match",
+                text: "Make sure that passwords match",
+            });
+            return;
+        }
+        var forgot_info = {
+            email: $scope.forgot_email,
+            password: $scope.forgot_newPassword,
+            otp: $scope.forgot_otp
+        }
+        var resetPassword = RGDCWebApplicationService.resetPassword(forgot_info);
+        resetPassword.then(function () {
+            Swal.fire({
+                icon: "success",
+                title: "Password Changed Successfully",
+                text: "Log In with your new password!",
+            });
+        });
+    };
 });
