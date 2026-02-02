@@ -328,13 +328,13 @@ html, body {
 }
 
     .modal.modal-fixed-footer {
-        top: 5% !important; /* Move it slightly down from the top edge */
-        height: 90% !important; /* Ensure it stays 90% of screen height */
+        top: 5% !important; 
+        height: 90% !important; 
     }
 
         .modal.modal-fixed-footer .modal-content {
-            height: calc(100% - 56px) !important; /* Subtract footer height */
-            overflow-y: auto !important; /* Force the vertical scrollbar */
+            height: calc(100% - 56px) !important; 
+            overflow-y: auto !important; 
         }
 
 .modal .modal-content {
@@ -804,13 +804,47 @@ select.browser-default.custom-input {
     padding: 8px 20px;
     border-radius: 8px;
     font-weight: bold;
-    cursor: pointer;
-    pointer-events: auto !important;
 }
 
-.view-only-mode {
+    .update-btn:hover {
+        background-color: #673e21;
+        color: white;
+    }
+
+.edit-btn {
+    background-color: #967863;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: -30px;
+    margin-top: -5px;
+}
+
+    .edit-btn:hover {
+        background-color: #673e21;
+        color: white;
+    }
+
+.cancel-btn {
+    background-color: gray;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: -30px;
+    margin-top: -5px;
+}
+
+    .cancel-btn:hover {
+        background-color: dimgray;
+        color: white;
+    }
+
+.view-only {
     pointer-events: none;
-    opacity: 0.8;
 }
 
 .last-update {
@@ -920,3 +954,84 @@ select.browser-default.custom-input {
     color: #333;
 }
 
+.patient-info-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 850px !important;
+}
+
+.patient-info-modal input[type="text"] {
+    width: 100%;
+    height: 40px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    padding: 0 10px;
+}
+
+.footer-center {
+    background-color: #e0e0e0 !important;
+    text-align: center;
+    border: none !important;
+}
+
+#modal-patient-info.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    height: 77% !important;
+    max-height: 85% !important;
+    overflow: hidden; 
+}
+
+.med-his-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 100% !important;
+    max-width: 950px !important;
+    padding: 0 20px 0 20px !important;
+}
+
+    .med-his-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
+
+    .med-his-modal::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .med-his-modal::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .med-his-modal::-webkit-scrollbar-thumb {
+        background: #967863;
+        border-radius: 10px;
+    }
+
+        .med-his-modal::-webkit-scrollbar-thumb:hover {
+            background: #836754;
+        }
+
+#med-his-modal.modal {
+    top: 50% !important;
+    left: 50% !important;
+    height: 80% !important;
+    max-height: 90% !important;
+    overflow: hidden;
+}
+
+.footer-center2 {
+    background-color: #e0e0e0 !important;
+    border: none !important;
+    margin-bottom: 45px !important;
+}

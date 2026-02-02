@@ -41,6 +41,8 @@
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
                         <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
+
+                        <button class="edit-btn right modal-trigger" data-target="modal-patient-info">EDIT</button>
                     </div>
                 </div>
             </div>
@@ -132,24 +134,27 @@
 
                     @*medical history*@
                     <div id="med" class="containerOverflow-2 row m-0">
-                        <div class="medical-history-container view-only-mode">
+                        <div class="medical-history-container">
                             <div class="form-header">
                                 @*previous physician info*@
                                 <div class="physician-info">
-                                    <p class="medInfo">Name of previous physician: 
+                                    <p class="medInfo">
+                                        Name of previous physician:
                                         <span style="font-weight:bold">---</span>
                                     </p>
-                                    <p>Physician's Office:
+                                    <p>
+                                        Physician's Office:
                                         <span style="font-weight:bold">---</span>
                                     </p>
-                                    <p>Physician's Contacts:
+                                    <p>
+                                        Physician's Contacts:
                                         <span style="font-weight:bold">---</span>
                                     </p>
                                 </div>
                                 @*update button and last updated*@
                                 <div class="col">
                                     <div class="row">
-                                        <button class="update-btn right modal-trigger" data-target="modal-medical-history">UPDATE</button>
+                                        <button class="update-btn right modal-trigger" data-target="medical-history-modal">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
                                         <p class="last-update">Last Update: Day Month, Year | Time</p>
@@ -161,53 +166,64 @@
 
                             @*medical history*@
                             <ol class="medical-questions">
-                                <li>Are you in good health? 
+                                <li>
+                                    Are you in good health?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Are you under medical treatment now?
+                                <li>
+                                    Are you under medical treatment now?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Have you ever had a serious illness or surgical operation?
+                                <li>
+                                    Have you ever had a serious illness or surgical operation?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Have you ever been hospitalized?
+                                <li>
+                                    Have you ever been hospitalized?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Are you taking prescription/non-prescription medication?
+                                <li>
+                                    Are you taking prescription/non-prescription medication?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Are you taking tobacco products?
+                                <li>
+                                    Are you taking tobacco products?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Do you use alcohol, cocaine, or other dangerous drugs?
+                                <li>
+                                    Do you use alcohol, cocaine, or other dangerous drugs?
                                     <span class="placeholder-text">YES/NO</span>
                                 </li>
-                                <li>Allergies:
+                                <li>
+                                    Allergies:
                                     <span class="placeholder-text">---</span>
                                 </li>
-                                <li>Bleeding Time:
+                                <li>
+                                    Bleeding Time:
                                     <span class="placeholder-text">---</span>
                                 </li>
 
                                 <li>
                                     For women only:
-                                    <div class="women-only-options">
-                                        <label><input name="preg" type="radio" class="with-gap" /><span>Are you pregnant?</span></label>
-                                        <label><input name="nurs" type="radio" class="with-gap" /><span>Are you nursing?</span></label>
-                                        <label><input name="pill" type="radio" class="with-gap" /><span>Are you taking birth control pills?</span></label>
+                                    <div class="women-only-options view-only">
+                                        <label><input type="checkbox" class="filled-in" /><span>Are you pregnant?</span></label>
+                                        <label><input type="checkbox" class="filled-in" /><span>Are you nursing?</span></label>
+                                        <label><input type="checkbox" class="filled-in" /><span>Are you taking birth control pills?</span></label>
                                     </div>
                                 </li>
 
-                                <li>Blood type:
+                                <li>
+                                    Blood type:
                                     <span class="placeholder-text">---</span>
                                 </li>
-                                <li>Blood pressure:
+                                <li>
+                                    Blood pressure:
                                     <span class="placeholder-text">---</span>
                                 </li>
                                 <li>Do you have or have had any of the following?</li>
                             </ol>
 
-                            <div class="checkbox-grid">
+                            <div class="checkbox-grid view-only">
                                 <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
@@ -387,5 +403,386 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+
+@*Patient info*@
+<div id="modal-patient-info" class="modal modal-fixed-footer patient-info-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Patient Information</h5>
+
+        <div class="row">
+            @*Firstname*@
+            <div class="col s4">
+                <label class="custom-label">
+                    First Name
+                    <input type="text" class="custom-input" placeholder="First Name">
+                </label>
+            </div>
+
+            @*Middlename*@
+            <div class="col s4">
+                <label class="custom-label">
+                    Middle Name
+                    <input type="text" class="custom-input" placeholder="Middle Name">
+                </label>
+            </div>
+
+            @*Lastname*@
+            <div class="col s4">
+                <label class="custom-label">
+                    Last Name
+                    <input type="text" class="custom-input" placeholder="Last Name">
+                </label>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col s6">
+                @*Gender*@
+                <label class="custom-label">
+                    Gender
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="1">Male</option>
+                        <option value="2">Female</option>
+                        <option value="3">Others</option>
+                    </select>
+                </label>
+
+                @*Birthday*@
+                <label class="custom-label">
+                    Birthday
+                    <input type="text" class="custom-input" placeholder="Birthday">
+                </label>
+
+                @*Address*@
+                <label class="custom-label">
+                    Address
+                    <input type="text" class="custom-input" placeholder="Address">
+                </label>
+
+                @*Nationality*@
+                <label class="custom-label">
+                    Nationality
+                    <input type="text" class="custom-input" placeholder="Nationality">
+                </label>
+
+                @*Guardian*@
+                <label class="custom-label">
+                    Guardian
+                    <input type="text" class="custom-input" placeholder="Guardian">
+                </label>
+
+                @*Email*@
+                <label class="custom-label">
+                    Email Address
+                    <input type="text" class="custom-input" placeholder="Email Address">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Civil status*@
+                <label class="custom-label">
+                    Civil Status
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </label>
+
+                @*Occupation*@
+                <label class="custom-label">
+                    Occupation
+                    <input type="text" class="custom-input" placeholder="Occupation">
+                </label>
+
+                @*Religion*@
+                <label class="custom-label">
+                    Religion
+                    <input type="text" class="custom-input" placeholder="Religion">
+                </label>
+
+                @*Medical Insurance*@
+                <label class="custom-label">
+                    Medical Insurance
+                    <input type="text" class="custom-input" placeholder="Medical Insurance">
+                </label>
+
+                @*Guardian Contact #*@
+                <label class="custom-label">
+                    Guardian's Contact Number
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number ">
+                </label>
+
+                @*Contact #*@
+                <label class="custom-label">
+                    Contact Number
+                    <input type="text" class="custom-input" placeholder="Contact Number">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD NEW ACCOUNT PICTURE</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+
+@*medical history modal*@
+<div id="medical-history-modal" class="modal modal modal-fixed-footer med-his-modal">
+    <div class="medical-history-container">
+        <h5 class="modal-form-title">Edit Medical History</h5>
+
+        <div class="form-header">
+            @*previous physician info*@
+            <div class="row" style="padding: 0 10px; flex:1">
+                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin:0 0 -15px 0;">
+                    <span>Name of previous physician:</span>
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Name of previous physician">
+                </p>
+
+                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 -15px 0;">
+                    <span>Physician's office:</span>
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's office">
+                </p>
+
+                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 5px 0;">
+                    <span>Physician's contact:</span>
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's contact">
+                </p>
+            </div>
+
+        </div>
+        <hr class="form-divider" style="margin-bottom:10px;">
+
+        @*medical history*@
+        <ol class="medical-questions">
+            <li>
+                @*Are you in good health?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Are you in good health?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right:-25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="1" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="1" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Are you under medical treatment now?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Are you under medical treatment now?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="2" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="2" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Have you ever had a serious illness or surgical operation?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Have you ever had a serious illness or surgical operation?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="3" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="3" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Have you ever been hospitalized?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Have you ever been hospitalized?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="4" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="4" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Are you taking prescription/non-prescription medication?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Are you taking prescription/non-prescription medication?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="5" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="5" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Are you taking tobacco products?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Are you taking tobacco products?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="6" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="6" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li>
+                @*Do you use alcohol, cocaine, or other dangerous drugs?*@
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span>Do you use alcohol, cocaine, or other dangerous drugs?</span>
+
+                    <div style="display: flex; gap: 15px; margin-right: -25px;">
+                        <label style="display: flex; align-items: center;">
+                            <input name="7" type="radio" class="with-gap" />
+                            <span>Yes</span>
+                        </label>
+                        <label style="display: flex; align-items: center;">
+                            <input name="7" type="radio" class="with-gap" />
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </li>
+            <li style="margin: -10px 0 10px 0;">
+                @*Allergies*@
+                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+                    <span>Allergies:</span>
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Allergies...">
+                </div>
+            </li>
+            <li style="margin: -25px 0 0 0;">
+                @*Bleeding time:*@
+                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+                    <span>Bleeding time:</span>
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time...">
+                </div>
+            </li>
+
+            <li>
+                For women only:
+                <div class="women-only-options">
+                    <label><input type="checkbox" class="filled-in" /><span>Are you pregnant?</span></label>
+                    <label><input type="checkbox" class="filled-in" /><span>Are you nursing?</span></label>
+                    <label><input type="checkbox" class="filled-in" /><span>Are you taking birth control pills?</span></label>
+                </div>
+            </li>
+
+            <li style="margin: -10px 0 10px 0;">
+                @*Blood ppressure*@
+                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+                    <span>Blood pressure:</span>
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Blood pressure...">
+                </div>
+            </li>
+            <li style="margin: -25px 0 0 0;">
+                @*Blood type:*@
+                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
+                    <span>Blood type:</span>
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time...">
+                </div>
+            </li>
+            <li>Do you have or have had any of the following?</li>
+        </ol>
+
+        <div class="checkbox-grid">
+            <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>AIDS or HIV Infection</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Sexually Transmitted Disease</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Stomach Troubles / Ulcer</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Fainting Seizure</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Rapid Weight Loss</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Radiation Therapy</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Joint Replacement / Implant</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Heart Surgery</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
+
+            <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
+
+            <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
+            <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
+
+            <div class="other-section">
+                <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
+                <input type="text" class="other-input" style="margin-right:25px">
+            </div>
+        </div>
+
+        @*signature*@
+        <div class="signature-container" style="margin-left:320px">
+            <div class="signature-pad" style="margin-top: 20px;">
+                <i class="material-icons">image</i>
+            </div>
+            <div class="signature-line"></div>
+            <span class="signature-label">Signature</span>
+        </div>
+    </div>
+
+    <div class="footer-center2">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD SIGNATURE</button>
+        <button class="modal-close cancel-btn right" style="font-weight: 500; margin-right: 110px;">CANCEL</button>
+        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px">SAVE</button>
     </div>
 </div>
