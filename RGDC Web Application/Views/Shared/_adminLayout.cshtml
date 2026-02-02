@@ -114,6 +114,30 @@
             });
         });
 
+        //Pop up modals
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.modal');
+            M.Modal.init(elems, {
+                startingTop: '4%', // Start slightly lower
+                endingTop: '10%'   // End at a visible spot
+            });
+        });
+
+        //Date
+        document.addEventListener('DOMContentLoaded', function () {
+            var today = new Date();
+
+            // Date picker
+            var dateElems = document.querySelectorAll('.datepicker');
+            M.Datepicker.init(dateElems, {
+                format: 'mm/dd/yyyy',
+                maxDate: today,
+                yearRange: [1920, today.getFullYear()],
+                autoClose: true,
+                showClearBtn: true
+            });
+        });
+
         @* admin finance table *@
         new DataTable('#adminFinance');
         @* admin patients table *@

@@ -281,6 +281,11 @@
 
                     @*Progress Notes*@
                     <div id="prog" class="row m-0">
+
+                        <div class="row">
+                            <a class="edit-btn right modal-trigger" data-target="modal-progress-notes">ADD NOTE</a>
+                        </div>
+
                         <table id="progressNotes" class="hover">
                             @*table headers*@
                             <thead>
@@ -305,10 +310,10 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>
-                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-progress-note" data-position="bottom" data-tooltip="Delete Progress Note">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-progress-note" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -328,14 +333,24 @@
                     </div>
 
                     @*Dental Chart*@
-                    <div id="dent" class="row m-0 containerOverflow-2">
+                    <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
+
+                        <div class="row">
+                            <a class="edit-btn right modal-trigger" data-target="modal-dental-chart">EDIT CHART</a>
+                        </div>
+
                         <div class="row m-0 center">
                             <img src="https://placehold.co/2550x3300" style="max-height: 47rem" />
                         </div>
+
                     </div>
 
                     @*Forms*@
                     <div id="forms" class="row m-0">
+                        <div class="row">
+                            <a class="edit-btn right">ADD FORM</a>
+                        </div>
+
                         <table id="patientForms" class="hover tableClk">
                             @*table headers*@
                             <thead>
@@ -374,6 +389,7 @@
 
                     @*post op*@
                     <div id="postOp" class="row m-0">
+
                         <div class="row">
                             <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
                                 <div class="card-content brown-text lighten-1">
@@ -386,12 +402,12 @@
                             </div>
                         </div>
                         @*edit and delete buttons*@
-                    <div class="row m-0 left">
-                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Edit Post Op" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
-                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn" data-position="bottom" data-tooltip="Delete Post Op">
-                            <i class="material-icons brown-text lighten-1">delete</i>
-                        </a>
-                    </div>
+                        <div class="row m-0 left">
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Edit Post Op" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn" data-position="bottom" data-tooltip="Delete Post Op">
+                                <i class="material-icons brown-text lighten-1">delete</i>
+                            </a>
+                        </div>
                     </div>
 
                     @*appointments*@
@@ -784,5 +800,147 @@
         <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD SIGNATURE</button>
         <button class="modal-close cancel-btn right" style="font-weight: 500; margin-right: 110px;">CANCEL</button>
         <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+
+@*Add Progress botes*@
+<div id="modal-progress-notes" class="modal modal-fixed-footer prog-notes-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Progress Note</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="Date">
+                </label>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist">
+                </label>
+
+                @*Amount*@
+                <label class="custom-label">
+                    Amount
+                    <input type="text" class="custom-input" placeholder="Amount">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Procedures*@
+                <label class="custom-label">
+                    Procedures
+                    <input type="text" class="custom-input" placeholder="Procedures">
+                </label>
+
+                @*Tooth Number*@
+                <label class="custom-label">
+                    Tooth Number
+                    <input type="text" class="custom-input" placeholder="Tooth Number">
+                </label>
+
+                @*Paid*@
+                <label class="custom-label">
+                    Paid
+                    <input type="text" class="custom-input" placeholder="Paid">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+@*Edit Progress botes*@
+<div id="modal-edit-progress-note" class="modal modal-fixed-footer prog-notes-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Progress Note</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="Date">
+                </label>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist">
+                </label>
+
+                @*Amount*@
+                <label class="custom-label">
+                    Amount
+                    <input type="text" class="custom-input" placeholder="Amount">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Procedures*@
+                <label class="custom-label">
+                    Procedures
+                    <input type="text" class="custom-input" placeholder="Procedures">
+                </label>
+
+                @*Tooth Number*@
+                <label class="custom-label">
+                    Tooth Number
+                    <input type="text" class="custom-input" placeholder="Tooth Number">
+                </label>
+
+                @*Paid*@
+                <label class="custom-label">
+                    Paid
+                    <input type="text" class="custom-input" placeholder="Paid">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+@*DELETE Progress botes*@
+<div id="modal-delete-progress-note" class="modal modal-fixed-footer delete-prog-note-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Progress Note</h5>
+
+        <p class="custom-label">Are you sure you want to delete this progress note? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
+</div>
+
+@*Dental Chart*@
+<div id="modal-dental-chart" class="modal modal-fixed-footer dental-chart-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Dental Chart</h5>
+
+        <div class="row">
+            <div class="row m-0 center">
+                <img src="https://placehold.co/2550x3300" style="max-height: 33rem" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD DENTAL CHART</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
     </div>
 </div>
