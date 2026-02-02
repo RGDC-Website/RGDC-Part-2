@@ -109,6 +109,14 @@
         new DataTable('#dentistPatientsTabTable');
         //finance tab table
         new DataTable('#dentistFinance');
+
+        //clickeable DataTables
+        const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
+        for (const financeTblRow of financeTblRows) {
+            financeTblRow.addEventListener("click", function () {
+                window.location.href = this.dataset.href;
+            })
+        }
     </script>
 
 </body>
