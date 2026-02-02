@@ -115,19 +115,8 @@
             var instances = M.Dropdown.init(elems);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var el = document.querySelectorAll('.tabs');
-            var instance = M.Tabs.init(el, {
-                swipeable: false 
-            });
-        });
-
         @*patient finance table*@
         new DataTable('#patientFinance');
-        @*patient profile table - progress notes*@
-        new DataTable('#progressNotes');
-        @*patient profile table - forms*@
-        new DataTable('#patientForms');
 
         //clickeable DataTables
         const financeTblRows = document.querySelectorAll(".tableClk tbody tr");

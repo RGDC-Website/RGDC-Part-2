@@ -275,7 +275,7 @@
                                     <th>Dentist</th>
                                     <th>Amount</th>
                                     <th>Paid</th>
-                                    <th>Balance</th>
+                                    <th colspan="2">Balance</th>
                                 </tr>
                             </thead>
                             @*table content*@
@@ -288,6 +288,12 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
+                                    <td>
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Progress Note">
+                                            <i class="material-icons brown-text lighten-1">delete</i>
+                                        </a>
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                    </td>
                                 </tr>
                             </tbody>
                             @*table footer*@
@@ -311,26 +317,31 @@
                             <img src="https://placehold.co/2550x3300" style="max-height: 47rem" />
                         </div>
                     </div>
+
                     @*Forms*@
                     <div id="forms" class="row m-0">
-                        <table id="patientForms" class="hover">
+                        <table id="patientForms" class="hover tableClk">
                             @*table headers*@
                             <thead>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
                                     <th>Form</th>
                                     <th colspan="2">Dentist</th>
-                                    @*<th></th>*@
                                 </tr>
                             </thead>
                             @*table content*@
                             <tbody>
-                                <tr>
+                                <tr data-href="#" title="View Form" class="clkPointer">
                                     <td>MM/DD/YYYY</td>
                                     <td>Form</td>
                                     <td>Name</td>
-                                    @*view button*@
-                                    <td><a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="left" data-tooltip="View Form"><i class="material-icons brown-text lighten-1">remove_red_eye</i></td>
+                                    @*edit and delete button*@
+                                    <td>
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Form">
+                                            <i class="material-icons brown-text lighten-1">delete</i>
+                                        </a>
+                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit FOrm" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                    </td>
                                 </tr>
                             </tbody>
                             @*table footer*@
@@ -363,7 +374,9 @@
 
                     @*appointments*@
                     <div id="appts" class="row m-0">
-
+                        <div class="row">
+                            appointments
+                        </div>
                     </div>
                 </div>
             </div>
