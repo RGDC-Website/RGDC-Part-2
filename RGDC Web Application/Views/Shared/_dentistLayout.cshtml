@@ -16,9 +16,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
-
 </head>
-<body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
+<body>
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
         <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -40,7 +39,7 @@
             <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
                 <ul>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
@@ -70,9 +69,8 @@
     </div>
 
 
-
-    @*Arrow filter (desccending ascending)*@
     <script>
+        //Arrow filter (descending and ascending)
         document.addEventListener('click', function (event) {
             if (event.target.classList.contains('sort-arrow')) {
                 const clicked = event.target;
@@ -93,41 +91,24 @@
             }
         });
 
-
-        @*Pop up modalz*@
-        document.addEventListener('DOMContentLoaded', function () {
-            var elems = document.querySelectorAll('.modal');
-            M.Modal.init(elems, {
-                startingTop: '4%', // Start slightly lower
-                endingTop: '10%'   // End at a visible spot
-            });
-        });
-
+        //Tooltip
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {
-                exitDelay: -5
+                    exitDelay: -5
             });
         });
 
+        //Dropdown
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.dropdown-trigger');
             var instances = M.Dropdown.init(elems);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            var el = document.querySelectorAll('.tabs');
-            var instance = M.Tabs.init(el, {
-                swipeable: false 
-            });
-        });
-
-        @*patient finance table*@
-        new DataTable('#patientFinance');
-        @*patient profile table - progress notes*@
-        new DataTable('#progressNotes');
-        @*patient profile table - forms*@
-        new DataTable('#patientForms');
+        //patients tab table
+        new DataTable('#dentistPatientsTabTable');
+        //finance tab table
+        new DataTable('#dentistFinance');
 
         //clickeable DataTables
         const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
@@ -137,10 +118,6 @@
             })
         }
     </script>
-    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
-    <script src="~/Scripts/angular.min.js"></script>
-    <script src="~/Scripts/RGDCscripts/Module.js"></script>
-    <script src="~/Scripts/RGDCscripts/Service.js"></script>
-    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
+
 </body>
 </html>

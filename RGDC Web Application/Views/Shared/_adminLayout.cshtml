@@ -108,6 +108,16 @@
 
         @* admin finance table *@
         new DataTable('#adminFinance');
+        @* admin patients table *@
+        new DataTable('#adminPatientsTabTable');
+
+        //clickeable DataTables
+        const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
+        for (const financeTblRow of financeTblRows) {
+            financeTblRow.addEventListener("click", function () {
+                window.location.href = this.dataset.href;
+            })
+        }
     </script>
 
 </body>
