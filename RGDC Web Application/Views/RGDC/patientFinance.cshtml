@@ -16,24 +16,22 @@
 
     @*finance table*@
     <div class="row" style="padding: 2rem">
-        <table id="patientFinance" class="hover">
+        <table id="patientFinance" class="hover tableClk">
             @*table headers*@
             <thead>
                 <tr class="brown-text lighten-1">
                     <th>Patient Name</th>
                     <th>Dentist</th>
-                    <th colspan="2">Date</th>
+                    <th>Date</th>
                     @*<th></th>*@
                 </tr>
             </thead>
             @*table content*@
             <tbody>
-                <tr>
+                <tr data-href="#" title="View payment record" class="clkPointer">
                     <td class="valign-wrapper"><img src="https://placehold.co/400" class="circle responsive-img" style="max-width:3rem; margin-right:0.5rem" />Name</td>
                     <td>Name</td>
                     <td>MM/DD/YYYY</td>
-                    @*view button*@
-                    <td><a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="left" data-tooltip="View Payment Record"><i class="material-icons brown-text lighten-1">remove_red_eye</i></td>
                 </tr>
             </tbody>
             @*table footer*@
@@ -42,7 +40,6 @@
                     <th>Date</th>
                     <th>Form</th>
                     <th>Dentist</th>
-                    <th></th>
                 </tr>
             </tfoot>
         </table>
