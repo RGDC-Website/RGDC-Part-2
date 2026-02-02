@@ -459,10 +459,15 @@
             </div>
 
             <div class="col s6">
-                @*Civil stat*@
+                @*Civil status*@
                 <label class="custom-label">
                     Civil Status
-                    <input type="text" class="custom-input" placeholder="Civil Status">
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
                 </label>
 
                 @*Occupation*@
