@@ -37,5 +37,26 @@
         return $http.get("/RGDC/getSessionVariable");
     };
 
+    this.getAuthEmail = function () {
+        return $http.get("/RGDC/GetAuthEmail");
+    };
+
+    //Reset Password
+    this.sendOTP = function (forgot_email) {
+        return $http({
+            method: "post",
+            url: "/RGDC/sendOTP",
+            data: forgot_email
+        });
+    }
+
+    this.resetPassword = function (info) {
+        return $http({
+            method: "post",
+            url: "/RGDC/resetPassword",
+            data: info
+        });
+    }
+
 
 });

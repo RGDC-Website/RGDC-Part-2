@@ -8,14 +8,16 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
-using System.Security.Cryptography;
-using System.Text;
 
 
 namespace RGDC_Web_Application.Controllers
@@ -340,6 +342,86 @@ namespace RGDC_Web_Application.Controllers
         public ActionResult patientFinance()
         {
             return View();
+        }
+        [HttpGet]
+        public JsonResult GetAuthEmail()
+        {
+            if (Session["UserEmail"] != null)
+            {
+                return Json(new
+                            {
+                                email = Session["UserEmail"].ToString(),
+                            }, JsonRequestBehavior.AllowGet);
+            } else
+            {
+                return Json(new
+                {
+                    email = ""
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
+        }
+
+        [HttpPost]
+        public JsonResult sendOTP(string email)
+        {
+            using (var db = new RGDCContext())
+            {
+                var user = db.tbl_account.FirstOrDefault(u => u.email == email);
+                if (user == null)
+                    return Json(new { success = false, message = "Email not found" });
+
+                var otp = new Random().Next(100000, 999999).ToString();
+
+                Session["RESET_OTP"] = otp;
+                Session["RESET_EMAIL"] = email;
+
+                try
+                {
+                    // SEND EMAIL
+                    MailMessage mail = new MailMessage();
+                    mail.To.Add(email);
+                    mail.Subject = "Password Reset OTP";
+                    mail.Body = $"Your OTP is: {otp}";
+                    mail.From = new MailAddress("jmlzpnt@gmail.com");
+
+                    SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                    smtp.Credentials = new NetworkCredential("jmlzpnt@gmail.com", "jubxxcrsgyleffin");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+
+                    return Json(new { success = true, message = "OTP sent successfully" });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpPost]
+        public JsonResult resetPassword(string email, string otp, string password)
+        {
+            using (var db = new RGDCContext())
+            {
+                if (Session["RESET_OTP"]?.ToString() != otp ||
+                    Session["RESET_EMAIL"]?.ToString() != email)
+                {
+                    return Json(new { success = false, message = "Invalid OTP" });
+                }
+
+                var user = db.tbl_account.FirstOrDefault(u => u.email == email);
+                if (user == null)
+                    return Json(new { success = false, message = "Email not found" });
+
+                user.password = passwordHash(password);
+                db.SaveChanges();
+
+                Session.Remove("RESET_OTP");
+                Session.Remove("RESET_EMAIL");
+
+                return Json(new { success = true, message = "Password reset successfully" });
+            }
         }
     }
 }
