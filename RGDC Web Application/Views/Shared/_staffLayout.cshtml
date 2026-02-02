@@ -110,6 +110,14 @@
         new DataTable('#staffPatientsTabTable');
         //finance tab table
         new DataTable('#staffFinance');
+
+        //clickeable DataTables
+        const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
+        for (const financeTblRow of financeTblRows) {
+            financeTblRow.addEventListener("click", function(){
+                window.location.href = this.dataset.href;
+            })
+        }
     </script>
 
 </body>

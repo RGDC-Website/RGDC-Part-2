@@ -141,6 +141,10 @@ a:hover {
     margin: 0 !important;
 }
 
+.clkPointer{
+    cursor: pointer !important;
+}
+
 .dt-length select {
     display: inline-block !important;
 }

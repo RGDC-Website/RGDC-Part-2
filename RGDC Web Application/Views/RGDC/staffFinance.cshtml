@@ -21,7 +21,7 @@
 
     @*dentist finance table*@
     <div class="row" style="padding: 2rem">
-        <table id="staffFinance" class="hover">
+        <table id="staffFinance" class="hover tableClk">
             @*table headers*@
             <thead>
                 <tr class="brown-text lighten-1">
@@ -33,7 +33,7 @@
             </thead>
             @*table content*@
             <tbody>
-                <tr>
+                <tr data-href="#" title="View payment record" class="clkPointer"> 
                     <td class="valign-wrapper"><img src="https://placehold.co/400" class="circle responsive-img" style="max-width:3rem; margin-right:0.5rem" />Name</td>
                     <td>Name</td>
                     <td>MM/DD/YYYY</td>
@@ -42,7 +42,6 @@
                         <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Payment Record">
                             <i class="material-icons brown-text lighten-1">delete</i>
                         </a>
-                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                     </td>
                 </tr>
             </tbody>
