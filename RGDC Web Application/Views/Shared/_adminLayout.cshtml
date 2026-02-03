@@ -18,7 +18,7 @@
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
 <body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
-    <div class="row" style="margin: 0;">
+    <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
         @*sidebar nav*@
         <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
             <h5 style="font-weight:bold;">RGDC</h5>
@@ -31,17 +31,17 @@
 
             @*user name and role*@
             <div class="row center">
-                <h5 style="font-weight:bold;">Name</h5>
-                <h6>Role</h6>
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
             </div>
 
             @*nav tabs*@
-            <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;" ng-init="getSessionVariables()">
+            <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;" >
                 <ul>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                    <li><a href="#!" ng-show="userIsOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-                    <li><a href="#!" ng-show="userIsPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-                    <li><a href="#!" ng-show="userIsAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+                    <li><a href="#!" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+                    <li><a href="#!" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+                    <li><a href="#!" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>

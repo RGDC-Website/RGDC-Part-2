@@ -312,13 +312,21 @@
             $scope.currentUserName = returnedData.data.userName || "";
             $scope.currentUserID = returnedData.data.userID || "";
             $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
+            $scope.currentUserFullName = returnedData.data.fullName || "";
+            console.log($scope.currentUserAuthorization)
             if ($scope.currentUserAuthorization == "0") {
                 $scope.isUserOwner = true;
                 $scope.isUserAdmin = true;
-            } else if ($scope.currentUserAuthorization == "1" || currentUserAuthorization == "2") {
+                $scope.userRole = "Owner"
+            } else if ($scope.currentUserAuthorization == "1" || $scope.currentUserAuthorization == "2") {
                 $scope.isUserAdmin = true;
+                if ($scope.currentUserAuthorization == "1")
+                    $scope.userRole = "Dental Staff"
+                else 
+                    $scope.userRole = "Dentist"
             } else if ($scope.currentUserAuthorization == "3") {
                 $scope.isUserPatient = true;
+                $scope.userRole = "Patient"
             }
         });
     }

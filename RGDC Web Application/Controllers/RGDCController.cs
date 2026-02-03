@@ -12,6 +12,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mail;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -178,6 +179,7 @@ namespace RGDC_Web_Application.Controllers
                         // Set session variables
                         Session["UserID"] = user.accID;
                         Session["UserName"] = user.firstName;
+                        Session["UserFullName"] = user.firstName + " " + user.lastName;
                         Session["UserAuthorization"] = user.role;
                         Session["IsLoggedIn"] = true;
 
@@ -186,6 +188,7 @@ namespace RGDC_Web_Application.Controllers
                             success = true,
                             message = "Login successful",
                             firstName = Session["UserName"].ToString(),
+                            fullName = Session["UserFullName"].ToString(),
                             authorization = user.role
                         }, JsonRequestBehavior.AllowGet);
                     }
@@ -290,6 +293,7 @@ namespace RGDC_Web_Application.Controllers
                                 // Set session variables
                                 Session["UserID"] = user.accID;
                                 Session["UserName"] = user.firstName;
+                                Session["UserFullName"] = user.firstName + " " + user.lastName;
                                 Session["UserAuthorization"] = user.role;
                                 Session["IsLoggedIn"] = true;
                                 return RedirectToAction("adminDashboard", "RGDC");
@@ -316,6 +320,7 @@ namespace RGDC_Web_Application.Controllers
                         // Set session variables
                         Session["UserID"] = user.accID;
                         Session["UserName"] = user.firstName;
+                        Session["UserFullName"] = user.firstName + " " + user.lastName;
                         Session["UserAuthorization"] = user.role;
                         Session["IsLoggedIn"] = true;
                         return RedirectToAction("adminDashboard", "RGDC");
@@ -330,6 +335,7 @@ namespace RGDC_Web_Application.Controllers
             {
                 userID = 1,
                 userName = Session["UserName"].ToString(),
+                fullName = Session["UserFullName"].ToString(),
                 userAuthorization = Session["UserAuthorization"].ToString(),
             }, JsonRequestBehavior.AllowGet);
         }
