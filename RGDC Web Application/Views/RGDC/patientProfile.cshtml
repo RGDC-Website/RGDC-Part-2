@@ -348,7 +348,7 @@
                     @*Forms*@
                     <div id="forms" class="row m-0">
                         <div class="row">
-                            <a class="edit-btn right">ADD FORM</a>
+                            <a class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk">
@@ -368,10 +368,10 @@
                                     <td>Name</td>
                                     @*edit and delete button*@
                                     <td>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn" data-position="bottom" data-tooltip="Delete Form">
+                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -403,8 +403,8 @@
                         </div>
                         @*edit and delete buttons*@
                         <div class="row m-0 left">
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Edit Post Op" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn" data-position="bottom" data-tooltip="Delete Post Op">
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped modal-trigger" data-target="modal-edit-postOp" data-position="bottom" data-tooltip="Edit Post Op" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger" data-target="modal-delete-postOp" data-position="bottom" data-tooltip="Delete Post Op">
                                 <i class="material-icons brown-text lighten-1">delete</i>
                             </a>
                         </div>
@@ -942,5 +942,113 @@
         <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD DENTAL CHART</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+@*Add form*@
+<div id="modal-add-form" class="modal modal-fixed-footer add-form-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Form</h5>
+
+        @*Date*@
+        <label class="custom-label">
+            Date
+            <input type="text" class="custom-input" placeholder="Date">
+        </label>
+
+        @*Dentist*@
+        <label class="custom-label">
+            Dentist
+            <input type="text" class="custom-input" placeholder="Dentist">
+        </label>
+
+        <div class="row">
+            <div class="row m-0 center">
+                <img src="https://placehold.co/2550x3300" style="max-height: 25rem; margin-top:15px;" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD FORM</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+@*Edit form*@
+<div id="modal-edit-form" class="modal modal-fixed-footer edit-form-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
+
+        @*Date*@
+        <label class="custom-label">
+            Date
+            <input type="text" class="custom-input" placeholder="Date">
+        </label>
+
+        @*Dentist*@
+        <label class="custom-label">
+            Dentist
+            <input type="text" class="custom-input" placeholder="Dentist">
+        </label>
+
+        <div class="row">
+            <div class="row m-0 center">
+                <img src="https://placehold.co/2550x3300" style="max-height: 25rem; margin-top:15px;" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD FORM</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+@*DELETE Form*@
+<div id="modal-delete-form" class="modal modal-fixed-footer delete-form-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Form</h5>
+
+        <p class="custom-label">Are you sure you want to delete this form? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
+</div>
+
+@*Edit Post Op*@
+<div id="modal-edit-postOp" class="modal modal-fixed-footer edit-postOp-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
+
+        @*Dentist*@
+        <label class="custom-label">
+            Post Operation Instructions
+            <textarea style="flex: 1; height: 550px; padding-top: 10px; background-color:white"></textarea>
+        </label>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+    </div>
+</div>
+
+@*DELETE postOp*@
+<div id="modal-delete-postOp" class="modal modal-fixed-footer delete-postOp-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Form</h5>
+
+        <p class="custom-label">Are you sure you want to delete this post operation instruction? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
     </div>
 </div>
