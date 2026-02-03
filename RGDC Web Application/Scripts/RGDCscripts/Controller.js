@@ -8,6 +8,10 @@
         STRONG: 'Strong'
     };
     $scope.showPatientForm = false;
+    $scope.isUserOwner = false;
+    $scope.isUserAdmin = false;
+    $scope.isUserPatient = false;
+
 
     $scope.hasSpecialChar = function (pwd) {
         if (!pwd) return false;
@@ -273,18 +277,14 @@
                 $scope.currentUserFirstName = returnedData.data.firstName || "";
                 $scope.currentUserAuthorization = String(returnedData.data.authorization || "");
 
+                console.log($scope.currentUserFirstName)
                 Swal.fire({
                     title: "Login Successful!",
-                    text: "Welcome back, " + returnedData.data.firstName + "!",
+                    text: "Welcome back, " + $scope.currentUserFirstName + "!",
                     icon: "success"
                 }).then(() => {
                     // Redirect to home page after successful login
-                    if ($scope.currentUserAuthorization === "3") {
-                        window.location.href = "/RGDC/patientDashboard";
-                    } else {
                         window.location.href = "/RGDC/adminDashboard";
-                    }
-
                 });
             } else {
                 $scope.loginError = returnedData.data ? returnedData.data.message : "Invalid email or password";
@@ -312,7 +312,14 @@
             $scope.currentUserName = returnedData.data.userName || "";
             $scope.currentUserID = returnedData.data.userID || "";
             $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
-            console.log($scope.currentUserName)
+            if ($scope.currentUserAuthorization == "0") {
+                $scope.isUserOwner = true;
+                $scope.isUserAdmin = true;
+            } else if ($scope.currentUserAuthorization == "1" || currentUserAuthorization == "2") {
+                $scope.isUserAdmin = true;
+            } else if ($scope.currentUserAuthorization == "3") {
+                $scope.isUserPatient = true;
+            }
         });
     }
 
@@ -376,6 +383,10 @@
         }
         var resetPassword = RGDCWebApplicationService.resetPassword(forgot_info);
         resetPassword.then(function () {
+            var modal = document.getElementById("password-modal");
+            if (modal) {
+                modal.style.display = "none";
+            }
             Swal.fire({
                 icon: "success",
                 title: "Password Changed Successfully",

@@ -185,7 +185,7 @@ namespace RGDC_Web_Application.Controllers
                         {
                             success = true,
                             message = "Login successful",
-                            userName = Session["UserName"].ToString(),
+                            firstName = Session["UserName"].ToString(),
                             authorization = user.role
                         }, JsonRequestBehavior.AllowGet);
                     }
@@ -292,15 +292,8 @@ namespace RGDC_Web_Application.Controllers
                                 Session["UserName"] = user.firstName;
                                 Session["UserAuthorization"] = user.role;
                                 Session["IsLoggedIn"] = true;
-                                if (Session["UserAuthorization"].ToString() == "3")
-                                {
-                                    return RedirectToAction("patientDashboard", "RGDC");
-                                }
-                                else
-                                {
-                                    return RedirectToAction("adminDashboard", "RGDC");
-                                }
-                            } else
+                                return RedirectToAction("adminDashboard", "RGDC");
+                                } else
                             {
                                 return RedirectToAction("signUp", "RGDC");
                             }
@@ -325,14 +318,7 @@ namespace RGDC_Web_Application.Controllers
                         Session["UserName"] = user.firstName;
                         Session["UserAuthorization"] = user.role;
                         Session["IsLoggedIn"] = true;
-                        if (Session["UserAuthorization"].ToString() == "3")
-                        {
-                            return RedirectToAction("patientDashboard", "RGDC");
-                        }
-                        else
-                        {
-                            return RedirectToAction("adminDashboard", "RGDC");
-                        }
+                        return RedirectToAction("adminDashboard", "RGDC");
                     }
                 }
                 return RedirectToAction("", "RGDC");
