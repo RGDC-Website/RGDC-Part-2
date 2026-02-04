@@ -20,7 +20,7 @@
     </div>
 
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;">
+    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -35,12 +35,12 @@
 
                     @*user name and role*@
                     <div class="row center">
-                        <h5 class="bold brown-text lighten-1">Name</h5>
-                        <h6 class="bold brown-text lighten-1">ID: 000000</h6>
+                        <h5 class="bold brown-text lighten-1">{{selectedPatient.patientName}}</h5>
+                        <h6 class="bold brown-text lighten-1">ID: {{selectedPatient.patientID}}</h6>
 
                         @*last and next visit*@
-                        <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
-                        <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
+                        <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
+                        <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit}}</p>
 
                         <button class="edit-btn right modal-trigger" data-target="modal-patient-info">EDIT</button>
                     </div>

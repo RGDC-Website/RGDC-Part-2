@@ -402,4 +402,66 @@
             });
         });
     };
+
+    $scope.getPatients = function () {
+        if ($scope.userAuthorization != 3) {
+            var getPatientList = RGDCWebApplicationService.getPatientList();
+            getPatientList.then(function (patientList) {
+                $scope.patientArray = patientList.data;
+                $scope.patientArray.forEach(function (patient) {
+                    if (patient.lastVisit) {
+                        patient.lastVisit = formatDateToMDY(patient.lastVisit)
+                    }
+                });
+            });
+        }
+    }
+
+    $scope.goToPatientInfo = function (patient) {
+        var patientID = {
+            patientID: patient.patientID.toString()
+        }
+
+        console.log(patientID)
+
+        if ($scope.userAuthorization != 3) {
+            RGDCWebApplicationService.goToPatient(patientID)
+                .then(function (response) {
+                    if (response.data && response.data.success) {
+                        window.location.href = "/RGDC/patientProfile";
+                    }
+                })
+                .catch(function (err) {
+                    console.error(err);
+                });
+        }
+    };
+
+    $scope.getSelectedPatientDetails = function () {
+        if ($scope.userAuthorization != 3) {
+            var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
+            getPatientInfo.then(function (patientInfo) {
+                patientInfo.data.lastVisit = formatDateToMDY(patientInfo.data.lastVisit)
+                patientInfo.data.nextVisit = formatDateToMDY(patientInfo.data.nextVisit)
+                $scope.selectedPatient = patientInfo.data;
+            });
+        } else {
+            var getPersonalInfo = RGDCWebApplicationService.getPersonalInfo();
+            getPersonalInfo.then(function (patientInfo) {
+                patientInfo.data.lastVisit = formatDateToMDY(patientInfo.data.lastVisit)
+                patientInfo.data.nextVisit = formatDateToMDY(patientInfo.data.nextVisit)
+                $scope.selectedPatient = patientInfo.data;
+            });
+        }
+    }
+    function formatDateToMDY(dateString) {
+        const timestamp = parseInt(dateString.match(/\d+/)[0], 10);
+        const date = new Date(timestamp);
+
+        return dateString = date.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+        });
+    }
 });

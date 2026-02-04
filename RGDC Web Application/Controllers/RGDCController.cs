@@ -1,5 +1,6 @@
 ﻿using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
 using RGDC_Web_Application.Models;
 using RGDC_Web_Application.Models.Context;
@@ -85,8 +86,10 @@ namespace RGDC_Web_Application.Controllers
         [HttpPost]
         public JsonResult CheckEmail(string email)
         {
-            try {
-                using (var db = new RGDCContext()) {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
                     if (db == null)
                     {
                         return Json(new { exists = false, error = "DB context is null" });
@@ -99,7 +102,8 @@ namespace RGDC_Web_Application.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return Json(new
                 {
                     exists = false,
@@ -297,7 +301,8 @@ namespace RGDC_Web_Application.Controllers
                                 Session["UserAuthorization"] = user.role;
                                 Session["IsLoggedIn"] = true;
                                 return RedirectToAction("adminDashboard", "RGDC");
-                                } else
+                            }
+                            else
                             {
                                 return RedirectToAction("signUp", "RGDC");
                             }
@@ -330,10 +335,10 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-        public JsonResult getSessionVariable() {
+        public JsonResult getSessionVariable()
+        {
             return Json(new
             {
-                userID = 1,
                 userName = Session["UserName"].ToString(),
                 fullName = Session["UserFullName"].ToString(),
                 userAuthorization = Session["UserAuthorization"].ToString(),
@@ -368,17 +373,18 @@ namespace RGDC_Web_Application.Controllers
             if (Session["UserEmail"] != null)
             {
                 return Json(new
-                            {
-                                email = Session["UserEmail"].ToString(),
-                            }, JsonRequestBehavior.AllowGet);
-            } else
+                {
+                    email = Session["UserEmail"].ToString(),
+                }, JsonRequestBehavior.AllowGet);
+            }
+            else
             {
                 return Json(new
                 {
                     email = ""
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
         }
 
         [HttpPost]
@@ -440,6 +446,63 @@ namespace RGDC_Web_Application.Controllers
                 Session.Remove("RESET_EMAIL");
 
                 return Json(new { success = true, message = "Password reset successfully" });
+            }
+        }
+
+        public JsonResult getPatientList()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from p in db.tbl_patient
+                    join a in db.tbl_account
+                        on p.accID equals a.accID
+                    select new
+                    {
+                        patientID = p.patientID,
+                        accID = p.accID,
+                        patientName = a.firstName + " " + a.lastName,
+                        lastVisit = p.lastVisit
+                    }
+                ).ToList();
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult goToPatient(tblPatientModel patient)
+        {
+            Session["SelectedPatientID"] = patient.patientID;
+
+            return Json(new
+            {
+                success = true,
+            });
+        }
+
+        public JsonResult getSelectedPatientDetails()
+        {
+            using (var db = new RGDCContext())
+            {
+                string patientID = Session["SelectedPatientID"].ToString();
+                var result = (
+                    from p in db.tbl_patient
+                    join a in db.tbl_account
+                        on p.accID equals a.accID
+                    where p.patientID.ToString() == patientID
+                    select new
+                    {
+                        patientID = p.patientID,
+                        accID = p.accID,
+                        patientName = a.firstName + " " + a.lastName,
+                        birthDate = a.birthDate,
+                        contactNumber = a.contactNumber,
+                        address = a.address,
+                        civilStatus = a.civilStatus,
+                        lastVisit = p.lastVisit,
+                        nextVisit = p.nextVisit
+                    }
+                ).FirstOrDefault();
+                return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
     }

@@ -58,5 +58,19 @@
         });
     }
 
+    this.getPatientList = function () {
+        return $http.get("/RGDC/getPatientList");
+    }
 
+    this.goToPatient = function (patientID) {
+        return $http({
+            method: "post",
+            url: "/RGDC/goToPatient",
+            data: patientID
+        });
+    }
+
+    this.getSelectedPatientDetails = function () {
+        return $http.get("/RGDC/getSelectedPatientDetails");
+    }
 });
