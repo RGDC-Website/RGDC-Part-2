@@ -8,6 +8,7 @@ using RGDC_Web_Application.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -483,26 +484,198 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
-                string patientID = Session["SelectedPatientID"].ToString();
+                var sessionVal = Session["SelectedPatientID"];
+                if (sessionVal == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(sessionVal.ToString(), out int pid))
+                    return Json(null, JsonRequestBehavior.AllowGet);
+
                 var result = (
                     from p in db.tbl_patient
-                    join a in db.tbl_account
-                        on p.accID equals a.accID
-                    where p.patientID.ToString() == patientID
+                    join a in db.tbl_account on p.accID equals a.accID
+                    join g in db.tbl_gender on a.genderID equals g.genderID into gj
+                    from g in gj.DefaultIfEmpty()
+                    where p.patientID == pid
                     select new
                     {
                         patientID = p.patientID,
                         accID = p.accID,
+                        currPhy = p.currentPhysician,
+                        prevPhy = p.previousPhysician,
+                        guar = p.guardian,
+                        guarNum = p.guardianNumber,
+                        insurance = p.insurance,
+                        referral = p.referral,
+                        dentalChartLink = p.dentalChartLink,
                         patientName = a.firstName + " " + a.lastName,
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
                         birthDate = a.birthDate,
+                        genderID = a.genderID,
+                        gender = g != null ? g.description : null,
+                        email = a.email,
                         contactNumber = a.contactNumber,
                         address = a.address,
                         civilStatus = a.civilStatus,
+                        religion = a.religion,
+                        nationality = a.nationality,
+                        accCreated = a.accCreatedAt,
                         lastVisit = p.lastVisit,
                         nextVisit = p.nextVisit
                     }
                 ).FirstOrDefault();
+
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UpdatePatient(PatientUpdateData profInfo)
+        {
+            if (profInfo == null) return Json(new { success = false, message = "No data provided" });
+
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    // find account
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == profInfo.accID);
+                    if (acc == null) return Json(new { success = false, message = "Account not found" });
+
+                    // update account fields (only update when non-null/empty to avoid overwriting unintentionally)
+                    acc.firstName = string.IsNullOrWhiteSpace(profInfo.firstName) ? acc.firstName : profInfo.firstName;
+                    acc.middleName = string.IsNullOrWhiteSpace(profInfo.middleName) ? acc.middleName : profInfo.middleName;
+                    acc.lastName = string.IsNullOrWhiteSpace(profInfo.lastName) ? acc.lastName : profInfo.lastName;
+                    if (profInfo.genderID.HasValue) acc.genderID = profInfo.genderID.Value;
+                    if (profInfo.birthDate.HasValue) acc.birthDate = profInfo.birthDate.Value;
+                    acc.email = string.IsNullOrWhiteSpace(profInfo.email) ? acc.email : profInfo.email;
+                    acc.contactNumber = string.IsNullOrWhiteSpace(profInfo.contactNumber) ? acc.contactNumber : profInfo.contactNumber;
+                    acc.address = string.IsNullOrWhiteSpace(profInfo.address) ? acc.address : profInfo.address;
+                    acc.civilStatus = string.IsNullOrWhiteSpace(profInfo.civilStatus) ? acc.civilStatus : profInfo.civilStatus;
+                    acc.religion = string.IsNullOrWhiteSpace(profInfo.religion) ? acc.religion : profInfo.religion;
+                    acc.nationality = string.IsNullOrWhiteSpace(profInfo.nationality) ? acc.nationality : profInfo.nationality;
+                    acc.accUpdatedAt = DateTime.Now;
+
+                    // find patient
+                    var pat = db.tbl_patient.FirstOrDefault(p => p.patientID == profInfo.patientID);
+                    if (pat == null) return Json(new { success = false, message = "Patient record not found" });
+
+                    pat.currentPhysician = string.IsNullOrWhiteSpace(profInfo.currentPhysician) ? pat.currentPhysician : profInfo.currentPhysician;
+                    pat.previousPhysician = string.IsNullOrWhiteSpace(profInfo.previousPhysician) ? pat.previousPhysician : profInfo.previousPhysician;
+                    pat.guardian = string.IsNullOrWhiteSpace(profInfo.guardian) ? pat.guardian : profInfo.guardian;
+                    pat.guardianNumber = string.IsNullOrWhiteSpace(profInfo.guardianNumber) ? pat.guardianNumber : profInfo.guardianNumber;
+                    pat.insurance = string.IsNullOrWhiteSpace(profInfo.insurance) ? pat.insurance : profInfo.insurance;
+                    pat.referral = string.IsNullOrWhiteSpace(profInfo.referral) ? pat.referral : profInfo.referral;
+                    if (profInfo.lastVisit.HasValue) pat.lastVisit = profInfo.lastVisit.Value;
+                    if (profInfo.nextVisit.HasValue) pat.nextVisit = profInfo.nextVisit.Value;
+
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error updating profile: {ex.Message}"
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult Upload()
+        {
+            try
+            {
+                if (Request.Files.Count == 0)
+                    return Json(new { success = false, message = "No file received." });
+
+                HttpPostedFileBase file = Request.Files[0];
+
+                if (file == null || file.ContentLength == 0)
+                    return Json(new { success = false, message = "No file provided." });
+
+                // Get patient ID from session
+                var sessionVal = Session["SelectedPatientID"];
+                if (sessionVal == null)
+                    return Json(new { success = false, message = "No patient selected." });
+
+                if (!int.TryParse(sessionVal.ToString(), out int patientID))
+                    return Json(new { success = false, message = "Invalid patient ID." });
+
+                string uploadPath = Server.MapPath("~/Content/Uploads/");
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                string fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+                string filePath = Path.Combine(uploadPath, fileName);
+                file.SaveAs(filePath);
+
+                string relativePath = "/Content/Uploads/" + fileName;
+
+                using (var db = new RGDCContext())
+                {
+                    // Save to tbl_images
+                    var imgData = new tblImagesModel()
+                    {
+                        imageName = fileName,
+                        imagePath = "/Content/Uploads/",
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now
+                    };
+                    db.tbl_images.Add(imgData);
+
+                    // UPDATE THE PATIENT'S DENTAL CHART LINK
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                    if (patient != null)
+                    {
+                        patient.dentalChartLink = relativePath;
+                        db.SaveChanges();
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "File uploaded successfully!",
+                            filePath = relativePath
+                        });
+                    }
+                    else
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Patient not found in database."
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error: {ex.Message}"
+                });
+            }
+        }
+
+        public JsonResult GetImages()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var imgData = db.tbl_images.Select(x => x).ToList();
+
+                    return Json(imgData, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error while processing getServiceFunc {ex.Message} : {ex.StackTrace} : {ex.InnerException}");
             }
         }
     }

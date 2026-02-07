@@ -73,4 +73,32 @@
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
     }
+
+    this.updatePatient = function (patientData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/UpdatePatient",
+            data: patientData
+        });
+    }
+
+    this.getImageService = function () {
+        return $http.get("/RGDC/GetImages");
+    };
+
+    this.uploadFile = function (file) {
+        var formData = new FormData();
+        formData.append('file', file);
+
+        var response = $http({
+            method: "POST",
+            url: "/RGDC/Upload",
+            data: formData,
+            headers: {
+                'Content-Type': undefined
+            },
+            transformRequest: angular.identity
+        });
+        return response;
+    };
 });

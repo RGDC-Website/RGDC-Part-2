@@ -1,4 +1,4 @@
-﻿app.controller("RGDCWebApplicationController", function ($scope, RGDCWebApplicationService) {
+﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService) {
 
     $scope.currentUserName = "";
     const STRENGTH = {
@@ -441,27 +441,391 @@
         if ($scope.userAuthorization != 3) {
             var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
             getPatientInfo.then(function (patientInfo) {
-                patientInfo.data.lastVisit = formatDateToMDY(patientInfo.data.lastVisit)
-                patientInfo.data.nextVisit = formatDateToMDY(patientInfo.data.nextVisit)
-                $scope.selectedPatient = patientInfo.data;
+                if (!patientInfo || !patientInfo.data) return;
+
+                var p = patientInfo.data;
+
+                // format visit dates (existing)
+                if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
+                if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+
+                if (p.birthDate) {
+                    var birthJs = parseJsonDateToJsDate(p.birthDate);
+                    if (birthJs) {
+                        // Store raw date for datepicker
+                        p.birthDateRaw = birthJs;
+                        // Format for display
+                        p.birthDate = birthJs.toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                        // Calculate age
+                        p.age = computeAgeFromDate(birthJs);
+                    } else {
+                        p.birthDateRaw = null;
+                        p.birthDate = "";
+                        p.age = "";
+                    }
+                } else {
+                    p.birthDateRaw = null;
+                    p.birthDate = "";
+                    p.age = "";
+                }
+
+                // format account creation date
+                if (p.accCreated) {
+                    var accJs = parseJsonDateToJsDate(p.accCreated);
+                    if (accJs) {
+                        p.accCreated = accJs.toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                    }
+                } else {
+                    p.accCreated = "";
+                }
+
+                $scope.selectedPatient = p;
+
+                // Initialize datepicker after patient data loads
+                initializeDatepicker();
             });
         } else {
             var getPersonalInfo = RGDCWebApplicationService.getPersonalInfo();
             getPersonalInfo.then(function (patientInfo) {
-                patientInfo.data.lastVisit = formatDateToMDY(patientInfo.data.lastVisit)
-                patientInfo.data.nextVisit = formatDateToMDY(patientInfo.data.nextVisit)
-                $scope.selectedPatient = patientInfo.data;
+                if (!patientInfo || !patientInfo.data) return;
+
+                var p = patientInfo.data;
+
+                if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
+                if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+
+                if (p.birthDate) {
+                    var birthJs = parseJsonDateToJsDate(p.birthDate);
+                    if (birthJs) {
+                        p.birthDateRaw = birthJs;
+                        p.birthDate = birthJs.toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                        p.age = computeAgeFromDate(birthJs);
+                    } else {
+                        p.birthDateRaw = null;
+                        p.birthDate = "";
+                        p.age = "";
+                    }
+                } else {
+                    p.birthDateRaw = null;
+                    p.birthDate = "";
+                    p.age = "";
+                }
+
+                if (p.accCreated) {
+                    var accJs = parseJsonDateToJsDate(p.accCreated);
+                    if (accJs) {
+                        p.accCreated = accJs.toLocaleDateString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric"
+                        });
+                    }
+                } else {
+                    p.accCreated = "";
+                }
+
+                $scope.selectedPatient = p;
+
+                // Initialize datepicker after patient data loads
+                initializeDatepicker();
             });
         }
     }
+    function initializeDatepicker() {
+        $timeout(function () {
+            var birthDateElem = document.getElementById('birthDate');
+            if (birthDateElem) {
+                // Destroy any existing instance
+                var existingInstance = M.Datepicker.getInstance(birthDateElem);
+                if (existingInstance) {
+                    existingInstance.destroy();
+                }
+
+                // Initialize new datepicker
+                var datepicker = M.Datepicker.init(birthDateElem, {
+                    format: 'mmmm dd, yyyy',
+                    yearRange: [1900, new Date().getFullYear()],
+                    autoClose: true,
+                    maxDate: new Date(),
+                    onSelect: function (date) {
+                        $scope.$apply(function () {
+                            // Store raw date
+                            $scope.selectedPatient.birthDateRaw = date;
+
+                            // Format for display
+                            $scope.selectedPatient.birthDate = date.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+
+                            // Calculate age
+                            $scope.selectedPatient.age = computeAgeFromDate(date);
+
+                            console.log('Selected birth date:', date);
+                            console.log('Calculated age:', $scope.selectedPatient.age);
+                        });
+                    }
+                });
+
+                // Set initial date if patient has birthDateRaw
+                if ($scope.selectedPatient && $scope.selectedPatient.birthDateRaw) {
+                    var initialDate = new Date($scope.selectedPatient.birthDateRaw);
+                    datepicker.setDate(initialDate);
+                }
+            }
+        }, 300);
+    }
+
+    // helper: parse ASP.NET JSON date "/Date(1234567890)/" or accept already-ISO strings
+    function parseJsonDateToJsDate(dateInput) {
+        if (!dateInput) return null;
+
+        // If it's already a Date object, return it
+        if (Object.prototype.toString.call(dateInput) === '[object Date]') {
+            return isNaN(dateInput.getTime()) ? null : dateInput;
+        }
+
+        // ASP.NET JSON format: "/Date(1234567890)/" (milliseconds)
+        var msMatch = String(dateInput).match(/\/Date\((-?\d+)\)\//);
+        if (msMatch) {
+            var ts = parseInt(msMatch[1], 10);
+            return new Date(ts);
+        }
+
+        // ISO or other string format - let Date parse it
+        if (typeof dateInput === 'string') {
+            var d = new Date(dateInput);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        // numeric timestamp (ms)
+        if (typeof dateInput === 'number') {
+            return new Date(dateInput);
+        }
+
+        return null;
+    }
+
+    function computeAgeFromDate(birthDate) {
+        if (!birthDate) return "";
+
+        // Normalize to local date-only values to avoid timezone-induced off-by-one errors
+        var bYear = birthDate.getFullYear();
+        var bMonth = birthDate.getMonth();
+        var bDay = birthDate.getDate();
+
+        var today = new Date();
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDay = today.getDate();
+
+        var age = tYear - bYear;
+        if (tMonth < bMonth || (tMonth === bMonth && tDay < bDay)) {
+            age--;
+        }
+        return age;
+    }
+
     function formatDateToMDY(dateString) {
-        const timestamp = parseInt(dateString.match(/\d+/)[0], 10);
+        const match = String(dateString).match(/\d+/);
+        if (!match) return dateString;
+        const timestamp = parseInt(match[0], 10);
         const date = new Date(timestamp);
 
-        return dateString = date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",
             year: "numeric"
         });
     }
+
+    // UPDATE FUNCTION
+    $scope.updatePatientProfile = function () {
+        if (!$scope.selectedPatient) return;
+
+        var profInfo = {
+            patientID: $scope.selectedPatient.patientID,
+            accID: $scope.selectedPatient.accID,
+            firstName: $scope.selectedPatient.firstName,
+            middleName: $scope.selectedPatient.middleName,
+            lastName: $scope.selectedPatient.lastName,
+            genderID: $scope.selectedPatient.genderID ? parseInt($scope.selectedPatient.genderID) : null,
+            birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
+            email: $scope.selectedPatient.email,
+            contactNumber: $scope.selectedPatient.contactNumber,
+            address: $scope.selectedPatient.address,
+            civilStatus: $scope.selectedPatient.civilStatus,
+            religion: $scope.selectedPatient.religion,
+            nationality: $scope.selectedPatient.nationality,
+            currentPhysician: $scope.selectedPatient.currPhy || $scope.selectedPatient.currentPhysician,
+            previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
+            guardian: $scope.selectedPatient.guar,
+            guardianNumber: $scope.selectedPatient.guarNum,
+            insurance: $scope.selectedPatient.insurance,
+            referral: $scope.selectedPatient.referral
+        };
+
+        var updateData = RGDCWebApplicationService.updatePatient(profInfo);
+        updateData.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: response.data.message || "Profile updated."
+                });
+                $scope.getSelectedPatientDetails();
+                var modal = document.getElementById("modal-patient-info");
+                if (modal) {
+                    if (typeof M !== 'undefined' && M.Modal) {
+                        var inst = M.Modal.getInstance(modal);
+                        if (inst) inst.close();
+                    } else {
+                        modal.style.display = "none";
+                    }
+                }
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error!",
+                    text: response.data.message || "Failed to update profile."
+                });
+            }
+        }, function (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: "Failed to update profile"
+            });
+            console.error(error);
+        });
+    };
+
+    $scope.uploadFile = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files[0];
+
+            if (!file) {
+                document.body.removeChild(input);
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid File',
+                    text: 'Please select an image file.'
+                });
+                document.body.removeChild(input);
+                return;
+            }
+
+            Swal.fire({
+                title: 'Uploading...',
+                text: 'Please wait while we upload your dental chart.',
+                allowOutsideClick: false,
+                didOpen: function () {
+                    Swal.showLoading();
+                }
+            });
+
+            RGDCWebApplicationService.uploadFile(file)
+                .then(function (response) {
+                    console.log('Upload response:', response.data);
+                    var json = response.data || {};
+
+                    if (json.success === true && json.filePath) {
+                        $timeout(function () {
+                            // Close the dental chart modal
+                            var modal = document.getElementById('modal-dental-chart');
+                            if (modal && typeof M !== 'undefined' && M.Modal) {
+                                var inst = M.Modal.getInstance(modal);
+                                if (inst) inst.close();
+                            }
+
+                            if ($scope.selectedPatient) {
+                                $scope.selectedPatient.dentalChartLink = json.filePath;
+                            }
+
+                            var cacheBuster = '?t=' + new Date().getTime();
+                            var mainImg = document.getElementById('dentalChartMain');
+                            var modalImg = document.getElementById('dentalChartModalImg');
+
+                            if (mainImg) {
+                                mainImg.src = json.filePath + cacheBuster;
+                                console.log('Updated main image to:', json.filePath);
+                            }
+                            if (modalImg) {
+                                modalImg.src = json.filePath + cacheBuster;
+                                console.log('Updated modal image to:', json.filePath);
+                            }
+
+                            // Refresh patient details from server
+                            $scope.getSelectedPatientDetails();
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: json.message || 'Dental chart uploaded successfully.'
+                            });
+                        }, 0);
+                    } else {
+                        console.error('Upload failed:', json);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Upload Failed',
+                            text: json.message || 'Unknown server response.'
+                        });
+                    }
+
+                    if (input && input.parentNode) {
+                        document.body.removeChild(input);
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Upload error:', err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Upload Error',
+                        text: err.data && err.data.message ? err.data.message : 'An error occurred while uploading.'
+                    });
+
+                    if (input && input.parentNode) {
+                        document.body.removeChild(input);
+                    }
+                });
+        };
+
+        input.click();
+    };
+
+    $scope.getImages = function () {
+        var getData = RGDCWebApplicationService.getImageService();
+        getData.then(function (returnedData) {
+            $scope.imageList = returnedData.data;
+            $timeout(function () {
+                var elems = document.querySelectorAll('.carousel');
+                M.Carousel.init(elems);
+            }, 0);
+        });
+    };
+
 });

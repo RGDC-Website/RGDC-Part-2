@@ -53,45 +53,45 @@
                         <div class="col m6 l6">
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">AGE</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.age}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">GENDER</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.gender}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">EMAIL ADDRESS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.email}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ADDRESS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.address}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">RELIGION</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.religion}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">REFERRAL</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.referral}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">INSURANCE</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.insurance}}</p>
                             </div>
                         </div>
                         <div class="col m6 l6">
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">BIRTHDAY</p>
-                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.birthDate}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">CONTACT NUMBER</p>
-                                <p class="brown-text lighten-1">+00 0000000000</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.contactNumber}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">CIVIL STATUS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.civilStatus}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">OCCUPATION</p>
@@ -99,15 +99,15 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">NATIONALITY</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.nationality}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">GUARDIAN</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.guar}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ACCOUNT CREATION</p>
-                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.accCreated}}</p>
                             </div>
                         </div>
                     </div>
@@ -340,7 +340,11 @@
                         </div>
 
                         <div class="row m-0 center">
-                            <img src="https://placehold.co/2550x3300" style="max-height: 47rem" />
+                            @* bind to patient-specific link returned by GetSelectedPatientDetails *@
+                            <img id="dentalChartMain"
+                                 ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
+                                 alt="Dental Chart"
+                                 style="max-height: 47rem" />
                         </div>
 
                     </div>
@@ -433,7 +437,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     First Name
-                    <input type="text" class="custom-input" placeholder="First Name">
+                    <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedPatient.firstName">
                 </label>
             </div>
 
@@ -441,7 +445,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     Middle Name
-                    <input type="text" class="custom-input" placeholder="Middle Name">
+                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedPatient.middleName">
                 </label>
             </div>
 
@@ -449,7 +453,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     Last Name
-                    <input type="text" class="custom-input" placeholder="Last Name">
+                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedPatient.lastName">
                 </label>
             </div>
         </div>
@@ -460,7 +464,7 @@
                 @*Gender*@
                 <label class="custom-label">
                     Gender
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.genderID" required>
                         <option value="" disabled selected>Select Gender</option>
                         <option value="1">Male</option>
                         <option value="2">Female</option>
@@ -471,31 +475,42 @@
                 @*Birthday*@
                 <label class="custom-label">
                     Birthday
-                    <input type="text" class="custom-input" placeholder="Birthday">
+                    <div style="position: relative;">
+                        <input id="birthDate"
+                               ng-model="selectedPatient.birthDate"
+                               type="text"
+                               class="datepicker custom-input"
+                               placeholder="Select Birthday"
+                               readonly
+                               required>
+                        <i class="material-icons"
+                           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"
+                           onclick="document.getElementById('birthDate').click();">event</i>
+                    </div>
                 </label>
 
                 @*Address*@
                 <label class="custom-label">
                     Address
-                    <input type="text" class="custom-input" placeholder="Address">
+                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
                 </label>
 
                 @*Nationality*@
                 <label class="custom-label">
                     Nationality
-                    <input type="text" class="custom-input" placeholder="Nationality">
+                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
                 </label>
 
                 @*Guardian*@
                 <label class="custom-label">
                     Guardian
-                    <input type="text" class="custom-input" placeholder="Guardian">
+                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
                 </label>
 
                 @*Email*@
                 <label class="custom-label">
                     Email Address
-                    <input type="text" class="custom-input" placeholder="Email Address">
+                    <input type="text" class="custom-input" placeholder="Email Address" ng-model="selectedPatient.email">
                 </label>
             </div>
 
@@ -503,7 +518,7 @@
                 @*Civil status*@
                 <label class="custom-label">
                     Civil Status
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
                         <option value="Single">Single</option>
                         <option value="Married">Married</option>
@@ -520,25 +535,25 @@
                 @*Religion*@
                 <label class="custom-label">
                     Religion
-                    <input type="text" class="custom-input" placeholder="Religion">
+                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
                 </label>
 
                 @*Medical Insurance*@
                 <label class="custom-label">
                     Medical Insurance
-                    <input type="text" class="custom-input" placeholder="Medical Insurance">
+                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
                 </label>
 
                 @*Guardian Contact #*@
                 <label class="custom-label">
                     Guardian's Contact Number
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number ">
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" ng-model="selectedPatient.guarNum">
                 </label>
 
                 @*Contact #*@
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number">
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedPatient.contactNumber">
                 </label>
             </div>
         </div>
@@ -547,7 +562,7 @@
     <div class="modal-footer footer-center">
         <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD NEW ACCOUNT PICTURE</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="updatePatientProfile()">SAVE</button>
     </div>
 </div>
 
@@ -926,22 +941,24 @@
     </div>
 </div>
 
-@*Dental Chart*@
+@*Dental Chart modal*@
 <div id="modal-dental-chart" class="modal modal-fixed-footer dental-chart-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Dental Chart</h5>
 
         <div class="row">
             <div class="row m-0 center">
-                <img src="https://placehold.co/2550x3300" style="max-height: 33rem" />
+                <img id="dentalChartModalImg"
+                     ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
+                     alt="Dental Chart"
+                     style="max-height: 33rem" />
             </div>
         </div>
     </div>
 
     <div class="modal-footer footer-center">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD DENTAL CHART</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="uploadFile()">UPLOAD & SAVE</button>
     </div>
 </div>
 
