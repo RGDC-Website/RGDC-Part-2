@@ -18,6 +18,14 @@
         });
     };
 
+    this.signUpPatient = function (accDetails) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/signUpPatient',
+            data: accDetails
+        });
+    };
+
     //Get Genders
     this.getGender = function () {
         return $http.get("/RGDC/getGender");
@@ -100,5 +108,29 @@
             transformRequest: angular.identity
         });
         return response;
+    };
+
+    this.logOut = function () {
+        return $http.get("/RGDC/logOut");
+    };
+
+    this.updateMedHist = function (medHist) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/updateMedHist',
+            data: medHist
+        });
+    };
+
+    this.updateMedHistIni = function (prevPhys) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/updateMedHistIni',
+            data: prevPhys
+        });
+    };
+
+    this.getPatientTreatment = function () {
+        return $http.get("/RGDC/getPatientTreatment");
     };
 });

@@ -8,11 +8,13 @@ namespace RGDC_Web_Application.Models
     public class tblTreatmentPlanModel
     {
         public int trtPlanID { get; set; }
-        public int dentistID { get; set; }
+        public int accID { get; set; }
         public int patientID { get; set; }
+        public DateTime date { get; set; }
         public string toothNumber { get; set; }
-        public int procedureID { get; set; }
-        public int paymentID { get; set; }
+        public string procedureID { get; set; }
+        public float amount { get; set; }
+        public float paid { get; set; }
 
     }
 }
