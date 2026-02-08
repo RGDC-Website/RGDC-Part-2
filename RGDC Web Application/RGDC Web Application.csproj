@@ -206,6 +206,7 @@
     <Compile Include="Models\Map\tblAppointmentMap.cs" />
     <Compile Include="Models\Map\tblAccountMap.cs" />
     <Compile Include="Models\PatientUpdateData.cs" />
+    <Compile Include="Models\MedicalHistoryModel.cs" />
     <Compile Include="Models\tblImagesModel.cs" />
     <Compile Include="Models\tblTreatmentPlanModel.cs" />
     <Compile Include="Models\tblStaffModel.cs" />

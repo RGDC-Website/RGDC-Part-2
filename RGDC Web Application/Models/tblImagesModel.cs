@@ -10,7 +10,6 @@ namespace RGDC_Web_Application.Models
         public int imageID { get; set; }
         public string imagePath { get; set; }
         public string imageName { get; set; }
-
         public DateTime updatedAt { get; set; }
         public DateTime createdAt { get; set; }
     }

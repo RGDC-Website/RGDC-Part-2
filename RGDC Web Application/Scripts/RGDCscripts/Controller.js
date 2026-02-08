@@ -14,6 +14,13 @@
     $scope.isUserOwner = false;
     $scope.isUserAdmin = false;
     $scope.isUserPatient = false;
+    $scope.medical = {
+        history: {
+            women: {},
+            other: {}
+},
+        conditions: {}
+    };
 
 
     $scope.hasSpecialChar = function (pwd) {
@@ -31,7 +38,7 @@
         if (!pwd) {
             $scope.passwordStrength = '';
             $scope.strengthColor = '';
-            $scope.pwdChecks = { length:false, upper:false, lower:false, number:false, special:false };
+            $scope.pwdChecks = { length: false, upper: false, lower: false, number: false, special: false };
             return;
         }
 
@@ -91,7 +98,7 @@
     // Email validation
     $scope.emailValid = false;
 
-    $scope.emailChecks = { hasAt:false, noSpace:true, hasDotAfterAt:false };
+    $scope.emailChecks = { hasAt: false, noSpace: true, hasDotAfterAt: false };
 
     // track active input to show/hide requirement helpers
     $scope.active = '';
@@ -162,7 +169,7 @@
         getEmail.then(function (returnedData) {
             if (!returnedData.data.exists) {
                 var modal = document.getElementById("patientInformationForm");
-                if (modal ) {
+                if (modal) {
                     modal.style.display = "block";
                 } else {
                     Swal.fire({
@@ -206,9 +213,9 @@
     };
 
     $scope.signUp = function () {
-       
+
         try {
-        var birthDate = new Date($scope.signUp_birthDate);
+            var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
             if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
@@ -227,10 +234,22 @@
                     accCreatedAt: new Date(),
                     accUpdatedAt: new Date(),
                 }
+
                 if ($scope.signUp_agreement == true) {
                     var signUp = RGDCWebApplicationService.signUp(accountData);
-                    signUp.then(function () {
-                         window.location.href = "/RGDC/logIn";
+                    signUp.then(function (signUpID) {
+                        var patientData = {
+                            currentPhysician: $scope.signUp_currentPhysician,
+                            referral: $scope.signUp_referral,
+                            lastVisit: $scope.signUp_lastVisit,
+                            medicalHistory: "",
+                            accID: signUpID.data.accID
+
+                        }
+                        var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
+                        signUpPatient.then(function () {
+                            window.location.href = "/RGDC/logIn";
+                        });
                     });
                 } else {
                     Swal.fire({
@@ -238,7 +257,7 @@
                         title: "Read and Accept the Following:",
                         text: "Terms and Conditions & Data Privacy Policy",
                     });
-                }                
+                }
             }
             else {
                 Swal.fire({
@@ -248,7 +267,7 @@
                 });
             }
         } catch (e) {
-                console.log(e.message)
+            console.log(e.message)
         }
     }
 
@@ -299,7 +318,7 @@
                     icon: "success"
                 }).then(() => {
                     // Redirect to home page after successful login
-                        window.location.href = "/RGDC/adminDashboard";
+                    window.location.href = "/RGDC/adminDashboard";
                 });
             } else {
                 $scope.loginError = returnedData.data ? returnedData.data.message : "Invalid email or password";
@@ -337,7 +356,7 @@
                 $scope.isUserAdmin = true;
                 if ($scope.currentUserAuthorization == "1")
                     $scope.userRole = "Dental Staff"
-                else 
+                else
                     $scope.userRole = "Dentist"
             } else if ($scope.currentUserAuthorization == "3") {
                 $scope.isUserPatient = true;
@@ -350,11 +369,11 @@
         var authEmail = RGDCWebApplicationService.getAuthEmail();
         authEmail.then(function (response) {
             console.log(response.data.email)
-                if (response.data.email) {
-                    $scope.signUp_email = response.data.email;
-                    $scope.signUp_emailLocked = true;
-                }
-            });
+            if (response.data.email) {
+                $scope.signUp_email = response.data.email;
+                $scope.signUp_emailLocked = true;
+            }
+        });
     };
 
     $scope.sendOTP = function () {
@@ -379,11 +398,11 @@
                     text: "Check your Inbox."
                 });
             } else {
-            Swal.fire({
-                icon: "error",
-                title: "OTP not Sent",
-                text: response.data.message,
-            });
+                Swal.fire({
+                    icon: "error",
+                    title: "OTP not Sent",
+                    text: response.data.message,
+                });
             }
 
         });
@@ -463,6 +482,14 @@
                 // format visit dates (existing)
                 if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
                 if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+                if (p.medHistUpdate) p.medHistUpdate = formatDateToMDYTime(p.medHistUpdate);
+
+                $scope.fillMedicalHistoryForm(p.medHist);
+
+                // previous physician details
+                if (p.prevPhy) $scope.prevPhy = p.prevPhy;
+                if (p.prevPhyOffice) $scope.prevPhyOffice = p.prevPhyOffice;
+                if (p.prevPhyContact) $scope.prevPhyContact = p.prevPhyContact;
 
                 // preserve / coerce genderID to number for binding
                 if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
@@ -519,6 +546,15 @@
                 // Initialize datepicker after patient data loads
                 initializeDatepicker();
             });
+            var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
+            getPatientTreatment.then(function (patientTreatment) {
+                $scope.patientTreatments = patientTreatment.data;
+                $scope.patientTreatments.forEach(function (patient) {
+                    if (patient.date) {
+                        patient.date = formatDateToMDY(patient.date)
+                    }
+                });
+            })
         } else {
             var getPersonalInfo = RGDCWebApplicationService.getPersonalInfo();
             getPersonalInfo.then(function (patientInfo) {
@@ -686,6 +722,23 @@
             month: "long",
             day: "numeric",
             year: "numeric"
+        });
+    }
+
+    function formatDateToMDYTime(dateString) {
+        const match = String(dateString).match(/\d+/);
+        if (!match) return dateString;
+
+        const timestamp = parseInt(match[0], 10);
+        const date = new Date(timestamp);
+
+        return date.toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true
         });
     }
 

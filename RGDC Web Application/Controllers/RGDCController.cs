@@ -131,7 +131,7 @@ namespace RGDC_Web_Application.Controllers
         }
 
         [HttpPost]
-        public void signUpAcc(tblAccountModel accDetails)
+        public JsonResult signUpAcc(tblAccountModel accDetails)
         {
             try
             {
@@ -154,6 +154,36 @@ namespace RGDC_Web_Application.Controllers
                         accUpdatedAt = DateTime.Now
                     };
                     addUser.tbl_account.Add(newData);
+                    addUser.SaveChanges();
+                    return Json(new
+                    {
+                        accID = newData.accID
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public void signUpPatient(tblPatientModel accDetails)
+        {
+            try
+            {
+                using (var addUser = new RGDCContext())
+                {
+                    var newData = new tblPatientModel()
+                    {
+                        accID = accDetails.accID,
+                        currentPhysician = accDetails.currentPhysician,
+                        referral = accDetails.referral,
+                        lastVisit = accDetails.lastVisit,
+                        medicalHistory = accDetails.medicalHistory,
+                        medHistUpdate = DateTime.Now
+                    };
+                    addUser.tbl_patient.Add(newData);
                     addUser.SaveChanges();
                 }
             }
@@ -336,7 +366,7 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-        public JsonResult getSessionVariable()
+        public JsonResult getSessionVariable()  
         {
             return Json(new
             {
@@ -502,6 +532,8 @@ namespace RGDC_Web_Application.Controllers
                         accID = p.accID,
                         currPhy = p.currentPhysician,
                         prevPhy = p.previousPhysician,
+                        prevPhyOffice = p.previousPhysicianOffice,
+                        prevPhyContact = p.previousPhysicianContact,
                         guar = p.guardian,
                         guarNum = p.guardianNumber,
                         insurance = p.insurance,
@@ -522,6 +554,8 @@ namespace RGDC_Web_Application.Controllers
                         religion = a.religion,
                         nationality = a.nationality,
                         accCreated = a.accCreatedAt,
+                        medHist = p.medicalHistory,
+                        medHistUpdate = p.medHistUpdate,
                         lastVisit = p.lastVisit,
                         nextVisit = p.nextVisit
                     }
@@ -767,6 +801,97 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 throw new ArgumentException($"There is an error while processing getServiceFunc {ex.Message} : {ex.StackTrace} : {ex.InnerException}");
+            }
+        }
+
+        public void logOut()
+        {
+            Session["UserID"] = "";
+            Session["UserName"] = "";
+            Session["UserFullName"] = "";
+            Session["UserAuthorization"] = "";
+            Session["IsLoggedIn"] = false;
+            Session["SelectedPatientID"] = "";
+        }
+
+
+        [HttpPost]
+        public JsonResult updateMedHist(MedicalHistoryModel medHist)
+        {
+            if (medHist == null)
+                return Json(new { success = false, message = "No data received" }, JsonRequestBehavior.AllowGet);
+
+            string jsonString = JsonConvert.SerializeObject(medHist);
+
+            using (var db = new RGDCContext())
+            {
+                var sessionVal = Session["SelectedPatientID"];
+                if (sessionVal == null)
+                    return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(sessionVal.ToString(), out int pid))
+                    return Json(new { success = false, message = "Invalid patient ID" }, JsonRequestBehavior.AllowGet);
+
+                var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == pid);
+                if (patient == null)
+                    return Json(new { success = false, message = "Patient not found" }, JsonRequestBehavior.AllowGet);
+
+                patient.medicalHistory = jsonString;
+                db.SaveChanges();
+
+                return Json(new { success = true, jsonstring = jsonString }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult updateMedHistIni(tblPatientModel prevPhys)
+        {
+            using (var db = new RGDCContext())
+            {
+                var sessionVal = Session["SelectedPatientID"];
+                if (sessionVal == null)
+                    return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(sessionVal.ToString(), out int pid))
+                    return Json(new { success = false, message = "Invalid patient ID" }, JsonRequestBehavior.AllowGet);
+
+                var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == pid);
+                if (patient == null)
+                    return Json(new { success = false, message = "Patient not found" }, JsonRequestBehavior.AllowGet);
+
+                patient.previousPhysician = prevPhys.previousPhysician;
+                patient.previousPhysicianOffice = prevPhys.previousPhysicianOffice;
+                patient.previousPhysicianContact = prevPhys.previousPhysicianContact;
+
+                db.SaveChanges();
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getPatientTreatment()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from t in db.tbl_treatmentplan
+                    join p in db.tbl_patient
+                        on t.patientID equals p.patientID
+                    join a in db.tbl_account
+                        on p.accID equals a.accID
+                    select new
+                    {
+                        trtPlanID = t.trtPlanID,
+                        date = t.date,
+                        procedureID = t.procedureID,
+                        toothNumber = t.toothNumber,
+                        accID = a.accID,
+                        dentistName = a.firstName + " " + a.lastName,
+                        amount = t.amount,
+                        paid = t.paid
+                    }
+                ).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
     }

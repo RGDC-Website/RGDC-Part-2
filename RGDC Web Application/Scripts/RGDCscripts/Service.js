@@ -18,6 +18,14 @@
         });
     };
 
+    this.signUpPatient = function (accDetails) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/signUpPatient',
+            data: accDetails
+        });
+    };
+
     //Get Genders
     this.getGender = function () {
         return $http.get("/RGDC/getGender");
