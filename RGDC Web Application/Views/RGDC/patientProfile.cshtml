@@ -20,7 +20,7 @@
     </div>
 
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
+    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails(); getGender()">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -235,43 +235,44 @@
                                 <label><input type="checkbox" class="filled-in" /><span>Radiation Therapy</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Joint Replacement / Implant</span></label>
                                 <label><input type="checkbox" class="filled-in" /><span>Heart Surgery</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
 
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
 
-                                <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
+                                    <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
 
-                                <div class="other-section">
-                                    <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
-                                    <input type="text" class="other-input">
-                                </div>
+                                    <div class="other-section">
+                                        <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
+                                        <input type="text" class="other-input">
+                                    </div>
                             </div>
 
                             @*signature*@
                             <div class="signature-container">
-                                <div class="signature-pad" style="margin-top: 20px;">
-                                    <i class="material-icons">image</i>
+                                <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                                    <img ng-if="selectedPatient.signatureLink || signaturePreview" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature" style="max-width:250px; max-height:100px; object-fit:contain;" />
+                                    <i ng-if="!(selectedPatient.signatureLink || signaturePreview)" class="material-icons">image</i>
                                 </div>
                                 <div class="signature-line"></div>
                                 <span class="signature-label">Signature</span>
@@ -340,7 +341,6 @@
                         </div>
 
                         <div class="row m-0 center">
-                            @* bind to patient-specific link returned by GetSelectedPatientDetails *@
                             <img id="dentalChartMain"
                                  ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
                                  alt="Dental Chart"
@@ -464,11 +464,11 @@
                 @*Gender*@
                 <label class="custom-label">
                     Gender
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.genderID" required>
-                        <option value="" disabled selected>Select Gender</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
-                        <option value="3">Others</option>
+                    <select class="browser-default custom-input"
+                            ng-model="selectedPatient.genderID"
+                            ng-options="g.genderID as g.description for g in genderArray"
+                            style="margin-bottom:15px;">
+                        <option value="" disabled>Select Gender</option>
                     </select>
                 </label>
 
@@ -477,15 +477,11 @@
                     Birthday
                     <div style="position: relative;">
                         <input id="birthDate"
-                               ng-model="selectedPatient.birthDate"
-                               type="text"
-                               class="datepicker custom-input"
+                               ng-model="selectedPatient.birthDateRaw"
+                               type="date"
+                               class="custom-input"
                                placeholder="Select Birthday"
-                               readonly
-                               required>
-                        <i class="material-icons"
-                           style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"
-                           onclick="document.getElementById('birthDate').click();">event</i>
+                               max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                     </div>
                 </label>
 
@@ -597,7 +593,7 @@
         @*medical history*@
         <ol class="medical-questions">
             <li>
-                @*Are you in good health?*@
+                @*Are you in good health? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you in good health?</span>
 
@@ -614,7 +610,7 @@
                 </div>
             </li>
             <li>
-                @*Are you under medical treatment now?*@
+                @*Are you under medical treatment now? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you under medical treatment now?</span>
 
@@ -631,7 +627,7 @@
                 </div>
             </li>
             <li>
-                @*Have you ever had a serious illness or surgical operation?*@
+                @*Have you ever had a serious illness or surgical operation? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Have you ever had a serious illness or surgical operation?</span>
 
@@ -648,7 +644,7 @@
                 </div>
             </li>
             <li>
-                @*Have you ever been hospitalized?*@
+                @*Have you ever been hospitalized? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Have you ever been hospitalized?</span>
 
@@ -665,7 +661,7 @@
                 </div>
             </li>
             <li>
-                @*Are you taking prescription/non-prescription medication?*@
+                @*Are you taking prescription/non-prescription medication? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you taking prescription/non-prescription medication?</span>
 
@@ -682,7 +678,7 @@
                 </div>
             </li>
             <li>
-                @*Are you taking tobacco products?*@
+                @*Are you taking tobacco products? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you taking tobacco products?</span>
 
@@ -699,7 +695,7 @@
                 </div>
             </li>
             <li>
-                @*Do you use alcohol, cocaine, or other dangerous drugs?*@
+                @*Do you use alcohol, cocaine, or other dangerous drugs? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Do you use alcohol, cocaine, or other dangerous drugs?</span>
 
@@ -803,18 +799,20 @@
 
         @*signature*@
         <div class="signature-container" style="margin-left:320px">
-            <div class="signature-pad" style="margin-top: 20px;">
-                <i class="material-icons">image</i>
+            <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                <img ng-if="signaturePreview || selectedPatient.signatureLink" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature Preview" style="max-width:250px; max-height:100px; object-fit:contain;" />
+                <i ng-if="!(signaturePreview || selectedPatient.signatureLink)" class="material-icons">image</i>
             </div>
             <div class="signature-line"></div>
             <span class="signature-label">Signature</span>
+
         </div>
     </div>
 
     <div class="footer-center2">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD SIGNATURE</button>
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickSignatureFile()">UPLOAD SIGNATURE</button>
         <button class="modal-close cancel-btn right" style="font-weight: 500; margin-right: 110px;">CANCEL</button>
-        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px" ng-click="saveSignature()">SAVE</button>
     </div>
 </div>
 
@@ -1069,3 +1067,50 @@
         <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof M === 'undefined' || !M.Datepicker) return;
+
+        var dateElems = document.querySelectorAll('.datepicker');
+        var dateOptions = {
+            format: 'mmmm dd, yyyy',
+            yearRange: 100,
+            showClearBtn: true,
+            container: document.body
+        };
+
+        var instances = M.Datepicker.init(dateElems, dateOptions);
+        document.querySelectorAll('.datepicker-icon, .datepicker-trigger').forEach(function (icon) {
+            icon.addEventListener('click', function (e) {
+                var input = icon.closest('.datepicker-wrapper') ? icon.closest('.datepicker-wrapper').querySelector('.datepicker') : null;
+                if (!input) {
+                    var sib = icon.previousElementSibling || icon.nextElementSibling;
+                    if (sib && sib.classList && sib.classList.contains('datepicker')) input = sib;
+                }
+                if (input) {
+                    var inst = M.Datepicker.getInstance(input);
+                    if (inst) inst.open();
+                    else input.focus();
+                }
+            });
+        });
+
+        var modalElems = document.querySelectorAll('.modal');
+        modalElems.forEach(function (modal) {
+            modal.addEventListener('modalOpen', function () {
+            });
+
+            try {
+                var mi = M.Modal.getInstance(modal);
+                if (mi) {
+                    var origOpen = mi.open;
+                    mi.open = function () {
+                        M.Datepicker.init(dateElems, dateOptions);
+                        origOpen.apply(mi, arguments);
+                    };
+                }
+            } catch (_) { /* ignore if modal instance unavailable */ }
+        });
+    });
+</script>

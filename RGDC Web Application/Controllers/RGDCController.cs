@@ -507,6 +507,7 @@ namespace RGDC_Web_Application.Controllers
                         insurance = p.insurance,
                         referral = p.referral,
                         dentalChartLink = p.dentalChartLink,
+                        signatureLink = p.signatureLink,
                         patientName = a.firstName + " " + a.lastName,
                         firstName = a.firstName,
                         middleName = a.middleName,
@@ -527,6 +528,96 @@ namespace RGDC_Web_Application.Controllers
                 ).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UploadSignature()
+        {
+            try
+            {
+                if (Request.Files == null || Request.Files.Count == 0)
+                    return Json(new { success = false, message = "No file received." });
+
+                HttpPostedFileBase file = Request.Files[0];
+                if (file == null || file.ContentLength == 0)
+                    return Json(new { success = false, message = "No file provided." });
+
+                // Validate image MIME type
+                if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                    return Json(new { success = false, message = "Invalid file type. Image required." });
+
+                string uploadPath = Server.MapPath("~/Content/Uploads/");
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                string fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+                string filePath = Path.Combine(uploadPath, fileName);
+                file.SaveAs(filePath);
+
+                string relativePath = "/Content/Uploads/" + fileName;
+
+                using (var db = new RGDCContext())
+                {
+                    var imgData = new tblImagesModel()
+                    {
+                        imageName = fileName,
+                        imagePath = "/Content/Uploads/",
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now
+                    };
+                    db.tbl_images.Add(imgData);
+                    db.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Signature uploaded to server.",
+                        filePath = relativePath,
+                        imageID = imgData.imageID
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error uploading signature: {ex.Message}"
+                });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SavePatientSignature(string imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath))
+                return Json(new { success = false, message = "No image path provided." });
+
+            var sessionVal = Session["SelectedPatientID"];
+            if (sessionVal == null) return Json(new { success = false, message = "No patient selected." });
+
+            if (!int.TryParse(sessionVal.ToString(), out int patientID))
+                return Json(new { success = false, message = "Invalid patient ID." });
+
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                    if (patient == null)
+                        return Json(new { success = false, message = "Patient not found." });
+
+                    // store signature link on patient record
+                    patient.signatureLink = imagePath;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Signature saved to patient record.", filePath = imagePath });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error saving signature to patient: {ex.Message}" });
             }
         }
 

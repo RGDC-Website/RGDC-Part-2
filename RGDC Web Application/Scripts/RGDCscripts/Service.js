@@ -101,4 +101,43 @@
         });
         return response;
     };
+
+    // primary signature uploader
+    this.uploadSignature = function (file) {
+        var formData = new FormData();
+        formData.append('file', file);
+
+        return $http({
+            method: "POST",
+            url: "/RGDC/UploadSignature",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+    };
+
+    this.savePatientSignature = function (imagePath) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/SavePatientSignature",
+            data: { imagePath: imagePath }
+        });
+    };
+
+    if (typeof this.uploadSignature !== 'function') {
+        var self = this;
+        this.uploadSignature = function (file) {
+            return self.uploadFile(file);
+        };
+    }
+
+    if (typeof this.savePatientSignature !== 'function') {
+        this.savePatientSignature = function (imagePath) {
+            return $http({
+                method: "POST",
+                url: "/RGDC/SavePatientSignature",
+                data: { imagePath: imagePath }
+            });
+        };
+    }
 });

@@ -1,5 +1,8 @@
 ﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService) {
 
+    $scope.signaturePreview = null;
+    $scope._uploadedSignaturePath = null;
+
     $scope.currentUserName = "";
     const STRENGTH = {
         WEAK: 'Weak',
@@ -95,17 +98,14 @@
 
     $scope.hasValidEmail = function (email) {
         if (!email) return false;
-        // simple, commonly used email regex
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
     $scope.checkEmail = function () {
         const email = $scope.signUp_email || '';
         $scope.emailValid = $scope.hasValidEmail(email);
-        // progressive checks
         $scope.emailChecks.hasAt = /@/.test(email);
         $scope.emailChecks.noSpace = !/\s/.test(email);
-        // dot after at
         const atIndex = email.indexOf('@');
         $scope.emailChecks.hasDotAfterAt = atIndex > -1 && email.indexOf('.', atIndex) > atIndex + 1;
     };
@@ -183,12 +183,27 @@
         }
     }
 
-    $scope.getGender = function (){
-        var genders = RGDCWebApplicationService.getGender();
-        genders.then(function (returnedData) {
-            $scope.genderArray = returnedData.data;
+    $scope.getGender = function () {
+        // load gender lookup from server
+        RGDCWebApplicationService.getGender()
+            .then(function (returnedData) {
+                $scope.genderArray = returnedData.data || [];
+
+                // ensure genderIDs are numbers (server may return strings)
+                $scope.genderArray.forEach(function (g) {
+                    if (g && typeof g.genderID !== 'undefined') g.genderID = parseInt(g.genderID, 10);
+                });
+
+                // If a patient is already loaded, coerce model to numeric and ensure it's present in list
+                if ($scope.selectedPatient && typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null) {
+                    $scope.selectedPatient.genderID = parseInt($scope.selectedPatient.genderID, 10);
+                }
+            })
+            .catch(function (err) {
+                console.error('Failed to load genders', err);
+                $scope.genderArray = [];
             });
-    }
+    };
 
     $scope.signUp = function () {
        
@@ -449,6 +464,13 @@
                 if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
                 if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
 
+                // preserve / coerce genderID to number for binding
+                if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
+                    p.genderID = parseInt(p.genderID, 10);
+                } else {
+                    p.genderID = null;
+                }
+
                 if (p.birthDate) {
                     var birthJs = parseJsonDateToJsDate(p.birthDate);
                     if (birthJs) {
@@ -489,6 +511,11 @@
 
                 $scope.selectedPatient = p;
 
+                // ensure genderArray is loaded; if not, load it so select has options
+                if (!$scope.genderArray || $scope.genderArray.length === 0) {
+                    $scope.getGender();
+                }
+
                 // Initialize datepicker after patient data loads
                 initializeDatepicker();
             });
@@ -498,6 +525,13 @@
                 if (!patientInfo || !patientInfo.data) return;
 
                 var p = patientInfo.data;
+
+                // coerce genderID
+                if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
+                    p.genderID = parseInt(p.genderID, 10);
+                } else {
+                    p.genderID = null;
+                }
 
                 if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
                 if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
@@ -538,11 +572,15 @@
 
                 $scope.selectedPatient = p;
 
+                if (!$scope.genderArray || $scope.genderArray.length === 0) {
+                    $scope.getGender();
+                }
+
                 // Initialize datepicker after patient data loads
                 initializeDatepicker();
             });
         }
-    }
+    };
     function initializeDatepicker() {
         $timeout(function () {
             var birthDateElem = document.getElementById('birthDate');
@@ -622,7 +660,6 @@
     function computeAgeFromDate(birthDate) {
         if (!birthDate) return "";
 
-        // Normalize to local date-only values to avoid timezone-induced off-by-one errors
         var bYear = birthDate.getFullYear();
         var bMonth = birthDate.getMonth();
         var bDay = birthDate.getDate();
@@ -657,26 +694,28 @@
         if (!$scope.selectedPatient) return;
 
         var profInfo = {
-            patientID: $scope.selectedPatient.patientID,
-            accID: $scope.selectedPatient.accID,
-            firstName: $scope.selectedPatient.firstName,
-            middleName: $scope.selectedPatient.middleName,
-            lastName: $scope.selectedPatient.lastName,
-            genderID: $scope.selectedPatient.genderID ? parseInt($scope.selectedPatient.genderID) : null,
-            birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
-            email: $scope.selectedPatient.email,
-            contactNumber: $scope.selectedPatient.contactNumber,
-            address: $scope.selectedPatient.address,
-            civilStatus: $scope.selectedPatient.civilStatus,
-            religion: $scope.selectedPatient.religion,
-            nationality: $scope.selectedPatient.nationality,
-            currentPhysician: $scope.selectedPatient.currPhy || $scope.selectedPatient.currentPhysician,
-            previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
-            guardian: $scope.selectedPatient.guar,
-            guardianNumber: $scope.selectedPatient.guarNum,
-            insurance: $scope.selectedPatient.insurance,
-            referral: $scope.selectedPatient.referral
-        };
+             patientID: $scope.selectedPatient.patientID,
+             accID: $scope.selectedPatient.accID,
+             firstName: $scope.selectedPatient.firstName,
+             middleName: $scope.selectedPatient.middleName,
+             lastName: $scope.selectedPatient.lastName,
+             genderID: (typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null)
+                ? parseInt($scope.selectedPatient.genderID)
+                : null,
+             birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
+             email: $scope.selectedPatient.email,
+             contactNumber: $scope.selectedPatient.contactNumber,
+             address: $scope.selectedPatient.address,
+             civilStatus: $scope.selectedPatient.civilStatus,
+             religion: $scope.selectedPatient.religion,
+             nationality: $scope.selectedPatient.nationality,
+             currentPhysician: $scope.selectedPatient.currPhy || $scope.selectedPatient.currentPhysician,
+             previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
+             guardian: $scope.selectedPatient.guar,
+             guardianNumber: $scope.selectedPatient.guarNum,
+             insurance: $scope.selectedPatient.insurance,
+             referral: $scope.selectedPatient.referral
+         };
 
         var updateData = RGDCWebApplicationService.updatePatient(profInfo);
         updateData.then(function (response) {
@@ -778,7 +817,6 @@
                                 console.log('Updated modal image to:', json.filePath);
                             }
 
-                            // Refresh patient details from server
                             $scope.getSelectedPatientDetails();
 
                             Swal.fire({
@@ -828,4 +866,158 @@
         });
     };
 
+
+    // Open file picker and preview image in modal
+    $scope.pickSignatureFile = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) {
+                document.body.removeChild(input);
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+                document.body.removeChild(input);
+                return;
+            }
+
+            // preview locally
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    $scope.signaturePreview = evt.target.result;
+                    $scope._uploadedSignaturePath = null;
+                });
+            };
+            reader.readAsDataURL(file);
+
+            // store the file on the input for later upload on Save
+            input._pickedFile = file;
+
+            // attach Save action to upload immediately (or let user click Save)
+            $scope._pickedSignatureFile = file;
+
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    // Save signature: upload image to server (tbl_images) then link to patient record and refresh UI
+    $scope.saveSignature = function () {
+        var file = $scope._pickedSignatureFile;
+        if (!file && !$scope.signaturePreview && !$scope._uploadedSignaturePath) {
+            Swal.fire({ icon: 'error', title: 'No Image', text: 'Pick an image first.' });
+            return;
+        }
+
+        if ($scope._uploadedSignaturePath) {
+            $scope._linkSignatureToPatient($scope._uploadedSignaturePath);
+            return;
+        }
+
+        var uploader = null;
+        if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadSignature === 'function') {
+            uploader = RGDCWebApplicationService.uploadSignature;
+        } else if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadFile === 'function') {
+            uploader = RGDCWebApplicationService.uploadFile;
+            console.warn('RGDCWebApplicationService.uploadSignature not found, falling back to uploadFile.');
+        } else {
+            Swal.fire({ icon: 'error', title: 'Upload Not Available', text: 'Upload service is not loaded.' });
+            return;
+        }
+
+        // Upload file
+        Swal.fire({ title: 'Uploading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        uploader(file)
+            .then(function (resp) {
+                Swal.close();
+                var data = resp && resp.data ? resp.data : resp;
+                if (data && data.success && data.filePath) {
+                    $scope._uploadedSignaturePath = data.filePath;
+                    $scope._linkSignatureToPatient(data.filePath);
+                } else {
+                    var msg = (data && data.message) ? data.message : 'Unknown error uploading signature.';
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: msg });
+                }
+            })
+            .catch(function (err) {
+                Swal.close();
+                console.error('UploadSignature error', err);
+                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload signature' });
+            });
+    };
+
+    $scope._linkSignatureToPatient = function (filePath) {
+        Swal.fire({ title: 'Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        var saver;
+        if (RGDCWebApplicationService && typeof RGDCWebApplicationService.savePatientSignature === 'function') {
+            saver = function (path) {
+                return RGDCWebApplicationService.savePatientSignature(path);
+            };
+        } else {
+            console.warn('RGDCWebApplicationService.savePatientSignature not found - using $http fallback.');
+            saver = function (path) {
+                return $http({
+                    method: "POST",
+                    url: "/RGDC/SavePatientSignature",
+                    data: { imagePath: path }
+                });
+            };
+        }
+
+        saver(filePath)
+            .then(function (resp) {
+                Swal.close();
+                var data = (resp && resp.data) ? resp.data : resp;
+                if (data && data.success) {
+                    // Refresh patient details so signatureLink is present and shown
+                    $scope.getSelectedPatientDetails();
+
+                    // Also update local preview shown in medical-history tab
+                    $scope.signaturePreview = data.filePath || filePath;
+                    $scope._uploadedSignaturePath = data.filePath || filePath;
+                    // clear picked file
+                    $scope._pickedSignatureFile = null;
+
+                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Signature saved.' });
+
+                    // close modal if open (medical-history-modal)
+                    var modal = document.getElementById('medical-history-modal');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var inst = M.Modal.getInstance(modal);
+                        if (inst) inst.close();
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Save Failed', text: (data && data.message) ? data.message : 'Could not save signature.' });
+                }
+            })
+            .catch(function (err) {
+                Swal.close();
+                console.error('SavePatientSignature error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save signature for patient.' });
+            });
+    };
+
+    // When patient details reload, if server has signatureLink use that as preview in medical history
+    var origGetSelectedPatientDetails = $scope.getSelectedPatientDetails;
+    $scope.getSelectedPatientDetails = function () {
+        if (typeof origGetSelectedPatientDetails === 'function') {
+            origGetSelectedPatientDetails();
+            $timeout(function () {
+                if ($scope.selectedPatient && $scope.selectedPatient.signatureLink) {
+                    $scope.signaturePreview = $scope.selectedPatient.signatureLink;
+                }
+            }, 400);
+        }
+    };
 });
