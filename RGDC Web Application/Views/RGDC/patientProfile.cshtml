@@ -7,20 +7,20 @@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*back button*@
         <div class="col m8 l8 valign-wrapper" style="margin-top: 7px;">
-            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Back to Patients Tab"><i class="material-icons brown-text lighten-1 left">arrow_back</i></a>
+            <a href="/RGDC/adminPatientsTab" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Back to Patients Tab"><i class="material-icons brown-text lighten-1 left">arrow_back</i></a>
         </div>
 
         @*refresh and logout buttons*@
         <div class="col m4 l4">
             <span class="right" style="margin-top:7px;">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+                <div ng-click="logOut()" class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
 
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;">
+    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails(); getGender()">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -35,12 +35,12 @@
 
                     @*user name and role*@
                     <div class="row center">
-                        <h5 class="bold brown-text lighten-1">Name</h5>
-                        <h6 class="bold brown-text lighten-1">ID: 000000</h6>
+                        <h5 class="bold brown-text lighten-1">{{selectedPatient.patientName}}</h5>
+                        <h6 class="bold brown-text lighten-1">ID: {{selectedPatient.patientID}}</h6>
 
                         @*last and next visit*@
-                        <p class="brown-text lighten-1">Last Visit: MM/DD/YYYY</p>
-                        <p class="brown-text lighten-1">Next Visit: MM/DD/YYYY</p>
+                        <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
+                        <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit || "---"}}</p>
 
                         <button class="edit-btn right modal-trigger" data-target="modal-patient-info">EDIT</button>
                     </div>
@@ -53,45 +53,45 @@
                         <div class="col m6 l6">
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">AGE</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.age}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">GENDER</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.gender}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">EMAIL ADDRESS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.email}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ADDRESS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.address}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">RELIGION</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.religion}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">REFERRAL</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.referral}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">INSURANCE</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.insurance}}</p>
                             </div>
                         </div>
                         <div class="col m6 l6">
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">BIRTHDAY</p>
-                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.birthDate}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">CONTACT NUMBER</p>
-                                <p class="brown-text lighten-1">+00 0000000000</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.contactNumber}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">CIVIL STATUS</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.civilStatus}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">OCCUPATION</p>
@@ -99,15 +99,15 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">NATIONALITY</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.nationality}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">GUARDIAN</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.guar}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ACCOUNT CREATION</p>
-                                <p class="brown-text lighten-1">Month D, YYYY</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.accCreated}}</p>
                             </div>
                         </div>
                     </div>
@@ -140,15 +140,15 @@
                                 <div class="physician-info">
                                     <p class="medInfo">
                                         Name of previous physician:
-                                        <span style="font-weight:bold">---</span>
+                                        <span style="font-weight:bold"> {{selectedPatient.prevPhy || '---'}}</span>
                                     </p>
                                     <p>
                                         Physician's Office:
-                                        <span style="font-weight:bold">---</span>
+                                        <span style="font-weight:bold"> {{selectedPatient.prevPhyOffice || '---'}}</span>
                                     </p>
                                     <p>
                                         Physician's Contacts:
-                                        <span style="font-weight:bold">---</span>
+                                        <span style="font-weight:bold"> {{selectedPatient.prevPhyContact || '---'}}</span>
                                     </p>
                                 </div>
                                 @*update button and last updated*@
@@ -157,7 +157,7 @@
                                         <button class="update-btn right modal-trigger" data-target="medical-history-modal">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
-                                        <p class="last-update">Last Update: Day Month, Year | Time</p>
+                                        <p class="last-update">Last Update: {{selectedPatient.medHistUpdate || '...'}}</p>
                                     </div>
                                 </div>
 
@@ -168,110 +168,114 @@
                             <ol class="medical-questions">
                                 <li>
                                     Are you in good health?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.goodHealth }}</span>
                                 </li>
                                 <li>
                                     Are you under medical treatment now?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.underTreatment }}</span>
                                 </li>
                                 <li>
                                     Have you ever had a serious illness or surgical operation?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.seriousIllness }}</span>
                                 </li>
                                 <li>
                                     Have you ever been hospitalized?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.hospitalized }}</span>
                                 </li>
                                 <li>
                                     Are you taking prescription/non-prescription medication?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.prescription }}</span>
                                 </li>
                                 <li>
                                     Are you taking tobacco products?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.tobacco }}</span>
                                 </li>
                                 <li>
                                     Do you use alcohol, cocaine, or other dangerous drugs?
-                                    <span class="placeholder-text">YES/NO</span>
+                                    <span class="placeholder-text">{{medical.history.drugs }}</span>
                                 </li>
                                 <li>
                                     Allergies:
-                                    <span class="placeholder-text">---</span>
+                                    <span class="placeholder-text">{{medical.history.allergies || '---'}}</span>
                                 </li>
                                 <li>
                                     Bleeding Time:
-                                    <span class="placeholder-text">---</span>
+                                    <span class="placeholder-text">{{medical.history.bleedingTime || '---'}}</span>
                                 </li>
 
                                 <li>
                                     For women only:
                                     <div class="women-only-options view-only">
-                                        <label><input type="checkbox" class="filled-in" /><span>Are you pregnant?</span></label>
-                                        <label><input type="checkbox" class="filled-in" /><span>Are you nursing?</span></label>
-                                        <label><input type="checkbox" class="filled-in" /><span>Are you taking birth control pills?</span></label>
+                                        <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
+                                        <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
+                                        <label><input type="checkbox" ng-model="medical.history.pills" class="filled-in" /><span>Are you taking birth control pills?</span></label>
                                     </div>
                                 </li>
 
                                 <li>
                                     Blood type:
-                                    <span class="placeholder-text">---</span>
+                                    <span class="placeholder-text">{{medical.history.bloodType || '---'}}</span>
                                 </li>
                                 <li>
                                     Blood pressure:
-                                    <span class="placeholder-text">---</span>
+                                    <span class="placeholder-text">{{medical.history.bloodPressure || '---'}}</span>
                                 </li>
                                 <li>Do you have or have had any of the following?</li>
                             </ol>
 
                             <div class="checkbox-grid view-only">
-                                <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>AIDS or HIV Infection</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Sexually Transmitted Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Stomach Troubles / Ulcer</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Fainting Seizure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Rapid Weight Loss</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Radiation Therapy</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Joint Replacement / Implant</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Surgery</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.highBloodPressure" /><span>High Blood Pressure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.lowBloodPressure" /><span>Low Blood Pressure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.epilepsy" /><span>Epilepsy / Convulsions</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hiv" /><span>AIDS or HIV Infection</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.std" /><span>Sexually Transmitted Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stomachUlcer" /><span>Stomach Troubles / Ulcer</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.faintingSeizure" /><span>Fainting Seizure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rapidWeightLoss" /><span>Rapid Weight Loss</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.radiationTherapy" /><span>Radiation Therapy</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.jointReplacement" /><span>Joint Replacement / Implant</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartSurgery" /><span>Heart Surgery</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartAttack" /><span>Heart Attack</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.thyroidProblem" /><span>Thyroid Problem</span></label>
 
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartDisease" /><span>Heart Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartMurmur" /><span>Heart Murmur</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.liverDisease" /><span>Hepatitis / Liver Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rheumaticFever" /><span>Rheumatic Fever</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.allergies" /><span>Hay Fever / Allergies</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.respiratoryProblems" /><span>Respiratory Problems</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hepatitisJaundice" /><span>Hepatitis / Jaundice</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.tuberculosis" /><span>Tuberculosis</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.swollenAnkles" /><span>Swollen Ankles</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.kidneyDisease" /><span>Kidney Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.diabetes" /><span>Diabetes</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.chestPain" /><span>Chest Pain</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stroke" /><span>Stroke</span></label>
 
-                                <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.cancer" /><span>Cancer / Tumors</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.anemia" /><span>Anemia</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.angina" /><span>Angina</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.asthma" /><span>Asthma</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.emphysema" /><span>Emphysema</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bleedingProblems" /><span>Bleeding Problems</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bloodDiseases" /><span>Blood Diseases</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.headInjuries" /><span>Head Injuries</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.arthritis" /><span>Arthritis / Rheumatism</span></label>
 
                                 <div class="other-section">
-                                    <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
-                                    <input type="text" class="other-input">
+                                    <label>
+                                        <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
+                                        <span>Other/s:</span>
+                                    </label>
+                                    <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
                                 </div>
                             </div>
 
                             @*signature*@
                             <div class="signature-container">
-                                <div class="signature-pad" style="margin-top: 20px;">
-                                    <i class="material-icons">image</i>
+                                <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                                    <img ng-if="selectedPatient.signatureLink || signaturePreview" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature" style="max-width:250px; max-height:100px; object-fit:contain;" />
+                                    <i ng-if="!(selectedPatient.signatureLink || signaturePreview)" class="material-icons">image</i>
                                 </div>
                                 <div class="signature-line"></div>
                                 <span class="signature-label">Signature</span>
@@ -283,7 +287,7 @@
                     <div id="prog" class="row m-0">
 
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-progress-notes">ADD NOTE</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-progress-notes">ADD NOTE</a>
                         </div>
 
                         <table id="progressNotes" class="hover">
@@ -301,19 +305,19 @@
                             </thead>
                             @*table content*@
                             <tbody>
-                                <tr>
-                                    <td>MM/DD/YYYY</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>Name</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>-</td>
+                                <tr ng-repeat="patientTreatment in patientTreatments">
+                                    <td>{{patientTreatment.date}}</td>
+                                    <td>{{patientTreatment.procedureID}}</td>
+                                    <td>{{patientTreatment.toothNumber}}</td>
+                                    <td>{{patientTreatment.dentist}}</td>
+                                    <td>{{patientTreatment.amount}}</td>
+                                    <td>{{patientTreatment.paid}}</td>
+                                    <td>{{patientTreatment.amount - patientTreatment.paid}}</td>
                                     <td>
-                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-progress-note" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <a ng-click="editPatient(patientTreatment.trtPlanID)" ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-progress-note" data-position="bottom" data-tooltip="Delete Progress Note">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-progress-note" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-progress-note" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -336,11 +340,14 @@
                     <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-dental-chart">EDIT CHART</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-dental-chart">EDIT CHART</a>
                         </div>
 
                         <div class="row m-0 center">
-                            <img src="https://placehold.co/2550x3300" style="max-height: 47rem" />
+                            <img id="dentalChartMain"
+                                 ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
+                                 alt="Dental Chart"
+                                 style="max-height: 47rem" />
                         </div>
 
                     </div>
@@ -348,7 +355,7 @@
                     @*Forms*@
                     <div id="forms" class="row m-0">
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk">
@@ -368,10 +375,10 @@
                                     <td>Name</td>
                                     @*edit and delete button*@
                                     <td>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -426,7 +433,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     First Name
-                    <input type="text" class="custom-input" placeholder="First Name">
+                    <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedPatient.firstName">
                 </label>
             </div>
 
@@ -434,7 +441,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     Middle Name
-                    <input type="text" class="custom-input" placeholder="Middle Name">
+                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedPatient.middleName">
                 </label>
             </div>
 
@@ -442,7 +449,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     Last Name
-                    <input type="text" class="custom-input" placeholder="Last Name">
+                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedPatient.lastName">
                 </label>
             </div>
         </div>
@@ -453,42 +460,49 @@
                 @*Gender*@
                 <label class="custom-label">
                     Gender
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
-                        <option value="" disabled selected>Select Gender</option>
-                        <option value="1">Male</option>
-                        <option value="2">Female</option>
-                        <option value="3">Others</option>
+                    <select class="browser-default custom-input"
+                            ng-model="selectedPatient.genderID"
+                            ng-options="g.genderID as g.description for g in genderArray"
+                            style="margin-bottom:15px;">
+                        <option value="" disabled>Select Gender</option>
                     </select>
                 </label>
 
                 @*Birthday*@
                 <label class="custom-label">
                     Birthday
-                    <input type="text" class="custom-input" placeholder="Birthday">
+                    <div style="position: relative;">
+                        <input id="birthDate"
+                               ng-model="selectedPatient.birthDateRaw"
+                               type="date"
+                               class="custom-input"
+                               placeholder="Select Birthday"
+                               max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
                 </label>
 
                 @*Address*@
                 <label class="custom-label">
                     Address
-                    <input type="text" class="custom-input" placeholder="Address">
+                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
                 </label>
 
                 @*Nationality*@
                 <label class="custom-label">
                     Nationality
-                    <input type="text" class="custom-input" placeholder="Nationality">
+                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
                 </label>
 
                 @*Guardian*@
                 <label class="custom-label">
                     Guardian
-                    <input type="text" class="custom-input" placeholder="Guardian">
+                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
                 </label>
 
                 @*Email*@
                 <label class="custom-label">
                     Email Address
-                    <input type="text" class="custom-input" placeholder="Email Address">
+                    <input type="text" class="custom-input" placeholder="Email Address" ng-model="selectedPatient.email">
                 </label>
             </div>
 
@@ -496,7 +510,7 @@
                 @*Civil status*@
                 <label class="custom-label">
                     Civil Status
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" required>
+                    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
                         <option value="Single">Single</option>
                         <option value="Married">Married</option>
@@ -513,25 +527,25 @@
                 @*Religion*@
                 <label class="custom-label">
                     Religion
-                    <input type="text" class="custom-input" placeholder="Religion">
+                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
                 </label>
 
                 @*Medical Insurance*@
                 <label class="custom-label">
                     Medical Insurance
-                    <input type="text" class="custom-input" placeholder="Medical Insurance">
+                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
                 </label>
 
                 @*Guardian Contact #*@
                 <label class="custom-label">
                     Guardian's Contact Number
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number ">
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" ng-model="selectedPatient.guarNum">
                 </label>
 
                 @*Contact #*@
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number">
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedPatient.contactNumber">
                 </label>
             </div>
         </div>
@@ -540,7 +554,7 @@
     <div class="modal-footer footer-center">
         <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD NEW ACCOUNT PICTURE</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="updatePatientProfile()">SAVE</button>
     </div>
 </div>
 
@@ -555,17 +569,17 @@
             <div class="row" style="padding: 0 10px; flex:1">
                 <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin:0 0 -15px 0;">
                     <span>Name of previous physician:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Name of previous physician">
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Name of previous physician" ng-model="prevPhy">
                 </p>
 
                 <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 -15px 0;">
                     <span>Physician's office:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's office">
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's office" ng-model="prevPhyOffice">
                 </p>
 
                 <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 5px 0;">
                     <span>Physician's contact:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's contact">
+                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's contact" ng-model="prevPhyContact">
                 </p>
             </div>
 
@@ -575,119 +589,119 @@
         @*medical history*@
         <ol class="medical-questions">
             <li>
-                @*Are you in good health?*@
+                @*Are you in good health? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you in good health?</span>
 
                     <div style="display: flex; gap: 15px; margin-right:-25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="1" type="radio" class="with-gap" />
+                            <input name="1" value="Yes" type="radio" class="with-gap" ng-model="medical.history.goodHealth" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="1" type="radio" class="with-gap" />
+                            <input name="1" type="radio" value="No" class="with-gap" ng-model="medical.history.goodHealth" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Are you under medical treatment now?*@
+                @*Are you under medical treatment now? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you under medical treatment now?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="2" type="radio" class="with-gap" />
+                            <input name="2" type="radio" value="Yes" class="with-gap" ng-model="medical.history.underTreatment" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="2" type="radio" class="with-gap" />
+                            <input name="2" type="radio" value="No" class="with-gap" ng-model="medical.history.underTreatment" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Have you ever had a serious illness or surgical operation?*@
+                @*Have you ever had a serious illness or surgical operation? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Have you ever had a serious illness or surgical operation?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="3" type="radio" class="with-gap" />
+                            <input name="3" type="radio" value="Yes" class="with-gap" ng-model="medical.history.seriousIllness" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="3" type="radio" class="with-gap" />
+                            <input name="3" type="radio" value="No" class="with-gap" ng-model="medical.history.seriousIllness" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Have you ever been hospitalized?*@
+                @*Have you ever been hospitalized? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Have you ever been hospitalized?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="4" type="radio" class="with-gap" />
+                            <input name="4" type="radio" value="Yes" class="with-gap" ng-model="medical.history.hospitalized" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="4" type="radio" class="with-gap" />
+                            <input name="4" type="radio" value="No" class="with-gap" ng-model="medical.history.hospitalized" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Are you taking prescription/non-prescription medication?*@
+                @*Are you taking prescription/non-prescription medication? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you taking prescription/non-prescription medication?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="5" type="radio" class="with-gap" />
+                            <input name="5" type="radio" value="Yes" class="with-gap" ng-model="medical.history.prescription" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="5" type="radio" class="with-gap" />
+                            <input name="5" type="radio" value="No" class="with-gap" ng-model="medical.history.prescription" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Are you taking tobacco products?*@
+                @*Are you taking tobacco products? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Are you taking tobacco products?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="6" type="radio" class="with-gap" />
+                            <input name="6" type="radio" value="Yes" class="with-gap" ng-model="medical.history.tobacco" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="6" type="radio" class="with-gap" />
+                            <input name="6" type="radio" value="No" class="with-gap" ng-model="medical.history.tobacco" />
                             <span>No</span>
                         </label>
                     </div>
                 </div>
             </li>
             <li>
-                @*Do you use alcohol, cocaine, or other dangerous drugs?*@
+                @*Do you use alcohol, cocaine, or other dangerous drugs? *@
                 <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                     <span>Do you use alcohol, cocaine, or other dangerous drugs?</span>
 
                     <div style="display: flex; gap: 15px; margin-right: -25px;">
                         <label style="display: flex; align-items: center;">
-                            <input name="7" type="radio" class="with-gap" />
+                            <input name="7" type="radio" value="Yes" class="with-gap" ng-model="medical.history.drugs" />
                             <span>Yes</span>
                         </label>
                         <label style="display: flex; align-items: center;">
-                            <input name="7" type="radio" class="with-gap" />
+                            <input name="7" type="radio" value="No" class="with-gap" ng-model="medical.history.drugs" />
                             <span>No</span>
                         </label>
                     </div>
@@ -697,23 +711,23 @@
                 @*Allergies*@
                 <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
                     <span>Allergies:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Allergies...">
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Allergies..." ng-model="medical.history.allergies">
                 </div>
             </li>
             <li style="margin: -25px 0 0 0;">
                 @*Bleeding time:*@
                 <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
                     <span>Bleeding time:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time...">
+                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time..." ng-model="medical.history.bleedingTime">>
                 </div>
             </li>
 
             <li>
                 For women only:
                 <div class="women-only-options">
-                    <label><input type="checkbox" class="filled-in" /><span>Are you pregnant?</span></label>
-                    <label><input type="checkbox" class="filled-in" /><span>Are you nursing?</span></label>
-                    <label><input type="checkbox" class="filled-in" /><span>Are you taking birth control pills?</span></label>
+                    <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
+                    <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
+                    <label><input type="checkbox" ng-model="medical.history.pills" class="filled-in" /><span>Are you taking birth control pills?</span></label>
                 </div>
             </li>
 
@@ -721,78 +735,218 @@
                 @*Blood ppressure*@
                 <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
                     <span>Blood pressure:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Blood pressure...">
+                    <input type="text" class="custom-input" ng-model="medical.history.bloodPressure" style="flex: 1; margin-right: -30px;" placeholder="Blood pressure...">
                 </div>
             </li>
             <li style="margin: -25px 0 0 0;">
                 @*Blood type:*@
                 <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
                     <span>Blood type:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time...">
+                    <input type="text" class="custom-input" ng-model="medical.history.bloodType" style="flex: 1; margin-right: -30px;" placeholder="Blood Type...">
                 </div>
             </li>
             <li>Do you have or have had any of the following?</li>
         </ol>
 
         <div class="checkbox-grid">
-            <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>AIDS or HIV Infection</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Sexually Transmitted Disease</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Stomach Troubles / Ulcer</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Fainting Seizure</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Rapid Weight Loss</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Radiation Therapy</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Joint Replacement / Implant</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Heart Surgery</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
 
-            <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.highBloodPressure" class="filled-in" />
+                <span>High Blood Pressure</span>
+            </label>
 
-            <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
-            <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.lowBloodPressure" class="filled-in" />
+                <span>Low Blood Pressure</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.epilepsy" class="filled-in" />
+                <span>Epilepsy / Convulsions</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.hiv" class="filled-in" />
+                <span>AIDS or HIV Infection</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.std" class="filled-in" />
+                <span>Sexually Transmitted Disease</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.stomachUlcer" class="filled-in" />
+                <span>Stomach Troubles / Ulcer</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.faintingSeizure" class="filled-in" />
+                <span>Fainting Seizure</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.rapidWeightLoss" class="filled-in" />
+                <span>Rapid Weight Loss</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.radiationTherapy" class="filled-in" />
+                <span>Radiation Therapy</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.jointReplacement" class="filled-in" />
+                <span>Joint Replacement / Implant</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.heartSurgery" class="filled-in" />
+                <span>Heart Surgery</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.heartAttack" class="filled-in" />
+                <span>Heart Attack</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.thyroidProblem" class="filled-in" />
+                <span>Thyroid Problem</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.heartDisease" class="filled-in" />
+                <span>Heart Disease</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.heartMurmur" class="filled-in" />
+                <span>Heart Murmur</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.liverDisease" class="filled-in" />
+                <span>Hepatitis / Liver Disease</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.rheumaticFever" class="filled-in" />
+                <span>Rheumatic Fever</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.allergies" class="filled-in" />
+                <span>Hay Fever / Allergies</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.respiratoryProblems" class="filled-in" />
+                <span>Respiratory Problems</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.hepatitisJaundice" class="filled-in" />
+                <span>Hepatitis / Jaundice</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.tuberculosis" class="filled-in" />
+                <span>Tuberculosis</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.swollenAnkles" class="filled-in" />
+                <span>Swollen Ankles</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.kidneyDisease" class="filled-in" />
+                <span>Kidney Disease</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.diabetes" class="filled-in" />
+                <span>Diabetes</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.chestPain" class="filled-in" />
+                <span>Chest Pain</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.stroke" class="filled-in" />
+                <span>Stroke</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.cancer" class="filled-in" />
+                <span>Cancer / Tumors</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.anemia" class="filled-in" />
+                <span>Anemia</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.angina" class="filled-in" />
+                <span>Angina</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.asthma" class="filled-in" />
+                <span>Asthma</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.emphysema" class="filled-in" />
+                <span>Emphysema</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.bleedingProblems" class="filled-in" />
+                <span>Bleeding Problems</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.bloodDiseases" class="filled-in" />
+                <span>Blood Diseases</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.headInjuries" class="filled-in" />
+                <span>Head Injuries</span>
+            </label>
+
+            <label>
+                <input type="checkbox" ng-model="medical.conditions.arthritis" class="filled-in" />
+                <span>Arthritis / Rheumatism</span>
+            </label>
 
             <div class="other-section">
-                <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
-                <input type="text" class="other-input" style="margin-right:25px">
+                <label><input type="checkbox" class="filled-in" ng-model="medical.history.checkedd"> <span>Other/s:</span></label>
+                <input type="text" class="other-input" style="margin-right:25px" ng-disabled="!medical.history.checkedd" ng-model="medical.history.text">
             </div>
         </div>
 
         @*signature*@
         <div class="signature-container" style="margin-left:320px">
-            <div class="signature-pad" style="margin-top: 20px;">
-                <i class="material-icons">image</i>
+            <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                <img ng-if="signaturePreview || selectedPatient.signatureLink" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature Preview" style="max-width:250px; max-height:100px; object-fit:contain;" />
+                <i ng-if="!(signaturePreview || selectedPatient.signatureLink)" class="material-icons">image</i>
             </div>
             <div class="signature-line"></div>
             <span class="signature-label">Signature</span>
+
         </div>
     </div>
 
     <div class="footer-center2">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD SIGNATURE</button>
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickSignatureFile()">UPLOAD SIGNATURE</button>
         <button class="modal-close cancel-btn right" style="font-weight: 500; margin-right: 110px;">CANCEL</button>
-        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px" ng-click="saveSignature()">SAVE</button>
     </div>
 </div>
 
@@ -919,22 +1073,24 @@
     </div>
 </div>
 
-@*Dental Chart*@
+@*Dental Chart modal*@
 <div id="modal-dental-chart" class="modal modal-fixed-footer dental-chart-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Dental Chart</h5>
 
         <div class="row">
             <div class="row m-0 center">
-                <img src="https://placehold.co/2550x3300" style="max-height: 33rem" />
+                <img id="dentalChartModalImg"
+                     ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
+                     alt="Dental Chart"
+                     style="max-height: 33rem" />
             </div>
         </div>
     </div>
 
     <div class="modal-footer footer-center">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD DENTAL CHART</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="uploadFile()">UPLOAD & SAVE</button>
     </div>
 </div>
 
@@ -1045,3 +1201,50 @@
         <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof M === 'undefined' || !M.Datepicker) return;
+
+        var dateElems = document.querySelectorAll('.datepicker');
+        var dateOptions = {
+            format: 'mmmm dd, yyyy',
+            yearRange: 100,
+            showClearBtn: true,
+            container: document.body
+        };
+
+        var instances = M.Datepicker.init(dateElems, dateOptions);
+        document.querySelectorAll('.datepicker-icon, .datepicker-trigger').forEach(function (icon) {
+            icon.addEventListener('click', function (e) {
+                var input = icon.closest('.datepicker-wrapper') ? icon.closest('.datepicker-wrapper').querySelector('.datepicker') : null;
+                if (!input) {
+                    var sib = icon.previousElementSibling || icon.nextElementSibling;
+                    if (sib && sib.classList && sib.classList.contains('datepicker')) input = sib;
+                }
+                if (input) {
+                    var inst = M.Datepicker.getInstance(input);
+                    if (inst) inst.open();
+                    else input.focus();
+                }
+            });
+        });
+
+        var modalElems = document.querySelectorAll('.modal');
+        modalElems.forEach(function (modal) {
+            modal.addEventListener('modalOpen', function () {
+            });
+
+            try {
+                var mi = M.Modal.getInstance(modal);
+                if (mi) {
+                    var origOpen = mi.open;
+                    mi.open = function () {
+                        M.Datepicker.init(dateElems, dateOptions);
+                        origOpen.apply(mi, arguments);
+                    };
+                }
+            } catch (_) { /* ignore if modal instance unavailable */ }
+        });
+    });
+</script>

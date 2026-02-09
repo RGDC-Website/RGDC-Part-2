@@ -6,19 +6,19 @@
     @*top part (welcome, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*user name*@
-        <div class="col m8 l8"><h4>Welcome, Name!</h4></div>
+        <div class="col m8 l8" ng-show="currentUserName"><h4>Welcome, {{currentUserName}}!</h4></div>
         @*refresh and logout buttons*@
         <div class="col m4 l4">
             <span class="right">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Print Report"> <i class="material-icons brown-text lighten-1">print</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+                <div class="col valign-wrapper" ng-show="isUserAdmin"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Print Report"> <i class="material-icons brown-text lighten-1">print</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
 
     @*overview*@
-    <div class="row" style="padding: 0 1rem 0 1rem">
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin">
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">OVERVIEW</p>
 
         @*overview cards*@
@@ -137,7 +137,7 @@
     </div>
 
     @*analytics*@
-    <div class="row" style="padding: 0 1rem 0 1rem">
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin">
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">ANALYTICS</p>
 
         @*analytics cards*@

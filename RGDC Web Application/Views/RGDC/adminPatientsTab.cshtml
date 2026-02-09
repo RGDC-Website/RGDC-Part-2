@@ -11,7 +11,7 @@
         <div class="col m4 l4">
             <span class="right">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+                <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
@@ -21,7 +21,7 @@
     </div>
 
     @*patients*@
-    <table id="adminPatientsTabTable" class="hover tableClk">
+    <table id="adminPatientsTabTable" class="hover tableClk" ng-init="getPatients()">
         <thead>
             <tr class="brown-text lighten-1">
                 <th>Patient Name</th>
@@ -31,9 +31,9 @@
         </thead>
         @*table content*@
         <tbody>
-            <tr data-href="#" title="View patient record" class="clkPointer">
-                <td>Name</td>
-                <td>Month DD, YYYY</td>
+            <tr data-href="#" title="View patient record" class="clkPointer"  ng-repeat="patient in patientArray" ng-click="goToPatientInfo(patient)">
+                <td>{{patient.patientName}}</td>
+                <td>{{patient.lastVisit}}</td>
                 <td>X Appointment Scheduled</td>
                 <td>
                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>

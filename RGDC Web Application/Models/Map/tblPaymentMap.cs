@@ -7,12 +7,12 @@ using System.Web;
 
 namespace RGDC_Web_Application.Models.Map
 {
-    public class tblPatientMap : EntityTypeConfiguration<tblPatientModel>
+    public class tblPaymentMap : EntityTypeConfiguration<tblPaymentModel>
     {
-        public tblPatientMap()
+        public tblPaymentMap()
         {
-            HasKey(t => t.patientID);
-            ToTable("tbl_patient");
+            HasKey(t => t.paymentID);
+            ToTable("tbl_payment");
         }
     }
 }

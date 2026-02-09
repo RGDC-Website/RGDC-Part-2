@@ -4,72 +4,16 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
-    <!-- Compiled and minified CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-    <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="~/Content/style.css">
-
-    @*datatable*@
+    <!-- Datatables and jQuery first -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 
-</head>
-<body ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
-    <div class="row" style="margin: 0;">
-        @*sidebar nav*@
-        <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
-            <h5 style="font-weight:bold;">RGDC</h5>
+    <!-- Then Materialize JS (depends on jQuery) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-            @*user pfp and name*@
-            <div class="row center" style="margin-top: 5rem;">
-                @*lagyan nalang ng src for image source*@
-                <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
-            </div>
-
-            @*user name and role*@
-            <div class="row center">
-                <h5 style="font-weight:bold;">Name</h5>
-                <h6>Role</h6>
-            </div>
-
-            @*nav tabs*@
-            <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
-                <ul>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-                    <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                        <li>
-                            <a href="#!" class="white-text">one</a>
-                        </li>
-                        <li>
-                            <a href="#!" class="white-text">two</a>
-                        </li>
-                    </ul>
-                </ul>
-            </div>
-
-            @*date and time at the bottom of the screen*@
-            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
-                <span>Month DD, YYYY | </span>
-                <span>00:00 AM</span>
-            </div>
-
-        </div>
-
-        @*content*@
-        <div class="col s12 m9 l9" style="margin-left: 25%">
-            @RenderBody()
-        </div>
-    </div>
-
-
+    <link rel="stylesheet" href="~/Content/style.css">
 
     @*Arrow filter (desccending ascending)*@
     <script>
@@ -126,10 +70,14 @@
             })
         }
     </script>
-    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
     <script src="~/Scripts/angular.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="~/Scripts/RGDCscripts/Module.js"></script>
     <script src="~/Scripts/RGDCscripts/Service.js"></script>
     <script src="~/Scripts/RGDCscripts/Controller.js"></script>
+
 </body>
 </html>

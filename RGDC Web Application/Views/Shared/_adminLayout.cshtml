@@ -4,6 +4,8 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -17,8 +19,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
-<body>
-    <div class="row" style="margin: 0;">
+<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
+    <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
         @*sidebar nav*@
         <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
             <h5 style="font-weight:bold;">RGDC</h5>
@@ -31,18 +33,19 @@
 
             @*user name and role*@
             <div class="row center">
-                <h5 style="font-weight:bold;">Name</h5>
-                <h6>Role</h6>
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
             </div>
 
             @*nav tabs*@
             <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
                 <ul>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+                    <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+                    <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+                    <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+                    <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-                    <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+                    <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
                     <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
                     <ul id="contactDropdown" class="dropdown-content brown lighten-1">
                         <li>
@@ -114,21 +117,12 @@
             });
         });
 
-        //Pop up modals
-        document.addEventListener('DOMContentLoaded', function () {
-            var elems = document.querySelectorAll('.modal');
-            M.Modal.init(elems, {
-                startingTop: '4%', // Start slightly lower
-                endingTop: '10%'   // End at a visible spot
-            });
-        });
-
         //Date
         document.addEventListener('DOMContentLoaded', function () {
             var today = new Date();
 
-            // Date picker
-            var dateElems = document.querySelectorAll('.datepicker');
+            // General date pickers (not the patient birthdate one)
+            var dateElems = document.querySelectorAll('.datepicker:not(#birthDate)');
             M.Datepicker.init(dateElems, {
                 format: 'mm/dd/yyyy',
                 maxDate: today,
@@ -137,6 +131,72 @@
                 showClearBtn: true
             });
         });
+        //Pop up modals
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems, {
+                startingTop: '4%',
+                endingTop: '10%',
+                onOpenEnd: function (modal) {
+                    // If it's the patient info modal, trigger datepicker initialization
+                    if (modal.id === 'modal-patient-info') {
+                        // Give the modal time to render
+                        setTimeout(function () {
+                            var scope = angular.element(document.body).scope();
+                            if (scope && scope.selectedPatient) {
+                                var birthDateElem = document.getElementById('birthDate');
+                                if (birthDateElem) {
+                                    var existingInstance = M.Datepicker.getInstance(birthDateElem);
+                                    if (existingInstance) {
+                                        existingInstance.destroy();
+                                    }
+
+                                    var datepicker = M.Datepicker.init(birthDateElem, {
+                                        format: 'mmmm dd, yyyy',
+                                        yearRange: [1900, new Date().getFullYear()],
+                                        autoClose: true,
+                                        maxDate: new Date(),
+                                        onSelect: function (date) {
+                                            scope.$apply(function () {
+                                                scope.selectedPatient.birthDateRaw = date;
+                                                scope.selectedPatient.birthDate = date.toLocaleDateString("en-US", {
+                                                    month: "long",
+                                                    day: "numeric",
+                                                    year: "numeric"
+                                                });
+                                                scope.selectedPatient.age = scope.computeAgeFromDate
+                                                    ? scope.computeAgeFromDate(date)
+                                                    : computeAgeFromDate(date);
+                                            });
+                                        }
+                                    });
+
+                                    if (scope.selectedPatient.birthDateRaw) {
+                                        datepicker.setDate(new Date(scope.selectedPatient.birthDateRaw));
+                                    }
+                                }
+                            }
+                        }, 200);
+                    }
+                }
+            });
+        });
+        function computeAgeFromDate(birthDate) {
+            if (!birthDate) return "";
+
+            var bDate = new Date(birthDate);
+            var today = new Date();
+
+            var age = today.getFullYear() - bDate.getFullYear();
+            var monthDiff = today.getMonth() - bDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < bDate.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+
 
         @* admin finance table *@
         new DataTable('#adminFinance');
@@ -156,6 +216,12 @@
             })
         }
     </script>
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Scripts/angular.min.js"></script>
 
+    <script src="~/Scripts/RGDCscripts/Module.js"></script>
+    <script src="~/Scripts/RGDCscripts/Service.js"></script>
+    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
 </body>
 </html>
