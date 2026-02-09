@@ -21,6 +21,7 @@
 },
         conditions: {}
     };
+    $scope.currentUserAuthorization;
 
 
     $scope.hasSpecialChar = function (pwd) {
@@ -341,13 +342,12 @@
     }
 
     $scope.getSessionVariables = function () {
-        var session = RGDCWebApplicationService.getSessionVariable();
-        session.then(function (returnedData) {
+            return RGDCWebApplicationService.getSessionVariable()
+            .then(function (returnedData) {
             $scope.currentUserName = returnedData.data.userName || "";
             $scope.currentUserID = returnedData.data.userID || "";
             $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
             $scope.currentUserFullName = returnedData.data.fullName || "";
-            console.log($scope.currentUserAuthorization)
             if ($scope.currentUserAuthorization == "0") {
                 $scope.isUserOwner = true;
                 $scope.isUserAdmin = true;
@@ -361,7 +361,8 @@
             } else if ($scope.currentUserAuthorization == "3") {
                 $scope.isUserPatient = true;
                 $scope.userRole = "Patient"
-            }
+                }
+             return $scope.currentUserAuthorization;
         });
     }
 
@@ -456,9 +457,7 @@
             patientID: patient.patientID.toString()
         }
 
-        console.log(patientID)
-
-        if ($scope.userAuthorization != 3) {
+        if ($scope.currentUserAuthorization != "3") {
             RGDCWebApplicationService.goToPatient(patientID)
                 .then(function (response) {
                     if (response.data && response.data.success) {
@@ -472,150 +471,179 @@
     };
 
     $scope.getSelectedPatientDetails = function () {
-        if ($scope.userAuthorization != 3) {
-            var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
-            getPatientInfo.then(function (patientInfo) {
-                if (!patientInfo || !patientInfo.data) return;
+        $scope.getSessionVariables().then(function (auth) {
+            console.log(auth)
+            if ($scope.currentUserAuthorization != 3) {
+                var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
+                getPatientInfo.then(function (patientInfo) {
+                    if (!patientInfo || !patientInfo.data) return;
 
-                var p = patientInfo.data;
+                    var p = patientInfo.data;
 
-                // format visit dates (existing)
-                if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
-                if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
-                if (p.medHistUpdate) p.medHistUpdate = formatDateToMDYTime(p.medHistUpdate);
+                    // format visit dates (existing)
+                    if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
+                    if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+                    if (p.medHistUpdate) p.medHistUpdate = formatDateToMDYTime(p.medHistUpdate);
 
-                $scope.fillMedicalHistoryForm(p.medHist);
+                    $scope.fillMedicalHistoryForm(p.medHist);
 
-                // previous physician details
-                if (p.prevPhy) $scope.prevPhy = p.prevPhy;
-                if (p.prevPhyOffice) $scope.prevPhyOffice = p.prevPhyOffice;
-                if (p.prevPhyContact) $scope.prevPhyContact = p.prevPhyContact;
+                    // previous physician details
+                    if (p.prevPhy) $scope.prevPhy = p.prevPhy;
+                    if (p.prevPhyOffice) $scope.prevPhyOffice = p.prevPhyOffice;
+                    if (p.prevPhyContact) $scope.prevPhyContact = p.prevPhyContact;
 
-                // preserve / coerce genderID to number for binding
-                if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
-                    p.genderID = parseInt(p.genderID, 10);
-                } else {
-                    p.genderID = null;
-                }
+                    // preserve / coerce genderID to number for binding
+                    if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
+                        p.genderID = parseInt(p.genderID, 10);
+                    } else {
+                        p.genderID = null;
+                    }
 
-                if (p.birthDate) {
-                    var birthJs = parseJsonDateToJsDate(p.birthDate);
-                    if (birthJs) {
-                        // Store raw date for datepicker
-                        p.birthDateRaw = birthJs;
-                        // Format for display
-                        p.birthDate = birthJs.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                        });
-                        // Calculate age
-                        p.age = computeAgeFromDate(birthJs);
+                    if (p.birthDate) {
+                        var birthJs = parseJsonDateToJsDate(p.birthDate);
+                        if (birthJs) {
+                            // Store raw date for datepicker
+                            p.birthDateRaw = birthJs;
+                            // Format for display
+                            p.birthDate = birthJs.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+                            // Calculate age
+                            p.age = computeAgeFromDate(birthJs);
+                        } else {
+                            p.birthDateRaw = null;
+                            p.birthDate = "";
+                            p.age = "";
+                        }
                     } else {
                         p.birthDateRaw = null;
                         p.birthDate = "";
                         p.age = "";
                     }
-                } else {
-                    p.birthDateRaw = null;
-                    p.birthDate = "";
-                    p.age = "";
-                }
 
-                // format account creation date
-                if (p.accCreated) {
-                    var accJs = parseJsonDateToJsDate(p.accCreated);
-                    if (accJs) {
-                        p.accCreated = accJs.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                        });
+                    // format account creation date
+                    if (p.accCreated) {
+                        var accJs = parseJsonDateToJsDate(p.accCreated);
+                        if (accJs) {
+                            p.accCreated = accJs.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+                        }
+                    } else {
+                        p.accCreated = "";
                     }
-                } else {
-                    p.accCreated = "";
-                }
 
-                $scope.selectedPatient = p;
+                    $scope.selectedPatient = p;
 
-                // ensure genderArray is loaded; if not, load it so select has options
-                if (!$scope.genderArray || $scope.genderArray.length === 0) {
-                    $scope.getGender();
-                }
-
-                // Initialize datepicker after patient data loads
-                initializeDatepicker();
-            });
-            var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
-            getPatientTreatment.then(function (patientTreatment) {
-                $scope.patientTreatments = patientTreatment.data;
-                $scope.patientTreatments.forEach(function (patient) {
-                    if (patient.date) {
-                        patient.date = formatDateToMDY(patient.date)
+                    // ensure genderArray is loaded; if not, load it so select has options
+                    if (!$scope.genderArray || $scope.genderArray.length === 0) {
+                        $scope.getGender();
                     }
+
+                    // Initialize datepicker after patient data loads
+                    initializeDatepicker();
                 });
-            })
-        } else {
-            var getPersonalInfo = RGDCWebApplicationService.getPersonalInfo();
-            getPersonalInfo.then(function (patientInfo) {
-                if (!patientInfo || !patientInfo.data) return;
+                var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
+                getPatientTreatment.then(function (patientTreatment) {
+                    $scope.patientTreatments = patientTreatment.data;
+                    $scope.patientTreatments.forEach(function (patient) {
+                        if (patient.date) {
+                            patient.date = formatDateToMDY(patient.date)
+                        }
+                    });
+                })
+            } else {
+                console.log("asasa")
+                var getPatientInfo = RGDCWebApplicationService.getOwnPatientDetails();
+                getPatientInfo.then(function (patientInfo) {
+                    console.log(patientInfo.data)
+                    if (!patientInfo || !patientInfo.data) return;
 
-                var p = patientInfo.data;
+                    var p = patientInfo.data;
 
-                // coerce genderID
-                if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
-                    p.genderID = parseInt(p.genderID, 10);
-                } else {
-                    p.genderID = null;
-                }
+                    // format visit dates (existing)
+                    if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
+                    if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+                    if (p.medHistUpdate) p.medHistUpdate = formatDateToMDYTime(p.medHistUpdate);
 
-                if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
-                if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
+                    $scope.fillMedicalHistoryForm(p.medHist);
 
-                if (p.birthDate) {
-                    var birthJs = parseJsonDateToJsDate(p.birthDate);
-                    if (birthJs) {
-                        p.birthDateRaw = birthJs;
-                        p.birthDate = birthJs.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                        });
-                        p.age = computeAgeFromDate(birthJs);
+                    // previous physician details
+                    if (p.prevPhy) $scope.prevPhy = p.prevPhy;
+                    if (p.prevPhyOffice) $scope.prevPhyOffice = p.prevPhyOffice;
+                    if (p.prevPhyContact) $scope.prevPhyContact = p.prevPhyContact;
+
+                    // preserve / coerce genderID to number for binding
+                    if (typeof p.genderID !== 'undefined' && p.genderID !== null) {
+                        p.genderID = parseInt(p.genderID, 10);
+                    } else {
+                        p.genderID = null;
+                    }
+
+                    if (p.birthDate) {
+                        var birthJs = parseJsonDateToJsDate(p.birthDate);
+                        if (birthJs) {
+                            // Store raw date for datepicker
+                            p.birthDateRaw = birthJs;
+                            // Format for display
+                            p.birthDate = birthJs.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+                            // Calculate age
+                            p.age = computeAgeFromDate(birthJs);
+                        } else {
+                            p.birthDateRaw = null;
+                            p.birthDate = "";
+                            p.age = "";
+                        }
                     } else {
                         p.birthDateRaw = null;
                         p.birthDate = "";
                         p.age = "";
                     }
-                } else {
-                    p.birthDateRaw = null;
-                    p.birthDate = "";
-                    p.age = "";
-                }
 
-                if (p.accCreated) {
-                    var accJs = parseJsonDateToJsDate(p.accCreated);
-                    if (accJs) {
-                        p.accCreated = accJs.toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                        });
+                    // format account creation date
+                    if (p.accCreated) {
+                        var accJs = parseJsonDateToJsDate(p.accCreated);
+                        if (accJs) {
+                            p.accCreated = accJs.toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric"
+                            });
+                        }
+                    } else {
+                        p.accCreated = "";
                     }
-                } else {
-                    p.accCreated = "";
-                }
 
-                $scope.selectedPatient = p;
+                    $scope.selectedPatient = p;
 
-                if (!$scope.genderArray || $scope.genderArray.length === 0) {
-                    $scope.getGender();
-                }
+                    console.log($scope.selectedPatient)
+                    // ensure genderArray is loaded; if not, load it so select has options
+                    if (!$scope.genderArray || $scope.genderArray.length === 0) {
+                        $scope.getGender();
+                    }
 
-                // Initialize datepicker after patient data loads
-                initializeDatepicker();
-            });
-        }
+                    // Initialize datepicker after patient data loads
+                    initializeDatepicker();
+                });
+                var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
+                getPatientTreatment.then(function (patientTreatment) {
+                    $scope.patientTreatments = patientTreatment.data;
+                    $scope.patientTreatments.forEach(function (patient) {
+                        if (patient.date) {
+                            patient.date = formatDateToMDY(patient.date)
+                        }
+                    });
+                })
+            }
+        });
     };
     function initializeDatepicker() {
         $timeout(function () {
@@ -1073,4 +1101,64 @@
             }, 400);
         }
     };
+
+    $scope.logOut = function () {
+        RGDCWebApplicationService.logOut();
+        window.location.href = "/RGDC/logIn";
+    }
+
+    $scope.medicalHistoryUpdate = function () {
+        var prevPhysicianDetails = {
+            previousPhysician: $scope.prevPhy,
+            previousPhysicianOffice: $scope.prevPhyOffice,
+            previousPhysicianContact: $scope.prevPhyContact
+        }
+        var medHist = {
+            history: $scope.medical.history,
+            conditions: $scope.medical.conditions
+        }
+        console.log(medHist);
+        var updateMedHistIni = RGDCWebApplicationService.updateMedHistIni(prevPhysicianDetails);
+        updateMedHistIni.then(function (response) {
+            if (response.data.success) {
+                var modal = document.getElementById("medical-history-modal")
+                var instance = M.Modal.getInstance(modal);
+                instance.close();
+                var updateMedHist = RGDCWebApplicationService.updateMedHist(medHist);
+                updateMedHist.then(function (response) {
+                    console.log(response.data.jsonstring);
+                    if (response.data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "SUCCESS",
+                            text: "Medical History Updated!"
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Unable to update medical history",
+                        });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Unable to update medical history",
+                });
+            }
+        });
+    }
+
+    $scope.fillMedicalHistoryForm = function (medHistString) {
+        var medHist = JSON.parse(medHistString);
+
+        $scope.medical = $scope.medical || {};
+        $scope.medical.history = $scope.medical.history || {};
+        $scope.medical.conditions = $scope.medical.conditions || {};
+
+        angular.copy(medHist.history, $scope.medical.history);
+        angular.copy(medHist.conditions, $scope.medical.conditions);
+    }
 });

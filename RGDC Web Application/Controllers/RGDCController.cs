@@ -565,6 +565,63 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        public JsonResult getOwnPatientDetails()
+        {
+            using (var db = new RGDCContext())
+            {
+                var sessionVal = Session["UserID"];
+                if (sessionVal == null) return Json(null, JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(sessionVal.ToString(), out int pid))
+                    return Json(null, JsonRequestBehavior.AllowGet);
+
+                var result = (
+                            from p in db.tbl_patient
+                            join a in db.tbl_account on p.accID equals a.accID
+                            join g in db.tbl_gender on a.genderID equals g.genderID into gj
+                            from g in gj.DefaultIfEmpty()
+                            where p.accID == pid
+                            select new
+                            {
+                                patientID = p.patientID,
+                                accID = p.accID,
+                                currPhy = p.currentPhysician,
+                                prevPhy = p.previousPhysician,
+                                prevPhyOffice = p.previousPhysicianOffice,
+                                prevPhyContact = p.previousPhysicianContact,
+                                guar = p.guardian,
+                                guarNum = p.guardianNumber,
+                                insurance = p.insurance,
+                                referral = p.referral,
+                                dentalChartLink = p.dentalChartLink,
+                                signatureLink = p.signatureLink,
+
+                                patientName = a.firstName + " " + a.lastName,
+                                firstName = a.firstName,
+                                middleName = a.middleName,
+                                lastName = a.lastName,
+                                birthDate = a.birthDate,
+                                genderID = a.genderID,
+                                gender = g != null ? g.description : null,
+                                email = a.email,
+                                contactNumber = a.contactNumber,
+                                address = a.address,
+                                civilStatus = a.civilStatus,
+                                religion = a.religion,
+                                nationality = a.nationality,
+                                accCreated = a.accCreatedAt,
+
+                                medHist = p.medicalHistory,
+                                medHistUpdate = p.medHistUpdate,
+                                lastVisit = p.lastVisit,
+                                nextVisit = p.nextVisit
+                            }
+                        ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+                 }
+        }
+
         [HttpPost]
         public JsonResult UploadSignature()
         {

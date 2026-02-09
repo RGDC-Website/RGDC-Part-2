@@ -82,6 +82,10 @@
         return $http.get("/RGDC/getSelectedPatientDetails");
     }
 
+    this.getOwnPatientDetails = function () {
+        return $http.get("/RGDC/getOwnPatientDetails");
+    }
+
     this.updatePatient = function (patientData) {
         return $http({
             method: "post",
@@ -148,4 +152,34 @@
             });
         };
     }
+
+
+    this.logOut = function () {
+        return $http.get("/RGDC/logOut");
+    };
+
+    this.updateMedHist = function (medHist) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/updateMedHist',
+            data: medHist
+        });
+    };
+
+    this.updateMedHistIni = function (prevPhys) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/updateMedHistIni',
+            data: prevPhys
+        });
+    };
+
+    
+    this.getPatientTreatment = function () {
+        return $http.get("/RGDC/getPatientTreatment");
+    };
+
+    this.patientPersonalInfo = function () {
+        return $http.get("/RGDC/patientPersonalInfo");
+    };
 });

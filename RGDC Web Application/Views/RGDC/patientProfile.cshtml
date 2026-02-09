@@ -14,7 +14,7 @@
         <div class="col m4 l4">
             <span class="right" style="margin-top:7px;">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+                <div ng-click="logOut()" class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
@@ -168,7 +168,7 @@
                             <ol class="medical-questions">
                                 <li>
                                     Are you in good health?
-                                    <span class="placeholder-text" >{{medical.history.goodHealth }}</span>
+                                    <span class="placeholder-text">{{medical.history.goodHealth }}</span>
                                 </li>
                                 <li>
                                     Are you under medical treatment now?
@@ -224,48 +224,51 @@
                             </ol>
 
                             <div class="checkbox-grid view-only">
-                                <label><input type="checkbox" class="filled-in" /><span>High Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Low Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Epilepsy / Convulsions</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>AIDS or HIV Infection</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Sexually Transmitted Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Stomach Troubles / Ulcer</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Fainting Seizure</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Rapid Weight Loss</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Radiation Therapy</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Joint Replacement / Implant</span></label>
-                                <label><input type="checkbox" class="filled-in" /><span>Heart Surgery</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Heart Attack</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Thyroid Problem</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.highBloodPressure" /><span>High Blood Pressure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.lowBloodPressure" /><span>Low Blood Pressure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.epilepsy" /><span>Epilepsy / Convulsions</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hiv" /><span>AIDS or HIV Infection</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.std" /><span>Sexually Transmitted Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stomachUlcer" /><span>Stomach Troubles / Ulcer</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.faintingSeizure" /><span>Fainting Seizure</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rapidWeightLoss" /><span>Rapid Weight Loss</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.radiationTherapy" /><span>Radiation Therapy</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.jointReplacement" /><span>Joint Replacement / Implant</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartSurgery" /><span>Heart Surgery</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartAttack" /><span>Heart Attack</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.thyroidProblem" /><span>Thyroid Problem</span></label>
 
-                                    <label><input type="checkbox" class="filled-in" /><span>Heart Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Heart Murmur</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Liver Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Rheumatic Fever</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Hay Fever / Allergies</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Respiratory Problems</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Hepatitis / Jaundice</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Tuberculosis</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Swollen Ankles</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Kidney Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Diabetes</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Chest Pain</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Stroke</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartDisease" /><span>Heart Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartMurmur" /><span>Heart Murmur</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.liverDisease" /><span>Hepatitis / Liver Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rheumaticFever" /><span>Rheumatic Fever</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.allergies" /><span>Hay Fever / Allergies</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.respiratoryProblems" /><span>Respiratory Problems</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hepatitisJaundice" /><span>Hepatitis / Jaundice</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.tuberculosis" /><span>Tuberculosis</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.swollenAnkles" /><span>Swollen Ankles</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.kidneyDisease" /><span>Kidney Disease</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.diabetes" /><span>Diabetes</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.chestPain" /><span>Chest Pain</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stroke" /><span>Stroke</span></label>
 
-                                    <label><input type="checkbox" class="filled-in" /><span>Cancer / Tumors</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Anemia</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Angina</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Asthma</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Emphysema</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Bleeding Problems</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Blood Diseases</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Head Injuries</span></label>
-                                    <label><input type="checkbox" class="filled-in" /><span>Arthritis / Rheumatism</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.cancer" /><span>Cancer / Tumors</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.anemia" /><span>Anemia</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.angina" /><span>Angina</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.asthma" /><span>Asthma</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.emphysema" /><span>Emphysema</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bleedingProblems" /><span>Bleeding Problems</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bloodDiseases" /><span>Blood Diseases</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.headInjuries" /><span>Head Injuries</span></label>
+                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.arthritis" /><span>Arthritis / Rheumatism</span></label>
 
-                                    <div class="other-section">
-                                        <label><input type="checkbox" class="filled-in" /><span>Other/s:</span></label>
-                                        <input type="text" class="other-input">
-                                    </div>
+                                <div class="other-section">
+                                    <label>
+                                        <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
+                                        <span>Other/s:</span>
+                                    </label>
+                                    <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
+                                </div>
                             </div>
 
                             @*signature*@
@@ -284,7 +287,7 @@
                     <div id="prog" class="row m-0">
 
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-progress-notes">ADD NOTE</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-progress-notes">ADD NOTE</a>
                         </div>
 
                         <table id="progressNotes" class="hover">
@@ -311,10 +314,10 @@
                                     <td>{{patientTreatment.paid}}</td>
                                     <td>{{patientTreatment.amount - patientTreatment.paid}}</td>
                                     <td>
-                                        <a ng-click="editPatient(patientTreatment.trtPlanID)"class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-progress-note" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <a ng-click="editPatient(patientTreatment.trtPlanID)" ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-progress-note" data-position="bottom" data-tooltip="Delete Progress Note">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-progress-note" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-progress-note" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -337,7 +340,7 @@
                     <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-dental-chart">EDIT CHART</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-dental-chart">EDIT CHART</a>
                         </div>
 
                         <div class="row m-0 center">
@@ -352,7 +355,7 @@
                     @*Forms*@
                     <div id="forms" class="row m-0">
                         <div class="row">
-                            <a class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk">
@@ -372,10 +375,10 @@
                                     <td>Name</td>
                                     @*edit and delete button*@
                                     <td>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
                                             <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
