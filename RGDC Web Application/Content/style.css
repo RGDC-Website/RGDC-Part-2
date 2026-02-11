@@ -345,6 +345,36 @@ html, body {
     margin-bottom: 0 !important;
 }
 
+.patient-information-form-modal {
+    border-radius: 10px !important;
+    max-width: fit-content;
+    background-color: #e5e5e5;
+    max-height: fit-content;
+    padding: 2vh;
+}
+
+#patientInformationForm.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-60%, -50%) !important;
+    max-height: 71% !important;
+    overflow: hidden;
+}
+
+
+#verifyEmail.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-100%, -50%) !important;
+    max-height: 71% !important;
+    overflow: hidden;
+}
+
+.modal.modal-fixed-footer {
+    height: calc(100% - 100px) !important;
+    overflow-y: auto !important;
+}
+
 .custom-label {
     color: #795548;
     font-size: 1.10rem;
@@ -1213,4 +1243,10 @@ select.browser-default.custom-input {
     height: 77% !important;
     max-height: 21% !important;
     overflow: hidden;
+}
+
+.modal-overlay {
+    background-color: rgba(0,0,0,0.5) !important;
+    display: block !important;
+    opacity: 1 !important;
 }
