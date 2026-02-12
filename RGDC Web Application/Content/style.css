@@ -323,7 +323,7 @@ html, body {
 .modal {
     border-radius: 10px !important;
     max-width: fit-content;
-    background-color: #e5e5e5;
+    background-color: #e0e0e0 !important;
     max-height: fit-content;
 }
 
@@ -346,6 +346,7 @@ html, body {
 }
 
 .patient-information-form-modal {
+    background-color: #e0e0e0 !important;
     border-radius: 10px !important;
     max-width: fit-content;
     background-color: #e5e5e5;
@@ -354,10 +355,20 @@ html, body {
 }
 
 #patientInformationForm.modal {
+    background-color: #e0e0e0 !important;
     top: 50% !important;
     left: 50% !important;
     transform: translate(-60%, -50%) !important;
     max-height: 71% !important;
+    overflow: hidden;
+}
+
+#patientInformationFormAdd.modal {
+    background-color: #e0e0e0 !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-55%, -50%) !important;
+    max-height: 76% !important;
     overflow: hidden;
 }
 
@@ -366,7 +377,7 @@ html, body {
     top: 50% !important;
     left: 50% !important;
     transform: translate(-100%, -50%) !important;
-    max-height: 71% !important;
+    max-height: 60% !important;
     overflow: hidden;
 }
 
@@ -936,6 +947,7 @@ select.browser-default.custom-input {
 
 .password-modal .modal-content {
     padding: 20px !important;
+    background-color: #e0e0e0 !important;
 }
 
 .medical-questions li {
