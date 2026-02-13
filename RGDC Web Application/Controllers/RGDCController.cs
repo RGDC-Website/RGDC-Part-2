@@ -58,6 +58,11 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
+        public ActionResult adminAppointment()
+        {
+            return View();
+        }
+
         public ActionResult staffDashboard()
         {
             return View();

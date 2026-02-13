@@ -460,7 +460,7 @@ html, body {
     width: 90% !important;
     top: 50% !important;
     left: 50% !important;
-    transform: translate(-50%, -50%) !important;
+    transform: translate(-70%, 100%) !important;
     bottom: auto !important;
     padding: 0 !important;
     border-radius: 15px !important;
@@ -1261,4 +1261,130 @@ select.browser-default.custom-input {
     background-color: rgba(0,0,0,0.5) !important;
     display: block !important;
     opacity: 1 !important;
+}
+
+.add-appt-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 850px !important;
+}
+
+    .add-appt-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
+
+#modal-add-appt.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-54%, -50%) !important;
+    height: 77% !important;
+    max-height: 42% !important;
+    overflow: hidden;
+}
+
+.edit-sched-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 850px !important;
+}
+
+    .edit-sched-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
+
+#modal-edit-sched.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-54%, -50%) !important;
+    height: 77% !important;
+    max-height: 42% !important;
+    overflow: hidden;
+}
+
+.delete-sched-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 550px !important;
+}
+
+#modal-delete-sched.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-85%, -50%) !important;
+    height: 77% !important;
+    max-height: 21% !important;
+    overflow: hidden;
+}
+
+.edit-req-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 850px !important;
+}
+
+    .edit-req-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
+
+#modal-edit-req.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-54%, -50%) !important;
+    height: 77% !important;
+    max-height: 42% !important;
+    overflow: hidden;
+}
+
+.delete-req-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 550px !important;
+}
+
+#modal-delete-req.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-85%, -50%) !important;
+    height: 77% !important;
+    max-height: 21% !important;
+    overflow: hidden;
+}
+
+.delete-past-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 550px !important;
+}
+
+#modal-delete-past.modal {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-85%, -50%) !important;
+    height: 77% !important;
+    max-height: 21% !important;
+    overflow: hidden;
 }

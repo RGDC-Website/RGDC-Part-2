@@ -1,0 +1,370 @@
+﻿@{
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div class="dashContainer">
+    @*top buttons*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*refresh and logout buttons*@
+        <div class="col m4 l4 offset-md-8 offset-l8">
+            <span class="right m-0">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+    @*create new finance record button*@
+    <div class="row m-0">
+        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="modal-add-appt"><i class="material-icons left">add</i>Create New Appointment</a>
+    </div>
+
+    <div class="card grey lighten-2" style="margin-top:2vh;">
+        <nav class="nav-extended grey lighten-2 z-depth-0">
+            <div class="nav-content p-1">
+                <ul class="tabs tabs-transparent center-tabs">
+                    <li class="tab px-1"><a class="brown-text p-0" href="#sched">Scheduled Appointments</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#req">Requested Appointments</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#past">Past Appointments</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="card-content">
+            @*Scheduled Appointments*@
+            <div id="sched" class="containerOverflow-2 row m-0">
+                <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Scheduled Appointments</p>
+                @*admin scheduled appointments table*@
+                <div class="row" style="padding: 2rem; font-size: .9rem ">
+                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                        @*table headers*@
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" title="View patient record" class="clkPointer">
+                                <td>MM/DD/YYY</td>
+                                <td>00:00 AM</td>
+                                <td>Purpose...</td>
+                                <td>Dentist...</td>
+                                <td>Patient...</td>
+                                <td>
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-sched" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <i class="material-icons brown-text lighten-1">delete</i>
+                                    </a>
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-sched" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        @*table footer*@
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+
+            @*Requested Appointments*@
+            <div id="req" class="containerOverflow-2 row m-0">
+                <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Requested Appointments</p>
+                @*admin requested appointments table*@
+                <div class="row" style="padding: 2rem; font-size: .9rem ">
+                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                        @*table headers*@
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" title="View patient record" class="clkPointer">
+                                <td>MM/DD/YYY</td>
+                                <td>00:00 AM</td>
+                                <td>Purpose...</td>
+                                <td>Dentist...</td>
+                                <td>Patient...</td>
+                                <td>
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-req" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <i class="material-icons brown-text lighten-1">delete</i>
+                                    </a>
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-req" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        @*table footer*@
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+
+            @*Past Appointments*@
+            <div id="past" class="containerOverflow-2 row m-0">
+                <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Past Appointments</p>
+                @*admin past appointments table*@
+                <div class="row" style="padding: 2rem; font-size: .9rem ">
+                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                        @*table headers*@
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" title="View patient record" class="clkPointer">
+                                <td>MM/DD/YYY</td>
+                                <td>00:00 AM</td>
+                                <td>Purpose...</td>
+                                <td>Dentist...</td>
+                                <td>Patient...</td>
+                                <td>
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-past" data-position="bottom" data-tooltip="Delete Progress Note">
+                                        <i class="material-icons brown-text lighten-1">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        @*table footer*@
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Add Appointment*@
+<div id="modal-add-appt" class="modal modal-fixed-footer add-appt-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Add New Appointment</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                </label>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Time*@
+                <label class="custom-label">
+                    Time
+                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                </label>
+
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="Patient">
+                </label>
+            </div>
+
+            <div class="col s12">
+                @*Purpose*@
+                <label class="custom-label">
+                    Purpose
+                    <input type="text" class="custom-input" placeholder="Purpose">
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+
+@*Edit Sched Appointment*@
+<div id="modal-edit-sched" class="modal modal-fixed-footer edit-sched-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Scheduled Appointment</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                </label>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Time*@
+                <label class="custom-label">
+                    Time
+                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                </label>
+
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="Patient">
+                </label>
+            </div>
+
+            <div class="col s12">
+                @*Purpose*@
+                <label class="custom-label">
+                    Purpose
+                    <input type="text" class="custom-input" placeholder="Purpose">
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+@*DELETE scheduled appointment*@
+<div id="modal-delete-sched" class="modal modal-fixed-footer delete-sched-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Scheduled Appointment</h5>
+
+        <p class="custom-label">Are you sure you want to delete this scheduled appointment? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
+</div>
+
+@*Edit Requested Appointment*@
+<div id="modal-edit-req" class="modal modal-fixed-footer edit-req-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Requested Appointment</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                </label>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Time*@
+                <label class="custom-label">
+                    Time
+                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                </label>
+
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="Patient">
+                </label>
+            </div>
+
+            <div class="col s12">
+                @*Purpose*@
+                <label class="custom-label">
+                    Purpose
+                    <input type="text" class="custom-input" placeholder="Purpose">
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+@*DELETE requested appointment*@
+<div id="modal-delete-req" class="modal modal-fixed-footer delete-req-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Requested Appointment</h5>
+
+        <p class="custom-label">Are you sure you want to delete this requested appointment? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
+</div>
+
+@*DELETE past appointment*@
+<div id="modal-delete-past" class="modal modal-fixed-footer delete-past-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Past Appointment</h5>
+
+        <p class="custom-label">Are you sure you want to delete this past appointment? </p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
+</div>
