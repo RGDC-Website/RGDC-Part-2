@@ -1,4 +1,30 @@
-﻿.navText {
+﻿@media only screen and (min-width: 601px) {
+    .main-content {
+        margin-left: 25% !important;
+    }
+
+    .appointment-container {
+        padding: 0 0.7rem 0 0.7rem !important;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .appointments-row {
+        display: grid;
+        margin-right: 1rem;
+    }
+    .appointment-container{
+        padding: 0 !important;
+    }
+
+}
+
+.navText {
     font-size: 1.5rem;
     padding-bottom: 0.5rem;
     padding-top: 0.5rem;
@@ -125,6 +151,12 @@ a:hover {
 .p-0 {
     padding: 0 !important;
 }
+.pr-05{
+    padding: 0 0.8rem 0 0 !important;
+}
+.pl-05{
+    padding: 0 0 0 0.8rem !important;
+}
 .px-1{
     padding: 0 1rem 0 1rem !important;
 }
@@ -148,6 +180,8 @@ a:hover {
 .dt-length select {
     display: inline-block !important;
 }
+
+
 
 
 html, body {
