@@ -403,7 +403,7 @@
                                     <span class="card-title bold">Post OP</span>
                                     <div class="divider"></div>
                                     @*post op content*@
-                                    <p>Nothing here.</p>
+                                    <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
                                 </div>
                             </div>
                         </div>
@@ -558,614 +558,182 @@
 </div>
 
 
-@*medical history modal*@
-<div id="medical-history-modal" class="modal modal-fixed-footer med-his-modal">
-    <div class="medical-history-container">
-        <h5 class="modal-form-title">Edit Medical History</h5>
-
-        <div class="form-header">
-            @*previous physician info*@
-            <div class="row" style="padding: 0 10px; flex:1">
-                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin:0 0 -15px 0;">
-                    <span>Name of previous physician:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Name of previous physician" ng-model="prevPhy">
-                </p>
-
-                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 -15px 0;">
-                    <span>Physician's office:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's office" ng-model="prevPhyOffice">
-                </p>
-
-                <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 5px 0;">
-                    <span>Physician's contact:</span>
-                    <input type="text" class="custom-input" style="flex: 1;" placeholder="Physician's contact" ng-model="prevPhyContact">
-                </p>
-            </div>
-
-        </div>
-        <hr class="form-divider" style="margin-bottom:10px;">
-
-        @*medical history*@
-        <ol class="medical-questions">
-            <li>
-                @*Are you in good health? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Are you in good health?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right:-25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="1" value="Yes" type="radio" class="with-gap" ng-model="medical.history.goodHealth" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="1" type="radio" value="No" class="with-gap" ng-model="medical.history.goodHealth" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Are you under medical treatment now? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Are you under medical treatment now?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="2" type="radio" value="Yes" class="with-gap" ng-model="medical.history.underTreatment" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="2" type="radio" value="No" class="with-gap" ng-model="medical.history.underTreatment" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Have you ever had a serious illness or surgical operation? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Have you ever had a serious illness or surgical operation?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="3" type="radio" value="Yes" class="with-gap" ng-model="medical.history.seriousIllness" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="3" type="radio" value="No" class="with-gap" ng-model="medical.history.seriousIllness" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Have you ever been hospitalized? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Have you ever been hospitalized?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="4" type="radio" value="Yes" class="with-gap" ng-model="medical.history.hospitalized" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="4" type="radio" value="No" class="with-gap" ng-model="medical.history.hospitalized" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Are you taking prescription/non-prescription medication? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Are you taking prescription/non-prescription medication?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="5" type="radio" value="Yes" class="with-gap" ng-model="medical.history.prescription" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="5" type="radio" value="No" class="with-gap" ng-model="medical.history.prescription" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Are you taking tobacco products? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Are you taking tobacco products?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="6" type="radio" value="Yes" class="with-gap" ng-model="medical.history.tobacco" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="6" type="radio" value="No" class="with-gap" ng-model="medical.history.tobacco" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li>
-                @*Do you use alcohol, cocaine, or other dangerous drugs? *@
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span>Do you use alcohol, cocaine, or other dangerous drugs?</span>
-
-                    <div style="display: flex; gap: 15px; margin-right: -25px;">
-                        <label style="display: flex; align-items: center;">
-                            <input name="7" type="radio" value="Yes" class="with-gap" ng-model="medical.history.drugs" />
-                            <span>Yes</span>
-                        </label>
-                        <label style="display: flex; align-items: center;">
-                            <input name="7" type="radio" value="No" class="with-gap" ng-model="medical.history.drugs" />
-                            <span>No</span>
-                        </label>
-                    </div>
-                </div>
-            </li>
-            <li style="margin: -10px 0 10px 0;">
-                @*Allergies*@
-                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                    <span>Allergies:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Allergies..." ng-model="medical.history.allergies">
-                </div>
-            </li>
-            <li style="margin: -25px 0 0 0;">
-                @*Bleeding time:*@
-                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                    <span>Bleeding time:</span>
-                    <input type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Bleeding time..." ng-model="medical.history.bleedingTime">>
-                </div>
-            </li>
-
-            <li>
-                For women only:
-                <div class="women-only-options">
-                    <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
-                    <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
-                    <label><input type="checkbox" ng-model="medical.history.pills" class="filled-in" /><span>Are you taking birth control pills?</span></label>
-                </div>
-            </li>
-
-            <li style="margin: -10px 0 10px 0;">
-                @*Blood ppressure*@
-                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                    <span>Blood pressure:</span>
-                    <input type="text" class="custom-input" ng-model="medical.history.bloodPressure" style="flex: 1; margin-right: -30px;" placeholder="Blood pressure...">
-                </div>
-            </li>
-            <li style="margin: -25px 0 0 0;">
-                @*Blood type:*@
-                <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                    <span>Blood type:</span>
-                    <input type="text" class="custom-input" ng-model="medical.history.bloodType" style="flex: 1; margin-right: -30px;" placeholder="Blood Type...">
-                </div>
-            </li>
-            <li>Do you have or have had any of the following?</li>
-        </ol>
-
-        <div class="checkbox-grid">
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.highBloodPressure" class="filled-in" />
-                <span>High Blood Pressure</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.lowBloodPressure" class="filled-in" />
-                <span>Low Blood Pressure</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.epilepsy" class="filled-in" />
-                <span>Epilepsy / Convulsions</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.hiv" class="filled-in" />
-                <span>AIDS or HIV Infection</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.std" class="filled-in" />
-                <span>Sexually Transmitted Disease</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.stomachUlcer" class="filled-in" />
-                <span>Stomach Troubles / Ulcer</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.faintingSeizure" class="filled-in" />
-                <span>Fainting Seizure</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.rapidWeightLoss" class="filled-in" />
-                <span>Rapid Weight Loss</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.radiationTherapy" class="filled-in" />
-                <span>Radiation Therapy</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.jointReplacement" class="filled-in" />
-                <span>Joint Replacement / Implant</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.heartSurgery" class="filled-in" />
-                <span>Heart Surgery</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.heartAttack" class="filled-in" />
-                <span>Heart Attack</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.thyroidProblem" class="filled-in" />
-                <span>Thyroid Problem</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.heartDisease" class="filled-in" />
-                <span>Heart Disease</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.heartMurmur" class="filled-in" />
-                <span>Heart Murmur</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.liverDisease" class="filled-in" />
-                <span>Hepatitis / Liver Disease</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.rheumaticFever" class="filled-in" />
-                <span>Rheumatic Fever</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.allergies" class="filled-in" />
-                <span>Hay Fever / Allergies</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.respiratoryProblems" class="filled-in" />
-                <span>Respiratory Problems</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.hepatitisJaundice" class="filled-in" />
-                <span>Hepatitis / Jaundice</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.tuberculosis" class="filled-in" />
-                <span>Tuberculosis</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.swollenAnkles" class="filled-in" />
-                <span>Swollen Ankles</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.kidneyDisease" class="filled-in" />
-                <span>Kidney Disease</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.diabetes" class="filled-in" />
-                <span>Diabetes</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.chestPain" class="filled-in" />
-                <span>Chest Pain</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.stroke" class="filled-in" />
-                <span>Stroke</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.cancer" class="filled-in" />
-                <span>Cancer / Tumors</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.anemia" class="filled-in" />
-                <span>Anemia</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.angina" class="filled-in" />
-                <span>Angina</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.asthma" class="filled-in" />
-                <span>Asthma</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.emphysema" class="filled-in" />
-                <span>Emphysema</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.bleedingProblems" class="filled-in" />
-                <span>Bleeding Problems</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.bloodDiseases" class="filled-in" />
-                <span>Blood Diseases</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.headInjuries" class="filled-in" />
-                <span>Head Injuries</span>
-            </label>
-
-            <label>
-                <input type="checkbox" ng-model="medical.conditions.arthritis" class="filled-in" />
-                <span>Arthritis / Rheumatism</span>
-            </label>
-
-            <div class="other-section">
-                <label><input type="checkbox" class="filled-in" ng-model="medical.history.checkedd"> <span>Other/s:</span></label>
-                <input type="text" class="other-input" style="margin-right:25px" ng-disabled="!medical.history.checkedd" ng-model="medical.history.text">
-            </div>
-        </div>
-
-        @*signature*@
-        <div class="signature-container" style="margin-left:320px">
-            <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
-                <img ng-if="signaturePreview || selectedPatient.signatureLink" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature Preview" style="max-width:250px; max-height:100px; object-fit:contain;" />
-                <i ng-if="!(signaturePreview || selectedPatient.signatureLink)" class="material-icons">image</i>
-            </div>
-            <div class="signature-line"></div>
-            <span class="signature-label">Signature</span>
-
-        </div>
-    </div>
-
-    <div class="footer-center2">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickSignatureFile()">UPLOAD SIGNATURE</button>
-        <button class="modal-close cancel-btn right" style="font-weight: 500; margin-right: 110px;">CANCEL</button>
-        <button type="submit" class="edit-btn right" style="font-weight:500; margin-right:20px" ng-click="saveSignature()">SAVE</button>
-    </div>
-</div>
-
-
-@*Add Progress botes*@
-<div id="modal-progress-notes" class="modal modal-fixed-footer prog-notes-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Progress Note</h5>
-
-        <div class="row">
-            <div class="col s6">
-                @*Date*@
-                <label class="custom-label">
-                    Date
-                    <input type="text" class="custom-input" placeholder="Date">
-                </label>
-
-                @*Dentist*@
-                <label class="custom-label">
-                    Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
-                </label>
-
-                @*Amount*@
-                <label class="custom-label">
-                    Amount
-                    <input type="text" class="custom-input" placeholder="Amount">
-                </label>
-            </div>
-
-            <div class="col s6">
-                @*Procedures*@
-                <label class="custom-label">
-                    Procedures
-                    <input type="text" class="custom-input" placeholder="Procedures">
-                </label>
-
-                @*Tooth Number*@
-                <label class="custom-label">
-                    Tooth Number
-                    <input type="text" class="custom-input" placeholder="Tooth Number">
-                </label>
-
-                @*Paid*@
-                <label class="custom-label">
-                    Paid
-                    <input type="text" class="custom-input" placeholder="Paid">
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
-    </div>
-</div>
-
-@*Edit Progress botes*@
-<div id="modal-edit-progress-note" class="modal modal-fixed-footer prog-notes-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Progress Note</h5>
-
-        <div class="row">
-            <div class="col s6">
-                @*Date*@
-                <label class="custom-label">
-                    Date
-                    <input type="text" class="custom-input" placeholder="Date">
-                </label>
-
-                @*Dentist*@
-                <label class="custom-label">
-                    Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
-                </label>
-
-                @*Amount*@
-                <label class="custom-label">
-                    Amount
-                    <input type="text" class="custom-input" placeholder="Amount">
-                </label>
-            </div>
-
-            <div class="col s6">
-                @*Procedures*@
-                <label class="custom-label">
-                    Procedures
-                    <input type="text" class="custom-input" placeholder="Procedures">
-                </label>
-
-                @*Tooth Number*@
-                <label class="custom-label">
-                    Tooth Number
-                    <input type="text" class="custom-input" placeholder="Tooth Number">
-                </label>
-
-                @*Paid*@
-                <label class="custom-label">
-                    Paid
-                    <input type="text" class="custom-input" placeholder="Paid">
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
-    </div>
-</div>
-
-@*DELETE Progress botes*@
-<div id="modal-delete-progress-note" class="modal modal-fixed-footer delete-prog-note-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Progress Note</h5>
-
-        <p class="custom-label">Are you sure you want to delete this progress note? </p>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
-    </div>
-</div>
-
-@*Dental Chart modal*@
-<div id="modal-dental-chart" class="modal modal-fixed-footer dental-chart-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Dental Chart</h5>
-
-        <div class="row">
-            <div class="row m-0 center">
-                <img id="dentalChartModalImg"
-                     ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
-                     alt="Dental Chart"
-                     style="max-height: 33rem" />
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="uploadFile()">UPLOAD & SAVE</button>
-    </div>
-</div>
-
-@*Add form*@
+@*Add form (match post-op modal sizing) *@
 <div id="modal-add-form" class="modal modal-fixed-footer add-form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Add Form</h5>
 
-        @*Date*@
-        <label class="custom-label">
-            Date
-            <input type="text" class="custom-input" placeholder="Date">
-        </label>
-
-        @*Dentist*@
-        <label class="custom-label">
-            Dentist
-            <input type="text" class="custom-input" placeholder="Dentist">
-        </label>
-
         <div class="row">
-            <div class="row m-0 center">
-                <img src="https://placehold.co/2550x3300" style="max-height: 25rem; margin-top:15px;" />
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    First Name
+                    <input type="text" class="custom-input" placeholder="First Name" ng-model="newForm.firstName" />
+                </label>
+
+                <label class="custom-label">
+                    Middle Name
+                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="newForm.middleName" />
+                </label>
+
+                <label class="custom-label">
+                    Last Name
+                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="newForm.lastName" />
+                </label>
+
+                <label class="custom-label">
+                    Gender
+                    <select class="browser-default custom-input" ng-model="newForm.genderID" ng-options="g.genderID as g.description for g in genderArray">
+                        <option value="" disabled>Select Gender</option>
+                    </select>
+                </label>
+
+                <label class="custom-label">
+                    Date of Birth
+                    <input type="date" class="custom-input" ng-model="newForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </label>
+            </div>
+
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    Civil Status
+                    <select class="browser-default custom-input" ng-model="newForm.civilStatus">
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </label>
+
+                <label class="custom-label">
+                    Contact Number
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="newForm.contactNumber" />
+                </label>
+
+                <label class="custom-label">
+                    Address
+                    <input type="text" class="custom-input" placeholder="Address" ng-model="newForm.address" />
+                </label>
+
+                <label class="custom-label">
+                    Terms &amp; Conditions
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+                        <label style="display:flex; align-items:center;">
+                            <input type="checkbox" class="filled-in" ng-model="newForm.acceptedTerms" />
+                            <span>I agree to the terms and conditions</span>
+                        </label>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    Upload form file / image (optional)
+                    <input type="file" class="custom-input" onchange="angular.element(this).scope().pickFormFile(this)" />
+                </label>
+            </div>
+
+            <div class="col s12 m6">
+                <div class="row m-0 center" style="margin-top:8px;">
+                    <img ng-if="newForm.previewLink" ng-src="{{newForm.previewLink}}" style="max-height: 14rem;" alt="Form Preview" />
+                    <img ng-if="!newForm.previewLink" src="https://placehold.co/2550x3300" style="max-height: 14rem;" alt="Placeholder" />
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-footer footer-center">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD FORM</button>
+        <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFile()">PICK FILE</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="addForm(newForm)" ng-disabled="!newForm.firstName || !newForm.lastName || !newForm.acceptedTerms">ADD</button>
     </div>
 </div>
 
-@*Edit form*@
+@*Edit form (match post-op modal sizing) *@
 <div id="modal-edit-form" class="modal modal-fixed-footer edit-form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
 
-        @*Date*@
-        <label class="custom-label">
-            Date
-            <input type="text" class="custom-input" placeholder="Date">
-        </label>
-
-        @*Dentist*@
-        <label class="custom-label">
-            Dentist
-            <input type="text" class="custom-input" placeholder="Dentist">
-        </label>
-
         <div class="row">
-            <div class="row m-0 center">
-                <img src="https://placehold.co/2550x3300" style="max-height: 25rem; margin-top:15px;" />
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    First Name
+                    <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedForm.firstName" />
+                </label>
+
+                <label class="custom-label">
+                    Middle Name
+                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedForm.middleName" />
+                </label>
+
+                <label class="custom-label">
+                    Last Name
+                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedForm.lastName" />
+                </label>
+
+                <label class="custom-label">
+                    Gender
+                    <select class="browser-default custom-input" ng-model="selectedForm.genderID" ng-options="g.genderID as g.description for g in genderArray">
+                        <option value="" disabled>Select Gender</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    Date of Birth
+                    <input type="date" class="custom-input" ng-model="selectedForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </label>
+
+                <label class="custom-label">
+                    Civil Status
+                    <select class="browser-default custom-input" ng-model="selectedForm.civilStatus">
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                    </select>
+                </label>
+
+                <label class="custom-label">
+                    Contact Number
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedForm.contactNumber" />
+                </label>
+
+                <label class="custom-label">
+                    Address
+                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedForm.address" />
+                </label>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    Terms &amp; Conditions
+                    <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+                        <label style="display:flex; align-items:center;">
+                            <input type="checkbox" class="filled-in" ng-model="selectedForm.acceptedTerms" />
+                            <span>I agree to the terms and conditions</span>
+                        </label>
+                    </div>
+                </label>
+            </div>
+
+            <div class="col s12 m6">
+                <div class="row m-0 center" style="margin-top:8px;">
+                    <img ng-if="selectedForm.formLink" ng-src="{{selectedForm.formLink}}" style="max-height: 14rem;" alt="Form Preview" />
+                    <img ng-if="!selectedForm.formLink" src="https://placehold.co/2550x3300" style="max-height: 14rem;" alt="Placeholder" />
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-footer footer-center">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px">UPLOAD FORM</button>
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFileForEdit()">UPLOAD FORM</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
-    </div>
-</div>
-
-@*DELETE Form*@
-<div id="modal-delete-form" class="modal modal-fixed-footer delete-form-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Form</h5>
-
-        <p class="custom-label">Are you sure you want to delete this form? </p>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="saveForm(selectedForm)" ng-disabled="!selectedForm.firstName || !selectedForm.lastName || !selectedForm.acceptedTerms">SAVE</button>
     </div>
 </div>
 
@@ -1174,32 +742,63 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
 
-        @*Dentist*@
-        <label class="custom-label">
-            Post Operation Instructions
-            <textarea style="flex: 1; height: 550px; padding-top: 10px; background-color:white"></textarea>
-        </label>
+        <div class="row">
+            <div class="col s12 m4">
+                <label class="custom-label">
+                    Template
+                    <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
+                        <option value="" disabled selected>Select template</option>
+                    </select>
+                </label>
+
+                <label class="custom-label" style="margin-top:8px;">
+                    Title
+                    <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
+                </label>
+            </div>
+
+            <div class="col s12 m8">
+                <label class="custom-label">
+                    Instructions
+                    <textarea ng-model="postOp.instructions" style="flex: 1; height: 420px; padding-top: 10px; background-color:white; width:100%"></textarea>
+                    <p class="small-muted" style="margin-top:6px;">You can paste formatted HTML here if your editor pipeline supports it.</p>
+                </label>
+            </div>
+        </div>
     </div>
 
     <div class="modal-footer footer-center">
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">SAVE</button>
+        <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="printPostOp()">PRINT</button>
+        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="savePostOp()">SAVE</button>
     </div>
 </div>
 
-@*DELETE postOp*@
-<div id="modal-delete-postOp" class="modal modal-fixed-footer delete-postOp-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Form</h5>
+<style>
+    #modal-add-form.modal,
+    #modal-edit-form.modal {
+        width: 90% !important;
+        max-width: 1100px !important;
+        height: 85vh !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+    }
 
-        <p class="custom-label">Are you sure you want to delete this post operation instruction? </p>
-    </div>
+    #modal-add-form .modal-content,
+    #modal-edit-form .modal-content {
+        height: calc(100% - 64px);
+        overflow-y: auto;
+    }
 
-    <div class="modal-footer footer-center">
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
-    </div>
-</div>
+    #modal-add-form .modal-footer,
+    #modal-edit-form .modal-footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+    }
+
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

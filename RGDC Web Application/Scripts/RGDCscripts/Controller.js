@@ -1,4 +1,4 @@
-﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService) {
+﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService, $http) {
 
     $scope.signaturePreview = null;
     $scope._uploadedSignaturePath = null;
@@ -258,6 +258,7 @@
                         title: "Read and Accept the Following:",
                         text: "Terms and Conditions & Data Privacy Policy",
                     });
+
                 }
             }
             else {
@@ -617,6 +618,8 @@
                                 day: "numeric",
                                 year: "numeric"
                             });
+                        }
+
                         }
                     } else {
                         p.accCreated = "";
@@ -1150,6 +1153,293 @@
             }
         });
     }
+
+    $scope.pickFormFile = function (inputElem) {
+        function handleFile(file, assignTo) {
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    if (assignTo === 'new') {
+                        $scope.newForm = $scope.newForm || {};
+                        $scope.newForm.previewLink = evt.target.result;
+                        $scope.newForm._file = file;
+                        $scope._pickedFormFile = file;
+                    } else {
+                        $scope.selectedForm = $scope.selectedForm || {};
+                        $scope.selectedForm.formLink = evt.target.result;
+                        $scope.selectedForm._file = file;
+                        $scope._pickedFormFileEdit = file;
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        if (inputElem && inputElem.files && inputElem.files[0]) {
+            handleFile(inputElem.files[0], 'new');
+            return;
+        }
+
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,application/pdf';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            handleFile(file, 'new');
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    $scope.pickFormFileForEdit = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*,application/pdf';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) {
+                document.body.removeChild(input);
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    $scope.selectedForm = $scope.selectedForm || {};
+                    $scope.selectedForm.formLink = evt.target.result;
+                    $scope.selectedForm._file = file;
+                    $scope._pickedFormFileEdit = file;
+                });
+            };
+            reader.readAsDataURL(file);
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    // addForm: upload optional file then POST form metadata to server
+    $scope.addForm = function (form) {
+        if (!form) form = $scope.newForm || {};
+        if (!form.firstName || !form.lastName || !form.acceptedTerms) {
+            Swal.fire({ icon: 'error', title: 'Missing fields', text: 'Please complete required fields and accept Terms & Conditions.' });
+            return;
+        }
+
+        var proceed = function (filePath) {
+            // send metadata to server (server should implement /RGDC/AddForm to save the record)
+            var payload = {
+                firstName: form.firstName,
+                middleName: form.middleName || '',
+                lastName: form.lastName,
+                genderID: form.genderID || null,
+                birthDate: form.birthDate || null,
+                civilStatus: form.civilStatus || '',
+                contactNumber: form.contactNumber || '',
+                address: form.address || '',
+                acceptedTerms: !!form.acceptedTerms,
+                formLink: filePath || null
+            };
+            $http({
+                method: 'POST',
+                url: '/RGDC/AddForm',
+                data: payload
+            }).then(function (resp) {
+                var data = resp.data || resp;
+                if (data && data.success) {
+                    Swal.fire({ icon: 'success', title: 'Added', text: data.message || 'Form added.' });
+                    $scope.getSelectedPatientDetails();
+                    var modal = document.getElementById('modal-add-form');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var inst = M.Modal.getInstance(modal);
+                        if (inst) inst.close();
+                    }
+                    $scope.newForm = {};
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to add form.' });
+                }
+            }).catch(function (err) {
+                console.error('AddForm error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add form.' });
+            });
+        };
+
+        // upload file first if present
+        var file = (form._file || $scope._pickedFormFile);
+        if (file) {
+            Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            RGDCWebApplicationService.uploadFile(file).then(function (resp) {
+                Swal.close();
+                var d = resp.data || resp;
+                if (d && d.success && d.filePath) {
+                    proceed(d.filePath);
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (d && d.message) ? d.message : 'File upload failed.' });
+                }
+            }).catch(function (err) {
+                Swal.close();
+                console.error('uploadFile error', err);
+                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload file.' });
+            });
+        } else {
+            proceed(null);
+        }
+    };
+
+    // saveForm: update an existing form record (server endpoint /RGDC/SaveForm expected)
+    $scope.saveForm = function (form) {
+        if (!form) form = $scope.selectedForm || {};
+        if (!form.firstName || !form.lastName || !form.acceptedTerms) {
+            Swal.fire({ icon: 'error', title: 'Missing fields', text: 'Please complete required fields and accept Terms & Conditions.' });
+            return;
+        }
+
+        var proceed = function (filePath) {
+            var payload = {
+                formID: form.formID || null,
+                firstName: form.firstName,
+                middleName: form.middleName || '',
+                lastName: form.lastName,
+                genderID: form.genderID || null,
+                birthDate: form.birthDate || null,
+                civilStatus: form.civilStatus || '',
+                contactNumber: form.contactNumber || '',
+                address: form.address || '',
+                acceptedTerms: !!form.acceptedTerms,
+                formLink: filePath || form.formLink || null
+            };
+            $http({
+                method: 'POST',
+                url: '/RGDC/SaveForm',
+                data: payload
+            }).then(function (resp) {
+                var data = resp.data || resp;
+                if (data && data.success) {
+                    Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Form saved.' });
+                    $scope.getSelectedPatientDetails();
+                    var modal = document.getElementById('modal-edit-form');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var inst = M.Modal.getInstance(modal);
+                        if (inst) inst.close();
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to save form.' });
+                }
+            }).catch(function (err) {
+                console.error('SaveForm error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save form.' });
+            });
+        };
+
+        // if a new file was picked for edit, upload it
+        var file = (form._file || $scope._pickedFormFileEdit);
+        if (file) {
+            Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            RGDCWebApplicationService.uploadFile(file).then(function (resp) {
+                Swal.close();
+                var d = resp.data || resp;
+                if (d && d.success && d.filePath) {
+                    proceed(d.filePath);
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (d && d.message) ? d.message : 'File upload failed.' });
+                }
+            }).catch(function (err) {
+                Swal.close();
+                console.error('uploadFile error', err);
+                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload file.' });
+            });
+        } else {
+            proceed(null);
+        }
+    };
+
+    // postOp helpers: templates, apply, save and print
+    $scope.postOp = $scope.postOp || {};
+    $scope.postOp.templates = [
+        { key: 'simpleExtraction', name: 'Simple Extraction', title: 'Post-Op: Simple Extraction', instructions: '<ul><li>Avoid rinsing for 24 hours.</li><li>Apply ice for first 24 hours.</li><li>Take prescribed medication as directed.</li></ul>' },
+        { key: 'surgicalExtraction', name: 'Surgical Extraction', title: 'Post-Op: Surgical Extraction', instructions: '<ul><li>Keep head elevated for 48 hours.</li><li>No strenuous activity for 7 days.</li><li>Follow-up in 5 days.</li></ul>' },
+        { key: 'general', name: 'General Instructions', title: 'Post-Op Instructions', instructions: '<p>Maintain oral hygiene. Use soft diet for 48 hours. If bleeding persists, contact clinic.</p>' }
+    ];
+    $scope.postOp.selectedTemplate = null;
+    $scope.postOp.title = '';
+    $scope.postOp.instructions = '';
+
+    $scope.postOp.applyTemplate = function () {
+        var selectedKey = $scope.postOp.selectedTemplate;
+        if (!selectedKey) return;
+        var t = $scope.postOp.templates.find(function (x) { return x.key === selectedKey; });
+        if (t) {
+            $scope.postOp.title = t.title;
+            // instructions may contain HTML; we store as string
+            $scope.postOp.instructions = t.instructions;
+        }
+    };
+
+    $scope.savePostOp = function () {
+        var payload = {
+            title: $scope.postOp.title,
+            instructions: $scope.postOp.instructions
+        };
+        // optimistic: server endpoint expected at /RGDC/SavePostOp
+        $http({
+            method: 'POST',
+            url: '/RGDC/SavePostOp',
+            data: payload
+        }).then(function (resp) {
+            var data = resp.data || resp;
+            if (data && data.success) {
+                Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Post-Op instructions saved.' });
+                // update UI immediate (store in selectedPatient)
+                if ($scope.selectedPatient) {
+                    $scope.selectedPatient.postOpTitle = payload.title;
+                    $scope.selectedPatient.postOpInstructions = payload.instructions;
+                }
+                var modal = document.getElementById('modal-edit-postOp');
+                if (modal && typeof M !== 'undefined' && M.Modal) {
+                    var inst = M.Modal.getInstance(modal);
+                    if (inst) inst.close();
+                }
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to save post-op.' });
+            }
+        }).catch(function (err) {
+            console.error('SavePostOp error', err);
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save post-op.' });
+        });
+    };
+
+    $scope.printPostOp = function () {
+        // Build printable HTML from current postOp model
+        var title = $scope.postOp.title || ($scope.selectedPatient && $scope.selectedPatient.postOpTitle) || 'Post-Op Instructions';
+        var instructions = $scope.postOp.instructions || ($scope.selectedPatient && $scope.selectedPatient.postOpInstructions) || '<p>No instructions available.</p>';
+        var html = '<html><head><title>' + title + '</title>';
+        html += '<style>body{font-family: Arial, Helvetica, sans-serif; padding:20px;} h1{font-size:1.4rem;} .content{margin-top:10px;}</style></head><body>';
+        html += '<h1>' + title + '</h1><div class="content">' + instructions + '</div>';
+        html += '</body></html>';
+
+        var win = window.open('', '_blank', 'width=900,height=700');
+        if (!win) {
+            Swal.fire({ icon: 'error', title: 'Popup blocked', text: 'Please allow popups for this site to print.' });
+            return;
+        }
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        // Wait a moment to ensure content renders, then call print
+        setTimeout(function () {
+            win.focus();
+            win.print();
+        }, 400);
+    };
+
+    // ---- end new functions ----
 
     $scope.fillMedicalHistoryForm = function (medHistString) {
         var medHist = JSON.parse(medHistString);
