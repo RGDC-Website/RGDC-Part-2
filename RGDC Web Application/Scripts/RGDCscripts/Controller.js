@@ -213,6 +213,63 @@
             });
     };
 
+    // Helper: parse ASP.NET JSON date "/Date(1234567890)/" or accept already-ISO strings
+    // Made accessible to all functions that need it
+    function parseJsonDateToJsDate(dateInput) {
+        if (!dateInput) return null;
+
+        // If it's already a Date object, return it
+        if (Object.prototype.toString.call(dateInput) === '[object Date]') {
+            return isNaN(dateInput.getTime()) ? null : dateInput;
+        }
+
+        // ASP.NET JSON format: "/Date(1234567890)/" (milliseconds)
+        var msMatch = String(dateInput).match(/\/Date\((-?\d+)\)\//);
+        if (msMatch) {
+            var ts = parseInt(msMatch[1], 10);
+            return new Date(ts);
+        }
+
+        // ISO or other string format - let Date parse it
+        if (typeof dateInput === 'string') {
+            var d = new Date(dateInput);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        // numeric timestamp (ms)
+        if (typeof dateInput === 'number') {
+            return new Date(dateInput);
+        }
+
+        return null;
+    }
+
+    // --- Appointment listing: load scheduled appointments for admin table ---
+    $scope.loadAdminScheduledAppointments = function () {
+        RGDCWebApplicationService.getAdminScheduledAppointments()
+            .then(function (response) {
+                var data = response.data || [];
+                $scope.adminAppointments = data.map(function (a) {
+                    // Convert server date format to JS Date
+                    var jsDate = parseJsonDateToJsDate(a.dateTime);
+                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
+                    var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
+                    return {
+                        apptID: a.apptID,
+                        date: dateStr,
+                        time: timeStr,
+                        purpose: a.purpose || a.reason || "",
+                        dentistName: a.dentistName || "",
+                        patientName: a.patientName || ""
+                    };
+                });
+            })
+            .catch(function (err) {
+                console.error("Failed to load admin scheduled appointments", err);
+                $scope.adminAppointments = [];
+            });
+    };
+
     $scope.signUp = function () {
 
         try {
@@ -620,7 +677,7 @@
                             });
                         }
 
-                        }
+                        
                     } else {
                         p.accCreated = "";
                     }
@@ -692,36 +749,6 @@
                 }
             }
         }, 300);
-    }
-
-    // helper: parse ASP.NET JSON date "/Date(1234567890)/" or accept already-ISO strings
-    function parseJsonDateToJsDate(dateInput) {
-        if (!dateInput) return null;
-
-        // If it's already a Date object, return it
-        if (Object.prototype.toString.call(dateInput) === '[object Date]') {
-            return isNaN(dateInput.getTime()) ? null : dateInput;
-        }
-
-        // ASP.NET JSON format: "/Date(1234567890)/" (milliseconds)
-        var msMatch = String(dateInput).match(/\/Date\((-?\d+)\)\//);
-        if (msMatch) {
-            var ts = parseInt(msMatch[1], 10);
-            return new Date(ts);
-        }
-
-        // ISO or other string format - let Date parse it
-        if (typeof dateInput === 'string') {
-            var d = new Date(dateInput);
-            return isNaN(d.getTime()) ? null : d;
-        }
-
-        // numeric timestamp (ms)
-        if (typeof dateInput === 'number') {
-            return new Date(dateInput);
-        }
-
-        return null;
     }
 
     function computeAgeFromDate(birthDate) {
@@ -1451,4 +1478,221 @@
         angular.copy(medHist.history, $scope.medical.history);
         angular.copy(medHist.conditions, $scope.medical.conditions);
     }
+
+    // --- Edit appointment functionality ---
+    // Store appointment ID independently to prevent scope loss
+    var currentEditingApptID = null;
+    
+    $scope.editingAppt = {
+        apptID: null,
+        dateObj: '',
+        dateStr: '',
+        timeStr: '',
+        purpose: '',
+        dentistName: '',
+        patientName: ''
+    };
+
+    $scope.openEditApptModal = function (appt, $event) {
+        if ($event && $event.preventDefault) {
+            $event.preventDefault();
+            if ($event.stopPropagation) $event.stopPropagation();
+        }
+        if (!appt || !appt.apptID) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No valid appointment selected.'
+            });
+            return;
+        }
+
+        // Store apptID in a closure variable to preserve it
+        currentEditingApptID = appt.apptID;
+
+        // Parse the date string into ISO format for HTML5 date input
+        var isoDateStr = '';
+        if (appt.date) {
+            var dateObj = new Date(appt.date);
+            if (!isNaN(dateObj.getTime())) {
+                // Convert to ISO format (YYYY-MM-DD)
+                var year = dateObj.getFullYear();
+                var month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                var day = String(dateObj.getDate()).padStart(2, '0');
+                isoDateStr = year + '-' + month + '-' + day;
+            }
+        }
+
+        // Update the scope object directly with all properties
+        $scope.editingAppt.apptID = appt.apptID;
+        $scope.editingAppt.dateObj = isoDateStr;
+        $scope.editingAppt.dateStr = appt.date;
+        $scope.editingAppt.timeStr = appt.time;
+        $scope.editingAppt.purpose = appt.purpose;
+        $scope.editingAppt.dentistName = appt.dentistName;
+        $scope.editingAppt.patientName = appt.patientName;
+
+        // Open modal programmatically
+        $timeout(function () {
+            var modalElem = document.getElementById('modal-edit-sched');
+            if (modalElem) {
+                // Store apptID on the hidden input field
+                var hiddenField = document.getElementById('hiddenApptID');
+                if (hiddenField) {
+                    hiddenField.value = appt.apptID;
+                }
+                
+                // store apptID on modal element as backup
+                modalElem.setAttribute('data-edit-appt-id', appt.apptID);
+                var modalInst = M.Modal.getInstance(modalElem);
+                if (!modalInst) modalInst = M.Modal.init(modalElem);
+                modalInst.open();
+            }
+        }, 100);
+    };
+
+    $scope.onTimeChange = function () {
+        // no-op to avoid re-initializing Materialize select which duplicates elements
+    };
+
+    $scope.updateAppointment = function () {
+        if (!$scope.editingAppt) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'editingAppt object is undefined.'
+            });
+            return;
+        }
+
+        // Use apptID from multiple fallback sources
+        var hiddenField = document.getElementById('hiddenApptID');
+        var hiddenApptID = hiddenField ? parseInt(hiddenField.value) : null;
+        var apptIDToUse = $scope.editingAppt.apptID || hiddenApptID || currentEditingApptID;
+        
+        if (!apptIDToUse) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No appointment selected for editing. apptID is missing.'
+            });
+            return;
+        }
+
+        if (!$scope.editingAppt.dateObj || !$scope.editingAppt.timeStr || !$scope.editingAppt.purpose) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Fields',
+                text: 'Please fill in all required fields (Date, Time, Purpose).'
+            });
+            return;
+        }
+
+        // Parse ISO date format (YYYY-MM-DD) from HTML5 date input
+        var isoDateStr = $scope.editingAppt.dateObj;
+        var dateTime = new Date(isoDateStr);
+        
+        if (isNaN(dateTime.getTime())) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Date',
+                text: 'Please select a valid date.'
+            });
+            return;
+        }
+
+        // Extract time from the time string (format: "h:mm AM/PM" or "HH:mm")
+        var timeStr = $scope.editingAppt.timeStr;
+        var timeParts = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+        
+        if (!timeParts) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Time',
+                text: 'Please select a valid time.'
+            });
+            return;
+        }
+
+        var hours = parseInt(timeParts[1], 10);
+        var minutes = parseInt(timeParts[2], 10);
+        var meridiem = timeParts[3] ? timeParts[3].toUpperCase() : '';
+
+        // Convert to 24-hour format if AM/PM is present
+        if (meridiem) {
+            if (meridiem === 'PM' && hours !== 12) {
+                hours += 12;
+            } else if (meridiem === 'AM' && hours === 12) {
+                hours = 0;
+            }
+        }
+
+        // Set the time on the date object
+        dateTime.setHours(hours, minutes, 0, 0);
+
+        // Create the update data object with the properly formatted datetime
+        var updateData = {
+            apptID: apptIDToUse,
+            dateTime: dateTime,
+            reason: $scope.editingAppt.purpose
+        };
+
+        RGDCWebApplicationService.updateAppointment(updateData)
+            .then(function (response) {
+                if (response.data && response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Appointment updated successfully.'
+                    }).then(function() {
+                        // Close modal
+                        var modal = document.getElementById('modal-edit-sched');
+                        if (modal && typeof M !== 'undefined' && M.Modal) {
+                            var inst = M.Modal.getInstance(modal);
+                            if (inst) inst.close();
+                        }
+                        
+                        // Reset closure variable
+                        currentEditingApptID = null;
+                        
+                        // Reset the editingAppt object
+                        $scope.editingAppt = {
+                            apptID: null,
+                            dateObj: '',
+                            dateStr: '',
+                            timeStr: '',
+                            purpose: '',
+                            dentistName: '',
+                            patientName: ''
+                        };
+                        
+                        // Reload appointments
+                        $scope.loadAdminScheduledAppointments();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.data.message || 'Failed to update appointment.'
+                    });
+                }
+            })
+            .catch(function (err) {
+                console.error('Update appointment error:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the appointment.'
+                });
+            });
+    };
+
+    $scope.openDeleteApptModal = function (appt) {
+        $scope.deletingAppt = appt;
+    };
+
+    // Initialize admin appointments on controller load
+    $timeout(function () {
+        $scope.loadAdminScheduledAppointments();
+    }, 100);
 });

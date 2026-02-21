@@ -86,6 +86,18 @@
         return $http.get("/RGDC/getOwnPatientDetails");
     }
 
+    this.getAdminScheduledAppointments = function () {
+        return $http.get("/RGDC/GetAdminScheduledAppointments");
+    };
+
+    this.updateAppointment = function (appointmentData) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/UpdateAppointment',
+            data: appointmentData
+        });
+    };
+
     this.updatePatient = function (patientData) {
         return $http({
             method: "post",

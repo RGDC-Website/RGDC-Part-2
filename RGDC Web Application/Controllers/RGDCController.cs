@@ -961,6 +961,81 @@ namespace RGDC_Web_Application.Controllers
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+        public JsonResult GetAdminScheduledAppointments()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from appt in db.tbl_appointment
+                        // patient join: appointment.patientID -> tbl_patient.patientID -> tbl_account (patient acc)
+                    join pat in db.tbl_patient on appt.patientID equals pat.patientID into patj
+                    from pat in patj.DefaultIfEmpty()
+                    join patAcc in db.tbl_account on pat.accID equals patAcc.accID into patAccj
+                    from patAcc in patAccj.DefaultIfEmpty()
+
+                        // dentist join: appointment.dentistID -> tbl_dentist.dentistID -> tbl_account (dentist acc)
+                    join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID into dentj
+                    from dent in dentj.DefaultIfEmpty()
+                    join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
+                    from dentAcc in dentAccj.DefaultIfEmpty()
+
+                    orderby appt.dateTime
+                    select new
+                    {
+                        apptID = appt.apptID,
+                        dateTime = appt.dateTime,
+                        date = appt.dateTime, // client can format DateTime.Date
+                        time = appt.dateTime, // client can format DateTime.TimeOfDay or string formatting
+                        purpose = appt.reason,
+                        dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
+                        patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
+                        status = appt.status,
+                        remarks = appt.remarks,
+                        procedureID = appt.procedureID
+                    }
+                ).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult UpdateAppointment(AppointmentUpdateData appointmentData)
+        {
+            try
+            {
+                if (appointmentData == null)
+                    return Json(new { success = false, message = "No appointment data provided." });
+
+                if (appointmentData.apptID <= 0)
+                    return Json(new { success = false, message = "Invalid appointment ID." });
+
+                if (appointmentData.dateTime == null || appointmentData.dateTime == DateTime.MinValue)
+                    return Json(new { success = false, message = "Invalid date/time provided." });
+
+                if (string.IsNullOrWhiteSpace(appointmentData.reason))
+                    return Json(new { success = false, message = "Reason/purpose is required." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == appointmentData.apptID);
+                    if (appt == null)
+                        return Json(new { success = false, message = "Appointment not found." });
+
+                    appt.dateTime = appointmentData.dateTime;
+                    appt.reason = appointmentData.reason;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment updated successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error updating appointment: {ex.Message}" });
+            }
+        }
     }
 }
 

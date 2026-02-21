@@ -2,7 +2,7 @@
     Layout = "~/Views/Shared/_adminLayout.cshtml";
 }
 
-<div class="dashContainer">
+<div class="dashContainer" ng-controller="RGDCWebApplicationController">
     @*top buttons*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*refresh and logout buttons*@
@@ -49,17 +49,20 @@
                         </thead>
                         @*table content*@
                         <tbody>
-                            <tr data-href="#" title="View patient record" class="clkPointer">
-                                <td>MM/DD/YYY</td>
-                                <td>00:00 AM</td>
-                                <td>Purpose...</td>
-                                <td>Dentist...</td>
-                                <td>Patient...</td>
+                            <tr ng-if="(!adminAppointments || adminAppointments.length === 0)">
+                                <td colspan="5" class="center-align">No scheduled appointments found.</td>
+                            </tr>
+                            <tr ng-repeat="appt in adminAppointments track by appt.apptID" data-href="#" title="View patient record" class="clkPointer">
+                                <td>{{appt.date}}</td>
+                                <td>{{appt.time}}</td>
+                                <td>{{appt.purpose}}</td>
+                                <td>{{appt.dentistName}}</td>
+                                <td>{{appt.patientName}}</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-sched" data-position="bottom" data-tooltip="Delete Progress Note">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" ng-click="openDeleteApptModal(appt)" data-target="modal-delete-sched" data-position="bottom" data-tooltip="Delete Appointment">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-sched" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                    <a href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" ng-click="openEditApptModal(appt, $event)" data-position="bottom" data-tooltip="Edit Appointment" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                 </td>
                             </tr>
                         </tbody>
@@ -230,32 +233,61 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Scheduled Appointment</h5>
 
+        <!-- Hidden field to store apptID separately -->
+        <input type="hidden" id="hiddenApptID" value="">
+
         <div class="row">
             <div class="col s6">
-                @*Date*@
+                @*Date - using HTML5 date input for better modal compatibility*@
                 <label class="custom-label">
                     Date
-                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                    <input type="date" id="editApptDate" class="custom-input" ng-model="editingAppt.dateObj" placeholder="MM/DD/YYYY">
                 </label>
 
                 @*Dentist*@
                 <label class="custom-label">
                     Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
+                    <input type="text" class="custom-input" ng-bind="editingAppt.dentistName" placeholder="Dentist" readonly>
                 </label>
             </div>
 
             <div class="col s6">
-                @*Time*@
+                @*Time Dropdown*@
                 <label class="custom-label">
                     Time
-                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                    <select class="custom-input" ng-model="editingAppt.timeStr" ng-change="onTimeChange()">
+                        <option value="">Select Time</option>
+                        <option value="12:00 AM">12:00 AM</option>
+                        <option value="1:00 AM">1:00 AM</option>
+                        <option value="2:00 AM">2:00 AM</option>
+                        <option value="3:00 AM">3:00 AM</option>
+                        <option value="4:00 AM">4:00 AM</option>
+                        <option value="5:00 AM">5:00 AM</option>
+                        <option value="6:00 AM">6:00 AM</option>
+                        <option value="7:00 AM">7:00 AM</option>
+                        <option value="8:00 AM">8:00 AM</option>
+                        <option value="9:00 AM">9:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="1:00 PM">1:00 PM</option>
+                        <option value="2:00 PM">2:00 PM</option>
+                        <option value="3:00 PM">3:00 PM</option>
+                        <option value="4:00 PM">4:00 PM</option>
+                        <option value="5:00 PM">5:00 PM</option>
+                        <option value="6:00 PM">6:00 PM</option>
+                        <option value="7:00 PM">7:00 PM</option>
+                        <option value="8:00 PM">8:00 PM</option>
+                        <option value="9:00 PM">9:00 PM</option>
+                        <option value="10:00 PM">10:00 PM</option>
+                        <option value="11:00 PM">11:00 PM</option>
+                    </select>
                 </label>
 
                 @*Patient*@
                 <label class="custom-label">
                     Patient
-                    <input type="text" class="custom-input" placeholder="Patient">
+                    <input type="text" class="custom-input" ng-bind="editingAppt.patientName" placeholder="Patient" readonly>
                 </label>
             </div>
 
@@ -263,7 +295,7 @@
                 @*Purpose*@
                 <label class="custom-label">
                     Purpose
-                    <input type="text" class="custom-input" placeholder="Purpose">
+                    <input type="text" class="custom-input" ng-model="editingAppt.purpose" placeholder="Purpose">
                 </label>
             </div>
 
@@ -272,7 +304,7 @@
 
     <div class="modal-footer footer-center">
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+        <button type="button" ng-click="updateAppointment()" class="edit-btn" style="font-weight:500; margin-right:20px">UPDATE</button>
     </div>
 </div>
 
