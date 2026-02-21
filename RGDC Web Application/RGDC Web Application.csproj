@@ -300,6 +300,7 @@
     <Content Include="Views\RGDC\dentistPatientsTab.cshtml" />
     <Content Include="Views\RGDC\dentistFinance.cshtml" />
     <Content Include="Views\RGDC\adminAppointment.cshtml" />
+    <Content Include="Views\RGDC\adminClinicStaffTab.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

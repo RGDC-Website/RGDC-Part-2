@@ -16,7 +16,7 @@
 
     @*create new finance record button*@
     <div class="row m-0">
-        <a class="waves-effect waves-light btn left brown lighten-4 medBtn"><i class="material-icons left">add</i>Create New Payment Record</a>
+        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="modal-add-payrec"><i class="material-icons left">add</i>Create New Payment Record</a>
     </div>
 
     @*admin finance table*@
@@ -39,10 +39,10 @@
                     <td>MM/DD/YYYY</td>
                     @*view button*@
                     <td>
-                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Payment Record">
-                            <i class="material-icons brown-text lighten-1">delete</i> 
+                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modal-delete-payrec" data-position="bottom" data-tooltip="Delete Payment Record">
+                            <i class="material-icons brown-text lighten-1">delete</i>
                         </a>
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modal-edit-payrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                     </td>
                 </tr>
             </tbody>
@@ -57,5 +57,208 @@
             </tfoot>
         </table>
     </div>
+</div>
 
+@*ADD Payment Record*@
+<div id="modal-add-payrec" class="modal modal-fixed-footer add-payrec-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Add New Payment Record</h5>
+
+        <div class="row">
+            <div class="col s12">
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="Patient name...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist name...">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                @*Mode of Payment*@
+                <label class="custom-label">
+                    Mode of Payment
+                    <input type="text" class="custom-input" placeholder="Mode of payment...">
+                </label>
+            </div>
+
+            <div class="col s4">
+                @*Cost*@
+                <label class="custom-label">
+                    Cost
+                    <input type="text" class="custom-input" placeholder="Cost...">
+                </label>
+            </div>
+
+            <div class="col s4">
+                @*Discount*@
+                <label class="custom-label">
+                    Discount
+                    <input type="text" class="custom-input" placeholder="Discount...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                @*Total*@
+                <label class="custom-label">
+                    Total Ammount Due
+                    <input type="text" class="custom-input" placeholder="Total ammount due...">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Paid*@
+                <label class="custom-label">
+                    Total Ammount Paid
+                    <input type="text" class="custom-input" placeholder="Total ammount paid...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Description*@
+                <label class="custom-label">
+                    Description
+                    <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;" placeholder="Description..."></textarea>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">ADD</button>
+    </div>
+</div>
+
+
+
+@*EDIT Payment Record*@
+<div id="modal-edit-payrec" class="modal modal-fixed-footer edit-payrec-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Payment Record</h5>
+
+        <div class="row">
+            <div class="col s12">
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="Patient name...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist name...">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">
+                    Date
+                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                @*Mode of Payment*@
+                <label class="custom-label">
+                    Mode of Payment
+                    <input type="text" class="custom-input" placeholder="Mode of payment...">
+                </label>
+            </div>
+
+            <div class="col s4">
+                @*Cost*@
+                <label class="custom-label">
+                    Cost
+                    <input type="text" class="custom-input" placeholder="Cost...">
+                </label>
+            </div>
+
+            <div class="col s4">
+                @*Discount*@
+                <label class="custom-label">
+                    Discount
+                    <input type="text" class="custom-input" placeholder="Discount...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                @*Total*@
+                <label class="custom-label">
+                    Total Ammount Due
+                    <input type="text" class="custom-input" placeholder="Total ammount due...">
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Paid*@
+                <label class="custom-label">
+                    Total Ammount Paid
+                    <input type="text" class="custom-input" placeholder="Total ammount paid...">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Description*@
+                <label class="custom-label">
+                    Description
+                    <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;" placeholder="Description..."></textarea>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">EDIT</button>
+    </div>
+</div>
+
+@*DELETE Peyment Record*@
+<div id="modal-delete-payrec" class="modal modal-fixed-footer delete-payrec-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Payment Record</h5>
+
+        <p class="custom-label">Are you sure you want to delete this payment record?</p>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px">DELETE</button>
+    </div>
 </div>
