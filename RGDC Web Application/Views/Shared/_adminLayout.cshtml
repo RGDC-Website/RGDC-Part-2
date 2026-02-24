@@ -19,9 +19,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
-</head>
-<body id="body" ng-app="RGDCWebApplication" ng-controller="">
-@*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
+
+<body>
     <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
         @*sidebar nav*@
         <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -72,7 +71,7 @@
         <div class="row show-on-small-only hide-on-med-and-up s12 brown lighten-1 z-depth-3 white-text">
             <nav>
                 <div class="nav-wrapper px-1">
-                        <h5 class="bold brand-logo center">RGDC</h5>
+                    <h5 class="bold brand-logo center">RGDC</h5>
                     <ul class="left">
                         <li>
                             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -260,6 +259,20 @@
             var elems = document.querySelectorAll('.sidenav');
             var instances = M.Sidenav.init(elems);
         });
+
+       document.addEventListener('DOMContentLoaded', function () {
+           var today = new Date();
+
+           // Date picker
+           var dateElems = document.querySelectorAll('.datepicker');
+           M.Datepicker.init(dateElems, {
+               format: 'mm/dd/yyyy',
+               maxDate: today,
+               yearRange: [1920, today.getFullYear()],
+               autoClose: true,
+               showClearBtn: true
+           });
+       });
 
 
         @* admin finance table *@
