@@ -510,78 +510,6 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-        // Create appointment
-        [HttpPost]
-        public JsonResult CreateAppointment(tblAppointmentModel appt)
-        {
-            if (appt == null)
-                return Json(new { success = false, message = "No appointment data provided" }, JsonRequestBehavior.AllowGet);
-
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
-                    if (patient == null)
-                        return Json(new { success = false, message = "Patient not found" }, JsonRequestBehavior.AllowGet);
-
-                    int newApptId = db.tbl_appointment.Any() ? db.tbl_appointment.Max(a => a.apptID) + 1 : 1;
-
-                    int createdBy = appt.createdBy;
-                    if (Session["UserID"] != null && int.TryParse(Session["UserID"].ToString(), out int uid))
-                        createdBy = uid;
-
-                    var newAppt = new tblAppointmentModel()
-                    {
-                        apptID = newApptId,
-                        patientID = appt.patientID,
-                        dentistID = appt.dentistID,
-                        createdBy = createdBy,
-                        dateTime = appt.dateTime,
-                        reason = appt.reason ?? string.Empty,
-                        procedureID = appt.procedureID,
-                        remarks = appt.remarks ?? string.Empty,
-                        status = appt.status,
-                        schedCreatedAt = DateTime.Now,
-                        schedUpdatedAt = DateTime.Now
-                    };
-
-                    db.tbl_appointment.Add(newAppt);
-                    db.SaveChanges();
-
-                    return Json(new { success = true, apptID = newAppt.apptID }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Error creating appointment: {ex.Message}" }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        // Delete appointment
-        [HttpPost]
-        public JsonResult DeleteAppointment(int apptID)
-        {
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
-                    if (appt == null)
-                        return Json(new { success = false, message = "Appointment not found" }, JsonRequestBehavior.AllowGet);
-
-                    db.tbl_appointment.Remove(appt);
-                    db.SaveChanges();
-
-                    return Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Error deleting appointment: {ex.Message}" }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
         public JsonResult goToPatient(tblPatientModel patient)
         {
             Session["SelectedPatientID"] = patient.patientID;
@@ -1035,3 +963,6 @@ namespace RGDC_Web_Application.Controllers
         }
     }
 }
+
+      
+    
