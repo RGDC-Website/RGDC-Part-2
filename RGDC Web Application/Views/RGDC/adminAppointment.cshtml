@@ -56,7 +56,7 @@
                                 <td>Dentist...</td>
                                 <td>Patient...</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteSchedAppt" data-position="bottom" data-tooltip="Delete Progress Note">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeleteSchedAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
                                     <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditSchedAppt" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
@@ -83,7 +83,7 @@
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Requested Appointments</p>
                 @*admin requested appointments table*@
                 <div class="row" style="padding: 2rem; font-size: .9rem ">
-                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                    <table id="adminRequestedAppointment" class="hoverv tblClk">
                         @*table headers*@
                         <thead>
                             <tr class="brown-text lighten-1">
@@ -103,7 +103,7 @@
                                 <td>Dentist...</td>
                                 <td>Patient...</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteReqAppt" data-position="bottom" data-tooltip="Delete Progress Note">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeleteReqAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
                                     <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditReqAppt" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
@@ -130,7 +130,7 @@
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Past Appointments</p>
                 @*admin past appointments table*@
                 <div class="row" style="padding: 2rem; font-size: .9rem ">
-                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                    <table id="adminPastAppointment" class="hoverv tblClk">
                         @*table headers*@
                         <thead>
                             <tr class="brown-text lighten-1">
@@ -150,7 +150,7 @@
                                 <td>Dentist...</td>
                                 <td>Patient...</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePastAppt" data-position="bottom" data-tooltip="Delete Progress Note">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeletePastAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
                                 </td>
@@ -236,7 +236,7 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/MM/YYYY">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
@@ -344,7 +344,7 @@
     </div>
 </div>
 
-@*DELETE requesed appointment*@
+@*DELETE requested appointment*@
 <div id="modalDeleteReqAppt" class="modal appt-modal" style="width:30% !important">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Requested Appointment</h5>
@@ -371,3 +371,93 @@
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            if (typeof M !== 'undefined' && M.Modal) {
+                var elems = document.querySelectorAll('.modal');
+                M.Modal.init(elems);
+            }
+
+            var apptToDelete = null;
+
+            $(document).on('click', '.btn-delete-appt', function (e) {
+                e.preventDefault();
+                // read data-apptid 
+                apptToDelete = $(this).attr('data-apptid') || $(this).data('apptid') || null;
+
+                var target = $(this).attr('data-target') || $(this).data('target');
+                if (target) {
+                    var $modal = $('#' + target);
+                    if ($modal.length) {
+                        if (typeof M !== 'undefined' && M.Modal) {
+                            var instance = M.Modal.getInstance($modal[0]);
+                            if (instance) instance.open();
+                            else $modal.modal('open');
+                        } else {
+                            $modal.modal('open');
+                        }
+                    }
+                }
+            });
+
+            // Confirm deletion buttons 
+            $(document).on('click', '#modalDeleteSchedAppt .edit-btn, #modalDeleteReqAppt .edit-btn, #modalDeletePastAppt .edit-btn', function (e) {
+                e.preventDefault();
+
+                if (!apptToDelete) {
+                    if (typeof M !== 'undefined' && M.toast) {
+                        M.toast({ html: 'No appointment selected.' });
+                    } else {
+                        alert('No appointment selected.');
+                    }
+                    return;
+                }
+
+                // POST (form data)
+                $.post('/RGDC/DeleteAppointment', { apptID: apptToDelete })
+                    .done(function (res) {
+                        if (res && res.success) {
+                            // close open modal
+                            var $openModal = $('.modal.open');
+                            if ($openModal.length) {
+                                if (typeof M !== 'undefined' && M.Modal) {
+                                    var inst = M.Modal.getInstance($openModal[0]);
+                                    if (inst) inst.close();
+                                } else {
+                                    $openModal.modal('close');
+                                }
+                            }
+
+                            // remove rows that contain the same data-apptid
+                            $('tr').filter(function () {
+                                var $btn = $(this).find('.btn-delete-appt');
+                                return $btn.length && ($btn.attr('data-apptid') == apptToDelete || $btn.data('apptid') == apptToDelete);
+                            }).remove();
+
+                            if (typeof M !== 'undefined' && M.toast) {
+                                M.toast({ html: 'Appointment deleted.' });
+                            } else {
+                                alert('Appointment deleted.');
+                            }
+                        } else {
+                            var msg = (res && res.message) ? res.message : 'Error deleting appointment.';
+                            if (typeof M !== 'undefined' && M.toast) {
+                                M.toast({ html: msg });
+                            } else {
+                                alert(msg);
+                            }
+                        }
+                    })
+                    .fail(function () {
+                        if (typeof M !== 'undefined' && M.toast) {
+                            M.toast({ html: 'Error deleting appointment (server error).' });
+                        } else {
+                            alert('Error deleting appointment (server error).');
+                        }
+                    });
+            });
+        })();
+    </script>
+}
