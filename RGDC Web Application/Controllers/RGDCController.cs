@@ -582,7 +582,29 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-      
+        [HttpGet]
+
+        public JsonResult getDentists()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from d in db.tbl_dentist
+                    join a in db.tbl_account
+                        on d.accID equals a.accID
+                    select new
+                    {
+                        dentistID = d.dentistID,
+                        accID = d.accID,
+                        dentistName = a.firstName + " " + a.lastName,
+                        specialization = d.specialization,
+                        branchID = d.branchID
+                    }
+                ).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
         public JsonResult goToPatient(tblPatientModel patient)
         {
             Session["SelectedPatientID"] = patient.patientID;
