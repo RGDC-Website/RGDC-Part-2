@@ -60,7 +60,7 @@
 </div>
 
 @*ADD Payment Record*@
-<div id="modalAddPayrec" class="modal modal-fixed-footer add-payrec-modal" ng-init="getPatientsNDentist()">
+<div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Add New Payment Record</h5>
 
@@ -154,11 +154,11 @@
         </div>
     </div>
 
-        <div class="modal-footer">
-            <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-            <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="addPayment()">ADD</button>
-        </div>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="addPayment()">ADD</button>
     </div>
+</div>
 
 
 
