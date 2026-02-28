@@ -206,4 +206,22 @@
     this.patientPersonalInfo = function () {
         return $http.get("/RGDC/patientPersonalInfo");
     };
+
+    // create appointment
+    this.createAppointment = function (appointment) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/CreateAppointment",
+            data: appointment
+        });
+    };
+
+    // delete appointment
+    this.deleteAppointment = function (apptID) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/DeleteAppointment",
+            data: { apptID: apptID }
+        });
+    };
 });

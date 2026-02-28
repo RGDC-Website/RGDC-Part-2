@@ -16,7 +16,7 @@
 
     @*create new finance record button*@
     <div class="row m-0">
-        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="modal-add-payrec"><i class="material-icons left">add</i>Create New Payment Record</a>
+        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="modalAddPayrec"><i class="material-icons left">add</i>Create New Payment Record</a>
     </div>
 
     @*admin finance table*@
@@ -91,10 +91,11 @@
 
             <div class="col s6">
                 @*Date*@
-                <label class="custom-label">
-                    Date
-                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
-                </label>
+                <label class="custom-label">Date</label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                </div>
             </div>
         </div>
 
@@ -188,10 +189,11 @@
 
             <div class="col s6">
                 @*Date*@
-                <label class="custom-label">
-                    Date
-                    <input type="text" class="custom-input" placeholder="MM/DD/YYYY">
-                </label>
+                <label class="custom-label">Date</label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                </div>
             </div>
         </div>
 
@@ -257,7 +259,7 @@
 </div>
 
 @*DELETE Peyment Record*@
-<div id="modal-delete-payrec" class="modal modal-fixed-footer delete-payrec-modal">
+<div id="modalDeletePayrec" class="modal payrec-modal" style="width:30% !important">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Payment Record</h5>
 

@@ -73,7 +73,7 @@
 
 @*Forgot Password*@
 <div id="modal-password" class="modal password-modal">
-    <div class="modal-content">
+    <div class="modal-content" style="width:40vh !important">
         <h5 class="modal-form-title">Reset Your Password</h5>
 
         <div class="input-field">
@@ -84,11 +84,9 @@
                    required>
         </div>
 
-        <button class="btn btn-next" type="button" style="margin:-1vh 0 1vh 12.5vh;" ng-click="sendOTP()">
-            Send OTP
-        </button>
+        <button type="submit" class="edit-btn right" style="font-weight: 500; align-items:center" ng-click="sendOTP()">SEND OTP</button>
 
-        <hr>
+        <hr style="margin-top:6vh">
 
         <div class="input-field">
             <p class="custom-label">OTP Code <span class="required-mark">*</span></p>
@@ -112,11 +110,9 @@
         </div>
     </div>
 
-    <div class="modal-footer patient-modal-footer" style="margin-top:-3vh">
-        <a href="#!" class="modal-close btn btn-cancel">Cancel</a>
-        <button type="button" class="btn btn-next" ng-click="resetPassword()">
-            Reset
-        </button>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="resetPassword()">RESET</button>
     </div>
 </div>
 

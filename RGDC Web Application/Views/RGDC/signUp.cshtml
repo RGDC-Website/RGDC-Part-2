@@ -105,7 +105,7 @@
 
                 @*Sign up BTN*@
                 <button class="logSignBtn modal-trigger"
-                        data-target="patientInformationForm"
+                        data-target="modalPatientInformationForm"
                         type="button"
                         ng-click="signUpInitial()"
                         ng-disabled="!isFormValid()">
@@ -128,7 +128,7 @@
 </div>
 
 @*Patient information form*@
-<div id="patientInformationForm" class="modal patient-information-form-modal">
+<div id="modalPatientInformationForm" class="modal patientInformationForm-modal">
     <div>
         <h5 class="modal-form-title">Patient Information Form</h5>
 
@@ -299,13 +299,12 @@
         </form>
     </div>
 
-    @*Submit or cancel*@
-<div class="modal-footer footer-center" style="margin-top:1.5vh">
-    <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
-    <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-    <button type="submit" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">CREATE</button>
-    @*data-target="verifyEmail"*@
-</div>
+    @*Submit , upload, cancel*@
+    <div class="modal-footer" style="margin-top:2.5vh">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+        <button type="submit" class="edit-btn modal-trigger modal-close" data-target="verifyEmail" style="font-weight:500;">ADD</button>
+    </div>
 </div>
 
 @*Verification*@
@@ -322,10 +321,10 @@
         </div>
     </div>
 
-    <div class="modal-footer footer-center" style="margin-top:-2vh">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:1.5vh">RESEND OTP</button>
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin-right:1.5vh">CREATE</button>
+    <div class="modal-footer" style="padding:3vh !important; margin:-5vh 0 2vh 0 !important">
+        <button type="submit" class="edit-btn left" style="font-weight:500; margin-right:1vh;">RESEND OTP</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;">CONFIRM</button>
     </div>
 </div>
 
