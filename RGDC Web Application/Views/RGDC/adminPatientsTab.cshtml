@@ -26,7 +26,8 @@
             <tr class="brown-text lighten-1">
                 <th>Patient Name</th>
                 <th>Last Visit</th>
-                <th colspan="2">Appointments Scheduled</th>
+                <th>Appointments Scheduled</th>
+                <th></th>
             </tr>
         </thead>
         @*table content*@
@@ -34,19 +35,19 @@
             <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArray" ng-click="goToPatientInfo(patient)">
                 <td>{{patient.patientName}}</td>
                 <td>{{patient.lastVisit}}</td>
-                <td>X Appointment Scheduled</td>
+                <td>{{patient.appointmentsScheduled}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
                 <td>
                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
                 </td>
             </tr>
         </tbody>
-        <tfoot>
+        @*<tfoot>
             <tr class="brown-text lighten-1">
                 <th>Patient Name</th>
                 <th>Last Visit</th>
                 <th>Appointments Scheduled</th>
             </tr>
-        </tfoot>
+        </tfoot>*@
     </table>
 
 </div>

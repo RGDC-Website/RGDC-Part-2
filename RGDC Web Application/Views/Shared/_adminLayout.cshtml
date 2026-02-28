@@ -40,7 +40,7 @@
             @*nav tabs*@
             <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
                 <ul>
-                    <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+                    <li><a href="#" ng-click="goHome()" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
                     <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
                     <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
                     <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
@@ -102,7 +102,7 @@
                 <h6>{{userRole}}</h6>
             </div>
 
-            <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+            <li><a href="#" ng-click="goHome()" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
             <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
             <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
             <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
@@ -125,6 +125,8 @@
         @*content*@
         <div class="col s12 m9 l9 main-content" style="margin-left: 25%">
             @RenderBody()
+            <!-- Debug area: show requested appointments from root scope for troubleshooting -->
+            <!-- debug block removed -->
         </div>
     </div>
 

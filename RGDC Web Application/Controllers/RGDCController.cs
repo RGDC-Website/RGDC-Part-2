@@ -32,6 +32,55 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
+        public JsonResult GetCurrentDentist()
+        {
+            try
+            {
+                var sessionVal = Session["UserID"];
+                if (sessionVal == null) return Json(new { success = false, message = "Not logged in" }, JsonRequestBehavior.AllowGet);
+                if (!int.TryParse(sessionVal.ToString(), out int accID)) return Json(new { success = false, message = "Invalid user" }, JsonRequestBehavior.AllowGet);
+
+                using (var db = new RGDCContext())
+                {
+                    var dent = db.tbl_dentist.FirstOrDefault(d => d.accID == accID);
+                    if (dent == null) return Json(new { success = false, message = "No dentist record" }, JsonRequestBehavior.AllowGet);
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    var name = acc != null ? acc.firstName + " " + acc.lastName : null;
+                    return Json(new { success = true, dentistID = dent.dentistID, dentistName = name }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DeleteAppointment(int apptID)
+        {
+            try
+            {
+                if (apptID <= 0)
+                    return Json(new { success = false, message = "Invalid appointment ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null)
+                        return Json(new { success = false, message = "Appointment not found." });
+
+                    db.tbl_appointment.Remove(appt);
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment deleted successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error deleting appointment: {ex.Message}" });
+            }
+        }
+
         public ActionResult adminDashboard()
         {
             return View();
@@ -378,12 +427,24 @@ namespace RGDC_Web_Application.Controllers
 
         public JsonResult getSessionVariable()  
         {
-            return Json(new
+            try
             {
-                userName = Session["UserName"].ToString(),
-                fullName = Session["UserFullName"].ToString(),
-                userAuthorization = Session["UserAuthorization"].ToString(),
-            }, JsonRequestBehavior.AllowGet);
+                if (Session["UserName"] == null || Session["UserFullName"] == null || Session["UserAuthorization"] == null)
+                {
+                    return Json(new { success = false, message = "User session expired." }, JsonRequestBehavior.AllowGet);
+                }
+
+                return Json(new
+                {
+                    userName = Session["UserName"].ToString(),
+                    fullName = Session["UserFullName"].ToString(),
+                    userAuthorization = Session["UserAuthorization"].ToString(),
+                }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving session: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         public string passwordHash(string password)
@@ -494,6 +555,7 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
+                var today = DateTime.Now;
                 var result = (
                     from p in db.tbl_patient
                     join a in db.tbl_account
@@ -503,10 +565,88 @@ namespace RGDC_Web_Application.Controllers
                         patientID = p.patientID,
                         accID = p.accID,
                         patientName = a.firstName + " " + a.lastName,
-                        lastVisit = p.lastVisit
+                        lastVisit = p.lastVisit,
+                        // count upcoming/pending appointments for this patient
+                        appointmentsScheduled = db.tbl_appointment.Count(ap => ap.patientID == p.patientID && (ap.status == "Requested" || ap.status == "Scheduled"))
                     }
                 ).ToList();
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult GetPastAppointments()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var result = (
+                        from appt in db.tbl_appointment
+                        join pat in db.tbl_patient on appt.patientID equals pat.patientID into patj
+                        from pat in patj.DefaultIfEmpty()
+                        join patAcc in db.tbl_account on pat.accID equals patAcc.accID into patAccj
+                        from patAcc in patAccj.DefaultIfEmpty()
+                        join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID into dentj
+                        from dent in dentj.DefaultIfEmpty()
+                        join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
+                        from dentAcc in dentAccj.DefaultIfEmpty()
+                        where appt.status != "Scheduled"
+                        orderby appt.dateTime descending
+                        select new
+                        {
+                            apptID = appt.apptID,
+                            dateTime = appt.dateTime,
+                            purpose = appt.reason,
+                            dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
+                            patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
+                            status = appt.status,
+                            displayStatus = appt.status == "Scheduled" ? "Scheduled" : (appt.status == "Done" ? "Completed/Done" : appt.status),
+                            remarks = appt.remarks
+                        }
+                    ).ToList();
+
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult CancelAppointment(int apptID)
+        {
+            try
+            {
+                if (apptID <= 0) return Json(new { success = false, message = "Invalid appointment ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null) return Json(new { success = false, message = "Appointment not found." });
+
+                    // Prevent cancellation within 2 days of appointment date (inclusive)
+                    var today = DateTime.Today;
+                    var cutoff = today.AddDays(2);
+                    if (appt.dateTime.Date <= cutoff.Date)
+                    {
+                        return Json(new { success = false, message = "Cannot cancel appointment within 2 days of scheduled date." });
+                    }
+
+                    // prefix reason with Cancelled - if not already
+                    var orig = appt.reason ?? "";
+                    if (!orig.StartsWith("Cancelled - ")) appt.reason = "Cancelled - " + orig;
+
+                    appt.status = "Cancelled";
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment cancelled." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
 
@@ -873,12 +1013,14 @@ namespace RGDC_Web_Application.Controllers
 
         public void logOut()
         {
-            Session["UserID"] = "";
-            Session["UserName"] = "";
-            Session["UserFullName"] = "";
-            Session["UserAuthorization"] = "";
-            Session["IsLoggedIn"] = false;
-            Session["SelectedPatientID"] = "";
+            Session.Remove("UserID");
+            Session.Remove("UserName");
+            Session.Remove("UserFullName");
+            Session.Remove("UserAuthorization");
+            Session.Remove("IsLoggedIn");
+            Session.Remove("SelectedPatientID");
+            Session.Remove("RESET_OTP");
+            Session.Remove("RESET_EMAIL");
         }
 
 
@@ -967,6 +1109,24 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
+                // Auto-move past scheduled appointments to Done if their datetime has passed
+                try
+                {
+                    var now = DateTime.Now;
+                    var toMarkDone = db.tbl_appointment.Where(a => a.status == "Scheduled" && a.dateTime < now).ToList();
+                    if (toMarkDone.Any())
+                    {
+                        foreach (var a in toMarkDone)
+                        {
+                            a.status = "Done";
+                        }
+                        db.SaveChanges();
+                    }
+                }
+                catch
+                {
+                    // ignore any errors here to avoid breaking the listing
+                }
                 var result = (
                     from appt in db.tbl_appointment
                         // patient join: appointment.patientID -> tbl_patient.patientID -> tbl_account (patient acc)
@@ -981,6 +1141,7 @@ namespace RGDC_Web_Application.Controllers
                     join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
                     from dentAcc in dentAccj.DefaultIfEmpty()
 
+                    where appt.status == "Scheduled"
                     orderby appt.dateTime
                     select new
                     {
@@ -992,6 +1153,10 @@ namespace RGDC_Web_Application.Controllers
                         dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
                         patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
                         status = appt.status,
+                        // displayStatus normalizes requested/scheduled/done and indicates who requested when applicable
+                        displayStatus = appt.status == "Scheduled" ? "Scheduled" :
+                                        (appt.status == "Done" ? "Completed/Done" :
+                                        (appt.status == "Requested" ? ((patAcc != null && appt.createdBy == patAcc.accID) ? "Requested by Patient" : ((dentAcc != null && appt.createdBy == dentAcc.accID) ? "Requested by Dentist" : "Requested")) : appt.status)),
                         remarks = appt.remarks,
                         procedureID = appt.procedureID
                     }
@@ -1034,6 +1199,300 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Error updating appointment: {ex.Message}" });
+            }
+        }
+
+        public JsonResult GetDentistList()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var result = (
+                        from d in db.tbl_dentist
+                        join a in db.tbl_account on d.accID equals a.accID
+                        select new
+                        {
+                            dentistID = d.dentistID,
+                            accID = a.accID,
+                            dentistName = a.firstName + " " + a.lastName,
+                            firstName = a.firstName,
+                            lastName = a.lastName
+                        }
+                    ).ToList();
+
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving dentist list: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult GetPatientListForAppointment()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var result = (
+                        from p in db.tbl_patient
+                        join a in db.tbl_account on p.accID equals a.accID
+                        select new
+                        {
+                            patientID = p.patientID,
+                            accID = a.accID,
+                            patientName = a.firstName + " " + a.lastName,
+                            firstName = a.firstName,
+                            lastName = a.lastName
+                        }
+                    ).ToList();
+
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving patient list: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult CreateAppointmentRequest(AppointmentRequestData request)
+        {
+            try
+            {
+                if (request == null)
+                    return Json(new { success = false, message = "No appointment data provided." });
+
+                var patientID = request.patientID;
+                var dentistID = request.dentistID;
+                var dateTime = request.dateTime;
+                var reason = request.reason;
+
+                if (patientID <= 0 || dentistID <= 0)
+                    return Json(new { success = false, message = "Invalid patient or dentist ID." });
+
+                if (dateTime == DateTime.MinValue)
+                    return Json(new { success = false, message = "Invalid date/time provided." });
+
+                // Server-side validation: appointment must be at least 2 days from now
+                var minAllowed = DateTime.Today.AddDays(2);
+                if (dateTime.Date < minAllowed.Date)
+                {
+                    return Json(new { success = false, message = "Appointment date must be at least 2 days from today." });
+                }
+
+                if (string.IsNullOrWhiteSpace(reason))
+                    return Json(new { success = false, message = "Purpose/reason is required." });
+
+                var sessionVal = Session["UserID"];
+                if (sessionVal == null)
+                    return Json(new { success = false, message = "User session expired." });
+
+                if (!int.TryParse(sessionVal.ToString(), out int createdByID))
+                    return Json(new { success = false, message = "Invalid user ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                    if (patient == null)
+                        return Json(new { success = false, message = "Patient not found in database." });
+
+                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == dentistID);
+                    if (dentist == null)
+                        return Json(new { success = false, message = "Dentist not found in database." });
+
+                    var newAppointment = new tblAppointmentModel()
+                    {
+                        patientID = patientID,
+                        dentistID = dentistID,
+                        createdBy = createdByID,
+                        dateTime = dateTime,
+                        reason = reason,
+                        status = "Requested",
+                        schedCreatedAt = DateTime.Now,
+                        schedUpdatedAt = DateTime.Now
+                    };
+
+                    db.tbl_appointment.Add(newAppointment);
+                    db.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Appointment request created successfully.",
+                        apptID = newAppointment.apptID
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error creating appointment request: {ex.Message}" });
+            }
+        }
+
+        public JsonResult GetRequestedAppointments()
+        {
+            try
+            {
+                var sessionVal = Session["UserID"];
+                var userRole = Session["UserAuthorization"];
+
+                // Check if session values are null, empty, or whitespace
+                if (sessionVal == null || string.IsNullOrWhiteSpace(sessionVal.ToString()) ||
+                    userRole == null || string.IsNullOrWhiteSpace(userRole.ToString()))
+                {
+                    return Json(new { success = false, message = "User session expired or invalid." }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (!int.TryParse(sessionVal.ToString(), out int userID))
+                    return Json(new { success = false, message = "Invalid user ID." }, JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(userRole.ToString(), out int role))
+                    return Json(new { success = false, message = "Invalid user role." }, JsonRequestBehavior.AllowGet);
+
+                using (var db = new RGDCContext())
+                {
+                    if (role == 2)
+                    {
+                        // Dentist - get appointments where:
+                        // - dentistID matches current dentist (recipient)
+                        // - createdBy is NOT the current dentist (someone else created it for them)
+                        // - status is "Requested"
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.accID == userID);
+                        if (dentist != null)
+                        {
+                            var result = (
+                                from appt in db.tbl_appointment
+                                join pat in db.tbl_patient on appt.patientID equals pat.patientID
+                                join patAcc in db.tbl_account on pat.accID equals patAcc.accID
+                                where appt.dentistID == dentist.dentistID 
+                                   && appt.status == "Requested"
+                                   && appt.createdBy != userID  // Only show if created by someone else (patient or staff)
+                                orderby appt.dateTime
+                                select new
+                                {
+                                    apptID = appt.apptID,
+                                    dateTime = appt.dateTime,
+                                    date = appt.dateTime,
+                                    time = appt.dateTime,
+                                    purpose = appt.reason,
+                                    patientName = patAcc.firstName + " " + patAcc.lastName,
+                                    dentistName = "",
+                                status = appt.status, // No change
+                                createdBy = appt.createdBy, // No change
+                                displayStatus = appt.status == "Requested" ? (appt.createdBy == patAcc.accID ? "Requested by Patient" : "Requested by Dentist") : appt.status // No change
+                                }
+                            ).ToList();
+
+                            return Json(result, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    else if (role == 3)
+                    {
+                        // Patient - get appointments where:
+                        // - patientID matches current patient (recipient)
+                        // - createdBy is NOT the current patient (dentist or staff created it)
+                        // - status is "Requested"
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.accID == userID);
+                        if (patient != null)
+                        {
+                            var result = (
+                                from appt in db.tbl_appointment
+                                join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
+                                join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
+                                where appt.patientID == patient.patientID 
+                                   && appt.status == "Requested"
+                                   && appt.createdBy != userID  // Only show if created by someone else (dentist or staff)
+                                orderby appt.dateTime
+                                select new
+                                {
+                                    apptID = appt.apptID,
+                                    dateTime = appt.dateTime,
+                                    date = appt.dateTime,
+                                    time = appt.dateTime,
+                                    purpose = appt.reason,
+                                    patientName = "",
+                                    dentistName = dentAcc.firstName + " " + dentAcc.lastName,
+                                    status = appt.status,
+                                    createdBy = appt.createdBy,
+                                    displayStatus = appt.status == "Requested" ? (appt.createdBy == dentAcc.accID ? "Requested by Dentist" : "Requested by Patient") : appt.status
+                                }
+                            ).ToList();
+
+                            return Json(result, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+
+                    // If neither role matches or no appointments found, return empty array
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving requested appointments: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult AcceptAppointment(int apptID)
+        {
+            try
+            {
+                if (apptID <= 0)
+                    return Json(new { success = false, message = "Invalid appointment ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null)
+                        return Json(new { success = false, message = "Appointment not found." });
+
+                    if (appt.status != "Requested")
+                        return Json(new { success = false, message = "Appointment is not in requested status." });
+
+                    appt.status = "Scheduled";
+                    appt.schedUpdatedAt = DateTime.Now;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment accepted successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error accepting appointment: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DenyAppointment(int apptID)
+        {
+            try
+            {
+                if (apptID <= 0)
+                    return Json(new { success = false, message = "Invalid appointment ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null)
+                        return Json(new { success = false, message = "Appointment not found." });
+
+                    if (appt.status != "Requested")
+                        return Json(new { success = false, message = "Appointment is not in requested status." });
+
+                    appt.status = "Denied";
+                    appt.schedUpdatedAt = DateTime.Now;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment denied successfully." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error denying appointment: {ex.Message}" });
             }
         }
     }

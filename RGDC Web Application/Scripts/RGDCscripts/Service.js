@@ -9,6 +9,22 @@
         });
     };
 
+    this.deleteAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
+        return $http({
+            method: 'POST',
+            url: '/RGDC/DeleteAppointment',
+            data: (function(obj){
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
+    };
+
     //Sign Up
     this.signUp = function (accDetails) {
         return $http({
@@ -193,5 +209,83 @@
 
     this.patientPersonalInfo = function () {
         return $http.get("/RGDC/patientPersonalInfo");
+    };
+
+    this.getDentistList = function () {
+        return $http.get("/RGDC/GetDentistList");
+    };
+
+    this.getPatientListForAppointment = function () {
+        return $http.get("/RGDC/GetPatientListForAppointment");
+    };
+
+    this.getCurrentDentist = function () {
+        return $http.get('/RGDC/GetCurrentDentist');
+    };
+
+    this.createAppointmentRequest = function (appointmentData) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/CreateAppointmentRequest',
+            data: appointmentData
+        });
+    };
+
+    this.getRequestedAppointments = function () {
+        return $http.get("/RGDC/GetRequestedAppointments");
+    };
+
+    this.getPastAppointments = function () {
+        return $http.get('/RGDC/GetPastAppointments');
+    };
+
+    this.cancelAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
+        return $http({
+            method: 'POST',
+            url: '/RGDC/CancelAppointment',
+            data: (function(obj){
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
+    };
+
+    this.acceptAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
+        // Send as form urlencoded so MVC will bind primitive apptID parameter reliably
+        return $http({
+            method: 'POST',
+            url: '/RGDC/AcceptAppointment',
+            data: (function(obj){
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
+    };
+
+    this.denyAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
+        // Send as form urlencoded so MVC will bind primitive apptID parameter reliably
+        return $http({
+            method: 'POST',
+            url: '/RGDC/DenyAppointment',
+            data: (function(obj){
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
     };
 });
