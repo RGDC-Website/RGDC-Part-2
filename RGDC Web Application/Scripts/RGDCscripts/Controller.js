@@ -4,6 +4,7 @@
     $scope._uploadedSignaturePath = null;
 
     $scope.currentUserName = "";
+    $scope.currentUserID = "";
     const STRENGTH = {
         WEAK: 'Weak',
         FAIR: 'Fair',
@@ -22,6 +23,8 @@
         conditions: {}
     };
     $scope.currentUserAuthorization;
+    $scope.paymentsArray = [];
+    $scope.paymentID;
 
 
     $scope.hasSpecialChar = function (pwd) {
@@ -182,6 +185,53 @@
                 }
             }
         });
+    };
+
+    $scope.editPayRec = function (paymentID) {
+        $scope.getPatientsNDentist();
+        var paymentData = {
+            paymentID: paymentID
+        }
+        var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
+        getPaymentInfo.then(function (payment) {
+            $scope.paymentInfo = payment.data;
+            console.log($scope.paymentInfo)
+        });
+    }
+
+    $scope.deletePayRec = function (paymentID) {
+        $scope.deletePayment = paymentID
+    }
+
+    $scope.deletePaymentThis = function () {
+        var paymentData = {
+            paymentID: $scope.deletePayment
+        }
+        RGDCWebApplicationService.deletePayment(paymentData)
+            .then(function (response) {
+                console.log("success")
+                window.location.href = "/RGDC/adminFinance";
+            });
+    }
+
+    $scope.editPayment = function () {
+
+        var data = {
+            paymentID: $scope.paymentInfo.paymentID,
+            paymentMethod: $scope.paymentInfo.paymentMethod,
+            cost: $scope.paymentInfo.cost,
+            discount: $scope.paymentInfo.discount,
+            amountPaid: $scope.paymentInfo.amountPaid,
+            amountDue: $scope.paymentInfo.amountDue,
+            description: $scope.paymentInfo.description
+        };
+
+        console.log("Updating:", data);
+
+        RGDCWebApplicationService.updatePayment(data)
+            .then(function (response) {
+                window.location.href = "/RGDC/adminFinance";
+});
     };
 
     $scope.signUpRemove = function () {
@@ -453,6 +503,22 @@
         }
     }
 
+
+    $scope.getDentists = function () {
+        if ($scope.userAuthorization != 3) {
+            var getDentists = RGDCWebApplicationService.getDentists();
+            getDentists.then(function (dentistList) {
+                $scope.dentistArray = dentistList.data;
+            });
+        }
+    }
+
+
+    $scope.getPatientsNDentist = function () {
+        $scope.getPatients();
+        $scope.getDentists();
+    }
+
     $scope.goToPatientInfo = function (patient) {
         var patientID = {
             patientID: patient.patientID.toString()
@@ -620,7 +686,7 @@
                             });
                         }
 
-                        }
+                        
                     } else {
                         p.accCreated = "";
                     }
@@ -648,6 +714,20 @@
             }
         });
     };
+
+    $scope.getPayments = function () {
+        if ($scope.userAuthorization != 3) {
+            var getPayments = RGDCWebApplicationService.getPayments();
+            getPayments.then(function (paymentList) {
+                $scope.paymentsArray = paymentList.data;
+                $scope.paymentsArray.forEach(function (payment) {
+                    if (payment.paymentDate) {
+                        payment.paymentDate = formatDateToMDY(payment.paymentDate)
+                    }
+                });
+            });
+        }
+    }
     function initializeDatepicker() {
         $timeout(function () {
             var birthDateElem = document.getElementById('birthDate');
@@ -1450,5 +1530,44 @@
 
         angular.copy(medHist.history, $scope.medical.history);
         angular.copy(medHist.conditions, $scope.medical.conditions);
+    }
+
+    $scope.addPayment = function () {
+        var parts = $scope.selectedPatient.trim().split(' ');
+        var idPart = parts[parts.length - 1];
+
+        var id = parseInt(idPart);
+        $scope.selectedPatientID = isNaN(id) ? null : id;
+
+        var parts = $scope.selectedDentist.trim().split(' ');
+        var idPart = parts[parts.length - 1];
+
+        var id = parseInt(idPart);
+        $scope.selectedDentistID = isNaN(id) ? null : id;
+
+        if (!$scope.selectedPatientID || !$scope.selectedDentistID) {
+            alert("Please select a valid patient and dentist.");
+            return;
+        }
+        console.log($scope.currentUserID)
+
+        var paymentData = {
+            patientID: $scope.selectedPatientID,
+            dentistID: $scope.selectedDentistID,
+            paymentMethod: $scope.paymentMethod,
+            cost: parseFloat($scope.paymentCost) || 0,
+            discount: parseFloat($scope.paymentDiscount) || 0,
+            amountPaid: parseFloat($scope.paymentPaid) || 0,
+            amountDue: parseFloat($scope.paymentDue) || 0,
+            description: $scope.paymentDescription,
+            createdBy: $scope.currentUserID         
+        };
+
+        RGDCWebApplicationService.addPayment(paymentData).then(function (response) {
+            if (response.data.success) {
+                window.location.href = "/RGDC/adminPatientsTab";
+            }
+        })
+
     }
 });

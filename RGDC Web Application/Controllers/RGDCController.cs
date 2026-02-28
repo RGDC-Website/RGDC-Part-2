@@ -510,6 +510,30 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        [HttpGet]
+
+        public JsonResult getDentists()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from d in db.tbl_dentist
+                    join a in db.tbl_account
+                        on d.accID equals a.accID
+                    select new
+                    {
+                        dentistID = d.dentistID,
+                        accID = d.accID,
+                        dentistName = a.firstName + " " + a.lastName,
+                        specialization = d.specialization,
+                        branchID = d.branchID
+                    }
+                ).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public JsonResult goToPatient(tblPatientModel patient)
         {
             Session["SelectedPatientID"] = patient.patientID;
@@ -959,6 +983,150 @@ namespace RGDC_Web_Application.Controllers
                 ).ToList();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getPayments()
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from pay in db.tbl_payment
+                    join p in db.tbl_patient on pay.patientID equals p.patientID
+                    join pa in db.tbl_account on p.accID equals pa.accID
+                    join d in db.tbl_dentist on pay.dentistID equals d.dentistID
+                    join da in db.tbl_account on d.accID equals da.accID  // dentist account
+                    select new
+                    {
+                        // Patient info
+                        patientID = p.patientID,
+                        accID = p.accID,
+                        patientName = pa.firstName + " " + pa.lastName,
+                        birthDate = pa.birthDate,
+                        photoLink = pa.photoLink,
+                        guardian = p.guardian,
+                        guardianNumber = p.guardianNumber,
+                        nextVisit = p.nextVisit,
+                        lastVisit = p.lastVisit,
+
+                        // Dentist info
+                        dentistID = d.dentistID,
+                        dentistName = da.firstName + " " + da.middleName + " " + da.lastName,
+                        dentistSpecialization = d.specialization,
+                        branchID = d.branchID,
+
+                        // Payment info
+                        paymentID = pay.paymentID,
+                        description = pay.description,
+                        paymentMethod = pay.paymentMethod,
+                        paymentDate = pay.paymentDate,
+                        cost = pay.cost,
+                        discount = pay.discount,
+                        amountPaid = pay.amountPaid,
+                        amountDue = pay.amountDue
+                    }
+                ).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult addPayment(tblPaymentModel model)
+        {
+            if (model == null)
+                return Json(new { success = false, message = "Invalid data" });
+
+            using (var db = new RGDCContext())
+            {
+                model.payCreatedAt = DateTime.Now;
+                model.payUpdatedAt = DateTime.Now;
+
+                db.tbl_payment.Add(model);
+                db.SaveChanges();
+            }
+
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public JsonResult getPaymentInfo(tblPaymentModel paymentID)
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from pay in db.tbl_payment
+                    join p in db.tbl_patient on pay.patientID equals p.patientID
+                    join pa in db.tbl_account on p.accID equals pa.accID
+
+                    join d in db.tbl_dentist on pay.dentistID equals d.dentistID
+                    join da in db.tbl_account on d.accID equals da.accID  
+
+                    where pay.paymentID == paymentID.paymentID
+
+                    select new
+                    {
+                        paymentID = pay.paymentID,
+
+                        patientID = p.patientID,
+                        patientName = pa.firstName + " " + pa.lastName,
+
+                        dentistID = d.dentistID,
+                        dentistName = da.firstName + " " + da.lastName,
+
+                        paymentMethod = pay.paymentMethod,
+                        cost = pay.cost,
+                        discount = pay.discount,
+                        amountPaid = pay.amountPaid,
+                        amountDue = pay.amountDue,
+                        description = pay.description,
+                        paymentDate = pay.paymentDate
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult updatePayment(tblPaymentModel model)
+        {
+            using (var db = new RGDCContext())
+            {
+                var payment = db.tbl_payment
+                                .FirstOrDefault(x => x.paymentID == model.paymentID);
+
+                if (payment != null)
+                {
+                    payment.paymentMethod = model.paymentMethod;
+                    payment.cost = model.cost;
+                    payment.discount = model.discount;
+                    payment.amountPaid = model.amountPaid;
+                    payment.amountDue = model.amountDue;
+                    payment.description = model.description;
+                    payment.payUpdatedAt = DateTime.Now;
+
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult deletePayment(tblPaymentModel model)
+        {
+            using (var db = new RGDCContext())
+            {
+                var payment = db.tbl_payment
+                                .FirstOrDefault(x => x.paymentID == model.paymentID);
+
+                if (payment != null)
+                {
+                    db.tbl_payment.Remove(payment);
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
         }
     }

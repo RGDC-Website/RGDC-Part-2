@@ -300,11 +300,12 @@
     </div>
 
     @*Submit or cancel*@
-    <div class="modal-footer footer-center" style="margin-top:1.5vh">
-        <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn modal-trigger modal-close" data-target="verifyEmail" style="font-weight:500;">CREATE</button>
-    </div>
+<div class="modal-footer footer-center" style="margin-top:1.5vh">
+    <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
+    <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+    <button type="submit" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">CREATE</button>
+    @*data-target="verifyEmail"*@
+</div>
 </div>
 
 @*Verification*@

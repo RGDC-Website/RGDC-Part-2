@@ -70,6 +70,14 @@
         return $http.get("/RGDC/getPatientList");
     }
 
+    this.getPayments = function () {
+        return $http.get("/RGDC/getPayments");
+    }
+
+    this.getDentists = function () {
+        return $http.get("/RGDC/getDentists");
+    }
+
     this.goToPatient = function (patientID) {
         return $http({
             method: "post",
@@ -77,6 +85,22 @@
             data: patientID
         });
     }
+
+    this.addPayment = function (paymentData) {
+        return $http.post('/RGDC/addPayment', paymentData);
+    };
+
+    this.getPaymentInfo = function (paymentData) {
+        return $http.get('/RGDC/getPaymentInfo', paymentData)
+    };
+
+    this.updatePayment = function (data) {
+        return $http.post('/RGDC/updatePayment', data);
+    };
+
+    this.deletePayment = function (id) {
+        return $http.post('/RGDC/deletePayment', id);
+    };
 
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
