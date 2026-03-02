@@ -15,13 +15,13 @@
     <link rel="stylesheet" href="@Url.Content("~/Content/style.css")" />
 </head>
 
-<body"\>
-    <div class="row" style="margin: 0;">
-        @RenderBody()
-    </div>
+<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
+<div class="row" style="margin: 0;">
+    @RenderBody()
+</div>
 
-    @*Pop up modalz*@
-    <script>
+@*Pop up modalz*@
+<script>
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.modal');
             var instances = M.Modal.init(elems, {
@@ -43,11 +43,11 @@
                 showClearBtn: true
             });
         });
-    </script>
-    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
-    <script src="~/Scripts/angular.min.js"></script>
-    <script src="~/Scripts/RGDCscripts/Module.js"></script>
-    <script src="~/Scripts/RGDCscripts/Service.js"></script>
-    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
+</script>
+<script src="~/Scripts/jquery-3.7.0.min.js"></script>
+<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Scripts/RGDCscripts/Module.js"></script>
+<script src="~/Scripts/RGDCscripts/Service.js"></script>
+<script src="~/Scripts/RGDCscripts/Controller.js"></script>
 </body>
 </html>
