@@ -355,57 +355,40 @@ html, body {
 }
 
 .modal {
-    border-radius: 10px !important;
+    border-radius: 2vh !important;
     max-width: fit-content;
     background-color: #e0e0e0 !important;
     max-height: fit-content;
 }
 
-    .modal.modal-fixed-footer {
-        top: 5% !important; 
-        height: 90% !important; 
+    .modal .row {
+        margin-bottom: 0 !important;
     }
 
-        .modal.modal-fixed-footer .modal-content {
-            height: calc(100% - 56px) !important; 
-            overflow-y: auto !important; 
+    .modal .modal-footer {
+        background-color: #e0e0e0 !important;
+        height: auto !important;
+        min-height: 3vh;
+        display: flex !important;
+        align-items: center !important;
+        padding: 0 0 3.5vh 0 !important;
+    }
+
+        .modal .modal-footer button:nth-child(2) {
+            margin-left: auto !important;
         }
 
-.modal .modal-content {
-    padding: 15px 25px 5px 25px !important;
-}
-
-.modal .row {
-    margin-bottom: 0 !important;
-}
-
-.patient-information-form-modal {
+.patientInformationForm-modal {
     background-color: #e0e0e0 !important;
-    border-radius: 10px !important;
+    border-radius: 2vh !important;
     max-width: fit-content;
     background-color: #e5e5e5;
     max-height: fit-content;
     padding: 2vh;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
 }
-
-#patientInformationForm.modal {
-    background-color: #e0e0e0 !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-60%, -50%) !important;
-    max-height: 71% !important;
-    overflow: hidden;
-}
-
-#patientInformationFormAdd.modal {
-    background-color: #e0e0e0 !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-55%, -50%) !important;
-    max-height: 76% !important;
-    overflow: hidden;
-}
-
 
 #verifyEmail.modal {
     top: 50% !important;
@@ -413,11 +396,6 @@ html, body {
     transform: translate(-100%, -50%) !important;
     max-height: 60% !important;
     overflow: hidden;
-}
-
-.modal.modal-fixed-footer {
-    height: calc(100% - 100px) !important;
-    overflow-y: auto !important;
 }
 
 .custom-label {
@@ -442,8 +420,8 @@ html, body {
 .modal-form-title {
     color: #967863;
     font-weight: bold;
-    border-bottom: 1.5px solid #967863;
-    padding-bottom: 10px;
+    border-bottom: .1vh solid #967863;
+    padding-bottom: 1vh;
 }
 
 .modal-form-title-alt {
@@ -490,22 +468,24 @@ html, body {
 }
 
 .datepicker-modal {
-    max-width: 525px !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    margin: auto !important;
+    height: fit-content !important;
+    width: fit-content !important;
+    max-width: 53vh !important;
     width: 90% !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-70%, 100%) !important;
-    bottom: auto !important;
-    padding: 0 !important;
-    border-radius: 15px !important;
     overflow: hidden !important;
+    z-index: 2000;
 }
 
 .datepicker-date-display {
     background-color: #967863 !important;
-    padding: 55px 45px !important;
-    margin: -15px 10px -10px -30px !important;
-    justify-content: center;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
     .datepicker-table-wrapper td.is-selected {
@@ -515,6 +495,18 @@ html, body {
     .datepicker-cancel, .datepicker-done {
         color: #967863 !important;
     }
+
+.datepicker-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+    z-index: 2000; /* Must be higher than the first modal */
+}
 
 .photo-upload-container {
     margin-top: 20px;
@@ -799,12 +791,6 @@ select.browser-default.custom-input {
     margin-top: auto; 
 }
 
-.medical-history-container {
-    padding: 20px;
-    color: ##967863;
-    position: relative;
-}
-
 .checkbox-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -967,22 +953,6 @@ select.browser-default.custom-input {
     margin: -5px 0;
 }
 
-#modal-password.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important; 
-    width: 400px !important;
-    max-width: 90% !important;
-    height: auto !important;
-    max-height: 80vh;
-    position: fixed !important;
-    margin: 0 !important;
-}
-
-.password-modal .modal-content {
-    padding: 20px !important;
-    background-color: #e0e0e0 !important;
-}
 
 .medical-questions li {
     position: relative;
@@ -998,11 +968,6 @@ select.browser-default.custom-input {
     font-weight: bold;
     color: #967863;
     margin-right:10px;
-}
-
-.medical-history-modal {
-    width: 85% !important;
-    max-height: 90% !important;
 }
 
 .line-input {
@@ -1030,155 +995,10 @@ select.browser-default.custom-input {
     color: #333;
 }
 
-.patient-info-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-.patient-info-modal input[type="text"] {
-    width: 100%;
-    height: 40px;
-    margin-bottom: 15px;
-    border: none;
-    border-radius: 8px;
-    background: white;
-    padding: 0 10px;
-}
-
-.footer-center {
-    background-color: #e0e0e0 !important;
-    text-align: center;
-    border: none !important;
-}
-
-#modal-patient-info.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    height: 77% !important;
-    max-height: 85% !important;
-    overflow: hidden; 
-}
-
-.med-his-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 100% !important;
-    max-width: 950px !important;
-    padding: 0 20px 0 20px !important;
-}
-
-    .med-his-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
-    }
-
-    .med-his-modal::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .med-his-modal::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 10px;
-    }
-
-    .med-his-modal::-webkit-scrollbar-thumb {
-        background: #967863;
-        border-radius: 10px;
-    }
-
-        .med-his-modal::-webkit-scrollbar-thumb:hover {
-            background: #836754;
-        }
-
-#med-his-modal.modal {
-    top: 50% !important;
-    left: 50% !important;
-    height: 80% !important;
-    max-height: 90% !important;
-    overflow: hidden;
-}
-
 .footer-center2 {
     background-color: #e0e0e0 !important;
     border: none !important;
     margin-bottom: 45px !important;
-}
-
-.prog-notes-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-    .prog-notes-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
-    }
-
-#modal-progress-notes.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    height: 77% !important;
-    max-height: 42% !important;
-    overflow: hidden;
-}
-
-
-#modal-edit-progress-note.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    height: 77% !important;
-    max-height: 42% !important;
-    overflow: hidden;
-}
-
-.delete-prog-note-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 450px !important;
-}
-
-#modal-delete-progress-note.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-100%, -50%) !important;
-    height: 77% !important;
-    max-height: 21% !important;
-    overflow: hidden;
-}
-
-
-.dental-chart-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 500px !important;
-}
-
-#modal-dental-chart.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-90%, -50%) !important;
-    height: 77% !important;
-    max-height: 70% !important;
-    overflow: hidden;
 }
 
 .add-form-modal {
@@ -1296,197 +1116,92 @@ select.browser-default.custom-input {
     display: block !important;
     opacity: 1 !important;
 }
+.appt-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 2vh !important;
+    width: 90% !important;
+    max-width: 87vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+}
 
-.add-appt-modal {
+.payrec-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 2vh !important;
+    width: 90% !important;
+    max-width: 87vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+}
+
+.patientInfo-modal {
     background-color: #e0e0e0 !important;
     border-radius: 15px !important;
     width: 90% !important;
     max-width: 850px !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
 }
 
-    .add-appt-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
+.medhis-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 2vh !important;
+    width: 100% !important;
+    max-width: 100vh !important;
+    max-height: 90vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    padding: 4vh;
+    position: relative;
+}
+    .medhis-modal::-webkit-scrollbar {
+        width: 1vh;
     }
 
-#modal-add-appt.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-54%, -50%) !important;
-    height: 77% !important;
-    max-height: 42% !important;
-    overflow: hidden;
-}
-
-.edit-sched-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-    .edit-sched-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
+    .medhis-modal::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 1vh;
     }
 
-#modal-edit-sched.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-54%, -50%) !important;
-    height: 77% !important;
-    max-height: 42% !important;
-    overflow: hidden;
-}
-
-.delete-sched-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 550px !important;
-}
-
-#modal-delete-sched.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-85%, -50%) !important;
-    height: 77% !important;
-    max-height: 21% !important;
-    overflow: hidden;
-}
-
-.edit-req-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-    .edit-req-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
+    .medhis-modal::-webkit-scrollbar-thumb {
+        background: #967863;
+        border-radius: 1vh;
     }
 
-#modal-edit-req.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-54%, -50%) !important;
-    height: 77% !important;
-    max-height: 42% !important;
-    overflow: hidden;
-}
+        .medhis-modal::-webkit-scrollbar-thumb:hover {
+            background: #836754;
+        }
 
-.delete-req-modal {
+.progNotes-modal {
     background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
+    border-radius: 2vh !important;
     width: 90% !important;
-    max-width: 550px !important;
+    max-width: 95vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
 }
 
-#modal-delete-req.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-85%, -50%) !important;
-    height: 77% !important;
-    max-height: 21% !important;
-    overflow: hidden;
-}
-
-.delete-past-modal {
+.dentalChart-modal {
     background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
+    border-radius: 2vh !important;
     width: 90% !important;
-    max-width: 550px !important;
+    max-width: 70vh !important;
+    max-height: 85vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
 }
 
-#modal-delete-past.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-85%, -50%) !important;
-    height: 77% !important;
-    max-height: 21% !important;
-    overflow: hidden;
-}
-
-.add-payrec-modal {
+.password-modal {
+    padding: .5vh !important;
+    border-radius: 2vh;
     background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-    .add-payrec-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
-    }
-
-#modal-add-payrec.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-54%, -50%) !important;
-    height: 77% !important;
-    max-height: 65% !important;
-    overflow: hidden;
-}
-
-.edit-payrec-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 850px !important;
-}
-
-    .edit-payrec-modal input[type="text"] {
-        width: 100%;
-        height: 40px;
-        margin-bottom: 15px;
-        border: none;
-        border-radius: 8px;
-        background: white;
-        padding: 0 10px;
-    }
-
-#modal-edit-payrec.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-54%, -50%) !important;
-    height: 77% !important;
-    max-height: 65% !important;
-    overflow: hidden;
-}
-
-.delete-payrec-modal {
-    background-color: #e0e0e0 !important;
-    border-radius: 15px !important;
-    width: 90% !important;
-    max-width: 550px !important;
-}
-
-#modal-delete-payrec.modal {
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-85%, -60%) !important;
-    height: 77% !important;
-    max-height: 21% !important;
-    overflow: hidden;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
 }

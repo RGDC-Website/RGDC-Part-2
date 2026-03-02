@@ -1,1 +1,248 @@
-﻿
+﻿@{
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div class="dashContainer">
+    @*top part (welcome, refresh, logout)*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*user name*@
+        <div class="col m8 l8"><h4 class="bold">Patients</h4></div>
+        @*refresh and logout buttons*@
+        <div class="col m4 l4">
+            <span class="right">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+    <div class="card grey lighten-2" style="margin-top:2vh;">
+        <nav class="nav-extended grey lighten-2 z-depth-0">
+            <div class="nav-content p-1">
+                <ul class="tabs tabs-transparent center-tabs">
+                    <li class="tab px-1"><a class="brown-text p-0" href="#Owner">Owner</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#Dentist">Dentist</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#Staff">Staff</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="card-content">
+
+            <div id="Dentist" class="containerOverflow-2 row m-0">
+                <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Past Appointments</p>
+                @*Dentist Table*@
+                <table id="adminPatientsTabTable" class="hover tableClk">
+                    <thead>
+                        <tr class="brown-text lighten-1">
+                            <th>Dentist Name</th>
+                            <th>Specialization</th>
+                            <th colspan="2">Branch</th>
+                        </tr>
+                    </thead>
+                    @*table content*@
+                    <tbody>
+                        <tr data-href="#" title="View patient record" class="clkPointer">
+                            <td>Name...</td>
+                            <td>Specialization...</td>
+                            <td>Branch...</td>
+                            <td>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="brown-text lighten-1">
+                            <th>Dentist Name</th>
+                            <th>Specialization</th>
+                            <th>Branch</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@*Patient information form*@
+<div id="patientInformationFormAdd" class="modal patient-information-form-modal">
+    <div>
+        <h5 class="modal-form-title">Add Patient</h5>
+
+        <form>
+            <div class="row">
+                <div class="col s4">
+                    @*Photo upload*@
+                    <div class="row s4 center-align photo-upload-container">
+                        <div class="col s12">
+                            <div class="photo-box">
+                                <i class="material-icons photo-placeholder-icon">image</i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col s8">
+                    <div class="row">
+                        @*First name*@
+                        <div class="col s6">
+                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
+                            <input type="text"
+                                   class="custom-input"
+                                   ng-model="signUp_firstName"
+                                   maxlength="150"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Juan"
+                                   required>
+                        </div>
+                        @*MIddle name*@
+                        <div class="col s6">
+                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <input type="text"
+                                   class="custom-input"
+                                   ng-model="signUp_middleName"
+                                   maxlength="150"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Mercado"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @*Last name*@
+                        <div class="col s12">
+                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
+                            <input type="text" class="custom-input"
+                                   ng-model="signUp_lastName"
+                                   maxlength="150"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Dela Cruz"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @*Email*@
+            <div class="row">
+                <div class="col s12">
+                    <p class="custom-label">Email <span class="required-mark">*</span></p>
+                    <input type="text" class="custom-input"
+                           @*ng-model="signUp_lastName"*@
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                           placeholder="juandlc@gmail.com"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                @*Gender*@
+                <div class="col s3" ng-init="getGender()">
+                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
+                    <select class="browser-default custom-input" ng-model="signUp_genderID" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
+                    </select>
+                </div>
+                @*Birthdate*@
+                <div class="col s3">
+                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
+                    <div class="datepicker-wrapper">
+                        <input id="birthDate"
+                               ng-model="signUp_birthDate"
+                               type="text"
+                               class="datepicker custom-input"
+                               readonly
+                               required>
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    </div>
+                </div>
+
+                <div class="col s3">
+                    @*Civil status*@
+                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
+                    <select class="browser-default custom-input" ng-model="signUp_civilStatus" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="1">Single</option>
+                        <option value="2">Married</option>
+                        <option value="3">Widowed</option>
+                    </select>
+                </div>
+                <div class="col s3">
+                    @*Contact number*@
+                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           ng-model="signUp_contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="09XX-XXX-XXXX"
+                           maxlength="13"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           ng-class="{ 'input-valid': isContactFieldValid(), 'input-invalid': signUp_contactNumber && !isContactFieldValid() }"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    @*Address*@
+                    <p class="custom-label">Address <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           ng-model="signUp_address"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                @*Current physician*@
+                <div class="col s4">
+                    <p class="custom-label">Current Physician</p>
+                    <input type="text"
+                           ng-model="signUp_currentPhysician"
+                           class="custom-input"
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                           ng-class="{ 'input-valid': isCurrentPhysicianValid(), 'input-invalid': signUp_currentPhysician && !isCurrentPhysicianValid() }">
+                </div>
+                @*Refferal*@
+                <div class="col s4">
+                    <p class="custom-label">Referral (if any)</p>
+                    <input type="text"
+                           ng-model="signUp_referral"
+                           class="custom-input"
+                           maxlength="50"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
+                </div>
+                @*Last visit*@
+                <div class="col s4">
+                    <p class="custom-label">Last Visit</p>
+                    <div class="datepicker-wrapper">
+                        <input id="lastVisit"
+                               ng-model="signUp_lastVisit"
+                               type="text"
+                               class="datepicker custom-input"
+                               readonly
+                               ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
+                               required>
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    @*Submit or cancel*@
+    <div class="modal-footer footer-center" style="margin-top:2.5vh">
+        <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;">ADD</button>
+    </div>
+</div>

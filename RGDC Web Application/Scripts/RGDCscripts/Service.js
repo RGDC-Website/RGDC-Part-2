@@ -86,6 +86,14 @@
         return $http.get("/RGDC/getPatientList");
     }
 
+    this.getPayments = function () {
+        return $http.get("/RGDC/getPayments");
+    }
+
+    this.getDentists = function () {
+        return $http.get("/RGDC/getDentists");
+    }
+
     this.goToPatient = function (patientID) {
         return $http({
             method: "post",
@@ -93,6 +101,22 @@
             data: patientID
         });
     }
+
+    this.addPayment = function (paymentData) {
+        return $http.post('/RGDC/addPayment', paymentData);
+    };
+
+    this.getPaymentInfo = function (paymentData) {
+        return $http.get('/RGDC/getPaymentInfo', paymentData)
+    };
+
+    this.updatePayment = function (data) {
+        return $http.post('/RGDC/updatePayment', data);
+    };
+
+    this.deletePayment = function (id) {
+        return $http.post('/RGDC/deletePayment', id);
+    };
 
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
@@ -286,6 +310,21 @@
                 return str.join('&');
             })(payload),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+    // create appointment
+    this.createAppointment = function (appointment) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/CreateAppointment",
+            data: appointment
+        });
+    };
+
+    // delete appointment
+    this.deleteAppointment = function (apptID) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/DeleteAppointment",
+            data: { apptID: apptID }
         });
     };
 });
