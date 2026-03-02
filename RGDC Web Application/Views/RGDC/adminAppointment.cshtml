@@ -2,14 +2,14 @@
     Layout = "~/Views/Shared/_adminLayout.cshtml";
     }
 
-<div class="dashContainer">
+<div class="dashContainer" ng-controller="RGDCWebApplicationController">
     @*top buttons*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*refresh and logout buttons*@
         <div class="col m4 l4 offset-md-8 offset-l8">
             <span class="right m-0">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
@@ -45,26 +45,31 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         @*table content*@
                         <tbody>
-                            <tr data-href="#" title="View patient record" class="clkPointer">
-                                <td>MM/DD/YYY</td>
-                                <td>00:00 AM</td>
-                                <td>Purpose...</td>
-                                <td>Dentist...</td>
-                                <td>Patient...</td>
+                            <tr ng-if="(!adminAppointments || adminAppointments.length === 0)">
+                                <td colspan="5" class="center-align">No scheduled appointments found.</td>
+                            </tr>
+                            <tr ng-repeat="appt in adminAppointments track by appt.apptID" data-href="#" title="View patient record" class="clkPointer">
+                                <td>{{appt.date}}</td>
+                                <td>{{appt.time}}</td>
+                                <td>{{appt.purpose}}</td>
+                                <td>{{appt.dentistName}}</td>
+                                <td>{{appt.patientName}}</td>
+                                <td>{{appt.displayStatus || appt.status}}</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeleteSchedAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" ng-click="openDeleteApptModal(appt)" data-target="modal-delete-sched" data-position="bottom" data-tooltip="Delete Appointment">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditSchedAppt" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                    <a href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" ng-click="openEditApptModal(appt, $event)" data-position="bottom" data-tooltip="Edit Appointment" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                 </td>
                             </tr>
                         </tbody>
                         @*table footer*@
-                        <tfoot>
+                        @*<tfoot>
                             <tr class="brown-text lighten-1">
                                 <th>Date</th>
                                 <th>Time</th>
@@ -72,7 +77,7 @@
                                 <th>Dentist</th>
                                 <th>Patient</th>
                             </tr>
-                        </tfoot>
+                        </tfoot>*@
                     </table>
                 </div>
             </div>
@@ -92,34 +97,34 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         @*table content*@
                         <tbody>
-                            <tr data-href="#" title="View patient record" class="clkPointer">
-                                <td>MM/DD/YYY</td>
-                                <td>00:00 AM</td>
-                                <td>Purpose...</td>
-                                <td>Dentist...</td>
-                                <td>Patient...</td>
-                                <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeleteReqAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
-                                        <i class="material-icons brown-text lighten-1">delete</i>
-                                    </a>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditReqAppt" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                            <tr ng-if="(!requestedAppointments || requestedAppointments.length === 0)">
+                                <td colspan="7" class="center-align">No requested appointments found.</td>
+                            </tr>
+                            <tr ng-repeat="appt in requestedAppointments track by appt.apptID">
+                                <td>{{appt.date}}</td>
+                                <td>{{appt.time}}</td>
+                                <td>{{appt.purpose}}</td>
+                                <td>{{appt.dentistName}}</td>
+                                <td>{{appt.patientName}}</td>
+                                <td>{{appt.displayStatus || appt.status}}</td>
+                                <td style="text-align:center; vertical-align:middle;">
+                                    <div style="display:flex; flex-direction:column; align-items:center;">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px">
+                                            <i class="material-icons tiny">check</i>
+                                        </a>
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny">
+                                            <i class="material-icons tiny">close</i>
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                         @*table footer*@
-                        <tfoot>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Purpose</th>
-                                <th>Dentist</th>
-                                <th>Patient</th>
-                            </tr>
-                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -139,16 +144,18 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         @*table content*@
                         <tbody>
-                            <tr data-href="#" title="View patient record" class="clkPointer">
-                                <td>MM/DD/YYY</td>
-                                <td>00:00 AM</td>
-                                <td>Purpose...</td>
-                                <td>Dentist...</td>
-                                <td>Patient...</td>
+                            <tr ng-repeat="p in pastAppointments track by p.apptID">
+                                <td>{{p.date}}</td>
+                                <td>{{p.time}}</td>
+                                <td>{{p.purpose}}</td>
+                                <td>{{p.dentistName}}</td>
+                                <td>{{p.patientName}}</td>
+                                <td>{{p.displayStatus || p.status}}</td>
                                 <td>
                                     <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeletePastAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
                                         <i class="material-icons brown-text lighten-1">delete</i>
@@ -157,7 +164,7 @@
                             </tr>
                         </tbody>
                         @*table footer*@
-                        <tfoot>
+                        @*<tfoot>
                             <tr class="brown-text lighten-1">
                                 <th>Date</th>
                                 <th>Time</th>
@@ -165,7 +172,7 @@
                                 <th>Dentist</th>
                                 <th>Patient</th>
                             </tr>
-                        </tfoot>
+                        </tfoot>*@
                     </table>
                 </div>
             </div>
@@ -183,14 +190,21 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="newApptRequest.dateTime" placeholder="MM/DD/YYYY" min="{{minApptDate}}">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
-                @*Dentist*@
-                <label class="custom-label">
+                @*Dentist Selection / Current Dentist for dentist users *@
+                <label class="custom-label" ng-if="currentUserAuthorization !== '2'">
                     Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
+                    <select class="custom-input" ng-model="newApptRequest.dentistID">
+                        <option value="">Select Dentist</option>
+                        <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
+                    </select>
+                </label>
+                <label class="custom-label" ng-if="currentUserAuthorization === '2'">
+                    Dentist
+                    <input type="text" class="custom-input" ng-model="currentDentist.dentistName" readonly />
                 </label>
             </div>
 
@@ -198,13 +212,42 @@
                 @*Time*@
                 <label class="custom-label">
                     Time
-                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                    <select class="custom-input" ng-model="newApptRequest.time">
+                        <option value="">Select Time</option>
+                        <option value="12:00 AM">12:00 AM</option>
+                        <option value="1:00 AM">1:00 AM</option>
+                        <option value="2:00 AM">2:00 AM</option>
+                        <option value="3:00 AM">3:00 AM</option>
+                        <option value="4:00 AM">4:00 AM</option>
+                        <option value="5:00 AM">5:00 AM</option>
+                        <option value="6:00 AM">6:00 AM</option>
+                        <option value="7:00 AM">7:00 AM</option>
+                        <option value="8:00 AM">8:00 AM</option>
+                        <option value="9:00 AM">9:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="1:00 PM">1:00 PM</option>
+                        <option value="2:00 PM">2:00 PM</option>
+                        <option value="3:00 PM">3:00 PM</option>
+                        <option value="4:00 PM">4:00 PM</option>
+                        <option value="5:00 PM">5:00 PM</option>
+                        <option value="6:00 PM">6:00 PM</option>
+                        <option value="7:00 PM">7:00 PM</option>
+                        <option value="8:00 PM">8:00 PM</option>
+                        <option value="9:00 PM">9:00 PM</option>
+                        <option value="10:00 PM">10:00 PM</option>
+                        <option value="11:00 PM">11:00 PM</option>
+                    </select>
                 </label>
 
-                @*Patient*@
+                @*Patient Selection*@
                 <label class="custom-label">
                     Patient
-                    <input type="text" class="custom-input" placeholder="Patient">
+                    <select class="custom-input" ng-model="newApptRequest.patientID">
+                        <option value="">Select Patient</option>
+                        <option ng-repeat="patient in patientArray" value="{{patient.patientID}}">{{patient.patientName}}</option>
+                    </select>
                 </label>
             </div>
 
@@ -212,16 +255,16 @@
                 @*Purpose*@
                 <label class="custom-label">
                     Purpose
-                    <input type="text" class="custom-input" placeholder="Purpose">
+                    <input type="text" class="custom-input" ng-model="newApptRequest.reason" placeholder="Purpose">
                 </label>
             </div>
 
         </div>
     </div>
 
-    <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">ADD</button>
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" ng-click="createNewAppointmentRequest()" style="font-weight:500; margin-right:20px">ADD</button>
     </div>
 </div>
 
@@ -231,33 +274,62 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Scheduled Appointment</h5>
 
+        <!-- Hidden field to store apptID separately -->
+        <input type="hidden" id="hiddenApptID" value="">
+
         <div class="row">
             <div class="col s6">
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/MM/YYYY">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="editingAppt.dateObj" placeholder="MM/DD/YYYY" min="{{minApptDate}}">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
                 @*Dentist*@
                 <label class="custom-label">
                     Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
+                    <input type="text" class="custom-input" ng-bind="editingAppt.dentistName" placeholder="Dentist" readonly>
                 </label>
             </div>
 
             <div class="col s6">
-                @*Time*@
+                @*Time Dropdown*@
                 <label class="custom-label">
                     Time
-                    <input type="text" class="custom-input" placeholder="00:00 AM">
+                    <select class="custom-input" ng-model="editingAppt.timeStr" ng-change="onTimeChange()">
+                        <option value="">Select Time</option>
+                        <option value="12:00 AM">12:00 AM</option>
+                        <option value="1:00 AM">1:00 AM</option>
+                        <option value="2:00 AM">2:00 AM</option>
+                        <option value="3:00 AM">3:00 AM</option>
+                        <option value="4:00 AM">4:00 AM</option>
+                        <option value="5:00 AM">5:00 AM</option>
+                        <option value="6:00 AM">6:00 AM</option>
+                        <option value="7:00 AM">7:00 AM</option>
+                        <option value="8:00 AM">8:00 AM</option>
+                        <option value="9:00 AM">9:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="1:00 PM">1:00 PM</option>
+                        <option value="2:00 PM">2:00 PM</option>
+                        <option value="3:00 PM">3:00 PM</option>
+                        <option value="4:00 PM">4:00 PM</option>
+                        <option value="5:00 PM">5:00 PM</option>
+                        <option value="6:00 PM">6:00 PM</option>
+                        <option value="7:00 PM">7:00 PM</option>
+                        <option value="8:00 PM">8:00 PM</option>
+                        <option value="9:00 PM">9:00 PM</option>
+                        <option value="10:00 PM">10:00 PM</option>
+                        <option value="11:00 PM">11:00 PM</option>
+                    </select>
                 </label>
 
                 @*Patient*@
                 <label class="custom-label">
                     Patient
-                    <input type="text" class="custom-input" placeholder="Patient">
+                    <input type="text" class="custom-input" ng-bind="editingAppt.patientName" placeholder="Patient" readonly>
                 </label>
             </div>
 
@@ -265,16 +337,16 @@
                 @*Purpose*@
                 <label class="custom-label">
                     Purpose
-                    <input type="text" class="custom-input" placeholder="Purpose">
+                    <input type="text" class="custom-input" ng-model="editingAppt.purpose" placeholder="Purpose">
                 </label>
             </div>
 
         </div>
     </div>
 
-    <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">EDIT</button>
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="button" ng-click="updateAppointment()" class="edit-btn" style="font-weight:500; margin-right:20px">UPDATE</button>
     </div>
 </div>
 
@@ -283,12 +355,14 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Scheduled Appointment</h5>
 
-        <p class="custom-label">Are you sure you want to delete this scheduled appointment?</p>
+        <p class="custom-label">Are you sure you want to delete this scheduled appointment? </p>
+        @* Hidden backup field to store apptID so client can fallback if scope is lost *@
+        <input type="hidden" id="hiddenDeleteApptID" value="" />
     </div>
 
-    <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+        <button type="submit" class="edit-btn" ng-click="deleteAppointment()" style="font-weight:500; margin-right:20px">DELETE</button>
     </div>
 </div>
 

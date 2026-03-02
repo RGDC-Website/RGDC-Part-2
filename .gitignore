@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/APPOINTMENT_REQUEST_FILTERING_COMPLETE_FIX.md

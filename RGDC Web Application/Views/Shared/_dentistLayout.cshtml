@@ -17,7 +17,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
-<body>
+<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController" ng-init="getSessionVariables()">
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
         <div class="col m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -31,8 +31,8 @@
 
             @*user name and role*@
             <div class="row center">
-                <h5 style="font-weight:bold;">Name</h5>
-                <h6>Role</h6>
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
             </div>
 
             @*nav tabs*@
@@ -103,6 +103,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.dropdown-trigger');
             var instances = M.Dropdown.init(elems);
+        });
+
+        // Tabs (if present on page)
+        document.addEventListener('DOMContentLoaded', function () {
+            var el = document.querySelectorAll('.tabs');
+            if (el && el.length) M.Tabs.init(el, { swipeable: false });
+        });
+
+        // Sidenav (mobile)
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.sidenav');
+            if (elems && elems.length) M.Sidenav.init(elems);
         });
 
         //patients tab table
