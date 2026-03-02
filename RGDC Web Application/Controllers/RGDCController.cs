@@ -527,6 +527,42 @@ namespace RGDC_Web_Application.Controllers
         }
 
         [HttpPost]
+        public JsonResult sendEmail(string email)
+        {
+            using (var db = new RGDCContext())
+            {
+                var user = db.tbl_account.FirstOrDefault(u => u.email == email);
+                if (user == null)
+                    return Json(new { success = false, message = "Email not found" });
+
+                var otp = new Random().Next(100000, 999999).ToString();
+
+                Session["RESET_EMAIL"] = email;
+
+                try
+                {
+                    // SEND EMAIL
+                    MailMessage mail = new MailMessage();
+                    mail.To.Add(email);
+                    mail.Subject = "Password for your account!";
+                    mail.Body = $"Your Password is Default123, please change it immediately on your next login.";
+                    mail.From = new MailAddress("jmlzpnt@gmail.com");
+
+                    SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                    smtp.Credentials = new NetworkCredential("jmlzpnt@gmail.com", "jubxxcrsgyleffin");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+
+                    return Json(new { success = true, message = "Email sent successfully" });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+            }
+        }
+
+        [HttpPost]
         public JsonResult resetPassword(string email, string otp, string password)
         {
             using (var db = new RGDCContext())
@@ -1183,6 +1219,11 @@ namespace RGDC_Web_Application.Controllers
                                         (appt.status == "Requested" ? ((patAcc != null && appt.createdBy == patAcc.accID) ? "Requested by Patient" : ((dentAcc != null && appt.createdBy == dentAcc.accID) ? "Requested by Dentist" : "Requested")) : appt.status)),
                         remarks = appt.remarks,
                         procedureID = appt.procedureID
+                    }).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
         public JsonResult getPayments()
         {
             using (var db = new RGDCContext())
@@ -1430,7 +1471,7 @@ namespace RGDC_Web_Application.Controllers
                                 from appt in db.tbl_appointment
                                 join pat in db.tbl_patient on appt.patientID equals pat.patientID
                                 join patAcc in db.tbl_account on pat.accID equals patAcc.accID
-                                where appt.dentistID == dentist.dentistID 
+                                where appt.dentistID == dentist.dentistID
                                    && appt.status == "Requested"
                                    && appt.createdBy != userID  // Only show if created by someone else (patient or staff)
                                 orderby appt.dateTime
@@ -1443,9 +1484,9 @@ namespace RGDC_Web_Application.Controllers
                                     purpose = appt.reason,
                                     patientName = patAcc.firstName + " " + patAcc.lastName,
                                     dentistName = "",
-                                status = appt.status, // No change
-                                createdBy = appt.createdBy, // No change
-                                displayStatus = appt.status == "Requested" ? (appt.createdBy == patAcc.accID ? "Requested by Patient" : "Requested by Dentist") : appt.status // No change
+                                    status = appt.status, // No change
+                                    createdBy = appt.createdBy, // No change
+                                    displayStatus = appt.status == "Requested" ? (appt.createdBy == patAcc.accID ? "Requested by Patient" : "Requested by Dentist") : appt.status // No change
                                 }
                             ).ToList();
 
@@ -1465,7 +1506,7 @@ namespace RGDC_Web_Application.Controllers
                                 from appt in db.tbl_appointment
                                 join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
                                 join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
-                                where appt.patientID == patient.patientID 
+                                where appt.patientID == patient.patientID
                                    && appt.status == "Requested"
                                    && appt.createdBy != userID  // Only show if created by someone else (dentist or staff)
                                 orderby appt.dateTime
@@ -1495,6 +1536,8 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Error retrieving requested appointments: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+            }
+        }
         public JsonResult addPayment(tblPaymentModel model)
         {
             if (model == null)
@@ -1512,8 +1555,8 @@ namespace RGDC_Web_Application.Controllers
             return Json(new { success = true });
         }
 
-        [HttpGet]
-        public JsonResult getPaymentInfo(tblPaymentModel paymentID)
+        [HttpPost]
+        public JsonResult getPaymentInfo(tblPaymentModel paymod)
         {
             using (var db = new RGDCContext())
             {
@@ -1525,7 +1568,7 @@ namespace RGDC_Web_Application.Controllers
                     join d in db.tbl_dentist on pay.dentistID equals d.dentistID
                     join da in db.tbl_account on d.accID equals da.accID  
 
-                    where pay.paymentID == paymentID.paymentID
+                    where pay.paymentID == paymod.paymentID
 
                     select new
                     {
@@ -1578,6 +1621,8 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Error accepting appointment: {ex.Message}" });
+            }
+        }
         public JsonResult updatePayment(tblPaymentModel model)
         {
             using (var db = new RGDCContext())
@@ -1629,6 +1674,8 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = $"Error denying appointment: {ex.Message}" });
+            }
+        }
         public JsonResult deletePayment(tblPaymentModel model)
         {
             using (var db = new RGDCContext())

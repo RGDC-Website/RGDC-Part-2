@@ -74,6 +74,14 @@
         });
     }
 
+    this.sendEmail = function (user_email) {
+        return $http({
+            method: "post",
+            url: "/RGDC/sendEmail",
+            data: user_email
+        });
+    }
+
     this.resetPassword = function (info) {
         return $http({
             method: "post",
@@ -107,7 +115,12 @@
     };
 
     this.getPaymentInfo = function (paymentData) {
-        return $http.get('/RGDC/getPaymentInfo', paymentData)
+        console.log(paymentData)
+        return $http({
+            method: "post",
+            url: "/RGDC/getPaymentInfo",
+            data: paymentData
+        });
     };
 
     this.updatePayment = function (data) {
@@ -115,6 +128,7 @@
     };
 
     this.deletePayment = function (id) {
+        console.log(id)
         return $http.post('/RGDC/deletePayment', id);
     };
 
@@ -302,7 +316,7 @@
         return $http({
             method: 'POST',
             url: '/RGDC/DenyAppointment',
-            data: (function(obj){
+            data: (function (obj) {
                 var str = [];
                 for (var p in obj) if (obj.hasOwnProperty(p)) {
                     str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
@@ -310,6 +324,8 @@
                 return str.join('&');
             })(payload),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
+        }
     // create appointment
     this.createAppointment = function (appointment) {
         return $http({

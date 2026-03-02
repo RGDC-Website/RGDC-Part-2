@@ -38,10 +38,48 @@
         // ignore
     }
 
+    $scope.checkAddPatientEmail = function () {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        $scope.addPatientEmailValid = emailPattern.test($scope.addPatient_email);
+    };
+
+    $scope.isAddPatientEmailValid = function () {
+        return $scope.addPatientEmailValid;
+    };
+
+    $scope.checkAddPatientContact = function () {
+        const pattern = /^09\d{9}$/;
+        $scope.addPatientContactValid = pattern.test($scope.addPatient_contactNumber);
+    };
+
+    $scope.isAddPatientContactValid = function () {
+        return $scope.addPatientContactValid;
+    };
+
+    $scope.checkAddPatientAddress = function () {
+        $scope.addPatientAddressValid =
+            $scope.addPatient_address &&
+            $scope.addPatient_address.length >= 5;
+    };
+
+    $scope.isAddPatientAddressValid = function () {
+        return $scope.addPatientAddressValid;
+    };
 
     $scope.hasSpecialChar = function (pwd) {
         if (!pwd) return false;
         return /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?]/.test(pwd);
+    };
+
+    $scope.isAddPatientFormValid = function () {
+        return $scope.addPatient_firstName &&
+            $scope.addPatient_lastName &&
+            $scope.isAddPatientEmailValid() &&
+            $scope.isAddPatientContactValid() &&
+            $scope.isAddPatientAddressValid() &&
+            $scope.addPatient_genderID &&
+            $scope.addPatient_birthDate &&
+            $scope.addPatient_civilStatus;
     };
 
     $scope.passwordStrength = '';
@@ -300,7 +338,9 @@
         var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
         getPaymentInfo.then(function (payment) {
             $scope.paymentInfo = payment.data;
-            console.log($scope.paymentInfo)
+            if ($scope.paymentInfo.paymentDate) {
+                $scope.paymentInfo.paymentDate = formatDateToMDY($scope.paymentInfo.paymentDate)
+            }
         });
     }
 
@@ -314,30 +354,14 @@
         }
         RGDCWebApplicationService.deletePayment(paymentData)
             .then(function (response) {
-                console.log("success")
-                window.location.href = "/RGDC/adminFinance";
+                Swal.fire({ icon: 'success', title: 'Deleted', text: 'Successfully deleted payment record.' }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC/adminFinance";
+                        afterUpdate();
+                    }
+                });
             });
     }
-
-    $scope.editPayment = function () {
-
-        var data = {
-            paymentID: $scope.paymentInfo.paymentID,
-            paymentMethod: $scope.paymentInfo.paymentMethod,
-            cost: $scope.paymentInfo.cost,
-            discount: $scope.paymentInfo.discount,
-            amountPaid: $scope.paymentInfo.amountPaid,
-            amountDue: $scope.paymentInfo.amountDue,
-            description: $scope.paymentInfo.description
-        };
-
-        console.log("Updating:", data);
-
-        RGDCWebApplicationService.updatePayment(data)
-            .then(function (response) {
-                window.location.href = "/RGDC/adminFinance";
-});
-    };
 
     $scope.signUpRemove = function () {
         var modal = document.getElementById("patientInformationForm");
@@ -686,11 +710,13 @@
                 $scope.patientArray.forEach(function (patient) {
                     if (patient.lastVisit) {
                         patient.lastVisit = formatDateToMDY(patient.lastVisit);
-                    } else {
-                        patient.lastVisit = "-";
                     }
+                    console.log(patient.lastVisit)
+                    //} else {
+                    //    patient.lastVisit = "-";
+                    //}
                     // ensure appointmentsScheduled exists
-                    patient.appointmentsScheduled = (typeof patient.appointmentsScheduled !== 'undefined') ? patient.appointmentsScheduled : 0;
+                    //patient.appointmentsScheduled = (typeof patient.appointmentsScheduled !== 'undefined') ? patient.appointmentsScheduled : 0;
                 });
             });
         }
@@ -2384,9 +2410,22 @@
         $scope.selectedDentistID = isNaN(id) ? null : id;
 
         if (!$scope.selectedPatientID || !$scope.selectedDentistID) {
-            alert("Please select a valid patient and dentist.");
+            Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
             return;
         }
+
+        if (!$scope.paymentCost || !$scope.paymentPaid) {
+            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
+            return;
+        }
+
+        if (!$scope.paymentDate) {
+            Swal.fire({ icon: "error", title: "Error", text: "Select Proper Date." });
+            return;
+        }
+ 
+        $scope.paymentDue = $scope.paymentCost - ($scope.paymentDiscount || 0) - ($scope.paymentPaid || 0)
+
         console.log($scope.currentUserID)
 
         var paymentData = {
@@ -2394,6 +2433,7 @@
             dentistID: $scope.selectedDentistID,
             paymentMethod: $scope.paymentMethod,
             cost: parseFloat($scope.paymentCost) || 0,
+            paymentDate: $scope.paymentDate,
             discount: parseFloat($scope.paymentDiscount) || 0,
             amountPaid: parseFloat($scope.paymentPaid) || 0,
             amountDue: parseFloat($scope.paymentDue) || 0,
@@ -2403,9 +2443,97 @@
 
         RGDCWebApplicationService.addPayment(paymentData).then(function (response) {
             if (response.data.success) {
-                window.location.href = "/RGDC/adminPatientsTab";
+                Swal.fire({ icon: 'success', title: 'Added', text: 'Successfully added payment record.' }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC/adminFinance";
+                        afterUpdate();
+                    }
+                });
             }
         })
 
+    }
+
+    $scope.editPayment = function () {
+
+
+        if (!$scope.paymentInfo.cost || !$scope.paymentInfo.amountPaid) {
+            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
+            return;
+        }
+
+        $scope.paymentInfo.amountDue = $scope.paymentInfo.cost - ($scope.paymentInfo.discount || 0) - ($scope.paymentInfo.amountPaid || 0)
+
+        var data = {
+            paymentID: $scope.paymentInfo.paymentID,
+            paymentMethod: $scope.paymentInfo.paymentMethod,
+            cost: $scope.paymentInfo.cost,
+            paymentDate: $scope.paymentInfo.paymentDate,
+            discount: $scope.paymentInfo.discount,
+            amountPaid: $scope.paymentInfo.amountPaid,
+            amountDue: $scope.paymentInfo.amountDue,
+            description: $scope.paymentInfo.description
+        };
+
+       RGDCWebApplicationService.updatePayment(data)
+           .then(function (response) {
+               Swal.fire({ icon: 'success', title: 'Updated', text: 'Successfully updated payment record.' }).then((result) => {
+                   if (result.isConfirmed) {
+                       window.location.href = "/RGDC/adminFinance";
+                       afterUpdate();
+                   }
+
+               });
+            })
+    }; 
+
+    $scope.addPatient = function () {
+        //Add email duplication check
+        var birthDate = new Date($scope.addPatient_birthDate);
+        birthDate.setHours(0, 0, 0, 0); // 00:00:00
+        console.log($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_address && $scope.addPatient_civilStatus)
+        if ($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_address && $scope.addPatient_civilStatus) {
+            var accountData = {
+                firstName: $scope.addPatient_firstName,
+                middleName: $scope.addPatient_middleName,
+                lastName: $scope.addPatient_lastName,
+                genderID: $scope.addPatient_genderID,
+                birthDate: birthDate,
+                email: $scope.addPatient_email,
+                contactNumber: $scope.addPatient_contactNumber,
+                address: $scope.addPatient_address,
+                civilStatus: $scope.addPatient_civilStatus,
+                password: "Default123",
+                lastLogin: new Date(),
+                accCreatedAt: new Date(),
+                accUpdatedAt: new Date(),
+            }
+            var addPatient = RGDCWebApplicationService.signUp(accountData);
+            addPatient.then(function (addPatientID) {
+                var patientData = {
+                    currentPhysician: $scope.addPatient_currentPhysician,
+                    referral: $scope.addPatient_referral,
+                    lastVisit: $scope.addPatient_lastVisit,
+                    medicalHistory: "",
+                    accID: addPatientID.data.accID
+
+                }
+                var addPatientPatient = RGDCWebApplicationService.signUpPatient(patientData);
+                addPatientPatient.then(function () {
+                    var user_email = {
+                        email: $scope.addPatient_email
+                    }
+                    var sendEmail = RGDCWebApplicationService.sendEmail(user_email);
+                    Swal.fire({ icon: 'success', title: 'Add Patient', text: 'Successfully added new patient payment record.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            
+                            window.location.href = "/RGDC/adminPatientsTab";
+                            afterUpdate();
+                          }
+
+                    });
+                })
+            })
+        }                    
     }
 });

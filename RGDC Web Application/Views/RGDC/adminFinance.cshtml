@@ -42,7 +42,7 @@
                         <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)">
                             <i class="material-icons brown-text lighten-1">delete</i>
                         </a>
-                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1" ng-click="editPayRec(payment.paymentID)">edit</i></a>
+                        <a ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                     </td>
                 </tr>
             </tbody>
@@ -93,7 +93,7 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="paymentDate" placeholder="MM/DD/YYYY">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                 @*Mode of Payment*@
                 <label class="custom-label">
                     Mode of Payment
-                    <input type="text" class="custom-input" ng-model="paymentMethod" placeholder="Mode of payment...">
+                    <input type="text" class="custom-input" ng-model="paymentMethod"  placeholder="Mode of payment...">
                 </label>
             </div>
 
@@ -112,7 +112,7 @@
                 @*Cost*@
                 <label class="custom-label">
                     Cost
-                    <input type="text" class="custom-input" ng-model="paymentCost" placeholder="Cost...">
+                    <input type="text" class="custom-input" ng-model="paymentCost" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" placeholder="Cost...">
                 </label>
             </div>
 
@@ -120,7 +120,7 @@
                 @*Discount*@
                 <label class="custom-label">
                     Discount
-                    <input type="text" class="custom-input" ng-model="paymentDiscount" placeholder="Discount...">
+                    <input type="text" class="custom-input" ng-model="paymentDiscount" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" placeholder="Discount...">
                 </label>
             </div>
         </div>
@@ -130,7 +130,7 @@
                 @*Total*@
                 <label class="custom-label">
                     Total Amount Due
-                    <input type="text" class="custom-input" ng-model="paymentDue" placeholder="Total amount due...">
+                    <input type="text" class="custom-input" ng-model="paymentDue" oninput="this.value = this.value.replace(/[^0-9.]/g, '')"placeholder="Total amount due...">
                 </label>
             </div>
 
@@ -138,7 +138,7 @@
                 @*Paid*@
                 <label class="custom-label">
                     Total Amount Paid
-                    <input type="text" class="custom-input" ng-model="paymentPaid" placeholder="Total amount paid...">
+                    <input type="text" class="custom-input" ng-model="paymentPaid" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" placeholder="Total amount paid...">
                 </label>
             </div>
         </div>
@@ -172,7 +172,7 @@
                 @*Patient*@
                 <label class="custom-label">
                     Patient
-                    <input list="patients" id="patientSelect" class="custom-input" placeholder="Type patient name..." ng-model="paymentInfo.patientName" readonly />
+                    <input list="patients" id="patientSelect" class="custom-input" placeholder="Type patient name..." ng-model="paymentInfo.patientName" value="{{paymentInfo.patientName}}" readonly />
 
                 </label>
             </div>
@@ -191,7 +191,7 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="MM/DD/YYYY">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="paymentInfo.paymentDate" placeholder="MM/DD/YYYY">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
             </div>
@@ -210,7 +210,7 @@
                 @*Cost*@
                 <label class="custom-label">
                     Cost
-                    <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.cost">
+                    <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.cost" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
             </div>
 
@@ -218,7 +218,7 @@
                 @*Discount*@
                 <label class="custom-label">
                     Discount
-                    <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount">
+                    <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
             </div>
         </div>
@@ -228,7 +228,7 @@
                 @*Total*@
                 <label class="custom-label">
                     Total Amount Due
-                    <input type="text" class="custom-input" placeholder="Total amount due..." ng-model="paymentInfo.amountDue">
+                    <input type="text" class="custom-input" placeholder="Total amount due..." ng-model="paymentInfo.amountDue" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
             </div>
 
@@ -236,7 +236,7 @@
                 @*Paid*@
                 <label class="custom-label">
                     Total Amount Paid
-                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.amountPaid">
+                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.amountPaid" oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
             </div>
         </div>

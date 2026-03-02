@@ -27,27 +27,27 @@
                 <th>Patient Name</th>
                 <th>Last Visit</th>
                 <th>Appointments Scheduled</th>
-                <th></th>
+                
             </tr>
         </thead>
         @*table content*@
         <tbody>
             <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArray" ng-click="goToPatientInfo(patient)">
                 <td>{{patient.patientName}}</td>
-                <td>{{patient.lastVisit}}</td>
-                <td>{{patient.appointmentsScheduled}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
-                <td>
+                <td>{{patient.lastvisit}}</td>
+                <td>{{patient.appointmentsScheduled || '0'}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
+                @*<td>
                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePatient" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
-                </td>
+                </td>*@
             </tr>
         </tbody>
-        @*<tfoot>
+        <tfoot>
             <tr class="brown-text lighten-1">
                 <th>Patient Name</th>
                 <th>Last Visit</th>
                 <th>Appointments Scheduled</th>
             </tr>
-        </tfoot>*@
+        </tfoot>
     </table>
 
 </div>
@@ -78,7 +78,7 @@
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
-                                   ng-model="signUp_firstName"
+                                   ng-model="addPatient_firstName"
                                    maxlength="150"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Juan"
@@ -89,7 +89,7 @@
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
-                                   ng-model="signUp_middleName"
+                                   ng-model="addPatient_middleName"
                                    maxlength="150"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Mercado"
@@ -101,7 +101,7 @@
                         <div class="col s12">
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
-                                   ng-model="signUp_lastName"
+                                   ng-model="addPatient_lastName"
                                    maxlength="150"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Dela Cruz"
@@ -115,12 +115,29 @@
             <div class="row">
                 <div class="col s12">
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input"
-                           @*ng-model="signUp_lastName"*@
+
+                    <input class="custom-input"
+                           ng-focus="active='addEmail'"
+                           ng-blur="active=''"
+                           ng-model="addPatient_email"
+                           type="text"
                            maxlength="150"
-                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
-                           placeholder="juandlc@gmail.com"
+                           ng-change="checkAddPatientEmail()"
+                           ng-class="{
+                      'input-valid': isAddPatientEmailValid(),
+                      'input-invalid': addPatient_email && !isAddPatientEmailValid()
+                   }"
                            required>
+
+                    <span class="helper-text" style="color:#d32f2f"
+                          ng-show="addPatient_email && !isAddPatientEmailValid()">
+                        Enter a valid email address
+                    </span>
+
+                    <span class="helper-text" style="color:#388e3c"
+                          ng-show="isAddPatientEmailValid()">
+                        Email is valid
+                    </span>
                 </div>
             </div>
 
@@ -128,7 +145,7 @@
                 @*Gender*@
                 <div class="col s3" ng-init="getGender()">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="signUp_genderID" required>
+                    <select class="browser-default custom-input" ng-model="addPatient_genderID" required>
                         <option value="" disabled selected>Select Gender</option>
                         <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
                     </select>
@@ -138,7 +155,7 @@
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
-                               ng-model="signUp_birthDate"
+                               ng-model="addPatient_birthDate"
                                type="text"
                                class="datepicker custom-input"
                                readonly
@@ -150,7 +167,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="signUp_civilStatus" required>
+                    <select class="browser-default custom-input" ng-model="addPatient_civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -160,15 +177,17 @@
                 <div class="col s3">
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                    <input id="contactNumber"
-                           ng-model="signUp_contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="09XX-XXX-XXXX"
-                           maxlength="13"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                           ng-class="{ 'input-valid': isContactFieldValid(), 'input-invalid': signUp_contactNumber && !isContactFieldValid() }"
-                           required>
+                    <input ng-model="addPatient_contactNumber"
+                       type="text"
+                       class="custom-input"
+                       maxlength="11"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                       ng-change="checkAddPatientContact()"
+                       ng-class="{
+                          'input-valid': isAddPatientContactValid(),
+                          'input-invalid': addPatient_contactNumber && !isAddPatientContactValid()
+                       }"
+                       required>
                 </div>
             </div>
 
@@ -176,13 +195,14 @@
                 <div class="col s12">
                     @*Address*@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="signUp_address"
+                    <input ng-model="addPatient_address"
                            class="custom-input"
                            maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
+                           ng-change="checkAddPatientAddress()"
+                           ng-class="{
+                                  'input-valid': isAddPatientAddressValid(),
+                                  'input-invalid': addPatient_address && !isAddPatientAddressValid()
+                               }"
                            required>
                 </div>
             </div>
@@ -192,7 +212,7 @@
                 <div class="col s4">
                     <p class="custom-label">Current Physician</p>
                     <input type="text"
-                           ng-model="signUp_currentPhysician"
+                           ng-model="addPatient_currentPhysician"
                            class="custom-input"
                            maxlength="150"
                            oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
@@ -202,7 +222,7 @@
                 <div class="col s4">
                     <p class="custom-label">Referral (if any)</p>
                     <input type="text"
-                           ng-model="signUp_referral"
+                           ng-model="addPatient_referral"
                            class="custom-input"
                            maxlength="50"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
@@ -211,12 +231,14 @@
                 <div class="col s4">
                     <p class="custom-label">Last Visit</p>
                     <div class="datepicker-wrapper">
-                        <input id="lastVisit"
-                               ng-model="signUp_lastVisit"
+                        <input ng-model="addPatient_lastVisit"
                                type="text"
                                class="datepicker custom-input"
                                readonly
-                               ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
+                               ng-class="{
+                              'input-valid': addPatient_lastVisit,
+                              'input-invalid': addPatient_lastVisit === ''
+       }"
                                required>
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
@@ -230,7 +252,12 @@
     <div class="modal-footer" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">ADD</button>
+        <button type="submit"
+                class="edit-btn modal-close"
+                ng-click="addPatient()"
+                ng-disabled="!isAddPatientFormValid()">
+            ADD
+        </button>
     </div>
 </div>
 
