@@ -1,5 +1,5 @@
 ﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService, $http, $rootScope) {
-
+    //DON'T MERGE ANYTHING MUNA NASISIRA CODE
     $scope.signaturePreview = null;
     $scope._uploadedSignaturePath = null;
 
