@@ -1,13 +1,35 @@
-﻿@media only screen and (min-width: 601px) {
+﻿
+/*large*/
+@media only screen and (min-width: 993px) {
     .main-content {
         margin-left: 25% !important;
+        padding: 0 !important;
     }
 
-    .appointment-container {
-        padding: 0 0.7rem 0 0.7rem !important;
+    .center-tabs {
+        display: flex !important;
+        justify-content: center !important;
     }
 }
 
+/*medium*/
+@media only screen and (min-width: 601px) and (max-width: 992px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .appointment-container {
+        padding: 0 0.7rem;
+    }
+
+    .center-tabs {
+        display: flex !important;
+        justify-content: center !important;
+    }
+}
+
+/*small*/
 @media only screen and (max-width: 600px) {
     .main-content {
         margin-left: 0 !important;
@@ -16,12 +38,27 @@
 
     .appointments-row {
         display: grid;
-        margin-right: 1rem;
+        margin: 0rem 1rem !important;
     }
-    .appointment-container{
+
+    .appointment-container {
         padding: 0 !important;
     }
 
+    .center-tabs {
+        display: flex !important;
+        justify-content: flex-start !important;
+    }
+
+    .tabs.tabs-transparent {
+        overflow-x: auto !important;
+    }
+}
+
+.responsive-data-table-div {
+    padding: 2rem !important;
+    overflow-x: auto !important;
+    font-size: .9rem;
 }
 
 .navText {
@@ -31,7 +68,7 @@
     padding-left: 1rem;
 }
 
-a{
+a {
     border-radius: 15px
 }
 
@@ -47,52 +84,57 @@ a:hover {
 .tabs {
     overflow-x: hidden !important;
 }
-.tabs .indicator {
-    background-color: #8d6e63 !important;
-}
-.tabs .tab a.active {
-    color: #8d6e63 !important;
-    font-weight: bold;
-}
-.tabs .tab a,
-.tabs .tab a.active,
-.tabs .tab a:focus,
-.tabs .tab a:focus.active {
-    background-color: transparent !important;
-    outline: none !important;
-}
+
+    .tabs.tabs-transparent {
+        overflow-x: auto !important;
+    }
+
+    .tabs .indicator {
+        background-color: #8d6e63 !important;
+    }
+
+    .tabs .tab a.active {
+        color: #8d6e63 !important;
+        font-weight: bold;
+    }
+
+    .tabs .tab a,
+    .tabs .tab a.active,
+    .tabs .tab a:focus,
+    .tabs .tab a:focus.active {
+        background-color: transparent !important;
+        outline: none !important;
+    }
 
 .nav-extended .nav-content {
     height: auto !important;
 }
 
-.center-tabs {
-    display: flex !important;
-    justify-content: center !important;
-}
 
-.smallBtn{
+
+.smallBtn {
     padding: 0.5rem 0.5rem 0.25rem 0.5rem;
     border-radius: 15px;
 }
+
 .medBtn {
     color: #795548 !important;
 }
-.medBtn:hover {
-    background-color: #795548 !important;
-    color: white !important;
-}
 
-.smallBtn:hover{
+    .medBtn:hover {
+        background-color: #795548 !important;
+        color: white !important;
+    }
+
+.smallBtn:hover {
     background-color: #8d6e63 !important;
-
 }
 
-.smallBtn:hover i {
-    color:#fff !important;
-}
+    .smallBtn:hover i {
+        color: #fff !important;
+    }
 
-.containerOverflow{
+.containerOverflow {
     min-height: 12rem;
     max-height: 20rem;
     overflow-y: auto;
@@ -103,7 +145,7 @@ a:hover {
     min-height: 12rem;
     max-height: 46.3rem;
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: auto;
 }
 
     .containerOverflow-2::-webkit-scrollbar {
@@ -124,13 +166,14 @@ a:hover {
             background: #836754;
         }
 
-.dashContainer{
-    margin:0 1rem 0 1rem;
+.dashContainer {
+    margin: 0 1rem 0 1rem;
 }
 
 #checkBtn:hover {
     background-color: #4caf50 !important;
 }
+
 #denyBtn:hover {
     background-color: #d32f2f !important;
 }
@@ -144,36 +187,59 @@ a:hover {
     justify-content: space-evenly;
 }
 
-.bold{
-    font-weight:bold;
+.bold {
+    font-weight: bold;
 }
 
 .p-0 {
     padding: 0 !important;
 }
-.pr-05{
+
+.pr-05 {
     padding: 0 0.8rem 0 0 !important;
 }
-.pl-05{
+
+.pl-05 {
     padding: 0 0 0 0.8rem !important;
 }
-.px-1{
+
+.px-1 {
     padding: 0 1rem 0 1rem !important;
 }
-.p-1{
+
+.p-1 {
     padding: 1rem !important;
 }
-.p-2{
+
+.p-2 {
     padding: 2rem !important;
 }
+
 .mb-1 {
     margin-bottom: 1rem !important;
 }
-.m-0{
+
+.m-0 {
     margin: 0 !important;
 }
 
-.clkPointer{
+.mt-1 {
+    margin-top: 1rem;
+}
+
+.mb-2 {
+    margin-bottom: 2rem;
+}
+
+mb-3 {
+    margin-bottom: 3rem;
+}
+
+.ml-2 {
+    margin-left: 2rem;
+}
+
+.clkPointer {
     cursor: pointer !important;
 }
 
@@ -235,9 +301,9 @@ html, body {
     border: none;
 }
 
-.logSignBtn:active {
+    .logSignBtn:active {
         background-color: #836754;
-}
+    }
 
 .forgot-password-container {
     text-align: right;
@@ -247,15 +313,15 @@ html, body {
 
 .forgot-link {
     color: #967863;
-    text-decoration: underline; 
+    text-decoration: underline;
     font-size: 0.9rem;
     transition: color 0.3s;
     font-style: italic;
 }
 
-.forgot-link:hover {
+    .forgot-link:hover {
         color: #795548;
-}
+    }
 
 .checkbox-container {
     display: flex;
@@ -263,16 +329,16 @@ html, body {
     margin-top: 40px;
 }
 
-.checkbox-container [type="checkbox"].filled-in:checked + span:not(.lever):after {
-    border: 2px solid #967863;
-    border-radius: 5px;
-    background-color: #967863;
-}
+    .checkbox-container [type="checkbox"].filled-in:checked + span:not(.lever):after {
+        border: 2px solid #967863;
+        border-radius: 5px;
+        background-color: #967863;
+    }
 
-.checkbox-container span {
-    color: #333; 
-    font-size: 0.9rem;
-}
+    .checkbox-container span {
+        color: #333;
+        font-size: 0.9rem;
+    }
 
 [type="checkbox"].filled-in:checked + span:not(.lever):after {
     border: 2px solid #967863 !important;
@@ -287,7 +353,7 @@ html, body {
 }
 
 [type="checkbox"].filled-in + span:not(.lever):after {
-    border-radius: 4px !important; 
+    border-radius: 4px !important;
 }
 
 .login-divider {
@@ -299,19 +365,19 @@ html, body {
     font-size: 0.9rem;
 }
 
-.login-divider::before, .login-divider::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid #e0e0e0;
-}
+    .login-divider::before, .login-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e0e0e0;
+    }
 
-.login-divider:not(:empty)::before {
-    margin-right: .5em;
-}
+    .login-divider:not(:empty)::before {
+        margin-right: .5em;
+    }
 
-.login-divider:not(:empty)::after {
-    margin-left: .5em;
-}
+    .login-divider:not(:empty)::after {
+        margin-left: .5em;
+    }
 
 .social-login-container {
     display: flex;
@@ -320,20 +386,20 @@ html, body {
 }
 
 .google-btn img {
-    width: 40px; 
+    width: 40px;
     height: auto;
     transition: transform 0.2s ease;
     cursor: pointer;
 }
 
-.google-btn img:hover {
-    transform: scale(1.1);
-}
+    .google-btn img:hover {
+        transform: scale(1.1);
+    }
 
 .signup-title {
     font-weight: bold;
     color: #967863;
-    margin-bottom:50px;
+    margin-bottom: 50px;
 }
 
 .signup-footer {
@@ -350,9 +416,9 @@ html, body {
     transition: color 0.3s ease;
 }
 
-.signup-link:hover {
-    color: #795548; 
-}
+    .signup-link:hover {
+        color: #795548;
+    }
 
 .modal {
     border-radius: 2vh !important;
@@ -401,8 +467,8 @@ html, body {
 .custom-label {
     color: #795548;
     font-size: 1.10rem;
-    margin-bottom: 2px !important; 
-    display: block; 
+    margin-bottom: 2px !important;
+    display: block;
 }
 
 .custom-input {
@@ -453,7 +519,7 @@ html, body {
     padding-left: 30px !important;
     line-height: 25px !important;
     font-size: 1rem;
-    color: #333; 
+    color: #333;
 }
 
 .datepicker-wrapper {
@@ -488,13 +554,13 @@ html, body {
     justify-content: center !important;
 }
 
-    .datepicker-table-wrapper td.is-selected {
-        background-color: #967863 !important;
-    }
+.datepicker-table-wrapper td.is-selected {
+    background-color: #967863 !important;
+}
 
-    .datepicker-cancel, .datepicker-done {
-        color: #967863 !important;
-    }
+.datepicker-cancel, .datepicker-done {
+    color: #967863 !important;
+}
 
 .datepicker-overlay {
     position: fixed;
@@ -589,23 +655,23 @@ select.browser-default.custom-input {
     margin-top: 15px;
 }
 
-.terms-scroll-container::-webkit-scrollbar {
-    width: 8px;
-}
+    .terms-scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
 
-.terms-scroll-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
+    .terms-scroll-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
 
-.terms-scroll-container::-webkit-scrollbar-thumb {
-    background: #967863; 
-    border-radius: 10px;
-}
+    .terms-scroll-container::-webkit-scrollbar-thumb {
+        background: #967863;
+        border-radius: 10px;
+    }
 
-.terms-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #836754;
-}
+        .terms-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #836754;
+        }
 
 .preserve-format {
     color: black;
@@ -613,12 +679,29 @@ select.browser-default.custom-input {
 }
 
 /* Password strength indicator colors */
-.weak-strength { color: #d32f2f; }
-.fair-strength { color: #f57c00; }
-.good-strength { color: #fbc02d; }
-.strong-strength { color: #388e3c; }
-.requirement-complete { color: #388e3c; }
-.requirement-pending { color: #9e9e9e; }
+.weak-strength {
+    color: #d32f2f;
+}
+
+.fair-strength {
+    color: #f57c00;
+}
+
+.good-strength {
+    color: #fbc02d;
+}
+
+.strong-strength {
+    color: #388e3c;
+}
+
+.requirement-complete {
+    color: #388e3c;
+}
+
+.requirement-pending {
+    color: #9e9e9e;
+}
 
 /* Input valid/invalid border styles */
 .input-valid {
@@ -651,7 +734,7 @@ select.browser-default.custom-input {
     gap: 12px;
     align-items: center;
     width: 100%;
-    line-height:0;
+    line-height: 0;
 }
 
 .search-wrapper {
@@ -659,7 +742,7 @@ select.browser-default.custom-input {
     display: flex;
     flex-grow: 1;
     align-items: center;
-    height:50px;
+    height: 50px;
 }
 
 .search-input {
@@ -677,10 +760,10 @@ select.browser-default.custom-input {
     font-size: 1.2rem;
 }
 
-.search-input::placeholder {
-    font-size: 1.3rem;
-    opacity: 1;
-}
+    .search-input::placeholder {
+        font-size: 1.3rem;
+        opacity: 1;
+    }
 
 .search-icon {
     position: absolute;
@@ -697,23 +780,23 @@ select.browser-default.custom-input {
     padding: 0 25px !important;
     text-transform: none !important;
     font-weight: 500;
-    white-space: nowrap; 
-    width:200px;
-    font-size:1.2rem;
+    white-space: nowrap;
+    width: 200px;
+    font-size: 1.2rem;
 }
 
 .sort-arrow {
     font-size: 20px !important;
     cursor: pointer;
     color: #967863;
-    opacity: 0.2; 
+    opacity: 0.2;
     transition: 0.2s;
     margin: 0;
 }
 
-.sort-arrow.active {
-    opacity: 1 !important;
-}
+    .sort-arrow.active {
+        opacity: 1 !important;
+    }
 
 .patient-list-container {
     margin-top: 20px;
@@ -721,13 +804,13 @@ select.browser-default.custom-input {
     align-content: center;
 }
 
-.patient-list-container .row {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    display: flex; 
-    align-items: center;
-    flex-grow:1;
- }
+    .patient-list-container .row {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+    }
 
 .list-header {
     color: #967863;
@@ -737,10 +820,10 @@ select.browser-default.custom-input {
 
 .patient-card {
     width: 100%;
-    height:60px;
+    height: 60px;
     background-color: #e8e8e8 !important;
     color: #967863;
-    font-size:1.2rem;
+    font-size: 1.2rem;
     border-radius: 15px !important;
     margin-bottom: 8px !important;
     padding: 10px 0;
@@ -748,13 +831,13 @@ select.browser-default.custom-input {
     align-items: center !important;
 }
 
-.patient-card:hover {
-    background-color: #dfdfdf !important;
-}
+    .patient-card:hover {
+        background-color: #dfdfdf !important;
+    }
 
-.patient-card .col {
-    display: flex;
-}
+    .patient-card .col {
+        display: flex;
+    }
 
 .circle-avatar {
     color: #ffffff;
@@ -773,13 +856,26 @@ select.browser-default.custom-input {
     padding: 0 15px;
 }
 
-.col-name { width: 27%; text-align: left; padding-left: 10px; }
+.col-name {
+    width: 27%;
+    text-align: left;
+    padding-left: 10px;
+}
 
-.col-visit { width: 30%; text-align: center; }
+.col-visit {
+    width: 30%;
+    text-align: center;
+}
 
-.col-appts { width: 30%; text-align: center; }
+.col-appts {
+    width: 30%;
+    text-align: center;
+}
 
-.col-more { width: 7%; text-align: right; }
+.col-more {
+    width: 7%;
+    text-align: right;
+}
 
 .pagination-container {
     display: flex;
@@ -788,7 +884,7 @@ select.browser-default.custom-input {
     color: #967863;
     gap: 15px;
     padding-top: 10px;
-    margin-top: auto; 
+    margin-top: auto;
 }
 
 .checkbox-grid {
@@ -809,7 +905,7 @@ select.browser-default.custom-input {
     display: flex;
     align-items: center;
     gap: 10px;
-    grid-column: span 1; 
+    grid-column: span 1;
 }
 
 .other-input {
@@ -822,7 +918,7 @@ select.browser-default.custom-input {
     width: 250px;
     text-align: center;
     margin-top: 35px;
-    margin-left:19rem;
+    margin-left: 19rem;
 }
 
 .signature-pad {
@@ -854,7 +950,7 @@ select.browser-default.custom-input {
 .form-header {
     display: flex;
     justify-content: space-between;
-    align-items:flex-start;
+    align-items: flex-start;
     color: #7d6b5d;
 }
 
@@ -967,7 +1063,7 @@ select.browser-default.custom-input {
     top: 0;
     font-weight: bold;
     color: #967863;
-    margin-right:10px;
+    margin-right: 10px;
 }
 
 .line-input {
@@ -1008,15 +1104,15 @@ select.browser-default.custom-input {
     max-width: 500px !important;
 }
 
-.add-form-modal input[type="text"] {
-    width: 100%;
-    height: 40px;
-    margin-bottom: 15px;
-    border: none;
-    border-radius: 8px;
-    background: white;
-    padding: 0 10px;
-}
+    .add-form-modal input[type="text"] {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 8px;
+        background: white;
+        padding: 0 10px;
+    }
 
 #modal-add-form.modal {
     top: 50% !important;
@@ -1116,6 +1212,7 @@ select.browser-default.custom-input {
     display: block !important;
     opacity: 1 !important;
 }
+
 .appt-modal {
     background-color: #e0e0e0 !important;
     border-radius: 2vh !important;
@@ -1158,6 +1255,7 @@ select.browser-default.custom-input {
     padding: 4vh;
     position: relative;
 }
+
     .medhis-modal::-webkit-scrollbar {
         width: 1vh;
     }
