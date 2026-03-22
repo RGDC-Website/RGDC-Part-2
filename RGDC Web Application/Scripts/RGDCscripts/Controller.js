@@ -574,16 +574,8 @@
                 }).then(() => {
                     // Redirect based on user role
                     var auth = String(returnedData.data.authorization || "");
-                    if (auth === "3") {
-                        // patient
-                        window.location.href = "/RGDC/patientDashboard";
-                    } else if (auth === "2") {
-                        // dentist
-                        window.location.href = "/RGDC/dentistDashboard";
-                    } else {
-                        // owner/admin/staff
                         window.location.href = "/RGDC/adminDashboard";
-                    }
+                    
                 });
             } else {
                 $scope.loginError = returnedData.data ? returnedData.data.message : "Invalid email or password";
