@@ -19,117 +19,134 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
-<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
-<div class="row" style="margin: 0;" ng-init="getSessionVariables()">
-    @*sidebar nav*@
-    <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
-        <h5 style="font-weight:bold;">RGDC</h5>
+@*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
+<body id="body" ng-app="RGDCWebApplication">
+    <div class="row" ng-init="getSessionVariables()">
+        @*sidebar nav*@
+        <div class="col hide-on-med-and-down l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
+            <h5 style="font-weight:bold;">RGDC</h5>
 
-        @*user pfp and name*@
-        <div class="row center" style="margin-top: 5rem;">
-            @*lagyan nalang ng src for image source*@
-            <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
-        </div>
+            @*user pfp and name*@
+            <div class="row center" style="margin-top: 5rem;">
+                @*lagyan nalang ng src for image source*@
+                <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
+            </div>
 
-        @*user name and role*@
-        <div class="row center">
-            <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
-            <h6>{{userRole}}</h6>
-        </div>
+            @*user name and role*@
+            <div class="row center">
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
+            </div>
 
-        @*nav tabs*@
-        <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
-            <ul>
-                <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-                <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-                <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-                <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-                <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-                <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-                <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                    <li>
-                        <a href="#!" class="white-text">one</a>
-                    </li>
-                    <li>
-                        <a href="#!" class="white-text">two</a>
-                    </li>
-                </ul>
-            </ul>
-        </div>
-
-        @*date and time at the bottom of the screen*@
-        <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
-            <span>Month DD, YYYY | </span>
-            <span>00:00 AM</span>
-        </div>
-
-    </div>
-
-    @*sidebar nav (mobile)*@
-    <div class="row show-on-small-only hide-on-med-and-up s12 brown lighten-1 z-depth-3 white-text">
-        <nav>
-            <div class="nav-wrapper px-1">
-                <h5 class="bold brand-logo center">RGDC</h5>
-                <ul class="left">
-                    <li>
-                        <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                    </li>
-                </ul>
-                <ul class="right m-0">
-                    <li>
-                        <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">refresh</i></a>
-                    </li>
-                    <li ng-show="isUserAdmin">
-                        <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">print</i></a>
-                    </li>
+            @*nav tabs*@
+            <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
+                <ul>
+                    <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+                    <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+                    <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+                    <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+                    <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
+                    <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+                    <li><a href="" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
                 </ul>
             </div>
-        </nav>
-    </div>
+            <ul id="contactDropdown" class="dropdown-content brown lighten-1">
+                <li>
+                    <a href="" class="white-text">+63 963 220 1556</a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/profile.php?id=100089697375149" class="white-text">Facebook: Reyes-Guansing Dental Clinic</a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/_reyesguansingdentalclinic" class="white-text">Instagram: Reyes-Guansing Dental Clinic</a>
+                </li>
+            </ul>
+            <ul id="contactDropdownMobile" class="dropdown-content brown lighten-1">
+                <li>
+                    <a href="" class="white-text">+63 963 220 1556</a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/profile.php?id=100089697375149" class="white-text">Facebook: Reyes-Guansing Dental Clinic</a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/_reyesguansingdentalclinic" class="white-text">Instagram: Reyes-Guansing Dental Clinic</a>
+                </li>
+            </ul>
 
-    <ul class="sidenav brown lighten-1 z-depth-3 white-text" id="mobile-nav">
+            @*date and time at the bottom of the screen*@
+            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+                <span>Month DD, YYYY | </span>
+                <span>00:00 AM</span>
+            </div>
 
-        @*user pfp and name*@
-        <div class="row center" style="margin-top: 5rem;">
-            @*lagyan nalang ng src for image source*@
-            <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
         </div>
 
-        @*user name and role*@
-        <div class="row center">
-            <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
-            <h6>{{userRole}}</h6>
+        @*sidebar nav (mobile)*@
+        <div class=" show-on-medium-and-down hide-on-large-only s12 m12 brown lighten-1 z-depth-3 white-text p-0 m-0" style="width: 100% !important">
+            <nav>
+                <div class="nav-wrapper px-1">
+                    <h5 class="bold brand-logo center">RGDC</h5>
+                    <ul class="left">
+                        <li>
+                            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                        </li>
+                    </ul>
+                    <ul class="right m-0">
+                        <li>
+                            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">refresh</i></a>
+                        </li>
+                        <li ng-show="isUserAdmin">
+                        <li>
+                            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">print</i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
         </div>
 
-        <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-        <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-        <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-        <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-        <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-        <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-        <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-        <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-            <li>
-                <a href="#!" class="white-text">one</a>
-            </li>
-            <li>
-                <a href="#!" class="white-text">two</a>
-            </li>
+        <ul class="sidenav brown lighten-1 z-depth-3 white-text p-1" id="mobile-nav">
+
+            @*logout*@
+            <div class="row mt-1 mb-2">
+                <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
+            </div>
+
+            @*user pfp and name*@
+            <div class="row center" style="margin-top: 5rem;">
+                @*lagyan nalang ng src for image source*@
+                <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
+            </div>
+
+            @*user name and role*@
+            <div class="row center">
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
+            </div>
+
+            <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+            <li><a href="~/RGDC/adminClinicStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+            <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+            <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+            <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
+            <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+            <li><a href="" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdownMobile"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact Us</a></li>
+
+            @*date and time at the bottom of the screen*@
+            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+                <span>Month DD, YYYY | </span>
+                <span>00:00 AM</span>
+            </div>
+
         </ul>
-        <li>
-            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a>
-        </li>
-    </ul>
 
-    @*content*@
-    <div class="col s12 m9 l9 main-content" style="margin-left: 25%">
-        @RenderBody()
+        @*content*@
+        <div class="col l9 main-content container">
+            @RenderBody()
+        </div>
     </div>
-</div>
 
 
-<script>
+    <script>
         //Arrow filter (descending and ascending)
         document.addEventListener('click', function (event) {
             if (event.target.classList.contains('sort-arrow')) {
@@ -151,6 +168,12 @@
             }
         });
 
+        //materialboxed
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.materialboxed');
+            var instances = M.Materialbox.init(elems);
+        });
+
         //Tooltip
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
@@ -162,7 +185,10 @@
         //Dropdown
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.dropdown-trigger');
-            var instances = M.Dropdown.init(elems);
+            var instances = M.Dropdown.init(elems, {
+                coverTrigger: false,
+                constrainWidth: false
+            });
         });
 
         //tabs javascript
@@ -279,10 +305,17 @@
         @* admin patients table *@
         new DataTable('#adminPatientsTabTable');
 
+        @* admin scheduled appts table *@
+        new DataTable('#adminScheduledAppointment');
+        @* admin req appts table *@
+        new DataTable('#adminRequestedAppointment');
+        @* admin past appts table *@
+        new DataTable('#adminPastAppointment');
+
         @*patient profile table - progress notes*@
             new DataTable('#progressNotes');
         @*patient profile table - forms*@
-            new DataTable('#patientForms');
+        new DataTable('#patientForms');
 
         //clickeable DataTables
         const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
@@ -291,13 +324,13 @@
                 window.location.href = this.dataset.href;
             })
         }
-</script>
-<script src="~/Scripts/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="~/Scripts/angular.min.js"></script>
+    </script>
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/Scripts/angular.min.js"></script>
 
-<script src="~/Scripts/RGDCscripts/Module.js"></script>
-<script src="~/Scripts/RGDCscripts/Service.js"></script>
-<script src="~/Scripts/RGDCscripts/Controller.js"></script>
+    <script src="~/Scripts/RGDCscripts/Module.js"></script>
+    <script src="~/Scripts/RGDCscripts/Service.js"></script>
+    <script src="~/Scripts/RGDCscripts/Controller.js"></script>
 </body>
 </html>
