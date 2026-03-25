@@ -254,6 +254,9 @@ mb-3 {
     color: #795548 !important;
 }
 
+.socmed-img{
+    max-width: 6rem;
+}
 
 
 html, body {
