@@ -1,5 +1,95 @@
 ﻿@{
     Layout = "~/Views/Shared/_adminLayout.cshtml";
 }
+<div class="dashContainer">
+    @*top part (welcome, refresh, logout)*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*user name*@
+        <div class="col l8"><h4 class="bold">Contact Us</h4></div>
+        @*refresh and logout buttons*@
+        <div class="col hide-on-med-and-down l4">
+            <span class="right">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+
+    @*socials*@
+    <div class="row">
+        @*fb card*@
+        <div class="col s12 m3 l3">
+            <div class="card grey lighten-2 center">
+                <div class="card-content brown-text lighten-1">
+                    <a href="https://www.facebook.com/profile.php?id=100089697375149">
+                        <img src="#" alt="Facebook" />
+                        <p class="bold">Facebook</p>
+                        <p>Reyes-Guansing Dental Clinic</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @*IG card*@
+        <div class="col s12 m3 l3">
+            <div class="card grey lighten-2 center">
+                <div class="card-content brown-text lighten-1">
+                    <a href="https://www.instagram.com/_reyesguansingdentalclinic">
+                        <img src="#" alt="Instagram" />
+                        <p class="bold">Instagram</p>
+                        <p>_reyesguansingdentalcinic</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+        @*phone card*@
+        <div class="col s12 m3 l3">
+            <div class="card grey lighten-2 center">
+                <div class="card-content brown-text lighten-1">
+                        <i class="material-icons large">call</i>
+                        <p class="bold">Phone</p>
+                        <p>+63 963 220 1556</p>
+                </div>
+            </div>
+        </div>
+        @*email card*@
+        <div class="col s12 m3 l3">
+            <div class="card grey lighten-2 center">
+                <div class="card-content brown-text lighten-1">
+                    <a href="mailto:dentalclinicreyesguansing@gmail.com">
+                        <i class="material-icons large">email</i>
+                        <p class="bold">Email</p>
+                        <p class="truncate" title="dentalclinicreyesguansing@gmail.com">dentalclinicreyesguansing@gmail.com</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    @*maps*@
+    <div class="row">
+        <div class="col s12 m12 l12">
+            <div class="card grey lighten-2 center">
+                <div class="card-content brown-text lighten-1">
+                    <div class="row">
+                        <div class="col s12 m6 l6">
+                            @*insert gmaps kayo na bahala jan hehe*@
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <a href="https://tinyurl.com/RGDentalClinic">
+                                <i class="material-icons large">location_on</i>
+                                <p class="bold">Our Main Branch</p>
+                                <p>1191 Velarde Bldg., Del Pilar St., Cabanatuan City </p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
 
 
