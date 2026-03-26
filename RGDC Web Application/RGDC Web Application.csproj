@@ -307,6 +307,7 @@
     <Content Include="Views\RGDC\adminAppointment.cshtml" />
     <Content Include="Views\RGDC\adminClinicStaffTab.cshtml" />
     <Content Include="Views\RGDC\contactUsPage.cshtml" />
+    <Content Include="Views\RGDC\faqPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

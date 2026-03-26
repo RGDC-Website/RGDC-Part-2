@@ -1,0 +1,197 @@
+﻿@{
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<div class="dashContainer">
+    @*top part)*@
+    <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*user name*@
+        <div class="col m8 l8"><h4>Frequently Asked Questions</h4></div>
+        @*refresh and logout buttons*@
+        <div class="col hide-on-small-only m4 l4">
+            <span class="right">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12 m9 l10">
+            @*patient accounts*@
+            <div id="scrollspy-patientAcc" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Patient Accounts</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">I forgot my password. How do I reset it?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Lorem Ipsum.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">What should I do if my account gets locked?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                For security purposes, the system sends a verification notification to your registered email after five (5) consecutive failed login attempts. If login attempts continue to fail, the system will enforce a five-minute waiting period before another attempt is allowed. If you are still unable to access your account after this period, you may contact the clinic for assistance.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*appointments*@
+            <div id="scrollspy-appointments" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Appointments</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">What happens if my appointment overlaps with another patient's schedule?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                The system includes scheduling validation to prevent appointment conflicts. However, unforeseen emergencies may occasionally affect the schedule. If a brief waiting time is necessary, the staff will inform you upon arrival. The clinic appreciates your patience and understanding in such situations.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Can I walk in without a prior appointment?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Walk-in patients are accommodated depending on availability. However, patients are strongly encouraged to book their appointments online in advance to secure their preferred time slot. Scheduled appointments are prioritized to help minimize waiting time.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*privacy & security*@
+            <div id="scrollspy-privSec" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Privacy and Security</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">
+                            How is my personal data protected?
+                        </div>
+                        <div class="collapsible-body">
+                            <span>
+                                Your personal data is protected through secure data transmission, restricted access controls, and compliance with the Data Privacy Act of 2012, ensuring your information remains safe and confidential.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">What are my rights regarding my personal information?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Under Philippine law, you have the right to be informed about how your data is collected and used, to access your personal information, to object to certain types of data processing, to request corrections of inaccurate information, and to request erasure of your data, subject to the clinic’s 10-year retention policy. You also have the right to file a complaint with the National Privacy Commission if you believe your rights have been violated.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Is my data shared with other parties?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Your personal and clinical information is used solely for dental care, appointment management, billing, and internal clinic operations. The clinic does not sell or share your information with third parties outside the organization without your explicit consent.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*technical help*@
+            <div id="scrollspy-techHelp" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Technical Help</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">What devices can I use to access the system?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                The RGDC Dental Website is fully responsive and can be accessed using desktop computers, laptops, tablets, and mobile phones. It is compatible with any modern web browser.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Do I need an internet connection to use the system?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Yes, a stable internet connection is required to access the system. This ensures real-time data access and synchronization across all clinic branches. Temporary network interruptions may briefly affect system availability.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*dental records*@
+            <div id="scrollspy-dentRec" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Dental Records</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Can I view my own dental records online?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Yes, patients can securely access and view their own dental records through their registered account on the system.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Who can access my dental records?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Access to dental records is strictly role-based. The clinic owner, dentists, and authorized dental staff may view and update records as part of patient care. Patients may also view their own records. No other individuals can access this information without proper authorization.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">Do I need to fill in a consent form?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Yes, patient consent is required as part of the clinic’s process. During registration, patients must review and agree to the Terms and Conditions. For certain procedures, additional consent may be required, which the dentist will explain. All consent records are securely stored within the system.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">How long are my dental records kept?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Dental records are retained for a mandatory 10-year period in accordance with the clinic's policy. This retention period ensures that records are available for future reference, emergencies, or continued treatment.
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="collapsible-header">What clinical documents are included in my records?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                Dental records may include the patient’s biodata, medical history, dental chart, treatment plans, progress notes, prescriptions, post-operative instructions, informed consent forms, and referral or laboratory requests when applicable.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            @*payment records*@
+            <div id="scrollspy-payRec" class="section scrollspy">
+                <h5 class="brown-text lighten-1">Payment Records</h5>
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">What payment options are available?</div>
+                        <div class="collapsible-body">
+                            <span>
+                                We accept cash, and credit/debit cards. Please note that all payments must be made onsite at the clinic. Flexible payment arrangements may be available for major treatments. Our staff will be happy to discuss options with you.
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="col hide-on-small-only m3 l2">
+            <div class="toc-wrapper">
+                <ul class="section table-of-contents">
+                    <li><a href="#scrollspy-patientAcc">Patient Accounts</a></li>
+                    <li><a href="#scrollspy-appointments">Appointments</a></li>
+                    <li><a href="#scrollspy-privSec">Privacy and Security</a></li>
+                    <li><a href="#scrollspy-techHelp">Technical Help</a></li>
+                    <li><a href="#scrollspy-dentRec">Dental Records</a></li>
+                    <li><a href="#scrollspy-payRec">Payment Records</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
