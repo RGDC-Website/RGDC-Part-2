@@ -6,12 +6,12 @@
     @*top buttons*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*back button*@
-        <div class="col m8 l8 valign-wrapper" style="margin-top: 7px;">
+        <div class="col m8 l8" style="margin-top: 7px;">
             <a href="/RGDC/adminPatientsTab" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Back to Patients Tab"><i class="material-icons brown-text lighten-1 left">arrow_back</i></a>
         </div>
 
         @*refresh and logout buttons*@
-        <div class="col m4 l4">
+        <div class="col hide-on-med-and-down l4">
             <span class="right" style="margin-top:7px;">
                 <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
                 <div ng-click="logOut()" class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
@@ -115,7 +115,7 @@
             </div>
         </div>
 
-        @*right column*@
+        @*right column------------------------------------------------------------------------------------------------------------------------------------*@
         <div class="col m8 l8" style="padding-right: 0">
             <div class="card grey lighten-2">
                 <nav class="nav-extended grey lighten-2 z-depth-0">
@@ -129,7 +129,7 @@
                         </ul>
                     </div>
                 </nav>
-                <div class="card-content">
+                <div class="card-content containerOverflow-2">
 
                     @*medical history*@
                     <div id="med" class="containerOverflow-2 row m-0">
@@ -346,7 +346,7 @@
                             <img id="dentalChartMain"
                                  ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
                                  alt="Dental Chart"
-                                 style="max-height: 47rem" />
+                                 class="materialboxed responsive-img" />
                         </div>
 
                     </div>

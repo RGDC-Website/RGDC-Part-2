@@ -1,20 +1,23 @@
 ﻿@{
     Layout = "~/Views/Shared/_adminLayout.cshtml";
-    }
+}
 
-<div class="dashContainer" ng-controller="RGDCWebApplicationController">
-    @*top buttons*@
+@*<div class="dashContainer" ng-controller="RGDCWebApplicationController">*@
+<div class="dashContainer">
+    @*top part (title, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
+        @*user name*@
+        <div class="col m8 l8"><h4 class="bold">Appointments</h4></div>
         @*refresh and logout buttons*@
-        <div class="col m4 l4 offset-md-8 offset-l8">
-            <span class="right m-0">
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" ng-click="logOut()" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
+        <div class="col hide-on-med-and-down l4">
+            <span class="right">
+                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
 
-    @*create new finance record button*@
+    @*create new appointment button*@
     <div class="row m-0">
         <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="modalAddAppt"><i class="material-icons left">add</i>Create New Appointment</a>
     </div>
@@ -35,8 +38,8 @@
             <div id="sched" class="containerOverflow-2 row m-0">
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Scheduled Appointments</p>
                 @*admin scheduled appointments table*@
-                <div class="row" style="padding: 2rem; font-size: .9rem ">
-                    <table id="adminScheduledAppointment" class="hoverv tblClk">
+                <div class="row responsive-data-table-div">
+                    <table id="adminScheduledAppointment" class="hover tblClk">
                         @*table headers*@
                         <thead>
                             <tr class="brown-text lighten-1">
@@ -45,13 +48,13 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
-                                <th>Status</th>
+                                <th colspan="2">Status</th>
                             </tr>
                         </thead>
                         @*table content*@
                         <tbody>
                             <tr ng-if="(!adminAppointments || adminAppointments.length === 0)">
-                                <td colspan="5" class="center-align">No scheduled appointments found.</td>
+                                <td colspan="7" class="center-align">No scheduled appointments found.</td>
                             </tr>
                             <tr ng-repeat="appt in adminAppointments track by appt.apptID" data-href="#" title="View patient record" class="clkPointer">
                                 <td>{{appt.date}}</td>
@@ -69,15 +72,16 @@
                             </tr>
                         </tbody>
                         @*table footer*@
-                        @*<tfoot>
+                        <tfoot>
                             <tr class="brown-text lighten-1">
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
+                                <th colspan="2">Status</th>
                             </tr>
-                        </tfoot>*@
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -87,8 +91,8 @@
             <div id="req" class="containerOverflow-2 row m-0">
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Requested Appointments</p>
                 @*admin requested appointments table*@
-                <div class="row" style="padding: 2rem; font-size: .9rem ">
-                    <table id="adminRequestedAppointment" class="hoverv tblClk">
+                <div class="row responsive-data-table-div">
+                    <table id="adminRequestedAppointment" class="hover tblClk">
                         @*table headers*@
                         <thead>
                             <tr class="brown-text lighten-1">
@@ -97,7 +101,7 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
-                                <th>Status</th>
+                                <th colspan="2">Status</th>
                             </tr>
                         </thead>
                         @*table content*@
@@ -125,6 +129,16 @@
                             </tr>
                         </tbody>
                         @*table footer*@
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Purpose</th>
+                                <th>Dentist</th>
+                                <th>Patient</th>
+                                <th colspan="2">Status</th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -134,8 +148,8 @@
             <div id="past" class="containerOverflow-2 row m-0">
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Past Appointments</p>
                 @*admin past appointments table*@
-                <div class="row" style="padding: 2rem; font-size: .9rem ">
-                    <table id="adminPastAppointment" class="hoverv tblClk">
+                <div class="row responsive-data-table-div">
+                    <table id="adminPastAppointment" class="hover tblClk">
                         @*table headers*@
                         <thead>
                             <tr class="brown-text lighten-1">
@@ -144,7 +158,7 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
-                                <th>Status</th>
+                                <th colspan="2">Status</th>
                             </tr>
                         </thead>
                         @*table content*@
@@ -164,15 +178,16 @@
                             </tr>
                         </tbody>
                         @*table footer*@
-                        @*<tfoot>
+                        <tfoot>
                             <tr class="brown-text lighten-1">
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
+                                <th colspan="2">Status</th>
                             </tr>
-                        </tfoot>*@
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -447,7 +462,7 @@
 </div>
 
 
-    @*<script>
+@*<script>
         (function () {
             if (typeof M !== 'undefined' && M.Modal) {
                 var elems = document.querySelectorAll('.modal');
@@ -458,7 +473,7 @@
 
             $(document).on('click', '.btn-delete-appt', function (e) {
                 e.preventDefault();
-                // read data-apptid 
+                // read data-apptid
                 apptToDelete = $(this).attr('data-apptid') || $(this).data('apptid') || null;
 
                 var target = $(this).attr('data-target') || $(this).data('target');
@@ -476,7 +491,7 @@
                 }
             });
 
-            // Confirm deletion buttons 
+            // Confirm deletion buttons
             $(document).on('click', '#modalDeleteSchedAppt .edit-btn, #modalDeleteReqAppt .edit-btn, #modalDeletePastAppt .edit-btn', function (e) {
                 e.preventDefault();
 
