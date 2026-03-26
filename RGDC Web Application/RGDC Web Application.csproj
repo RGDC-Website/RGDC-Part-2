@@ -245,7 +245,9 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\images\dentalAppLogo.png" />
+    <Content Include="Content\images\facebook.png" />
     <Content Include="Content\images\google.png" />
+    <Content Include="Content\images\instagram.png" />
     <Content Include="Content\style.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -304,6 +306,7 @@
     <Content Include="Views\RGDC\dentistFinance.cshtml" />
     <Content Include="Views\RGDC\adminAppointment.cshtml" />
     <Content Include="Views\RGDC\adminClinicStaffTab.cshtml" />
+    <Content Include="Views\RGDC\contactUsPage.cshtml" />
     <Content Include="Views\RGDC\faqPage.cshtml" />
   </ItemGroup>
   <ItemGroup>

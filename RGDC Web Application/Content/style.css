@@ -223,6 +223,9 @@ a:hover {
     padding: 0 0 0 0.8rem !important;
 }
 
+.px-0{
+    padding: 1rem 0 !important;
+}
 .px-1 {
     padding: 0 1rem 0 1rem !important;
 }
@@ -267,7 +270,13 @@ mb-3 {
     display: inline-block !important;
 }
 
+.card-content a {
+    color: #795548 !important;
+}
 
+.socmed-img{
+    max-width: 6rem;
+}
 
 
 html, body {
