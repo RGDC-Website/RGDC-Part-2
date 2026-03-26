@@ -20,7 +20,7 @@
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
 @*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
-<body id="body" ng-app="RGDCWebApplication">
+<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
 <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
     @*sidebar nav*@
     <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -39,25 +39,26 @@
             </div>
 
         @*nav tabs*@
-        <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
-            <ul>
-                <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-                <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-                <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-                <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-                <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-                <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
-                <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-                <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                    <li>
-                        <a href="#!" class="white-text">one</a>
-                    </li>
-                    <li>
-                        <a href="#!" class="white-text">two</a>
-                    </li>
-                </ul>
-            </div>
+    <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
+        <ul>
+            <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+            <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+            <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+            <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+            <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
+            <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+            <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
+            <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
+            <ul id="contactDropdown" class="dropdown-content brown lighten-1">
+                <li>
+                    <a href="#!" class="white-text">one</a>
+                </li>
+                <li>
+                    <a href="#!" class="white-text">two</a>
+                </li>
+            </ul>
+        </ul>
+    </div>
            
 
             @*date and time at the bottom of the screen*@
@@ -116,7 +117,7 @@
             <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
             <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
             <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-            <li><a href="~/RGDC/contactUsPage" class="white-text valign-wrapper navText" ><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact Us</a></li>
+            <li><a href="~/RGDC/contactUsPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact Us</a></li>
 
             @*date and time at the bottom of the screen*@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
@@ -124,21 +125,22 @@
                 <span>00:00 AM</span>
             </div>
 
-        <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-        <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-        <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-        <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-        <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-        <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-        <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
-        <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-        <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-            <li>
-                <a href="#!" class="white-text">one</a>
-            </li>
-            <li>
-                <a href="#!" class="white-text">two</a>
-            </li>
+            <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+            <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+            <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+            <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+            <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
+            <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+            <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
+            <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
+            <ul id="contactDropdown" class="dropdown-content brown lighten-1">
+                <li>
+                    <a href="#!" class="white-text">one</a>
+                </li>
+                <li>
+                    <a href="#!" class="white-text">two</a>
+                </li>
+            </ul>
         </ul>
 
         @*content*@
