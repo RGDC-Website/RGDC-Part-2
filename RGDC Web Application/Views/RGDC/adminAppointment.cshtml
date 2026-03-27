@@ -64,7 +64,7 @@
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" ng-click="openDeleteApptModal(appt)" data-target="modal-delete-sched" data-position="bottom" data-tooltip="Delete Appointment">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn" ng-click="openDeleteApptModal(appt, 'scheduled')" data-position="bottom" data-tooltip="Delete Appointment">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
                                     <a href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0" ng-click="openEditApptModal(appt, $event)" data-position="bottom" data-tooltip="Edit Appointment" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
@@ -171,7 +171,7 @@
                                 <td>{{p.patientName}}</td>
                                 <td>{{p.displayStatus || p.status}}</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger btn-delete-appt" data-target="modalDeletePastAppt" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
+                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn btn-delete-appt" ng-click="openDeleteApptModal(p, 'past')" data-position="bottom" data-tooltip="Delete Appointment" data-apptid="">
                                         <i class="material-icons brown-text lighten-1">delete</i>
                                     </a>
                                 </td>
@@ -214,7 +214,7 @@
                     Dentist
                     <select class="custom-input" ng-model="newApptRequest.dentistID">
                         <option value="">Select Dentist</option>
-                        <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
+                        <option ng-repeat="dentist in dentistArray" ng-value="dentist.dentistID">{{dentist.dentistName}}</option>
                     </select>
                 </label>
                 <label class="custom-label" ng-if="currentUserAuthorization === '2'">
@@ -261,7 +261,7 @@
                     Patient
                     <select class="custom-input" ng-model="newApptRequest.patientID">
                         <option value="">Select Patient</option>
-                        <option ng-repeat="patient in patientArray" value="{{patient.patientID}}">{{patient.patientName}}</option>
+                        <option ng-repeat="patient in patientArray" ng-value="patient.patientID">{{patient.patientName}}</option>
                     </select>
                 </label>
             </div>

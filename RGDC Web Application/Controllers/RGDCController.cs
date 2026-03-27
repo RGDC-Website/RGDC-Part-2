@@ -1,4 +1,11 @@
-﻿using Microsoft.Ajax.Utilities;
+﻿//for google calendar api
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2.Responses;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
@@ -17,10 +24,12 @@ using System.Net.Mail;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace RGDC_Web_Application.Controllers
@@ -145,7 +154,7 @@ namespace RGDC_Web_Application.Controllers
         }
 
         public ActionResult contactUsPage()
-           {
+        {
             return View();
         }
         public ActionResult faqPage()
@@ -435,7 +444,7 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-        public JsonResult getSessionVariable()  
+        public JsonResult getSessionVariable()
         {
             try
             {
@@ -444,11 +453,30 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "User session expired." }, JsonRequestBehavior.AllowGet);
                 }
 
+                bool googleCalendarEnabled = false;
+                bool googleRefreshTokenPresent = false;
+                int accID = 0;
+
+                if (Session["UserID"] != null && int.TryParse(Session["UserID"].ToString(), out accID))
+                {
+                    using (var db = new RGDCContext())
+                    {
+                        var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                        if (acc != null)
+                        {
+                            googleCalendarEnabled = acc.googleCalendarEnabled;
+                            googleRefreshTokenPresent = !string.IsNullOrEmpty(acc.googleRefreshToken);
+                        }
+                    }
+                }
+
                 return Json(new
                 {
                     userName = Session["UserName"].ToString(),
                     fullName = Session["UserFullName"].ToString(),
                     userAuthorization = Session["UserAuthorization"].ToString(),
+                    googleCalendarEnabled = googleCalendarEnabled,
+                    googleRefreshTokenPresent = googleRefreshTokenPresent
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -839,7 +867,7 @@ namespace RGDC_Web_Application.Controllers
                         ).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
-                 }
+            }
         }
 
         [HttpPost]
@@ -1379,25 +1407,24 @@ namespace RGDC_Web_Application.Controllers
                 if (request == null)
                     return Json(new { success = false, message = "No appointment data provided." });
 
-                var patientID = request.patientID;
-                var dentistID = request.dentistID;
-                var dateTime = request.dateTime;
-                var reason = request.reason;
-
-                if (patientID <= 0 || dentistID <= 0)
+                // Validate required fields
+                if (request.patientID <= 0 || request.dentistID <= 0)
                     return Json(new { success = false, message = "Invalid patient or dentist ID." });
 
-                if (dateTime == DateTime.MinValue)
-                    return Json(new { success = false, message = "Invalid date/time provided." });
+                // Ensure dateTime was provided and is a sensible date (not DateTime.MinValue / zero)
+                if (request.dateTime == null || request.dateTime == DateTime.MinValue)
+                    return Json(new { success = false, message = "Invalid appointment date/time provided." });
 
-                // Server-side validation: appointment must be at least 2 days from now
+                var dateTime = request.dateTime;
+
+                // Server-side rule: appointment must be at least 2 days from today
                 var minAllowed = DateTime.Today.AddDays(2);
                 if (dateTime.Date < minAllowed.Date)
                 {
                     return Json(new { success = false, message = "Appointment date must be at least 2 days from today." });
                 }
 
-                if (string.IsNullOrWhiteSpace(reason))
+                if (string.IsNullOrWhiteSpace(request.reason))
                     return Json(new { success = false, message = "Purpose/reason is required." });
 
                 var sessionVal = Session["UserID"];
@@ -1409,21 +1436,21 @@ namespace RGDC_Web_Application.Controllers
 
                 using (var db = new RGDCContext())
                 {
-                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == request.patientID);
                     if (patient == null)
                         return Json(new { success = false, message = "Patient not found in database." });
 
-                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == dentistID);
+                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == request.dentistID);
                     if (dentist == null)
                         return Json(new { success = false, message = "Dentist not found in database." });
 
                     var newAppointment = new tblAppointmentModel()
                     {
-                        patientID = patientID,
-                        dentistID = dentistID,
+                        patientID = request.patientID,
+                        dentistID = request.dentistID,
                         createdBy = createdByID,
                         dateTime = dateTime,
-                        reason = reason,
+                        reason = request.reason,
                         status = "Requested",
                         schedCreatedAt = DateTime.Now,
                         schedUpdatedAt = DateTime.Now
@@ -1432,16 +1459,12 @@ namespace RGDC_Web_Application.Controllers
                     db.tbl_appointment.Add(newAppointment);
                     db.SaveChanges();
 
-                    return Json(new
-                    {
-                        success = true,
-                        message = "Appointment request created successfully.",
-                        apptID = newAppointment.apptID
-                    });
+                    return Json(new { success = true, message = "Appointment request created successfully.", apptID = newAppointment.apptID });
                 }
             }
             catch (Exception ex)
             {
+                // Log ex (recommended)
                 return Json(new { success = false, message = $"Error creating appointment request: {ex.Message}" });
             }
         }
@@ -1576,7 +1599,7 @@ namespace RGDC_Web_Application.Controllers
                     join pa in db.tbl_account on p.accID equals pa.accID
 
                     join d in db.tbl_dentist on pay.dentistID equals d.dentistID
-                    join da in db.tbl_account on d.accID equals da.accID  
+                    join da in db.tbl_account on d.accID equals da.accID
 
                     where pay.paymentID == paymod.paymentID
 
@@ -1624,6 +1647,51 @@ namespace RGDC_Web_Application.Controllers
                     appt.status = "Scheduled";
                     appt.schedUpdatedAt = DateTime.Now;
                     db.SaveChanges();
+
+                    //FOR GOOGLE CALENDAR CODE
+                    try
+                    {
+                        // Create event on dentist calendar if dentist account has google enabled
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                        if (dentist != null)
+                        {
+                            var dentistAcc = db.tbl_account.FirstOrDefault(a => a.accID == dentist.accID);
+                            if (dentistAcc != null && dentistAcc.googleCalendarEnabled && !string.IsNullOrEmpty(dentistAcc.googleRefreshToken))
+                            {
+                                // run asynchronously and don't block response
+                                Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await CreateGoogleEventForAccountAsync(db, appt.apptID, dentistAcc.accID, dentistAcc.googleRefreshToken);
+                                    }
+                                    catch { /* log */ }
+                                });
+                            }
+                        }
+
+                        // Optionally create event on patient calendar if patient account has google enabled
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+                        if (patient != null)
+                        {
+                            var patientAcc = db.tbl_account.FirstOrDefault(a => a.accID == patient.accID);
+                            if (patientAcc != null && patientAcc.googleCalendarEnabled && !string.IsNullOrEmpty(patientAcc.googleRefreshToken))
+                            {
+                                Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await CreateGoogleEventForAccountAsync(db, appt.apptID, patientAcc.accID, patientAcc.googleRefreshToken);
+                                    }
+                                    catch { /* log */ }
+                                });
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // swallow to avoid breaking accept flow; consider logging
+                    }
 
                     return Json(new { success = true, message = "Appointment accepted successfully." });
                 }
@@ -1700,6 +1768,199 @@ namespace RGDC_Web_Application.Controllers
                 }
 
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        //for google calendar codessssssss
+        [HttpGet]
+        public ActionResult ConnectGoogle()
+        {
+            var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+            var redirect = ConfigurationManager.AppSettings["GoogleRedirectUri"];
+            var scope = "https://www.googleapis.com/auth/calendar.events";
+            var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={HttpUtility.UrlEncode(clientId)}&redirect_uri={HttpUtility.UrlEncode(redirect)}&response_type=code&scope={HttpUtility.UrlEncode(scope)}&access_type=offline&prompt=consent";
+            return Redirect(authUrl);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GoogleAuthCallback(string code, string state)
+        {
+            if (string.IsNullOrEmpty(code)) return Content("Authorization failed. No code.");
+
+            var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+            var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+            var redirect = ConfigurationManager.AppSettings["GoogleRedirectUri"];
+
+            var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
+            {
+                ClientSecrets = new ClientSecrets { ClientId = clientId, ClientSecret = clientSecret }
+            });
+
+            TokenResponse token;
+            try
+            {
+                // Assign the result to the 'token' variable declared above
+                token = await flow.ExchangeCodeForTokenAsync("user", code, redirect, CancellationToken.None);
+            }
+            catch (System.Exception ex)
+            {
+                return Content("Token exchange failed: " + ex.Message);
+            }
+
+            // Save refresh token for current logged-in account (encrypt in production)
+            var sessionVal = Session["UserID"];
+            if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int accID))
+            {
+                using (var db = new RGDCContext())
+                {
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc != null)
+                    {
+                        if (!string.IsNullOrEmpty(token.RefreshToken))
+                            acc.googleRefreshToken = token.RefreshToken;
+                        acc.googleCalendarEnabled = true;
+                        db.SaveChanges();
+                    }
+                }
+            }
+            return Content("<script>try{window.opener.postMessage({ type: 'google-auth-success' }, '*');}catch(e){} window.close();</script>", "text/html");
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateGoogleEvent(int apptID)
+        {
+            try
+            {
+                var sessionVal = Session["UserID"];
+                if (sessionVal == null) return Json(new { success = false, message = "Not logged in" });
+
+                using (var db = new RGDCContext())
+                {
+                    int accID = int.Parse(sessionVal.ToString());
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc == null || !acc.googleCalendarEnabled || string.IsNullOrEmpty(acc.googleRefreshToken))
+                        return Json(new { success = false, message = "Google not connected" });
+
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null) return Json(new { success = false, message = "Appointment not found" });
+
+                    var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+                    var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+
+                    var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
+                    {
+                        ClientSecrets = new ClientSecrets { ClientId = clientId, ClientSecret = clientSecret },
+                        Scopes = new[] { CalendarService.Scope.CalendarEvents }
+                    });
+
+                    var token = new TokenResponse { RefreshToken = acc.googleRefreshToken };
+                    var cred = new UserCredential(flow, "user-" + accID, token);
+                    var refreshed = await cred.RefreshTokenAsync(CancellationToken.None);
+                    if (!refreshed) return Json(new { success = false, message = "Failed to refresh token" });
+
+                    var service = new CalendarService(new BaseClientService.Initializer
+                    {
+                        HttpClientInitializer = cred,
+                        ApplicationName = "RGDC Web Application"
+                    });
+
+                    var ev = new Event
+                    {
+                        Summary = appt.reason ?? "Appointment",
+                        Description = $"Dentist ID: {appt.dentistID}",
+                        Start = new EventDateTime { DateTime = appt.dateTime, TimeZone = "UTC" },
+                        End = new EventDateTime { DateTime = appt.dateTime.AddMinutes(30), TimeZone = "UTC" }
+                    };
+
+                    var created = await service.Events.Insert(ev, "primary").ExecuteAsync();
+
+                    // Optionally persist Google event id for later deletion/update
+                    appt.remarks = (appt.remarks ?? "") + $"|googleEventId:{created.Id}";
+                    db.SaveChanges();
+
+                    return Json(new { success = true, eventId = created.Id });
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult ToggleGoogleCalendar(bool enabled)
+        {
+            var sessionVal = Session["UserID"];
+            if (sessionVal == null) return Json(new { success = false, message = "Not logged in" });
+            int accID = int.Parse(sessionVal.ToString());
+
+            using (var db = new RGDCContext())
+            {
+                var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                if (acc == null) return Json(new { success = false, message = "Account not found" });
+                acc.googleCalendarEnabled = enabled;
+                if (!enabled) acc.googleRefreshToken = null; // optionally revoke
+                db.SaveChanges();
+            }
+
+            return Json(new { success = true });
+        }
+
+        private async Task CreateGoogleEventForAccountAsync(RGDCContext dbContext, int apptID, int accID, string refreshToken)
+        {
+            // You can create a new DbContext inside this task if you prefer
+            using (var db = new RGDCContext())
+            {
+                var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                if (appt == null) return;
+
+                var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+                var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+
+                var flow = new Google.Apis.Auth.OAuth2.Flows.GoogleAuthorizationCodeFlow(
+                    new Google.Apis.Auth.OAuth2.Flows.GoogleAuthorizationCodeFlow.Initializer
+                    {
+                        ClientSecrets = new Google.Apis.Auth.OAuth2.ClientSecrets { ClientId = clientId, ClientSecret = clientSecret },
+                        Scopes = new[] { Google.Apis.Calendar.v3.CalendarService.Scope.CalendarEvents }
+                    });
+
+                var token = new Google.Apis.Auth.OAuth2.Responses.TokenResponse { RefreshToken = refreshToken };
+                var cred = new Google.Apis.Auth.OAuth2.UserCredential(flow, "user-" + accID, token);
+
+                // refresh to get access token
+                var refreshed = await cred.RefreshTokenAsync(CancellationToken.None);
+                if (!refreshed) return;
+
+                var service = new Google.Apis.Calendar.v3.CalendarService(new Google.Apis.Services.BaseClientService.Initializer
+                {
+                    HttpClientInitializer = cred,
+                    ApplicationName = "RGDC Web Application"
+                });
+
+                var ev = new Google.Apis.Calendar.v3.Data.Event
+                {
+                    Summary = appt.reason ?? "RGDC Appointment",
+                    Description = $"Dentist ID: {appt.dentistID}",
+                    Start = new Google.Apis.Calendar.v3.Data.EventDateTime { DateTime = appt.dateTime, TimeZone = "UTC" },
+                    End = new Google.Apis.Calendar.v3.Data.EventDateTime { DateTime = appt.dateTime.AddMinutes(30), TimeZone = "UTC" }
+                };
+
+                var created = await service.Events.Insert(ev, "primary").ExecuteAsync();
+
+                // Optionally persist created.Id back to appt for future deletion/updates
+                if (!string.IsNullOrEmpty(created.Id))
+                {
+                    // safer to open a new db context for updates
+                    using (var updateDb = new RGDCContext())
+                    {
+                        var a = updateDb.tbl_appointment.FirstOrDefault(x => x.apptID == apptID);
+                        if (a != null)
+                        {
+                            a.remarks = (a.remarks ?? "") + $"|googleEventId:{created.Id}";
+                            updateDb.SaveChanges();
+                        }
+                    }
+                }
             }
         }
     }

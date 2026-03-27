@@ -335,12 +335,34 @@
         });
     };
 
-    // delete appointment
+    // delete appointment (send form urlencoded so MVC binds primitive apptID)
     this.deleteAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
         return $http({
-            method: "POST",
-            url: "/RGDC/DeleteAppointment",
-            data: { apptID: apptID }
+            method: 'POST',
+            url: '/RGDC/DeleteAppointment',
+            data: (function(obj){
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
         });
+    };
+
+
+    //google calendar CODDDDDDEEEEESSSSSSSSSSS
+    this.connectGoogle = function () {
+        return $http.get('/RGDC/ConnectGoogle');
+    };
+
+    this.toggleGoogleCalendar = function (enabled) {
+        return $http.post('/RGDC/ToggleGoogleCalendar', { enabled: enabled });
+    };
+
+    this.createGoogleEvent = function (apptID) {
+        return $http.post('/RGDC/CreateGoogleEvent', { apptID: apptID });
     };
 });

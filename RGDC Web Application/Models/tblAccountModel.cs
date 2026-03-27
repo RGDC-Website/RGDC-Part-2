@@ -25,7 +25,7 @@ namespace RGDC_Web_Application.Models
         public DateTime lastLogin { get; set; }
         public DateTime accCreatedAt { get; set; }
         public DateTime accUpdatedAt { get; set; }
-
-
+        public string googleRefreshToken { get; set; }
+        public bool googleCalendarEnabled { get; set; }
     }
 }
