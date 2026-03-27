@@ -144,7 +144,14 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
-
+        public ActionResult contactUsPage()
+        {
+            return View();
+        }
+        public ActionResult faqPage()
+        {
+            return View();
+        }
 
 
         [HttpPost]
