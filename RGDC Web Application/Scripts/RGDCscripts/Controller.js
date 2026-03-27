@@ -225,6 +225,7 @@
                 var modal = document.getElementById("patientInformationForm");
                 if (modal) {
                     modal.style.display = "block";
+                }
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -232,7 +233,7 @@
                         text: "Enter another email address",
                     });
                     return;
-                }
+                
             }
         });
     };
