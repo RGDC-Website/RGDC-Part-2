@@ -20,7 +20,7 @@
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
 </head>
 @*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
-<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
+<body id="body">
 <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
     @*sidebar nav*@
     <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -144,7 +144,8 @@
         </ul>
 
         @*content*@
-        <div class="col l9 main-content container">
+        @*<div class="col l9 main-content container">*@
+        <div class="col l9 main-content">
             @RenderBody()
         </div>
     </div>
@@ -203,9 +204,6 @@
             var tocElement = document.querySelector('.table-of-contents');
             var tocWrapper = document.querySelector('.toc-wrapper');
 
-            M.Pushpin.init(tocWrapper, {
-                top: tocWrapper.offsetTop
-            });
         });
 
         //tabs javascript

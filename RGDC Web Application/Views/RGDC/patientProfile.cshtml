@@ -117,7 +117,7 @@
 
         @*right column------------------------------------------------------------------------------------------------------------------------------------*@
         <div class="col m8 l8" style="padding-right: 0">
-            <div class="card grey lighten-2">
+            <div class="card grey lighten-2" style="height:86.8vh">
                 <nav class="nav-extended grey lighten-2 z-depth-0">
                     <div class="nav-content p-1">
                         <ul class="tabs tabs-transparent center-tabs">
@@ -129,7 +129,7 @@
                         </ul>
                     </div>
                 </nav>
-                <div class="card-content containerOverflow-2">
+                <div class="card-content">
 
                     @*medical history*@
                     <div id="med" class="containerOverflow-2 row m-0">
@@ -283,10 +283,10 @@
                     </div>
 
                     @*Progress Notes*@
-                    <div id="prog" class="row m-0">
+                    <div id="prog" class="row m-0 containerOverflow-2">
 
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modalAddProgNotes">ADD NOTE</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modalAddProgNotes">ADD NOTE</a>
                         </div>
 
                         <table id="progressNotes" class="hover">
@@ -339,7 +339,7 @@
                     <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modalDentalChart">EDIT CHART</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modalDentalChart">EDIT CHART</a>
                         </div>
 
                         <div class="row m-0 center">
@@ -352,9 +352,9 @@
                     </div>
 
                     @*Forms*@
-                    <div id="forms" class="row m-0">
+                    <div id="forms" class="row m-0 containerOverflow-2">
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk">
@@ -394,7 +394,7 @@
                     </div>
 
                     @*post op*@
-                    <div id="postOp" class="row m-0">
+                    <div id="postOp" class="row m-0 containerOverflow-2">
 
                         <div class="row">
                             <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
