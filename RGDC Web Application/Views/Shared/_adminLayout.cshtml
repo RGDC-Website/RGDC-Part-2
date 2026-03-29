@@ -21,64 +21,65 @@
 </head>
 @*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
 <body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
-<div class="row" style="margin: 0;" ng-init="getSessionVariables()">
-    @*sidebar nav*@
-    <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
-        <h5 style="font-weight:bold;">RGDC</h5>
+    <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
+        @*sidebar nav*@
+        <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text sidebar-fixed" style="min-height: 100vh; position: fixed;">
+            <h5 style="font-weight:bold;">RGDC</h5>
 
-        @*user pfp and name*@
-        <div class="row center" style="margin-top: 5rem;">
-            @*lagyan nalang ng src for image source*@
-            <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
-        </div>
-
-        @*user name and role*@
-        <div class="row center">
-            <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
-            <h6>{{userRole}}</h6>
-        </div>
-
-        @*Calendaryo CODESSS*@
-        <div class="row center" style="margin-top: 0.5rem;">
-            <div class="google-sync" style="display:inline-block; margin-left:0;">
-                <label style="vertical-align: middle;">
-                    <input type="checkbox" ng-model="googleCalendarEnabled" ng-change="toggleGoogleCalendar(googleCalendarEnabled)" />
-                    <span style="vertical-align: middle; margin-left:0.5rem;">Save appointments to Google Calendar</span>
-                </label>
-                <button class="btn small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
+            @*user pfp and name*@
+            <div class="row center sidebar-profile" style="margin-top: 5rem;">
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img" />
             </div>
-        </div>
 
-        @*nav tabs*@
-        <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
-            <ul>
-                <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-                <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-                <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-                <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-                <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-                <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-                <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
-                <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-                <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                    <li>
-                        <a href="#!" class="white-text">one</a>
-                    </li>
-                    <li>
-                        <a href="#!" class="white-text">two</a>
-                    </li>
+            @*user name and role*@
+            <div class="row center">
+                <h5 style="font-weight:bold;">{{currentUserFullName}}</h5>
+                <h6>{{userRole}}</h6>
+            </div>
+
+            @*Calendaryo CODESSS*@
+            <div class="row center" style="margin-top: 0.5rem;">
+                <div class="google-sync" style="display:inline-block; margin-left:0;">
+                    <label style="vertical-align: middle;">
+                        <input type="checkbox" ng-model="googleCalendarEnabled" ng-change="toggleGoogleCalendar(googleCalendarEnabled)" />
+                        <span style="vertical-align: middle; margin-left:0.5rem;">Save appointments to Google Calendar</span>
+                    </label>
+                    <button class="btn small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
+                </div>
+            </div>
+
+            @*nav tabs*@
+            <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
+                <ul>
+                    <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
+                    <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
+                    <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
+                    <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
+                    <li><a href="~/RGDC/adminAppointment" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
+                    <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
+                    <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
+                    <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
+                    <ul id="contactDropdown" class="dropdown-content brown lighten-1">
+                        <li>
+                            <a href="#!" class="white-text">one</a>
+                        </li>
+                        <li>
+                            <a href="#!" class="white-text">two</a>
+                        </li>
+                    </ul>
                 </ul>
-            </ul>
+            </div>
+
+
+            @*date and time at the bottom of the screen*@
+            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+                <span id="currentDate">Loading date...</span>
+                <span id="currentTime">Loading time...</span>
+            </div>
+
+
+
         </div>
-
-
-        @*date and time at the bottom of the screen*@
-        <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
-            <span>Month DD, YYYY | </span>
-            <span>00:00 AM</span>
-        </div>
-
-    </div>
 
         @*sidebar nav (mobile)*@
         <div class=" show-on-medium-and-down hide-on-large-only s12 m12 brown lighten-1 z-depth-3 white-text p-0 m-0" style="width: 100% !important">
@@ -313,7 +314,7 @@
             var instances = M.Sidenav.init(elems);
         });
 
-       document.addEventListener('DOMContentLoaded', function () { 
+       document.addEventListener('DOMContentLoaded', function () {
            var today = new Date();
 
            // Date picker
@@ -366,5 +367,47 @@
     <script src="~/Scripts/RGDCscripts/Module.js"></script>
     <script src="~/Scripts/RGDCscripts/Service.js"></script>
     <script src="~/Scripts/RGDCscripts/Controller.js"></script>
+    <script>
+
+
+        //for Date and time sa dashboard
+        (function () {
+            function pad(n) { return n < 10 ? '0' + n : n; }
+            var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+            function renderDateTime() {
+                try {
+                    var now = new Date();
+                    var month = months[now.getMonth()];
+                    var day = now.getDate();
+                    var year = now.getFullYear();
+
+                    var hours = now.getHours();
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    var minutes = pad(now.getMinutes());
+                    var seconds = pad(now.getSeconds());
+
+                    var dateEl = document.getElementById('currentDate');
+                    var timeEl = document.getElementById('currentTime');
+                    if (dateEl) dateEl.textContent = month + ' ' + day + ', ' + year + ' | ';
+                    if (timeEl) timeEl.textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+                } catch (e) {
+                    console.error('renderDateTime error', e);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () {
+                    renderDateTime();
+                    setInterval(renderDateTime, 1000);
+                });
+            } else {
+                renderDateTime();
+                setInterval(renderDateTime, 1000);
+            }
+        })();
+    </script>
 </body>
 </html>

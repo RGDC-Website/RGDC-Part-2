@@ -469,64 +469,71 @@
     
 
     $scope.signUp = function () {
-
         try {
             var birthDate = new Date($scope.signUp_birthDate);
-            birthDate.setHours(0, 0, 0, 0); // 00:00:00
+            birthDate.setHours(0, 0, 0, 0);
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
-                var accountData = {
-                    firstName: $scope.signUp_firstName,
-                    middleName: $scope.signUp_middleName,
-                    lastName: $scope.signUp_lastName,
-                    genderID: $scope.signUp_genderID,
-                    birthDate: birthDate,
-                    email: $scope.signUp_email,
-                    contactNumber: $scope.signUp_contactNumber,
-                    address: $scope.signUp_address,
-                    civilStatus: $scope.signUp_civilStatus,
-                    password: $scope.signUp_password,
-                    lastLogin: new Date(),
-                    accCreatedAt: new Date(),
-                    accUpdatedAt: new Date(),
-                }
-
-                if ($scope.signUp_agreement == true) {
-                    var signUp = RGDCWebApplicationService.signUp(accountData);
-                    signUp.then(function (signUpID) {
-                        var patientData = {
-                            currentPhysician: $scope.signUp_currentPhysician,
-                            referral: $scope.signUp_referral,
-                            lastVisit: $scope.signUp_lastVisit,
-                            medicalHistory: "",
-                            accID: signUpID.data.accID
-
-                        }
-                        var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
-                        signUpPatient.then(function () {
-                            window.location.href = "/RGDC/logIn";
-                        });
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Read and Accept the Following:",
-                        text: "Terms and Conditions & Data Privacy Policy",
-                    });
-
-                }
+            if (!($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password)) {
+                Swal.fire({ icon: "error", title: "Incomplete Inputs", text: "Ensure all fields are filled up with valid information." });
+                return;
             }
-            else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Incomplete Inputs",
-                    text: "Ensure all fields are filled up with valid information.",
+
+            if ($scope.signUp_agreement !== true) {
+                Swal.fire({ icon: "error", title: "Read and Accept the Following:", text: "Terms and Conditions & Data Privacy Policy" });
+                return;
+            }
+
+            var accountData = {
+                firstName: $scope.signUp_firstName,
+                middleName: $scope.signUp_middleName,
+                lastName: $scope.signUp_lastName,
+                genderID: $scope.signUp_genderID,
+                birthDate: birthDate,
+                email: $scope.signUp_email,
+                contactNumber: $scope.signUp_contactNumber,
+                address: $scope.signUp_address,
+                civilStatus: $scope.signUp_civilStatus,
+                password: $scope.signUp_password,
+                lastLogin: new Date(),
+                accCreatedAt: new Date(),
+                accUpdatedAt: new Date()
+            };
+
+            // Step 1: create account
+            RGDCWebApplicationService.signUp(accountData)
+                .then(function (signUpID) {
+                    var accID = signUpID && signUpID.data && signUpID.data.accID ? signUpID.data.accID : null;
+                    if (!accID) throw 'Failed to create account.';
+
+                    // Step 2: upload photo (optional) and link to created acc
+                    return uploadUserPhotoForAcc(accID).then(function () { return accID; });
+                })
+                .then(function (accID) {
+                    // Step 3: create patient record
+                    var patientData = {
+                        currentPhysician: $scope.signUp_currentPhysician,
+                        referral: $scope.signUp_referral,
+                        lastVisit: $scope.signUp_lastVisit,
+                        medicalHistory: "",
+                        accID: accID
+                    };
+                    return RGDCWebApplicationService.signUpPatient(patientData).then(function () { return accID; });
+                })
+                .then(function () {
+                    Swal.fire({ title: "Sign Up Successful!", text: "Account created. Please log in.", icon: "success" })
+                        .then(function () { window.location.href = "/RGDC/logIn"; });
+                })
+                .catch(function (err) {
+                    console.error('Sign up error:', err);
+                    var msg = (err && err.data && err.data.message) ? err.data.message : (typeof err === 'string' ? err : 'An error occurred during sign up');
+                    Swal.fire({ icon: "error", title: "Sign Up Failed", text: msg });
                 });
-            }
+
         } catch (e) {
-            console.log(e.message)
+            console.error('signUp exception:', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: 'An unexpected error occurred.' });
         }
-    }
+    };
 
     $scope.login = function () {
 
@@ -606,6 +613,7 @@
                 $scope.currentUserID = returnedData.data.userID || "";
                 $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
                 $scope.currentUserFullName = returnedData.data.fullName || "";
+                $scope.currentUserPhoto = returnedData.data.userPhoto || ""; // NEW: profile photo path
 
                 // BAGONG CODE PARA SA GOOGLE CALENDAR
                 $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
@@ -2342,16 +2350,20 @@
                         };
                         $scope.newApptRequest.time = "12:00 AM";
 
-                        var modal = findModalElement(['modalAddAppt','modal-add-appt','modalAddAppt']);
+                        var modal = findModalElement(['modalAddAppt', 'modal-add-appt', 'modalAddAppt']);
                         if (modal && typeof M !== 'undefined' && M.Modal) {
                             var inst = M.Modal.getInstance(modal);
                             if (inst) inst.close();
                         }
 
-                        // Reload requested appointments to refresh the view
-                        // Note: The appointment will only show in the recipient's requested appointments,
-                        // not the creator's, based on role-based filtering
-                        $scope.loadRequestedAppointments();
+                        // Refresh all appointment lists so UI stays in sync immediately
+                        try { $scope.loadRequestedAppointments(); } catch (e) { console.error(e); }
+                        try { $scope.loadBookedSlots(); } catch (e) { console.error(e); }
+                        try { $scope.loadAdminScheduledAppointments(); } catch (e) { console.error(e); }
+                        try { $scope.loadPastAppointments(); } catch (e) { console.error(e); }
+
+                        // Recompute any dashboard slices
+                        try { updateDashboardLists(); } catch (e) { console.error(e); }
                     });
                 } else {
                     Swal.fire({
@@ -2643,18 +2655,48 @@
                     try { existing = M.Datepicker.getInstance(el); } catch (e) { existing = null; }
                     if (existing) existing.destroy();
 
+                    // determine which model this date input should update
+                    var target = 'new'; // default
+                    var id = el.id || '';
+                    if (/edit/i.test(id)) target = 'edit';
+
                     M.Datepicker.init(el, {
                         format: 'mmmm dd, yyyy',
                         autoClose: true,
                         minDate: minDateObj,
                         onSelect: function (date) {
-                            $scope.$apply(function () {
-                                // store ISO string so later new Date(...) parses reliably
-                                $scope.newApptRequest = $scope.newApptRequest || {};
-                                $scope.newApptRequest.dateTime = date.toISOString();
-                            });
+                            try {
+                                if (target === 'new') {
+                                    $scope.newApptRequest = $scope.newApptRequest || {};
+                                    $scope.newApptRequest.dateTime = date.toISOString();
+                                } else {
+                                    $scope.editingAppt = $scope.editingAppt || {};
+                                    // editingAppt.dateObj stores ISO so editing code can parse it consistently
+                                    $scope.editingAppt.dateObj = date.toISOString();
+                                }
+                            } catch (e) {
+                                console.error('datepicker onSelect assign error', e);
+                            }
+                            // ensure digest safely (we are in Materialize callback outside Angular)
+                            try { $timeout(function () { }); } catch (e) { }
                         }
                     });
+
+                    // set initial date if scope already has a date value
+                    try {
+                        var inst = M.Datepicker.getInstance(el);
+                        if (inst) {
+                            if (target === 'new' && $scope.newApptRequest && $scope.newApptRequest.dateTime) {
+                                var d = new Date($scope.newApptRequest.dateTime);
+                                if (!isNaN(d.getTime())) inst.setDate(d);
+                            } else if (target === 'edit' && $scope.editingAppt && $scope.editingAppt.dateObj) {
+                                var d2 = new Date($scope.editingAppt.dateObj);
+                                if (!isNaN(d2.getTime())) inst.setDate(d2);
+                            }
+                        }
+                    } catch (e) {
+                        // ignore setDate failures
+                    }
                 });
             } catch (e) {
                 console.error('initializeAppointmentDatepickers error', e);
@@ -2741,4 +2783,167 @@
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create Google Calendar event.' });
             });
     };
+
+    //CODES PARA SA IMAGE UPLOAD NG SIGN UPPPPPPPPPPPPPPPPPPPPPPP
+
+    $scope.signupPhotoPreview = null;
+    $scope._pickedSignUpPhotoFile = null;
+    $scope._uploadedSignUpPhotoPath = null;
+
+    $scope.pickSignUpPhoto = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) { document.body.removeChild(input); return; }
+
+            // client-side validation: type + max size (5 MB)
+            if (!file.type || !file.type.startsWith('image/')) {
+                Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+                document.body.removeChild(input);
+                return;
+            }
+            var maxBytes = 5 * 1024 * 1024;
+            if (file.size && file.size > maxBytes) {
+                Swal.fire({ icon: 'error', title: 'File too large', text: 'Please choose an image smaller than 5 MB.' });
+                document.body.removeChild(input);
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    $scope.signupPhotoPreview = evt.target.result;     // Data URL preview
+                    $scope._pickedSignUpPhotoFile = file;              // keep file for later upload
+                    $scope._uploadedSignUpPhotoPath = null;            // reset previously uploaded path
+                });
+            };
+            reader.readAsDataURL(file);
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    function uploadUserPhotoForAcc(accID) {
+        // returns a Promise that resolves to filePath (string) or null
+        return new Promise(function (resolve, reject) {
+            if (!accID) return reject("Missing accID for photo upload.");
+            if (!$scope._pickedSignUpPhotoFile) return resolve(null);
+
+            Swal.fire({ title: 'Uploading photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            // Call service (returns an Angular $http promise)
+            RGDCWebApplicationService.uploadUserPhoto($scope._pickedSignUpPhotoFile, accID)
+                .then(function (resp) {
+                    Swal.close();
+                    var data = resp && resp.data ? resp.data : resp;
+                    if (data && data.success && data.filePath) {
+                        // update scope directly (we are inside Angular promise, no $apply)
+                        $scope._uploadedSignUpPhotoPath = data.filePath;
+                        if (!$scope.signupPhotoPreview) $scope.signupPhotoPreview = data.filePath;
+                        resolve(data.filePath);
+                    } else {
+                        reject((data && data.message) ? data.message : 'Upload failed');
+                    }
+                })
+                .catch(function (err) {
+                    Swal.close();
+                    console.error('UploadUserPhoto error:', err);
+                    // convert Angular error object to message
+                    var errMsg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Upload failed';
+                    reject(errMsg);
+                });
+        });
+    }
+
+    //for prevention of dual booking in appointment creationnnnnnnnnn
+    $scope.allTimeOptions = [
+        "12:00 AM", "1:00 AM", "2:00 AM", "3:00 AM", "4:00 AM", "5:00 AM", "6:00 AM",
+        "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+        "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM", "6:00 PM",
+        "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"
+    ];
+
+    $scope.timeOptions = angular.copy($scope.allTimeOptions);
+    $scope.bookedSlotsMap = {};
+
+    $scope.loadBookedSlots = function () {
+        RGDCWebApplicationService.getAdminScheduledAppointments()
+            .then(function (resp) {
+                var data = resp.data || [];
+                $scope.bookedSlotsMap = {};
+
+                data.forEach(function (a) {
+                    // Ensure dentistID exists and is numeric
+                    var did = a.dentistID ? parseInt(a.dentistID, 10) : 0;
+                    if (!did) return;
+
+                    // parse dateTime safely (handles "/Date(...)/" and ISO)
+                    var dt = parseJsonDateToJsDate(a.dateTime);
+                    if (!dt) return;
+
+                    // date key e.g., "2026-03-29"
+                    var dateKey = dt.toISOString().slice(0, 10);
+
+                    var timeStr = dt.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+
+                    $scope.bookedSlotsMap[did] = $scope.bookedSlotsMap[did] || {};
+                    $scope.bookedSlotsMap[did][dateKey] = $scope.bookedSlotsMap[did][dateKey] || [];
+
+                    // avoid duplicates
+                    if ($scope.bookedSlotsMap[did][dateKey].indexOf(timeStr) === -1) {
+                        $scope.bookedSlotsMap[did][dateKey].push(timeStr);
+                    }
+                });
+
+                computeAvailableTimesForSelection();
+            })
+            .catch(function (err) {
+                console.error('Failed to load booked slots', err);
+                $scope.bookedSlotsMap = {};
+                computeAvailableTimesForSelection();
+            });
+    };
+
+    function computeAvailableTimesForSelection() {
+        try {
+            // default to all times
+            var result = angular.copy($scope.allTimeOptions);
+
+            var selDateISO = $scope.newApptRequest && $scope.newApptRequest.dateTime ? (new Date($scope.newApptRequest.dateTime)).toISOString().slice(0, 10) : null;
+            var selDentist = $scope.newApptRequest && $scope.newApptRequest.dentistID ? $scope.newApptRequest.dentistID : null;
+
+            if (selDateISO && selDentist && $scope.bookedSlotsMap[selDentist] && $scope.bookedSlotsMap[selDentist][selDateISO]) {
+                var booked = $scope.bookedSlotsMap[selDentist][selDateISO];
+                result = result.filter(function (t) { return booked.indexOf(t) === -1; });
+            }
+
+            $scope.timeOptions = result;
+            // if current selected time is now booked/invalid, clear selection
+            if ($scope.newApptRequest && $scope.newApptRequest.time && result.indexOf($scope.newApptRequest.time) === -1) {
+                $scope.newApptRequest.time = "";
+            }
+        } catch (e) {
+            console.error('computeAvailableTimesForSelection error', e);
+            $scope.timeOptions = angular.copy($scope.allTimeOptions);
+        }
+    }
+
+    // watch for changes in selected date or dentist to recompute times
+    $scope.$watch('newApptRequest.dateTime', function (nv, ov) {
+        if (nv !== ov) computeAvailableTimesForSelection();
+    });
+    $scope.$watch('newApptRequest.dentistID', function (nv, ov) {
+        if (nv !== ov) computeAvailableTimesForSelection();
+    });
+
+    // initially load booked slots
+    $timeout(function () {
+        $scope.loadBookedSlots();
+    }, 200);
 });

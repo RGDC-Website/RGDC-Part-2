@@ -365,4 +365,19 @@
     this.createGoogleEvent = function (apptID) {
         return $http.post('/RGDC/CreateGoogleEvent', { apptID: apptID });
     };
+
+    //profile picsssssssssss
+    this.uploadUserPhoto = function (file, accID) {
+        var formData = new FormData();
+        formData.append('file', file);
+        if (typeof accID !== 'undefined' && accID !== null) formData.append('accID', accID);
+
+        return $http({
+            method: "POST",
+            url: "/RGDC/UploadUserPhoto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
+        });
+    };
 });

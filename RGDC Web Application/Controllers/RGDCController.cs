@@ -15,6 +15,7 @@ using RGDC_Web_Application.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -229,7 +230,8 @@ namespace RGDC_Web_Application.Controllers
                         password = passwordHash(accDetails.password),
                         lastLogin = DateTime.Now,
                         accCreatedAt = DateTime.Now,
-                        accUpdatedAt = DateTime.Now
+                        accUpdatedAt = DateTime.Now,
+                        photoLink = accDetails.photoLink
                     };
                     addUser.tbl_account.Add(newData);
                     addUser.SaveChanges();
@@ -295,6 +297,7 @@ namespace RGDC_Web_Application.Controllers
                         Session["UserFullName"] = user.firstName + " " + user.lastName;
                         Session["UserAuthorization"] = user.role;
                         Session["IsLoggedIn"] = true;
+                        Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
 
                         return Json(new
                         {
@@ -302,7 +305,8 @@ namespace RGDC_Web_Application.Controllers
                             message = "Login successful",
                             firstName = Session["UserName"].ToString(),
                             fullName = Session["UserFullName"].ToString(),
-                            authorization = user.role
+                            authorization = user.role,
+                            photoLink = Session["UserPhoto"].ToString()
                         }, JsonRequestBehavior.AllowGet);
                     }
                     else
@@ -409,6 +413,7 @@ namespace RGDC_Web_Application.Controllers
                                 Session["UserFullName"] = user.firstName + " " + user.lastName;
                                 Session["UserAuthorization"] = user.role;
                                 Session["IsLoggedIn"] = true;
+                                Session["UserPhoto"] = user.photoLink ?? "";
                                 return RedirectToAction("adminDashboard", "RGDC");
                             }
                             else
@@ -453,6 +458,8 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "User session expired." }, JsonRequestBehavior.AllowGet);
                 }
 
+                var userPhoto = Session["UserPhoto"] != null ? Session["UserPhoto"].ToString() : "";
+
                 bool googleCalendarEnabled = false;
                 bool googleRefreshTokenPresent = false;
                 int accID = 0;
@@ -475,6 +482,7 @@ namespace RGDC_Web_Application.Controllers
                     userName = Session["UserName"].ToString(),
                     fullName = Session["UserFullName"].ToString(),
                     userAuthorization = Session["UserAuthorization"].ToString(),
+                    userPhoto = userPhoto,
                     googleCalendarEnabled = googleCalendarEnabled,
                     googleRefreshTokenPresent = googleRefreshTokenPresent
                 }, JsonRequestBehavior.AllowGet);
@@ -664,7 +672,8 @@ namespace RGDC_Web_Application.Controllers
                         from dent in dentj.DefaultIfEmpty()
                         join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
                         from dentAcc in dentAccj.DefaultIfEmpty()
-                        where appt.status != "Scheduled"
+                            // Only include appointments that are completed/cancelled/denied
+                        where appt.status == "Done" || appt.status == "Cancelled" || appt.status == "Denied"
                         orderby appt.dateTime descending
                         select new
                         {
@@ -1244,14 +1253,16 @@ namespace RGDC_Web_Application.Controllers
                     select new
                     {
                         apptID = appt.apptID,
+                        dentistID = appt.dentistID,
+                        patientID = appt.patientID,
                         dateTime = appt.dateTime,
-                        date = appt.dateTime, // client can format DateTime.Date
-                        time = appt.dateTime, // client can format DateTime.TimeOfDay or string formatting
+                        date = appt.dateTime, 
+                        time = appt.dateTime, 
                         purpose = appt.reason,
                         dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
                         patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
                         status = appt.status,
-                        // displayStatus normalizes requested/scheduled/done and indicates who requested when applicable
+
                         displayStatus = appt.status == "Scheduled" ? "Scheduled" :
                                         (appt.status == "Done" ? "Completed/Done" :
                                         (appt.status == "Requested" ? ((patAcc != null && appt.createdBy == patAcc.accID) ? "Requested by Patient" : ((dentAcc != null && appt.createdBy == dentAcc.accID) ? "Requested by Dentist" : "Requested")) : appt.status)),
@@ -1407,22 +1418,18 @@ namespace RGDC_Web_Application.Controllers
                 if (request == null)
                     return Json(new { success = false, message = "No appointment data provided." });
 
-                // Validate required fields
                 if (request.patientID <= 0 || request.dentistID <= 0)
                     return Json(new { success = false, message = "Invalid patient or dentist ID." });
 
-                // Ensure dateTime was provided and is a sensible date (not DateTime.MinValue / zero)
                 if (request.dateTime == null || request.dateTime == DateTime.MinValue)
                     return Json(new { success = false, message = "Invalid appointment date/time provided." });
 
                 var dateTime = request.dateTime;
 
-                // Server-side rule: appointment must be at least 2 days from today
+                // Server-side business rule: appointment must be at least 2 days from today
                 var minAllowed = DateTime.Today.AddDays(2);
                 if (dateTime.Date < minAllowed.Date)
-                {
                     return Json(new { success = false, message = "Appointment date must be at least 2 days from today." });
-                }
 
                 if (string.IsNullOrWhiteSpace(request.reason))
                     return Json(new { success = false, message = "Purpose/reason is required." });
@@ -1444,6 +1451,24 @@ namespace RGDC_Web_Application.Controllers
                     if (dentist == null)
                         return Json(new { success = false, message = "Dentist not found in database." });
 
+                    var requested = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
+                    var conflictStart = requested;
+                    var conflictEnd = requested.AddMinutes(1);
+
+                    // consider both Scheduled and Requested as blocking to prevent overlapping slots
+                    var blockingStatuses = new List<string> { "Scheduled", "Requested" };
+
+                    bool conflict = db.tbl_appointment.Any(a =>
+                        a.dentistID == request.dentistID
+                        && blockingStatuses.Contains(a.status)
+                        && a.dateTime >= conflictStart
+                        && a.dateTime < conflictEnd);
+
+                    if (conflict)
+                    {
+                        return Json(new { success = false, message = "Selected date/time is already booked for that dentist." });
+                    }
+
                     var newAppointment = new tblAppointmentModel()
                     {
                         patientID = request.patientID,
@@ -1457,15 +1482,24 @@ namespace RGDC_Web_Application.Controllers
                     };
 
                     db.tbl_appointment.Add(newAppointment);
-                    db.SaveChanges();
+
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception exSave)
+                    {
+                        var baseEx = exSave.GetBaseException();
+                        return Json(new { success = false, message = "Database error: " + (baseEx != null ? baseEx.Message : exSave.Message) });
+                    }
 
                     return Json(new { success = true, message = "Appointment request created successfully.", apptID = newAppointment.apptID });
                 }
             }
             catch (Exception ex)
             {
-                // Log ex (recommended)
-                return Json(new { success = false, message = $"Error creating appointment request: {ex.Message}" });
+                var baseEx = ex.GetBaseException();
+                return Json(new { success = false, message = "Server error: " + (baseEx != null ? baseEx.Message : ex.Message) });
             }
         }
 
@@ -1961,6 +1995,68 @@ namespace RGDC_Web_Application.Controllers
                         }
                     }
                 }
+            }
+        }
+
+        //profile uploaddsasdasdaa
+        [HttpPost]
+        public JsonResult UploadUserPhoto()
+        {
+            try
+            {
+                if (Request.Files == null || Request.Files.Count == 0)
+                    return Json(new { success = false, message = "No file received." });
+
+                HttpPostedFileBase file = Request.Files[0];
+                if (file == null || file.ContentLength == 0)
+                    return Json(new { success = false, message = "No file provided." });
+
+                if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                    return Json(new { success = false, message = "Invalid file type. Image required." });
+
+                var maxBytes = 5 * 1024 * 1024;
+                if (file.ContentLength > maxBytes)
+                    return Json(new { success = false, message = "File too large. Max 5 MB." });
+
+                var accIdVal = Request.Form["accID"];
+                if (string.IsNullOrEmpty(accIdVal) || !int.TryParse(accIdVal, out int accID))
+                {
+                    return Json(new { success = false, message = "Missing or invalid accID." });
+                }
+
+                string uploadPath = Server.MapPath("~/Content/Uploads/");
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+                string fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+                string filePath = Path.Combine(uploadPath, fileName);
+                file.SaveAs(filePath);
+                string relativePath = "/Content/Uploads/" + fileName;
+
+                using (var db = new RGDCContext())
+                {
+                    var imgData = new tblImagesModel()
+                    {
+                        imageName = fileName,
+                        imagePath = "/Content/Uploads/",
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now
+                    };
+                    db.tbl_images.Add(imgData);
+                    db.SaveChanges();
+
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc != null)
+                    {
+                        acc.photoLink = relativePath;
+                        db.SaveChanges();
+                    }
+                }
+
+                return Json(new { success = true, message = "Photo uploaded and linked to account.", filePath = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error uploading photo: {ex.Message}" });
             }
         }
     }

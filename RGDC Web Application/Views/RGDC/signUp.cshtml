@@ -140,7 +140,8 @@
                     <div class="row s4 center-align photo-upload-container">
                         <div class="col s12">
                             <div class="photo-box">
-                                <i class="material-icons photo-placeholder-icon">image</i>
+                                <img ng-if="signupPhotoPreview || _uploadedSignUpPhotoPath" ng-src="{{ signupPhotoPreview || _uploadedSignUpPhotoPath }}" alt="Profile" />
+                                <i class="material-icons photo-placeholder-icon" ng-if="!signupPhotoPreview && !_uploadedSignUpPhotoPath">image</i>
                             </div>
                         </div>
                     </div>
@@ -302,9 +303,9 @@
 
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
+        <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;" ng-click="pickSignUpPhoto()">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-        <button type="submit" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">ADD</button>
+        <button type="button" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">ADD</button>
     </div>
 </div>
 
