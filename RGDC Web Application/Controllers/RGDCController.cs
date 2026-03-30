@@ -300,6 +300,31 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "Email and password are required" }, JsonRequestBehavior.AllowGet);
                 }
 
+                const int MAX_FAILED_ATTEMPTS = 3;
+                const int LOCKOUT_MINUTES = 15;
+                string failKey = $"LOGIN_FAIL_{email}";
+                string lockKey = $"LOGIN_LOCK_{email}";
+
+                if (Session[lockKey] != null)
+                {
+                    if (DateTime.TryParse(Session[lockKey].ToString(), out DateTime lockedUntil))
+                    {
+                        if (lockedUntil > DateTime.Now)
+                        {
+                            return Json(new { success = false, message = $"Account locked until {lockedUntil.ToString("g")}" }, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            Session.Remove(lockKey);
+                        }
+                    }
+                    else
+                    {
+                        Session.Remove(lockKey);
+                    }
+                }
+
+
                 using (var db = new RGDCContext())
                 {
                     var hashedPassword = passwordHash(password);
@@ -309,6 +334,8 @@ namespace RGDC_Web_Application.Controllers
                     if (user != null)
                     {
                         // Set session variables
+                        Session.Remove(failKey);
+                        Session.Remove(lockKey);
                         Session["UserID"] = user.accID;
                         Session["UserName"] = user.firstName;
                         Session["UserFullName"] = user.firstName + " " + user.lastName;
@@ -328,7 +355,32 @@ namespace RGDC_Web_Application.Controllers
                     }
                     else
                     {
-                        return Json(new { success = false, message = "Invalid email or password" }, JsonRequestBehavior.AllowGet);
+                        int failedAttempts = 0;
+                        if (Session[failKey] != null)
+                        {
+                            int.TryParse(Session[failKey].ToString(), out failedAttempts);
+                        }
+
+                        failedAttempts++;
+                        Session[failKey] = failedAttempts;
+
+                        if (failedAttempts >= MAX_FAILED_ATTEMPTS)
+                        {
+                            var lockedUntil = DateTime.Now.AddMinutes(LOCKOUT_MINUTES);
+                            Session[lockKey] = lockedUntil;
+                            Session.Remove(failKey);
+
+                            return Json(new
+                            {
+                                success = false,
+                                message = $"Account locked due to {MAX_FAILED_ATTEMPTS} failed attempts. Try again after {lockedUntil.ToString("g")}"
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                        else
+                        {
+                            int remaining = MAX_FAILED_ATTEMPTS - failedAttempts;
+                            return Json(new { success = false, message = $"Invalid email or password. {remaining} attempt(s) left." }, JsonRequestBehavior.AllowGet);
+                        }
                     }
                 }
             }
@@ -563,6 +615,7 @@ namespace RGDC_Web_Application.Controllers
 
                 Session["RESET_OTP"] = otp;
                 Session["RESET_EMAIL"] = email;
+                Session["RESET_OTP_EXPIRY"] = DateTime.Now.AddMinutes(10);  
 
                 try
                 {
@@ -628,21 +681,44 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
-                if (Session["RESET_OTP"]?.ToString() != otp ||
-                    Session["RESET_EMAIL"]?.ToString() != email)
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otp) || string.IsNullOrWhiteSpace(password)) {
+                    return Json(new { success = false, message = "Email, OTP and new password are required" });
+                }
+
+                if (Session["RESET_EMAIL"] == null || Session["RESET_OTP"] == null || Session["RESET_OTP_EXPIRY"] == null)
                 {
-                    return Json(new { success = false, message = "Invalid OTP" });
+                    return Json(new { success = false, message = "No OTP was requested or it has already been used/cleared" });
+                }
+
+                string sessionEmail = Session["RESET_EMAIL"].ToString();
+                string sessionOtp = Session["RESET_OTP"].ToString();
+                DateTime expiry;
+                if (!DateTime.TryParse(Session["RESET_OTP_EXPIRY"].ToString(), out expiry) || expiry < DateTime.Now)
+                {
+                    Session.Remove("RESET_OTP");
+                    Session.Remove("RESET_EMAIL");
+                    Session.Remove("RESET_OTP_EXPIRY");
+                    return Json(new { success = false, message = "OTP expired. Please request a new one." });
+                }
+
+                if (!string.Equals(sessionEmail, email, StringComparison.OrdinalIgnoreCase) || sessionOtp != otp)
+                {
+                    return Json(new { success = false, message = "Invalid OTP or email" });
                 }
 
                 var user = db.tbl_account.FirstOrDefault(u => u.email == email);
                 if (user == null)
                     return Json(new { success = false, message = "Email not found" });
 
+                if (password.Length < 8)
+                    return Json(new { success = false, message = "Password must be at least 8 characters long" });
+
                 user.password = passwordHash(password);
                 db.SaveChanges();
 
                 Session.Remove("RESET_OTP");
                 Session.Remove("RESET_EMAIL");
+                Session.Remove("RESET_OTP_EXPIRY");
 
                 return Json(new { success = true, message = "Password reset successfully" });
             }
