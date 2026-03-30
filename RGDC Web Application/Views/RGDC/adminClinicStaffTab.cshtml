@@ -6,18 +6,18 @@
     @*top part (welcome, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*user name*@
-        <div class="col m8 l8"><h4 class="bold">Clinic Personnel</h4></div>
+        <div class="col m8 l8"  ng-init="getClinicStaff()"><h4 class="bold">Clinic Personnel</h4></div>
         @*refresh and logout buttons*@
         <div class="col m4 l4">
             <span class="right">
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
+                <div class="col valign-wrapper"><a href="#adminClinicStaffTab" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
                 <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
     </div>
 
     <div class="card grey lighten-2" style="margin-top:2vh;">
-        <nav class="nav-extended grey lighten-2 z-depth-0">
+        <nav class="nav-extended grey lighten-2 z-depth-0" ng-init="getBranch()">
             <div class="nav-content p-1">
                 <ul class="tabs tabs-transparent center-tabs">
                     <li class="tab px-1"><a class="brown-text p-0" href="#Owner">Owner</a></li>
@@ -29,7 +29,7 @@
 
         <div class="card-content">
 
-            <div id="Owner" class="containerOverflow-2 row m-0">
+            <div id="Owner" class="containerOverflow-2 row m-0" n>
                 <div class="row m-0">
                     <p class="bold brown-text lighten-1" style="font-size:1.8rem; margin-bottom:1.7vh">Owner</p>
                     <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger right" style="margin-top: -4.5vh" data-target="ownerInformationFormAdd"><i class="material-icons left">group_add</i>Add Owner</a>
@@ -40,16 +40,17 @@
                         <tr class="brown-text lighten-1">
                             <th>Name</th>
                             <th>Specialization</th>
+                            <th></th>
                         </tr>
                     </thead>
                     @*table content*@
                     <tbody>
-                        <tr data-href="#" title="View patient record" class="clkPointer">
-                            <td>Name...</td>
-                            <td>Specialization...</td>
+                        <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="owner in clinicOwners track by owner.ownerID">
+                            <td>{{owner.fullName}}</td>
+                            <td>{{owner.specialization}}</td>
                             <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="ownerInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteOwner(owner.ownerID, owner.accID)">delete</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="ownerInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important" ng-click="editSelectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">edit</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -70,7 +71,7 @@
                 @*Dentist Table*@
                 <table id="adminClinicStaffTabTableDentist" class="hover tableClk">
                     <thead>
-                        <tr class="brown-text lighten-1">
+                        <tr class="brown-text lighten-1" >
                             <th>Name</th>
                             <th>Specialization</th>
                             <th>Branch</th>
@@ -78,13 +79,13 @@
                     </thead>
                     @*table content*@
                     <tbody>
-                        <tr data-href="#" title="View patient record" class="clkPointer">
-                            <td>Name...</td>
-                            <td>Specialization...</td>
-                            <td>Branch...</td>
+                        <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="dentist in clinicDentists track by dentist.dentistID">
+                            <td>{{dentist.fullName}}</td>
+                            <td>{{dentist.specialization}}</td>
+                            <td>{{dentist.description}}</td>
                             <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="dentistInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteDentist(dentist.dentistID, dentist.accID)">delete</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="dentistInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important" ><i class="material-icons brown-text lighten-1" ng-click="editSelectDentist(dentist.dentistID)">edit</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -114,13 +115,13 @@
                     </thead>
                     @*table content*@
                     <tbody>
-                        <tr data-href="#" title="View patient record" class="clkPointer">
-                            <td>Name...</td>
-                            <td>Role...</td>
-                            <td>Branch...</td>
+                        <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="staff in clinicStaff track by staff.staffID">
+                            <td>{{staff.fullName}}</td>
+                            <td>{{staff.staffRole}}</td>
+                            <td>{{staff.description}}</td>
                             <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="staffInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteStaff(staff.staffID, staff.accID)">delete</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="staffInformationFormEdit" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1" ng-click="editSelectStaff(staff.staffID)">edit</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -161,8 +162,9 @@
                     <div class="row">
                         @*First name*@
                         <div class="col s6">
-                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
+                            <p class="custom-label" >First Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="owner_firstName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Juan"
@@ -170,8 +172,9 @@
                         </div>
                         @*MIddle name*@
                         <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label" >Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="owner_middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -181,8 +184,9 @@
                     <div class="row">
                         @*Last name*@
                         <div class="col s12">
-                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
+                            <p class="custom-label" >Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
+                                   ng-model="owner_lastName"
                                    maxlength="150"
                                    placeholder="Dela Cruz"
                                    required>
@@ -194,9 +198,9 @@
             @*Email*@
             <div class="row">
                 <div class="col s12">
-                    <p class="custom-label">Email <span class="required-mark">*</span></p>
+                    <p class="custom-label" >Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
-                           @*ng-model="signUp_lastName"*@
+                           ng-model="owner_email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -205,18 +209,19 @@
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3">
+                <div class="col s3" ng-init="getGender()">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="owner_genderID">
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
-                    </select>
+                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
+                        </select>
                 </div>
                 @*Birthdate*@
                 <div class="col s3">
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
+                               ng-model="owner_birthDate"
                                type="text"
                                class="datepicker custom-input"
                                readonly
@@ -228,7 +233,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="owner_civilStatus"> 
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -239,6 +244,7 @@
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
+                           ng-model="owner_contactNumber"
                            type="text"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
@@ -252,6 +258,7 @@
                     @*Address*@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
+                            ng-model="owner_address"
                            type="text"
                            class="custom-input"
                            maxlength="250"
@@ -264,11 +271,14 @@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
                     <input type="text"
+                            ng-model="owner_specialization"
                            class="custom-input"
                            maxlength="50">
                 </div>
 
             </div>
+
+
         </form>
     </div>
 
@@ -276,7 +286,7 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">ADD</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="addOwner()    ">ADD</button>
     </div>
 </div>
 
@@ -305,6 +315,7 @@
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
+                                   ng-model="dentist_firstName"
                                    maxlength="150"
                                    placeholder="Juan"
                                    required>
@@ -313,6 +324,7 @@
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="dentist_middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -325,6 +337,7 @@
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
                                    maxlength="150"
+                                   ng-model="dentist_lastName"
                                    placeholder="Dela Cruz"
                                    required>
                         </div>
@@ -338,6 +351,7 @@
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
                            @*ng-model="signUp_lastName"*@
+                           ng-model="dentist_email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -346,11 +360,11 @@
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3">
+                <div class="col s3" >
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="dentist_genderID">
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
+                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
                     </select>
                 </div>
                 @*Birthdate*@
@@ -359,6 +373,7 @@
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
                                type="text"
+                               ng-model="dentist_birthDate"
                                class="datepicker custom-input"
                                readonly
                                required>
@@ -369,7 +384,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required   ng-model="dentist_civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -380,10 +395,11 @@
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
+                           ng-model="dentist_contactNumber"
                            type="text"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
-                           maxlength="13"
+                           maxlength="11"
                            required>
                 </div>
             </div>
@@ -394,6 +410,7 @@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="dentist_address"
                            class="custom-input"
                            maxlength="250"
                            required>
@@ -405,8 +422,20 @@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
                     <input type="text"
+                           ng-model="dentist_specialization"
                            class="custom-input"
                            maxlength="50">
+                </div>
+
+            </div>
+            <div class="row">
+                @*Branch*@
+                <div class="col s12">
+                    <p class="custom-label">Branch</p>
+                    <select class="browser-default custom-input" ng-model="dentist_branchID">
+                        <option value="" disabled selected>Select Branch</option>
+                        <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
+                    </select>
                 </div>
 
             </div>
@@ -417,7 +446,7 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">ADD</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="addDentist()">ADD</button>
     </div>
 </div>
 
@@ -445,6 +474,7 @@
                         <div class="col s6">
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="staff_firstName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Juan"
@@ -454,6 +484,7 @@
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="staff_middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -465,6 +496,7 @@
                         <div class="col s12">
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
+                                   ng-model="staff_lastName"
                                    maxlength="150"
                                    placeholder="Dela Cruz"
                                    required>
@@ -478,7 +510,7 @@
                 <div class="col s12">
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
-                           @*ng-model="signUp_lastName"*@
+                           ng-model="staff_email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -489,9 +521,9 @@
                 @*Gender*@
                 <div class="col s3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="staff_genderID">
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
+                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
                     </select>
                 </div>
                 @*Birthdate*@
@@ -499,6 +531,7 @@
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
+                               ng-model="staff_birthDate"
                                type="text"
                                class="datepicker custom-input"
                                readonly
@@ -510,7 +543,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="staff_civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -522,6 +555,7 @@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
                            type="text"
+                           ng-model="staff_contactNumber"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
                            maxlength="13"
@@ -535,6 +569,7 @@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="staff_address"
                            class="custom-input"
                            maxlength="250"
                            required>
@@ -546,10 +581,22 @@
                 <div class="col s12">
                     <p class="custom-label">Clinic Role</p>
                     <input type="text"
+                           ng-model="staff_staffRole"
                            class="custom-input"
                            maxlength="50">
                 </div>
 
+            </div>
+
+            <div class="row">
+                @*Branch*@
+                <div class="col s12">
+                    <p class="custom-label">Branch</p>
+                    <select class="browser-default custom-input" ng-model="staff_branchID">
+                        <option value="" disabled selected>Select Branch</option>
+                        <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
+                    </select>
+                </div>
             </div>
         </form>
     </div>
@@ -558,7 +605,7 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">ADD</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="addStaff()">ADD</button>
     </div>
 </div>
 
@@ -587,6 +634,7 @@
                         <div class="col s6">
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="owner.firstName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Juan"
@@ -596,6 +644,7 @@
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="owner.middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -607,6 +656,7 @@
                         <div class="col s12">
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
+                                   ng-model="owner.lastName"
                                    maxlength="150"
                                    placeholder="Dela Cruz"
                                    required>
@@ -620,7 +670,7 @@
                 <div class="col s12">
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
-                           @*ng-model="signUp_lastName"*@
+                           ng-model="owner.email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -631,9 +681,8 @@
                 @*Gender*@
                 <div class="col s3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="owner.genderID" ng-options="g.genderID as g.description for g in genderArray">
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
                     </select>
                 </div>
                 @*Birthdate*@
@@ -641,6 +690,7 @@
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
+                               ng-model="owner.birthDate"
                                type="text"
                                class="datepicker custom-input"
                                readonly
@@ -652,7 +702,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="owner.civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -663,6 +713,7 @@
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
+                           ng-model="owner.contactNumber"
                            type="text"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
@@ -676,6 +727,7 @@
                     @*Address*@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
+                           ng-model="owner.address"
                            type="text"
                            class="custom-input"
                            maxlength="250"
@@ -688,11 +740,14 @@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
                     <input type="text"
+                           ng-model="owner.specialization"
                            class="custom-input"
                            maxlength="50">
                 </div>
 
             </div>
+
+
         </form>
     </div>
 
@@ -700,14 +755,15 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">EDIT</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editOwner()">EDIT</button>
     </div>
 </div>
 
-@*ADD Denstist Information Form*@
+@*EDIT Denstist Information Form*@
 <div id="dentistInformationFormEdit" class="modal patientInformationForm-modal">
     <div>
         <h5 class="modal-form-title">Edit Dentist Profile</h5>
+
 
         <form>
             <div class="row">
@@ -729,6 +785,7 @@
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
+                                   ng-model="dentist.firstName"
                                    maxlength="150"
                                    placeholder="Juan"
                                    required>
@@ -737,6 +794,7 @@
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="dentist.middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -749,6 +807,7 @@
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
                                    maxlength="150"
+                                   ng-model="dentist.lastName"
                                    placeholder="Dela Cruz"
                                    required>
                         </div>
@@ -762,6 +821,7 @@
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
                            @*ng-model="signUp_lastName"*@
+                           ng-model="dentist.email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -772,9 +832,8 @@
                 @*Gender*@
                 <div class="col s3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="dentist.genderID" ng-options="g.genderID as g.description for g in genderArray"> 
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
                     </select>
                 </div>
                 @*Birthdate*@
@@ -783,6 +842,7 @@
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
                                type="text"
+                               ng-model="dentist.birthDate"
                                class="datepicker custom-input"
                                readonly
                                required>
@@ -793,7 +853,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="dentist.civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -804,10 +864,11 @@
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
+                           ng-model="dentist.contactNumber"
                            type="text"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
-                           maxlength="13"
+                           maxlength="11"
                            required>
                 </div>
             </div>
@@ -818,6 +879,7 @@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="dentist.address"
                            class="custom-input"
                            maxlength="250"
                            required>
@@ -829,8 +891,19 @@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
                     <input type="text"
+                           ng-model="dentist.specialization"
                            class="custom-input"
                            maxlength="50">
+                </div>
+
+            </div>
+            <div class="row">
+                @*Branch*@
+                <div class="col s12">
+                    <p class="custom-label">Branch</p>
+                    <select class="browser-default custom-input" ng-model="dentist.branchID" ng-options="b.branchID as b.description for b in branchArray">
+                        <option value="" disabled selected>Select Branch</option>
+                    </select>
                 </div>
 
             </div>
@@ -841,7 +914,7 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">EDIT</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">EDIT</button>
     </div>
 </div>
 
@@ -850,6 +923,7 @@
     <div>
         <h5 class="modal-form-title">Edit Staff Profile</h5>
 
+
         <form>
             <div class="row">
                 <div class="col s4">
@@ -869,6 +943,7 @@
                         <div class="col s6">
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="staff.firstName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Juan"
@@ -878,6 +953,7 @@
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
+                                   ng-model="staff.middleName"
                                    class="custom-input"
                                    maxlength="150"
                                    placeholder="Mercado"
@@ -889,6 +965,7 @@
                         <div class="col s12">
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
+                                   ng-model="staff.lastName"
                                    maxlength="150"
                                    placeholder="Dela Cruz"
                                    required>
@@ -902,7 +979,7 @@
                 <div class="col s12">
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
-                           @*ng-model="signUp_lastName"*@
+                           ng-model="staff.email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
                            required>
@@ -913,9 +990,8 @@
                 @*Gender*@
                 <div class="col s3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="staff.genderID" ng-options="g.genderID as g.description for g in genderArray">
                         <option value="" disabled selected>Select Gender</option>
-                        <option></option>
                     </select>
                 </div>
                 @*Birthdate*@
@@ -923,6 +999,7 @@
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
+                               ng-model="staff.birthDate"
                                type="text"
                                class="datepicker custom-input"
                                readonly
@@ -934,7 +1011,7 @@
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="staff.civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -946,6 +1023,7 @@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
                            type="text"
+                           ng-model="staff.contactNumber"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
                            maxlength="13"
@@ -959,6 +1037,7 @@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="staff.address"
                            class="custom-input"
                            maxlength="250"
                            required>
@@ -970,10 +1049,21 @@
                 <div class="col s12">
                     <p class="custom-label">Clinic Role</p>
                     <input type="text"
+                           ng-model="staff.staffRole"
                            class="custom-input"
                            maxlength="50">
                 </div>
 
+            </div>
+
+            <div class="row">
+                @*Branch*@
+                <div class="col s12">
+                    <p class="custom-label">Branch</p>
+                    <select class="browser-default custom-input" ng-model="staff.branchID" ng-options="b.branchID as b.description for b in branchArray"> 
+                        <option value="" disabled selected>Select Branch</option>
+                    </select>
+                </div>
             </div>
         </form>
     </div>
@@ -982,7 +1072,7 @@
     <div class="modal-footer footer-center" style="margin-top:2.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;">EDIT</button>
+        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editStaff()">EDIT</button>
     </div>
 </div>
 
@@ -994,11 +1084,12 @@
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Owner Profile</h5>
 
         <p class="custom-label">Are you sure you want to delete this owner profile?</p>
+        <input type="hidden" id="hiddenOwnerDelete" value="" />
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deleteOwner()">DELETE</button>
     </div>
 </div>
 
@@ -1008,11 +1099,12 @@
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Dentist Profile</h5>
 
         <p class="custom-label">Are you sure you want to delete this dentist profile?</p>
+        <input type="hidden" id="hiddenDentistDelete" value="" />
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deleteDentist()">DELETE</button>
     </div>
 </div>
 
@@ -1022,10 +1114,11 @@
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Staff Profile</h5>
 
         <p class="custom-label">Are you sure you want to delete this staff profile?</p>
+        <input type="hidden" id="hiddenStaffDelete" value="" />
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deleteStaff()">DELETE</button>
     </div>
 </div>

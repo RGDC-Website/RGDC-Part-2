@@ -22,47 +22,51 @@
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">OVERVIEW</p>
 
         @*overview cards*@
-        <div class="row">
+        <div class="row" ng-init="getOverviewData()">
+
             @*total no. of patients*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2">
                     <div class="card-content brown-text lighten-1">
                         <div class="row valign-wrapper" style="margin-bottom:0">
                             <div class="col m6 l6"><p class="center">TOTAL NUMBER OF PATIENTS</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
+                            <div class="col m6 l6"><h4 class="bold center">{{ overview.totalPatients }}</h4></div>
                         </div>
                     </div>
                 </div>
             </div>
+
             @*new patients this month*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2">
                     <div class="card-content brown-text lighten-1">
                         <div class="row valign-wrapper" style="margin-bottom:0">
                             <div class="col m6 l6"><p class="center">NEW PATIENTS THIS MONTH</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
+                            <div class="col m6 l6"><h4 class="bold center">{{ overview.newPatientsThisMonth }}</h4></div>
                         </div>
                     </div>
                 </div>
             </div>
+
             @*patients done this week*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 overviewCard">
                     <div class="card-content brown-text lighten-1">
                         <div class="row valign-wrapper" style="margin-bottom:0">
                             <div class="col m6 l6"><p class="center">PATIENTS DONE THIS WEEK</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
+                            <div class="col m6 l6"><h4 class="bold center">{{ overview.patientsDoneThisWeek }}</h4></div>
                         </div>
                     </div>
                 </div>
             </div>
+
             @*unpaid patients*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 overviewCard">
                     <div class="card-content brown-text lighten-1">
                         <div class="row valign-wrapper" style="margin-bottom:0">
                             <div class="col m6 l6"><p class="center">UNPAID PATIENTS</p></div>
-                            <div class="col m6 l6"><h4 class="bold center">0</h4></div>
+                            <div class="col m6 l6"><h4 class="bold center">{{ overview.unpaidPatients }}</h4></div>
                         </div>
                     </div>
                 </div>
@@ -78,34 +82,30 @@
             <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT REQUESTS <span class="new badge left" style="margin:0 0.25rem 0 0">(N)</span></span>
             <div class="card grey lighten-2">
                 <div class="card-content containerOverflow">
-                    @*individual appointment req*@
-                    <div class="card white z-depth-0">
-                        <div class="card-content brown-text lighten-1" style="padding: 1rem">
+                    <div ng-if="(!dashboardRequested || dashboardRequested.length === 0)" class="center-align brown-text">No appointment requests.</div>
+                    <div class="card white z-depth-0" ng-repeat="r in dashboardRequested track by r.apptID" style="margin-bottom:0.5rem">
+                        <div class="card-content brown-text lighten-1" style="padding: 0.75rem 1rem">
                             <div class="row valign-wrapper m-0">
-                                @*user pfp*@
-                                <div class="col s3 m2 l2"><img src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
-                                @*user name and preferred dentist*@
+                                <div class="col s3 m2 l2"><img ng-src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
                                 <div class="col s9 m3 l3">
-                                    <p class="bold">Name<i class="material-icons tiny green-text" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
-                                    <p>Dentist</p>
+                                    <p class="bold">{{r.patientName}} <i class="material-icons tiny green-text" ng-if="r.isNew" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
+                                    <p>{{r.dentistName}}</p>
                                 </div>
-                                @*procedure*@
-                                <div class="col hide-on-med-and-down l3"><p>Prodecure</p></div>
-                                @*date and time*@
-                                <div class="col hide-on-med-and-down l3"><p>MM/DD/YY 00:00AM</p></div>
+                                <div class="col hide-on-med-and-down l3"><p>{{r.purpose}}</p></div>
+                                <div class="col hide-on-med-and-down l3"><p>{{r.date}} {{r.time}}</p></div>
 
                                 @*procedure and dateTime (mobile)*@
                                 <div class="col s6 m6 hide-on-large-only">
-                                    <p>Procedure</p>
-                                    <p>MM/DD/YY</p>
+                                    <p>{{r.purpose}}</p>
+                                    <p>{{r.date}}</p>
                                 </div>
 
                                 @*yes or no btn*@
                                 <div class="col s6 m6 l1">
-                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" id="checkBtn" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem">
                                         <i class="material-icons tiny">check</i>
                                     </a>
-                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" id="denyBtn" data-position="right" data-tooltip="Deny">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Deny">
                                         <i class="material-icons tiny">close</i>
                                     </a>
                                 </div>
@@ -120,26 +120,22 @@
             <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT SCHEDULED <span class="badge left p-0" style="margin:0">(N)</span></span>
             <div class="card grey lighten-2">
                 <div class="card-content containerOverflow">
-                    @*individual appointment req*@
-                    <div class="card white z-depth-0">
-                        <div class="card-content brown-text lighten-1" style="padding: 1rem">
+                    <div ng-if="(!dashboardScheduled || dashboardScheduled.length === 0)" class="center-align brown-text">No scheduled appointments.</div>
+                    <div class="card white z-depth-0" ng-repeat="s in dashboardScheduled track by s.apptID" style="margin-bottom:0.5rem">
+                        <div class="card-content brown-text lighten-1" style="padding: 0.75rem 1rem">
                             <div class="row valign-wrapper m-0">
-                                @*user pfp*@
-                                <div class="col s3 m2 l2"><img src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
-                                @*user name and preferred dentist*@
+                                <div class="col s3 m2 l2"><img ng-src="https://placehold.co/400" alt="" class="circle responsive-img" style="max-width: 3rem" /></div>
                                 <div class="col s9 m3 l3">
-                                    <p class="bold">Name<i class="material-icons tiny green-text" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
-                                    <p>Dentist</p>
+                                    <p class="bold">{{s.patientName}}</p>
+                                    <p>{{s.dentistName}}</p>
                                 </div>
-                                @*procedure*@
-                                <div class="col hide-on-med-and-down l3"><p>Prodecure</p></div>
-                                @*date and time*@
-                                <div class="col hide-on-med-and-down l3"><p>MM/DD/YY 00:00AM</p></div>
+                                <div class="col hide-on-med-and-down l3"><p>{{s.purpose}}</p></div>
+                                <div class="col hide-on-med-and-down l3"><p>{{s.date}} {{s.time}}</p></div>
 
                                 @*procedure and dateTime (mobile)*@
                                 <div class="col s4 m4 hide-on-large-only">
-                                    <p>Procedure</p>
-                                    <p>MM/DD/YY</p>
+                                    <p>{{s.purpose}}</p>
+                                    <p>{{s.date}}</p>
                                 </div>
                             </div>
                         </div>
@@ -150,53 +146,50 @@
     </div>
 
     @*analytics*@
-    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin">
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin" ng-init="getAnalyticsData()"  >
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">ANALYTICS</p>
-
-        @*analytics cards*@
         <div class="row">
-            @*patients*@
-            <div class="col s12 m3 l3 ">
+
+            @*patients over time*@
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 p-1">
                     <div class="card-title brown-text lighten-1">Patients</div>
                     <div class="card-content brown-text lighten-1">
-                        @*insert chart*@
+                        <canvas id="patientsChart"></canvas>
                     </div>
                 </div>
             </div>
+
             @*procedures this week*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 p-1">
                     <div class="card-title brown-text lighten-1">Procedures this week</div>
                     <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
+                        <canvas id="proceduresWeekChart"></canvas>
                     </div>
                 </div>
             </div>
+
             @*procedures by revenue*@
-            <div class="col s12 m3 l3 ">
+            <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 p-1">
                     <div class="card-title brown-text lighten-1">Procedures by revenue</div>
                     <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
+                        <canvas id="proceduresRevenueChart"></canvas>
                     </div>
                 </div>
             </div>
+
             @*paid/unpaid*@
             <div class="col s12 m3 l3">
                 <div class="card grey lighten-2 p-1">
                     <div class="card-title brown-text lighten-1">Paid/Unpaid</div>
                     <div class="card-content brown-text lighten-1">
-                        <div class="row valign-wrapper" style="margin-bottom:0">
-                            @*insert chart*@
-                        </div>
+                        <canvas id="paidUnpaidChart"></canvas>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

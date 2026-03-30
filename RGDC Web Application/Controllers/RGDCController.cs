@@ -1,6 +1,13 @@
-﻿using Microsoft.Ajax.Utilities;
+﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
+using Google.Apis.Auth.OAuth2.Responses;
+using Google.Apis.Calendar.v3;
+using Google.Apis.Calendar.v3.Data;
+using Google.Apis.Services;
+using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
+using System.Data.Entity;
 using Newtonsoft.Json;
 using RGDC_Web_Application.Models;
 using RGDC_Web_Application.Models.Context;
@@ -10,6 +17,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -17,10 +25,12 @@ using System.Net.Mail;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 
 namespace RGDC_Web_Application.Controllers
@@ -145,9 +155,10 @@ namespace RGDC_Web_Application.Controllers
         }
 
         public ActionResult contactUsPage()
-           {
+        {
             return View();
         }
+
         public ActionResult faqPage()
         {
             return View();
@@ -199,6 +210,22 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        public JsonResult getBranch()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var getData = db.tbl_branch.ToList();
+                    return Json(getData, JsonRequestBehavior.AllowGet);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error {ex.Message}");
+            }
+        }
         [HttpPost]
         public JsonResult signUpAcc(tblAccountModel accDetails)
         {
@@ -220,7 +247,8 @@ namespace RGDC_Web_Application.Controllers
                         password = passwordHash(accDetails.password),
                         lastLogin = DateTime.Now,
                         accCreatedAt = DateTime.Now,
-                        accUpdatedAt = DateTime.Now
+                        accUpdatedAt = DateTime.Now,
+                        photoLink = accDetails.photoLink
                     };
                     addUser.tbl_account.Add(newData);
                     addUser.SaveChanges();
@@ -286,6 +314,7 @@ namespace RGDC_Web_Application.Controllers
                         Session["UserFullName"] = user.firstName + " " + user.lastName;
                         Session["UserAuthorization"] = user.role;
                         Session["IsLoggedIn"] = true;
+                        Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
 
                         return Json(new
                         {
@@ -293,7 +322,8 @@ namespace RGDC_Web_Application.Controllers
                             message = "Login successful",
                             firstName = Session["UserName"].ToString(),
                             fullName = Session["UserFullName"].ToString(),
-                            authorization = user.role
+                            authorization = user.role,
+                            photoLink = Session["UserPhoto"].ToString()
                         }, JsonRequestBehavior.AllowGet);
                     }
                     else
@@ -400,6 +430,7 @@ namespace RGDC_Web_Application.Controllers
                                 Session["UserFullName"] = user.firstName + " " + user.lastName;
                                 Session["UserAuthorization"] = user.role;
                                 Session["IsLoggedIn"] = true;
+                                Session["UserPhoto"] = user.photoLink ?? "";
                                 return RedirectToAction("adminDashboard", "RGDC");
                             }
                             else
@@ -435,7 +466,7 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
-        public JsonResult getSessionVariable()  
+        public JsonResult getSessionVariable()
         {
             try
             {
@@ -443,12 +474,32 @@ namespace RGDC_Web_Application.Controllers
                 {
                     return Json(new { success = false, message = "User session expired." }, JsonRequestBehavior.AllowGet);
                 }
+                var userPhoto = Session["UserPhoto"] != null ? Session["UserPhoto"].ToString() : "";
+                bool googleCalendarEnabled = false;
+                bool googleRefreshTokenPresent = false;
+                int accID = 0;
+
+                if (Session["UserID"] != null && int.TryParse(Session["UserID"].ToString(), out accID))
+                {
+                    using (var db = new RGDCContext())
+                    {
+                        var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                        if (acc != null)
+                        {
+                            googleCalendarEnabled = acc.googleCalendarEnabled;
+                            googleRefreshTokenPresent = !string.IsNullOrEmpty(acc.googleRefreshToken);
+                        }
+                    }
+                }
 
                 return Json(new
                 {
                     userName = Session["UserName"].ToString(),
                     fullName = Session["UserFullName"].ToString(),
                     userAuthorization = Session["UserAuthorization"].ToString(),
+                    userPhoto = userPhoto,
+                    googleCalendarEnabled = googleCalendarEnabled,
+                    googleRefreshTokenPresent = googleRefreshTokenPresent
                 }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -520,10 +571,10 @@ namespace RGDC_Web_Application.Controllers
                     mail.To.Add(email);
                     mail.Subject = "Password Reset OTP";
                     mail.Body = $"Your OTP is: {otp}";
-                    mail.From = new MailAddress("jmlzpnt@gmail.com");
+                    mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-                    smtp.Credentials = new NetworkCredential("jmlzpnt@gmail.com", "jubxxcrsgyleffin");
+                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
 
@@ -839,7 +890,7 @@ namespace RGDC_Web_Application.Controllers
                         ).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
-                 }
+            }
         }
 
         [HttpPost]
@@ -1152,23 +1203,26 @@ namespace RGDC_Web_Application.Controllers
             using (var db = new RGDCContext())
             {
                 var result = (
-                    from t in db.tbl_treatmentplan
-                    join p in db.tbl_patient
-                        on t.patientID equals p.patientID
-                    join a in db.tbl_account
-                        on p.accID equals a.accID
-                    select new
-                    {
-                        trtPlanID = t.trtPlanID,
-                        date = t.date,
-                        procedureID = t.procedureID,
-                        toothNumber = t.toothNumber,
-                        accID = a.accID,
-                        dentistName = a.firstName + " " + a.lastName,
-                        amount = t.amount,
-                        paid = t.paid
-                    }
-                ).ToList();
+            from t in db.tbl_treatmentplan
+            join p in db.tbl_patient
+                on t.patientID equals p.patientID
+            join pa in db.tbl_account   // patient account
+                on p.accID equals pa.accID
+            join da in db.tbl_account   // dentist account
+                on t.accID equals da.accID
+            select new
+            {
+                trtPlanID = t.trtPlanID,
+                date = t.date,
+                procedures = t.procedures,
+                toothNumber = t.toothNumber,
+                accID = pa.accID,
+                patientName = pa.firstName + " " + pa.lastName,
+                dentist = da.firstName + " " + da.lastName, // ✅ correct source
+                amount = t.amount,
+                paid = t.paid
+            }
+        ).ToList();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -1216,14 +1270,15 @@ namespace RGDC_Web_Application.Controllers
                     select new
                     {
                         apptID = appt.apptID,
+                        dentistID = appt.dentistID,
+                        patientID = appt.patientID,
                         dateTime = appt.dateTime,
-                        date = appt.dateTime, // client can format DateTime.Date
-                        time = appt.dateTime, // client can format DateTime.TimeOfDay or string formatting
+                        date = appt.dateTime, 
+                        time = appt.dateTime, 
                         purpose = appt.reason,
                         dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
                         patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
                         status = appt.status,
-                        // displayStatus normalizes requested/scheduled/done and indicates who requested when applicable
                         displayStatus = appt.status == "Scheduled" ? "Scheduled" :
                                         (appt.status == "Done" ? "Completed/Done" :
                                         (appt.status == "Requested" ? ((patAcc != null && appt.createdBy == patAcc.accID) ? "Requested by Patient" : ((dentAcc != null && appt.createdBy == dentAcc.accID) ? "Requested by Dentist" : "Requested")) : appt.status)),
@@ -1379,25 +1434,24 @@ namespace RGDC_Web_Application.Controllers
                 if (request == null)
                     return Json(new { success = false, message = "No appointment data provided." });
 
-                var patientID = request.patientID;
-                var dentistID = request.dentistID;
-                var dateTime = request.dateTime;
-                var reason = request.reason;
 
-                if (patientID <= 0 || dentistID <= 0)
+                if (request.patientID <= 0 || request.dentistID <= 0)
                     return Json(new { success = false, message = "Invalid patient or dentist ID." });
 
-                if (dateTime == DateTime.MinValue)
-                    return Json(new { success = false, message = "Invalid date/time provided." });
+                // Ensure dateTime was provided and is a sensible date (not DateTime.MinValue / zero)
+                if (request.dateTime == null || request.dateTime == DateTime.MinValue)
+                    return Json(new { success = false, message = "Invalid appointment date/time provided." });
 
-                // Server-side validation: appointment must be at least 2 days from now
+                var dateTime = request.dateTime;
+
+                // Server-side rule: appointment must be at least 2 days from today
                 var minAllowed = DateTime.Today.AddDays(2);
                 if (dateTime.Date < minAllowed.Date)
                 {
                     return Json(new { success = false, message = "Appointment date must be at least 2 days from today." });
                 }
 
-                if (string.IsNullOrWhiteSpace(reason))
+                if (string.IsNullOrWhiteSpace(request.reason))
                     return Json(new { success = false, message = "Purpose/reason is required." });
 
                 var sessionVal = Session["UserID"];
@@ -1409,40 +1463,66 @@ namespace RGDC_Web_Application.Controllers
 
                 using (var db = new RGDCContext())
                 {
-                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == request.patientID);
                     if (patient == null)
                         return Json(new { success = false, message = "Patient not found in database." });
 
-                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == dentistID);
+                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == request.dentistID);
                     if (dentist == null)
                         return Json(new { success = false, message = "Dentist not found in database." });
 
+                    var requested = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0);
+                    var conflictStart = requested;
+                    var conflictEnd = requested.AddMinutes(1);
+
+                    // consider both Scheduled and Requested as blocking to prevent overlapping slots
+                    var blockingStatuses = new List<string> { "Scheduled", "Requested" };
+
+                    bool conflict = db.tbl_appointment.Any(a =>
+                        a.dentistID == request.dentistID
+                        && blockingStatuses.Contains(a.status)
+                        && a.dateTime >= conflictStart
+                        && a.dateTime < conflictEnd);
+
+                    if (conflict)
+                    {
+                        return Json(new { success = false, message = "Selected date/time is already booked for that dentist." });
+                    }
+
+
                     var newAppointment = new tblAppointmentModel()
                     {
-                        patientID = patientID,
-                        dentistID = dentistID,
+                        patientID = request.patientID,
+                        dentistID = request.dentistID,
                         createdBy = createdByID,
                         dateTime = dateTime,
-                        reason = reason,
+                        reason = request.reason,
                         status = "Requested",
                         schedCreatedAt = DateTime.Now,
                         schedUpdatedAt = DateTime.Now
                     };
 
                     db.tbl_appointment.Add(newAppointment);
-                    db.SaveChanges();
 
-                    return Json(new
+                    try
                     {
-                        success = true,
-                        message = "Appointment request created successfully.",
-                        apptID = newAppointment.apptID
-                    });
+                        db.SaveChanges();
+                    }
+                    catch (Exception exSave)
+                    {
+                        var baseEx = exSave.GetBaseException();
+                        return Json(new { success = false, message = "Database error: " + (baseEx != null ? baseEx.Message : exSave.Message) });
+                    }
+
+
+                    return Json(new { success = true, message = "Appointment request created successfully.", apptID = newAppointment.apptID });
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error creating appointment request: {ex.Message}" });
+                // Log ex (recommended)
+                var baseEx = ex.GetBaseException();
+                return Json(new { success = false, message = "Server error: " + (baseEx != null ? baseEx.Message : ex.Message) });
             }
         }
 
@@ -1576,7 +1656,7 @@ namespace RGDC_Web_Application.Controllers
                     join pa in db.tbl_account on p.accID equals pa.accID
 
                     join d in db.tbl_dentist on pay.dentistID equals d.dentistID
-                    join da in db.tbl_account on d.accID equals da.accID  
+                    join da in db.tbl_account on d.accID equals da.accID
 
                     where pay.paymentID == paymod.paymentID
 
@@ -1625,6 +1705,52 @@ namespace RGDC_Web_Application.Controllers
                     appt.schedUpdatedAt = DateTime.Now;
                     db.SaveChanges();
 
+                    //FOR GOOGLE CALENDAR CODE
+                    try
+                    {
+                        // Create event on dentist calendar if dentist account has google enabled
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                        if (dentist != null)
+                        {
+                            var dentistAcc = db.tbl_account.FirstOrDefault(a => a.accID == dentist.accID);
+                            if (dentistAcc != null && dentistAcc.googleCalendarEnabled && !string.IsNullOrEmpty(dentistAcc.googleRefreshToken))
+                            {
+                                // run asynchronously and don't block response
+                                Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await CreateGoogleEventForAccountAsync(db, appt.apptID, dentistAcc.accID, dentistAcc.googleRefreshToken);
+                                    }
+                                    catch { /* log */ }
+                                });
+                            }
+                        }
+
+                        // Optionally create event on patient calendar if patient account has google enabled
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+                        if (patient != null)
+                        {
+                            var patientAcc = db.tbl_account.FirstOrDefault(a => a.accID == patient.accID);
+                            if (patientAcc != null && patientAcc.googleCalendarEnabled && !string.IsNullOrEmpty(patientAcc.googleRefreshToken))
+                            {
+                                Task.Run(async () =>
+                                {
+                                    try
+                                    {
+                                        await CreateGoogleEventForAccountAsync(db, appt.apptID, patientAcc.accID, patientAcc.googleRefreshToken);
+                                    }
+                                    catch { /* log */ }
+                                });
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // swallow to avoid breaking accept flow; consider logging
+                    }
+
+
                     return Json(new { success = true, message = "Appointment accepted successfully." });
                 }
             }
@@ -1633,6 +1759,200 @@ namespace RGDC_Web_Application.Controllers
                 return Json(new { success = false, message = $"Error accepting appointment: {ex.Message}" });
             }
         }
+
+        //for google calendar codessssssss
+        [HttpGet]
+        public ActionResult ConnectGoogle()
+        {
+            var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+            var redirect = ConfigurationManager.AppSettings["GoogleRedirectUri"];
+            var scope = "https://www.googleapis.com/auth/calendar.events";
+            var authUrl = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={HttpUtility.UrlEncode(clientId)}&redirect_uri={HttpUtility.UrlEncode(redirect)}&response_type=code&scope={HttpUtility.UrlEncode(scope)}&access_type=offline&prompt=consent";
+            return Redirect(authUrl);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GoogleAuthCallback(string code, string state)
+        {
+            if (string.IsNullOrEmpty(code)) return Content("Authorization failed. No code.");
+
+            var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+            var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+            var redirect = ConfigurationManager.AppSettings["GoogleRedirectUri"];
+
+            var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
+            {
+                ClientSecrets = new ClientSecrets { ClientId = clientId, ClientSecret = clientSecret }
+            });
+
+            TokenResponse token;
+            try
+            {
+                // Assign the result to the 'token' variable declared above
+                token = await flow.ExchangeCodeForTokenAsync("user", code, redirect, CancellationToken.None);
+            }
+            catch (System.Exception ex)
+            {
+                return Content("Token exchange failed: " + ex.Message);
+            }
+
+            // Save refresh token for current logged-in account (encrypt in production)
+            var sessionVal = Session["UserID"];
+            if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int accID))
+            {
+                using (var db = new RGDCContext())
+                {
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc != null)
+                    {
+                        if (!string.IsNullOrEmpty(token.RefreshToken))
+                            acc.googleRefreshToken = token.RefreshToken;
+                        acc.googleCalendarEnabled = true;
+                        db.SaveChanges();
+                    }
+                }
+            }
+            return Content("<script>try{window.opener.postMessage({ type: 'google-auth-success' }, '*');}catch(e){} window.close();</script>", "text/html");
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> CreateGoogleEvent(int apptID)
+        {
+            try
+            {
+                var sessionVal = Session["UserID"];
+                if (sessionVal == null) return Json(new { success = false, message = "Not logged in" });
+
+                using (var db = new RGDCContext())
+                {
+                    int accID = int.Parse(sessionVal.ToString());
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc == null || !acc.googleCalendarEnabled || string.IsNullOrEmpty(acc.googleRefreshToken))
+                        return Json(new { success = false, message = "Google not connected" });
+
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null) return Json(new { success = false, message = "Appointment not found" });
+
+                    var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+                    var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+
+                    var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
+                    {
+                        ClientSecrets = new ClientSecrets { ClientId = clientId, ClientSecret = clientSecret },
+                        Scopes = new[] { CalendarService.Scope.CalendarEvents }
+                    });
+
+                    var token = new TokenResponse { RefreshToken = acc.googleRefreshToken };
+                    var cred = new UserCredential(flow, "user-" + accID, token);
+                    var refreshed = await cred.RefreshTokenAsync(CancellationToken.None);
+                    if (!refreshed) return Json(new { success = false, message = "Failed to refresh token" });
+
+                    var service = new CalendarService(new BaseClientService.Initializer
+                    {
+                        HttpClientInitializer = cred,
+                        ApplicationName = "RGDC Web Application"
+                    });
+
+                    var ev = new Event
+                    {
+                        Summary = appt.reason ?? "Appointment",
+                        Description = $"Dentist ID: {appt.dentistID}",
+                        Start = new EventDateTime { DateTime = appt.dateTime, TimeZone = "UTC" },
+                        End = new EventDateTime { DateTime = appt.dateTime.AddMinutes(30), TimeZone = "UTC" }
+                    };
+
+                    var created = await service.Events.Insert(ev, "primary").ExecuteAsync();
+
+                    // Optionally persist Google event id for later deletion/update
+                    appt.remarks = (appt.remarks ?? "") + $"|googleEventId:{created.Id}";
+                    db.SaveChanges();
+
+                    return Json(new { success = true, eventId = created.Id });
+                }
+            }
+            catch (System.Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult ToggleGoogleCalendar(bool enabled)
+        {
+            var sessionVal = Session["UserID"];
+            if (sessionVal == null) return Json(new { success = false, message = "Not logged in" });
+            int accID = int.Parse(sessionVal.ToString());
+
+            using (var db = new RGDCContext())
+            {
+                var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                if (acc == null) return Json(new { success = false, message = "Account not found" });
+                acc.googleCalendarEnabled = enabled;
+                if (!enabled) acc.googleRefreshToken = null; // optionally revoke
+                db.SaveChanges();
+            }
+
+            return Json(new { success = true });
+        }
+
+        private async Task CreateGoogleEventForAccountAsync(RGDCContext dbContext, int apptID, int accID, string refreshToken)
+        {
+            // You can create a new DbContext inside this task if you prefer
+            using (var db = new RGDCContext())
+            {
+                var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                if (appt == null) return;
+
+                var clientId = ConfigurationManager.AppSettings["GoogleClientId"];
+                var clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
+
+                var flow = new Google.Apis.Auth.OAuth2.Flows.GoogleAuthorizationCodeFlow(
+                    new Google.Apis.Auth.OAuth2.Flows.GoogleAuthorizationCodeFlow.Initializer
+                    {
+                        ClientSecrets = new Google.Apis.Auth.OAuth2.ClientSecrets { ClientId = clientId, ClientSecret = clientSecret },
+                        Scopes = new[] { Google.Apis.Calendar.v3.CalendarService.Scope.CalendarEvents }
+                    });
+
+                var token = new Google.Apis.Auth.OAuth2.Responses.TokenResponse { RefreshToken = refreshToken };
+                var cred = new Google.Apis.Auth.OAuth2.UserCredential(flow, "user-" + accID, token);
+
+                // refresh to get access token
+                var refreshed = await cred.RefreshTokenAsync(CancellationToken.None);
+                if (!refreshed) return;
+
+                var service = new Google.Apis.Calendar.v3.CalendarService(new Google.Apis.Services.BaseClientService.Initializer
+                {
+                    HttpClientInitializer = cred,
+                    ApplicationName = "RGDC Web Application"
+                });
+
+                var ev = new Google.Apis.Calendar.v3.Data.Event
+                {
+                    Summary = appt.reason ?? "RGDC Appointment",
+                    Description = $"Dentist ID: {appt.dentistID}",
+                    Start = new Google.Apis.Calendar.v3.Data.EventDateTime { DateTime = appt.dateTime, TimeZone = "UTC" },
+                    End = new Google.Apis.Calendar.v3.Data.EventDateTime { DateTime = appt.dateTime.AddMinutes(30), TimeZone = "UTC" }
+                };
+
+                var created = await service.Events.Insert(ev, "primary").ExecuteAsync();
+
+                // Optionally persist created.Id back to appt for future deletion/updates
+                if (!string.IsNullOrEmpty(created.Id))
+                {
+                    // safer to open a new db context for updates
+                    using (var updateDb = new RGDCContext())
+                    {
+                        var a = updateDb.tbl_appointment.FirstOrDefault(x => x.apptID == apptID);
+                        if (a != null)
+                        {
+                            a.remarks = (a.remarks ?? "") + $"|googleEventId:{created.Id}";
+                            updateDb.SaveChanges();
+                        }
+                    }
+                }
+            }
+        }
+
         public JsonResult updatePayment(tblPaymentModel model)
         {
             using (var db = new RGDCContext())
@@ -1702,5 +2022,801 @@ namespace RGDC_Web_Application.Controllers
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+        //profile uploaddsasdasdaa
+        [HttpPost]
+        public JsonResult UploadUserPhoto()
+        {
+            try
+            {
+                if (Request.Files == null || Request.Files.Count == 0)
+                    return Json(new { success = false, message = "No file received." });
+
+                HttpPostedFileBase file = Request.Files[0];
+                if (file == null || file.ContentLength == 0)
+                    return Json(new { success = false, message = "No file provided." });
+
+                if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+                    return Json(new { success = false, message = "Invalid file type. Image required." });
+
+                var maxBytes = 5 * 1024 * 1024;
+                if (file.ContentLength > maxBytes)
+                    return Json(new { success = false, message = "File too large. Max 5 MB." });
+
+                var accIdVal = Request.Form["accID"];
+                if (string.IsNullOrEmpty(accIdVal) || !int.TryParse(accIdVal, out int accID))
+                {
+                    return Json(new { success = false, message = "Missing or invalid accID." });
+                }
+
+                string uploadPath = Server.MapPath("~/Content/Uploads/");
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+
+                string fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
+                string filePath = Path.Combine(uploadPath, fileName);
+                file.SaveAs(filePath);
+                string relativePath = "/Content/Uploads/" + fileName;
+
+                using (var db = new RGDCContext())
+                {
+                    var imgData = new tblImagesModel()
+                    {
+                        imageName = fileName,
+                        imagePath = "/Content/Uploads/",
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now
+                    };
+                    db.tbl_images.Add(imgData);
+                    db.SaveChanges();
+
+                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                    if (acc != null)
+                    {
+                        acc.photoLink = relativePath;
+                        db.SaveChanges();
+                    }
+                }
+
+                return Json(new { success = true, message = "Photo uploaded and linked to account.", filePath = relativePath });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error uploading photo: {ex.Message}" });
+            }
+        }
+        public ActionResult getClinicStaff()
+        {
+            using (var db = new RGDCContext())
+            {
+                var accounts = db.tbl_account
+                    .Select(a => new
+                    {
+                        a.accID,
+                        fullName = a.firstName + " " + a.lastName,
+                        a.email,
+                        a.role
+                    })
+                    .ToList();
+
+                var owners = (from o in db.tbl_owner
+                              join a in db.tbl_account on o.accID equals a.accID
+                              select new
+                              {
+                                  o.ownerID,
+                                  o.accID,
+                                  fullName = a.firstName + " " + a.lastName,
+                                  o.specialization,
+                                  o.signature
+                              }).ToList();
+
+                var dentists = (from d in db.tbl_dentist
+                                join a in db.tbl_account on d.accID equals a.accID
+                                join g in db.tbl_branch on d.branchID equals g.branchID
+                                select new
+                                {
+                                    d.dentistID,
+                                    d.accID,
+                                    fullName = a.firstName + " " + a.lastName,
+                                    d.specialization,
+                                    d.branchID,
+                                    g.description,
+                                    d.signature
+                                }).ToList();
+
+                var staff = (from s in db.tbl_staff
+                             join a in db.tbl_account on s.accID equals a.accID
+                             join g in db.tbl_branch on s.branchID equals g.branchID
+                             select new
+                             {
+                                 s.staffID,
+                                 s.accID,
+                                 fullName = a.firstName + " " + a.lastName,
+                                 s.staffRole,
+                                 s.branchID,
+                                 g.description,
+                                 s.signature
+                             }).ToList();
+
+                return Json(new
+                {
+                    accounts = accounts,
+                    owners = owners,
+                    dentists = dentists,
+                    staff = staff
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult addAccount(tblAccountModel accmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var newAccount = new tblAccountModel
+                {
+                    firstName = accmod.firstName,
+                    middleName = accmod.middleName,
+                    lastName = accmod.lastName,
+                    genderID = accmod.genderID,
+                    birthDate = accmod.birthDate,
+                    email = accmod.email,
+                    contactNumber = accmod.contactNumber,
+                    address = accmod.address,
+                    civilStatus = accmod.civilStatus,
+                    password = "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
+                    //photoLink = accmod.photoLink,
+                    role = accmod.role,
+                    lastLogin = DateTime.Now,
+                    accCreatedAt = DateTime.Now,
+                    accUpdatedAt = DateTime.Now
+                };
+
+                db.tbl_account.Add(newAccount);
+                db.SaveChanges();
+
+                // ← accID is now returned so JS can chain InsertOwner after this
+                return Json(new
+                {
+                    success = true,
+                    message = "Account inserted successfully.",
+                    accID = newAccount.accID
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult addOwner(tblOwnerModel ownermod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var newOwner = new tblOwnerModel
+                {
+                    accID = ownermod.accID,
+                    specialization = ownermod.specialization,
+                    //signature = ownermod.signature
+                };
+
+                db.tbl_owner.Add(newOwner);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner inserted successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult addDentist(tblDentistModel dentistmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var newDentist = new tblDentistModel
+                {
+                    accID = dentistmod.accID,
+                    specialization = dentistmod.specialization,
+                    branchID = dentistmod.branchID,
+                    //signature = ownermod.signature
+                };
+
+                db.tbl_dentist.Add(newDentist);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Dentist inserted successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        public JsonResult addStaff(tblStaffModel staffmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var newStaff = new tblStaffModel
+                {
+                    accID = staffmod.accID,
+                    staffRole = staffmod.staffRole,
+                    branchID = staffmod.branchID,
+                    //signature = ownermod.signature
+                };
+
+                db.tbl_staff.Add(newStaff);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Staff inserted successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult deleteOwner(tblOwnerModel ownermod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_owner.Find(ownermod.ownerID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Owner not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_owner.Remove(existing);
+
+                var existingAcc = db.tbl_account.Find(ownermod.accID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Owner not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_account.Remove(existingAcc);
+                db.SaveChanges();
+
+                return Json(new { success = true, message = "Owner deleted successfully." },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult deleteDentist(tblDentistModel dentistmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_dentist.Find(dentistmod.dentistID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Dentist not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_dentist.Remove(existing);
+
+                var existingAcc = db.tbl_account.Find(dentistmod.accID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Dentist not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_account.Remove(existingAcc);
+                db.SaveChanges();
+
+                return Json(new { success = true, message = "Dentist deleted successfully." },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult deleteStaff(tblStaffModel staffmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_staff.Find(staffmod.staffID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Staff not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_staff.Remove(existing);
+
+                var existingAcc = db.tbl_account.Find(staffmod.accID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Staff not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_account.Remove(existingAcc);
+                db.SaveChanges();
+
+                return Json(new { success = true, message = "Staff deleted successfully." },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult selectOwner(tblOwnerModel ownerAcc)
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from o in db.tbl_owner
+                    join a in db.tbl_account on o.accID equals a.accID
+                    where o.ownerID == ownerAcc.ownerID
+                    select new
+                    {
+                        // OWNER
+                        ownerID = o.ownerID,
+                        accID = o.accID,
+                        specialization = o.specialization,
+                        signature = o.signature,
+
+                        // ACCOUNT (matches your ng-model)
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
+                        genderID = a.genderID,
+                        birthDate = a.birthDate,
+                        email = a.email,
+                        contactNumber = a.contactNumber,
+                        address = a.address,
+                        civilStatus = a.civilStatus,
+                        photoLink = a.photoLink
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult selectDentist(tblDentistModel dentistAcc)
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from d in db.tbl_dentist
+                    join a in db.tbl_account on d.accID equals a.accID
+                    where d.dentistID == dentistAcc.dentistID
+                    select new
+                    {
+                        // OWNER
+                        dentistID = d.dentistID,
+                        accID = d.accID,
+                        specialization = d.specialization,
+                        branchID = d.branchID,
+                        signature = d.signature,
+
+                        // ACCOUNT (matches your ng-model)
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
+                        genderID = a.genderID,
+                        birthDate = a.birthDate,
+                        email = a.email,
+                        contactNumber = a.contactNumber,
+                        address = a.address,
+                        civilStatus = a.civilStatus,
+                        photoLink = a.photoLink
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult selectStaff(tblStaffModel staffAcc)
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from s in db.tbl_staff
+                    join a in db.tbl_account on s.accID equals a.accID
+                    where s.staffID == staffAcc.staffID
+                    select new
+                    {
+                        // OWNER
+                        staffID = s.staffID,
+                        accID = s.accID,
+                        staffRole = s.staffRole,
+                        branchID = s.branchID,
+                        signature = s.signature,
+
+                        // ACCOUNT (matches your ng-model)
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
+                        genderID = a.genderID,
+                        birthDate = a.birthDate,
+                        email = a.email,
+                        contactNumber = a.contactNumber,
+                        address = a.address,
+                        civilStatus = a.civilStatus,
+                        photoLink = a.photoLink
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult updateAccount(tblAccountModel accmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_account.FirstOrDefault(a => a.accID == accmod.accID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Account not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                existing.firstName = accmod.firstName;
+                existing.middleName = accmod.middleName;
+                existing.lastName = accmod.lastName;
+                existing.genderID = accmod.genderID;
+                existing.birthDate = accmod.birthDate;
+                existing.email = accmod.email;
+                existing.contactNumber = accmod.contactNumber;
+                existing.address = accmod.address;
+                existing.civilStatus = accmod.civilStatus;
+                existing.accUpdatedAt = DateTime.Now;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Account updated successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+        public JsonResult updateOwner(tblOwnerModel ownermod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_owner.FirstOrDefault(o => o.ownerID == ownermod.ownerID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Owner not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                existing.specialization = ownermod.specialization;
+                //existing.signature = ownermod.signature;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner updated successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult updateDentist(tblDentistModel dentistmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_dentist.FirstOrDefault(d => d.dentistID == dentistmod.dentistID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Dentist not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                existing.specialization = dentistmod.specialization;
+                existing.branchID = dentistmod.branchID;
+                //existing.signature = ownermod.signature;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Dentist updated successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult updateStaff(tblStaffModel staffmod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_staff.FirstOrDefault(s => s.staffID == staffmod.staffID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Staff not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                existing.staffRole = staffmod.staffRole;
+                existing.branchID = staffmod.branchID;
+                //existing.signature = ownermod.signature;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Staff updated successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getDentistOwner()
+        {
+            using (var db = new RGDCContext())
+            {
+                var dentists = (
+                    from d in db.tbl_dentist
+                    join a in db.tbl_account on d.accID equals a.accID
+                    select new
+                    {
+                        accID = d.accID,
+                        fullName = a.firstName + " " + a.lastName,
+                        type = "Dentist"
+                    });
+
+                var owners = (
+                    from o in db.tbl_owner
+                    join a in db.tbl_account on o.accID equals a.accID
+                    select new
+                    {
+                        accID = o.accID,
+                        fullName = a.firstName + " " + a.lastName,
+                        type = "Owner"
+                    });
+
+                var result = dentists.Concat(owners).ToList();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult addProgNotes(tblTreatmentPlanModel model)
+        {
+            using (var db = new RGDCContext())
+            {
+                try
+                {
+                    var note = new tblTreatmentPlanModel
+                    {
+                        date = model.date.Date.Add(DateTime.Now.TimeOfDay),
+                        patientID = model.patientID,
+                        accID = model.accID,
+                        amount = model.amount,
+                        paid = model.paid,
+                        procedures = model.procedures,
+                        toothNumber = model.toothNumber
+                    };
+
+                    db.tbl_treatmentplan.Add(note);
+                    db.SaveChanges();
+
+                    return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+                }
+
+                catch (Exception ex)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = ex.InnerException
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+        }
+
+        public JsonResult selectPlan(tblTreatmentPlanModel plan)
+        {
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                    from t in db.tbl_treatmentplan
+                    join a in db.tbl_account on t.accID equals a.accID
+                    join p in db.tbl_patient on t.patientID equals p.patientID
+
+                    where t.trtPlanID == plan.trtPlanID
+
+                    select new
+                    {
+                        // TREATMENT PLAN
+                        trtPlanID = t.trtPlanID,
+                        date = t.date,
+                        toothNumber = t.toothNumber,
+                        procedures = t.procedures,
+                        amount = t.amount,
+                        paid = t.paid,
+
+                        // DENTIST
+                        accID = t.accID,
+                        patientID = p.patientID
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        public JsonResult editProgressNotes(tblTreatmentPlanModel model)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_treatmentplan
+                    .FirstOrDefault(t => t.trtPlanID == model.trtPlanID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Progress note not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                // UPDATE FIELDS
+                existing.accID = model.accID;
+                existing.date = model.date;
+                existing.toothNumber = model.toothNumber;
+                existing.procedures = model.procedures;
+                existing.amount = model.amount;
+                existing.paid = model.paid;
+
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Progress note updated successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        public JsonResult deletePlan(tblTreatmentPlanModel trtPlan)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_treatmentplan
+                    .FirstOrDefault(t => t.trtPlanID == trtPlan.trtPlanID);
+
+                if (existing == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Progress note not found."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                db.tbl_treatmentplan.Remove(existing);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Progress note deleted successfully."
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult getOverviewData()
+        {
+            using (var db = new RGDCContext())
+            {
+                var today = DateTime.Now;
+                var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+
+                var totalPatients = db.tbl_patient.Count();
+
+                var newPatientsThisMonth = (from p in db.tbl_patient
+                                            join a in db.tbl_account on p.accID equals a.accID
+                                            where a.accCreatedAt >= startOfMonth
+                                            select p).Count();
+
+                var patientsDoneThisWeek = db.tbl_treatmentplan
+                    .Where(t => t.date >= startOfWeek)
+                    .Select(t => t.patientID)
+                    .Distinct()
+                    .Count();
+
+                var unpaidPatients = db.tbl_treatmentplan
+                    .Where(t => t.paid != 0)
+                    .Select(t => t.patientID)
+                    .Distinct()
+                    .Count();
+
+                return Json(new
+                {
+                    totalPatients,
+                    newPatientsThisMonth,
+                    patientsDoneThisWeek,
+                    unpaidPatients
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpGet]
+        public JsonResult getAnalyticsData()
+        {
+            using (var db = new RGDCContext())
+            {
+                var today = DateTime.Now;
+                var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+                var sixMonthsAgo = new DateTime(today.AddMonths(-5).Year, today.AddMonths(-5).Month, 1);
+
+                // Pull raw data into memory first — avoids MySQL GroupBy EF6 bug
+                var allAccounts = (from a in db.tbl_account select a).ToList();
+                var allTreatments = (from t in db.tbl_treatmentplan select t).ToList();
+
+                // Patients per month (last 6 months)
+                var patientsPerMonth = (from a in allAccounts
+                                        where a.accCreatedAt >= sixMonthsAgo
+                                        group a by new { a.accCreatedAt.Year, a.accCreatedAt.Month } into g
+                                        orderby g.Key.Year, g.Key.Month
+                                        select new
+                                        {
+                                            label = g.Key.Month + "/" + g.Key.Year,
+                                            count = g.Count()
+                                        }).ToList();
+
+                // Procedures this week
+                var proceduresThisWeek = (from t in allTreatments
+                                          where t.date >= startOfWeek
+                                          group t by t.date.DayOfWeek into g
+                                          select new
+                                          {
+                                              day = g.Key.ToString(),
+                                              count = g.Count()
+                                          }).ToList();
+
+                // Procedures by revenue
+                var proceduresByRevenue = (from t in allTreatments
+                                           group t by t.procedures into g
+                                           orderby g.Sum(x => x.amount) descending
+                                           select new
+                                           {
+                                               procedure = g.Key,
+                                               total = g.Sum(x => x.amount)
+                                           }).Take(5).ToList();
+
+                // Paid vs Unpaid
+                var paid = (from t in allTreatments where t.paid >= t.amount select t).Count();
+                var unpaid = (from t in allTreatments where t.paid < t.amount select t).Count();
+
+                return Json(new
+                {
+                    patientsPerMonth,
+                    proceduresThisWeek,
+                    proceduresByRevenue,
+                    paid,
+                    unpaid
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
     }
 }
+

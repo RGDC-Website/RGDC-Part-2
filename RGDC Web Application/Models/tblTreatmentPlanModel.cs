@@ -12,7 +12,7 @@ namespace RGDC_Web_Application.Models
         public int patientID { get; set; }
         public DateTime date { get; set; }
         public string toothNumber { get; set; }
-        public string procedureID { get; set; }
+        public string procedures { get; set; }
         public float amount { get; set; }
         public float paid { get; set; }
 

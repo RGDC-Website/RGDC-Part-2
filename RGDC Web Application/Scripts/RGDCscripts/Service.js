@@ -9,22 +9,6 @@
         });
     };
 
-    this.deleteAppointment = function (apptID) {
-        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
-        return $http({
-            method: 'POST',
-            url: '/RGDC/DeleteAppointment',
-            data: (function(obj){
-                var str = [];
-                for (var p in obj) if (obj.hasOwnProperty(p)) {
-                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
-                }
-                return str.join('&');
-            })(payload),
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
-        });
-    };
-
     //Sign Up
     this.signUp = function (accDetails) {
         return $http({
@@ -45,6 +29,10 @@
     //Get Genders
     this.getGender = function () {
         return $http.get("/RGDC/getGender");
+    };
+
+    this.getBranch = function () {
+        return $http.get("/RGDC/getBranch");
     };
 
     //Log In
@@ -240,7 +228,162 @@
         });
     };
 
+    this.addAccount = function (accountData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addAccount",
+            data: accountData
+        });
+    };
+
+    this.addOwner = function (ownerData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addOwner",
+            data: ownerData
+        });
+    };
+
+    this.addDentist = function (dentistData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addDentist",
+            data: dentistData
+        });
+    };
+
+    this.addStaff = function (staffData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addStaff",
+            data: staffData
+        });
+    };
+
+    this.deleteOwner = function (ownerAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/deleteOwner",
+            data: ownerAcc
+        });
+    };
+
+    this.deleteStaff = function (staffAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/deleteStaff",
+            data: staffAcc
+        });
+    };
+
+    this.deleteDentist = function (dentistAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/deleteDentist",
+            data: dentistAcc
+        });
+    };
+
+    this.selectOwner = function (ownerAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectOwner",
+            data: ownerAcc
+        });
+    };
+
+    this.selectDentist = function (dentistAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectDentist",
+            data: dentistAcc
+        });
+    };
+
+    this.selectStaff = function (staffAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectStaff",
+            data: staffAcc
+        });
+    };
+
+    this.editAccount = function (accDet) {
+        return $http({
+            method: "post",
+            url: "/RGDC/updateAccount",
+            data: accDet
+        });
+    };
+
+    this.editOwner = function (ownerDet) {
+        return $http({
+            method: "post",
+            url: "/RGDC/updateOwner",
+            data: ownerDet
+        });
+    };
+
+    this.editDentist = function (dentistDet) {
+        return $http({
+            method: "post",
+            url: "/RGDC/updateDentist",
+            data: dentistDet
+        });
+    };
+
+    this.editStaff = function (staffDet) {
+        return $http({
+            method: "post",
+            url: "/RGDC/updateStaff",
+            data: staffDet
+        });
+    };
     
+    this.addProgNotes = function (progressNotes) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addProgNotes",
+            data: progressNotes
+        });
+    };
+
+    this.selectPlan = function (trtPlan) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectPlan",
+            data: trtPlan
+        });
+    };
+
+    this.editProgressNotes = function (updatedProgNote) {
+        return $http({
+            method: "post",
+            url: "/RGDC/editProgressNotes",
+            data: updatedProgNote
+        });
+    };
+
+    this.deletePlan = function (trtPlan) {
+        return $http({
+            method: "post",
+            url: "/RGDC/deletePlan",
+            data: trtPlan
+        });
+    };
+
+    this.getDentistOwner = function () {
+        return $http.get("/RGDC/getDentistOwner");
+    };
+
+    this.getOverviewData = function () {
+        return $http.get('/RGDC/getOverviewData');
+    };
+
+    this.getAnalyticsData = function () {
+        return $http.get('/RGDC/getAnalyticsData');
+    };
+
     this.getPatientTreatment = function () {
         return $http.get("/RGDC/getPatientTreatment");
     };
@@ -266,6 +409,22 @@
             method: 'POST',
             url: '/RGDC/CreateAppointmentRequest',
             data: appointmentData
+        });
+    };
+
+
+    //profile picsssssssssss
+    this.uploadUserPhoto = function (file, accID) {
+        var formData = new FormData();
+        formData.append('file', file);
+        if (typeof accID !== 'undefined' && accID !== null) formData.append('accID', accID);
+
+        return $http({
+            method: "POST",
+            url: "/RGDC/UploadUserPhoto",
+            data: formData,
+            headers: { 'Content-Type': undefined },
+            transformRequest: angular.identity
         });
     };
 
@@ -335,12 +494,43 @@
         });
     };
 
-    // delete appointment
+    // delete appointment (send form urlencoded so MVC binds primitive apptID)
     this.deleteAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
         return $http({
-            method: "POST",
-            url: "/RGDC/DeleteAppointment",
-            data: { apptID: apptID }
+            method: 'POST',
+            url: '/RGDC/DeleteAppointment',
+            data: (function (obj) {
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
         });
     };
+
+    // clinic staff function
+    this.getClinicStaff = function (apptID) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/getClinicStaff",
+        });
+    };
+
+    //google calendar CODDDDDDEEEEESSSSSSSSSSS
+    this.connectGoogle = function () {
+        return $http.get('/RGDC/ConnectGoogle');
+    };
+
+    this.toggleGoogleCalendar = function (enabled) {
+        return $http.post('/RGDC/ToggleGoogleCalendar', { enabled: enabled });
+    };
+
+    this.createGoogleEvent = function (apptID) {
+        return $http.post('/RGDC/CreateGoogleEvent', { apptID: apptID });
+    };
+
+
 });
