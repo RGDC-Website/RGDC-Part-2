@@ -68,18 +68,19 @@
     padding-left: 1rem;
 }
 
-.table-of-contents a{
+.table-of-contents a {
     border-radius: 0px !important;
-
-}
-.table-of-contents a.active {
-    border-left: 3px solid #8d6e63 !important;
-}
-.table-of-contents a:hover {
-    border-left: 1px solid #8d6e63 !important;
 }
 
-a{
+    .table-of-contents a.active {
+        border-left: 3px solid #8d6e63 !important;
+    }
+
+    .table-of-contents a:hover {
+        border-left: 1px solid #8d6e63 !important;
+    }
+
+a {
     border-radius: 15px;
 }
 
@@ -95,7 +96,7 @@ a:hover {
 
 .toc-wrapper.pinned {
     top: 10px;
-    width: inherit; 
+    width: inherit;
     position: fixed;
 }
 
@@ -221,9 +222,10 @@ a:hover {
     padding: 0 0 0 0.8rem !important;
 }
 
-.px-0{
+.px-0 {
     padding: 1rem 0 !important;
 }
+
 .px-1 {
     padding: 0 1rem 0 1rem !important;
 }
@@ -272,7 +274,7 @@ mb-3 {
     color: #795548 !important;
 }
 
-.socmed-img{
+.socmed-img {
     max-width: 6rem;
 }
 
@@ -605,15 +607,30 @@ html, body {
     margin-top: 20px;
 }
 
+
+/*Para sa uplaadaadigng ng aimgaaess*/
 .photo-box {
-    width: 160px;
-    height: 160px;
-    background-color: white;
-    margin: 0 auto;
+    width: 8.5rem;
+    height: 8.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+    .photo-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+.photo-placeholder-icon {
+    font-size: 3rem;
+    color: #bdbdbd;
 }
 
 .photo-placeholder-icon {
@@ -1330,3 +1347,191 @@ select.browser-default.custom-input {
     inset: 0 !important;
     margin: auto !important;
 }
+
+/*para sa profile pic*/
+.sidebar-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3rem;
+}
+
+
+.sidebar-profile-img {
+    width: 10rem;
+    height: 10rem;
+    max-width: 10rem;
+    max-height: 10rem;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    border: 2px solid rgba(255,255,255,0.08);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.sidebar-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 25%;
+    max-width: 370px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2rem 1.5rem;
+    box-sizing: border-box;
+}
+body .main-content {
+    margin-left: 25% !important;
+}
+
+.sidebar-fixed .row {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/*para sa buttons nung edit and delete sa appt list table*/
+.actions-cell {
+    vertical-align: middle;
+    white-space: nowrap;
+    padding-right: 0.5rem;
+}
+
+.appt-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+    .appt-action-buttons .material-icons {
+        font-size: 1.05rem;
+        line-height: 1;
+    }
+
+/*para sa appt creation modal*/
+
+.modal.appt-modal,
+.modal.appt-modal.centered-modal {
+    max-width: 560px !important;
+    width: 92% !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+}
+
+    .modal.appt-modal .modal-content {
+        padding: 18px 20px !important;
+    }
+
+
+    .modal.appt-modal .row {
+        margin-bottom: 0.5rem;
+    }
+
+
+    .modal.appt-modal .custom-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #5d4037;
+    }
+
+    .modal.appt-modal .custom-input {
+        height: auto !important;
+        padding: 0.6rem 0.9rem !important;
+        line-height: 1.2 !important;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        font-size: 0.95rem;
+    }
+
+
+    .modal.appt-modal select.custom-input.browser-default,
+    .modal.appt-modal select.browser-default {
+        height: auto !important;
+        padding: 0.55rem 0.75rem !important;
+        line-height: normal !important;
+    }
+
+    .modal.appt-modal .datepicker-wrapper {
+        position: relative;
+    }
+
+    .modal.appt-modal .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 12px 18px !important;
+        box-shadow: none;
+    }
+
+        .modal.appt-modal .modal-footer .cancel-btn {
+            margin-right: auto;
+        }
+
+    .modal.appt-modal .input-field {
+        padding-top: 0.25rem;
+    }
+
+        .modal.appt-modal .input-field label,
+        .modal.appt-modal .custom-label {
+            position: static !important;
+            transform: none !important;
+            display: block !important;
+            margin: 0 0 0.45rem 0 !important;
+            line-height: 1.2;
+            font-weight: 600;
+            color: #5d4037;
+        }
+
+    .modal.appt-modal .custom-input,
+    .modal.appt-modal input[type="text"],
+    .modal.appt-modal select.browser-default,
+    .modal.appt-modal select.custom-input,
+    .modal.appt-modal .select-wrapper,
+    .modal.appt-modal .select-dropdown {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        height: 3rem !important;
+        padding: 0.55rem 0.9rem !important;
+        line-height: 1.2 !important;
+        border-radius: 8px !important;
+        border: 1px solid #ddd !important;
+        background-color: #fff !important;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .modal.appt-modal .datepicker-wrapper {
+        position: relative;
+    }
+
+        .modal.appt-modal .datepicker-wrapper .datepicker-icon {
+            position: absolute;
+            right: 0.7rem;
+            top: 0.7rem;
+            cursor: pointer;
+        }
+
+    .modal.appt-modal .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 12px 18px !important;
+    }
+
+        .modal.appt-modal .modal-footer .cancel-btn {
+            margin-right: auto;
+        }
+
+    .modal.appt-modal.small {
+        max-width: 420px !important;
+    }

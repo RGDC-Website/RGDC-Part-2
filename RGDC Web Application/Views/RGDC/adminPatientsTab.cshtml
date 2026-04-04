@@ -32,9 +32,9 @@
         </thead>
         @*table content*@
         <tbody>
-            <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArray" ng-click="goToPatientInfo(patient)">
+            <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArrayData" ng-click="goToPatientInfo(patient)">
                 <td>{{patient.patientName}}</td>
-                <td>{{patient.lastvisit}}</td>
+                <td>{{patient.lastVisitDisplay}}</td>
                 <td>{{patient.appointmentsScheduled || '0'}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
                 @*<td>
                         <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePatient" data-position="bottom" data-tooltip="Delete Account"><i class="material-icons brown-text lighten-1">delete</i></a>

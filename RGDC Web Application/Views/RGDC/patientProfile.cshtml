@@ -20,7 +20,7 @@
     </div>
 
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails(); getGender()">
+    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -91,11 +91,11 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">CIVIL STATUS</p>
-                                <p class="brown-text lighten-1">{{selectedPatient.civilStatus}}</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.civilStatus == 1 ? "Single" : selectedPatient.civilStatus == 2 ? "Married" : "Widowed"}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">OCCUPATION</p>
-                                <p class="brown-text lighten-1">n</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.occupation}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">NATIONALITY</p>
@@ -202,7 +202,7 @@
                                     <span class="placeholder-text">{{medical.history.bleedingTime || '---'}}</span>
                                 </li>
 
-                                <li>
+                                <li ng-show="selectedPatient.gender === 1">
                                     For women only:
                                     <div class="women-only-options view-only">
                                         <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
@@ -306,7 +306,7 @@
                             <tbody>
                                 <tr ng-repeat="patientTreatment in patientTreatments">
                                     <td>{{patientTreatment.date}}</td>
-                                    <td>{{patientTreatment.procedureID}}</td>
+                                    <td>{{patientTreatment.procedures}}</td>
                                     <td>{{patientTreatment.toothNumber}}</td>
                                     <td>{{patientTreatment.dentist}}</td>
                                     <td>{{patientTreatment.amount}}</td>
@@ -314,9 +314,9 @@
                                     <td>{{patientTreatment.amount - patientTreatment.paid}}</td>
                                     <td>
                                         <a ng-click="editPatient(patientTreatment.trtPlanID)" ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteProgNote" data-position="bottom" data-tooltip="Delete Progress Note">
-                                            <i class="material-icons brown-text lighten-1">delete</i>
+                                            <i class="material-icons brown-text lighten-1" ng-click="selectDeleteProg(patientTreatment.trtPlanID)">delete</i>
                                         </a>
-                                        <a ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditProgNote" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditProgNote" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1" ng-click="selectEditProg(patientTreatment.trtPlanID)">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -512,9 +512,9 @@
                     Civil Status
                     <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
-                        <option value="Single">Single</option>
-                        <option value="Married">Married</option>
-                        <option value="Widowed">Widowed</option>
+                        <option value="1">Single</option>
+                        <option value="2">Married</option>
+                        <option value="3">Widowed</option>
                     </select>
                 </label>
 
@@ -539,13 +539,13 @@
                 @*Guardian Contact #*@
                 <label class="custom-label">
                     Guardian's Contact Number
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" ng-model="selectedPatient.guarNum">
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" ng-model="selectedPatient.guarNum" max="11">
                 </label>
 
                 @*Contact #*@
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedPatient.contactNumber">
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedPatient.contactNumber" max="11">
                 </label>
             </div>
         </div>
@@ -723,7 +723,7 @@
                 </div>
             </li>
 
-            <li>
+            <li ng-show="selectedPatient.gender === 1">
                 For women only:
                 <div class="women-only-options">
                     <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
@@ -948,7 +948,7 @@
     <div class="modal-footer" style="margin:2vh 0 -5vh 0 !important">
         <button type="submit" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh -1vh" ng-click="pickSignatureFile()">UPLOAD SIGNATURE</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh -.8vh -1.2vh 0" ng-click="saveSignature()">SAVE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh -.8vh -1.2vh 0" ng-click="medicalHistoryUpdate()">SAVE</button>
     </div>
 </div>
 
@@ -962,21 +962,23 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
                 @*Dentist*@
-                <label class="custom-label">
-                    Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
-
-                </label>
+            <label class="custom-label" ng-init="getDentistOwner()">
+                Dentist
+                <select ng-model="progNote_accID" class="browser-default custom-input" 
+            ng-options="d.accID as d.fullName for d in dentistArrays track by d.accID">>
+                    <option value="" disabled selected>Select Dentist</option>
+                </select>
+            </label>
 
                 @*Amount*@
                 <label class="custom-label">
                     Amount
-                    <input type="text" class="custom-input" placeholder="Amount">
+                    <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote_amount">
                 </label>
             </div>
 
@@ -984,19 +986,19 @@
                 @*Procedures*@
                 <label class="custom-label">
                     Procedures
-                    <input type="text" class="custom-input" placeholder="Procedures">
+                    <input type="text" class="custom-input" placeholder="Procedures" ng-model="progNote_procedures">
                 </label>
 
                 @*Tooth Number*@
                 <label class="custom-label">
                     Tooth Number
-                    <input type="text" class="custom-input" placeholder="Tooth Number">
+                    <input type="text" class="custom-input" placeholder="Tooth Number" ng-model="progNote_toothNumber">
                 </label>
 
                 @*Paid*@
                 <label class="custom-label">
                     Paid
-                    <input type="text" class="custom-input" placeholder="Paid">
+                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote_paid">
                 </label>
             </div>
         </div>
@@ -1004,34 +1006,37 @@
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">ADD</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="addProgressNotes()">ADD</button>
     </div>
 </div>
 
 @*EDIT Progress botes*@
 <div id="modalEditProgNote" class="modal progNotes-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Progress Note</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Progress Note</h5>
         <div class="row">
             <div class="col s6">
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote.date">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
                 @*Dentist*@
                 <label class="custom-label">
                     Dentist
-                    <input type="text" class="custom-input" placeholder="Dentist">
-
+                    <select ng-model="progNote.accID"
+                            class="browser-default custom-input"
+                            ng-options="d.accID as d.fullName for d in dentistArrays">
+                        <option value="">Select Dentist</option>
+                    </select>
                 </label>
 
                 @*Amount*@
                 <label class="custom-label">
                     Amount
-                    <input type="text" class="custom-input" placeholder="Amount">
+                    <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote.amount">
                 </label>
             </div>
 
@@ -1039,19 +1044,19 @@
                 @*Procedures*@
                 <label class="custom-label">
                     Procedures
-                    <input type="text" class="custom-input" placeholder="Procedures">
+                    <input type="text" class="custom-input" placeholder="Procedures" ng-model="progNote.procedures">
                 </label>
 
                 @*Tooth Number*@
                 <label class="custom-label">
                     Tooth Number
-                    <input type="text" class="custom-input" placeholder="Tooth Number">
+                    <input type="text" class="custom-input" placeholder="Tooth Number" ng-model="progNote.toothNumber">
                 </label>
 
                 @*Paid*@
                 <label class="custom-label">
                     Paid
-                    <input type="text" class="custom-input" placeholder="Paid">
+                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
                 </label>
             </div>
         </div>
@@ -1059,7 +1064,7 @@
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">EDIT</button>
+        <button class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="editProgressNotes()">EDIT</button>
     </div>
 </div>
 
@@ -1073,7 +1078,7 @@
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deleteProgressNotes()">DELETE</button>
     </div>
 </div>
 
@@ -1148,7 +1153,7 @@
 
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="newForm.contactNumber" />
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="newForm.contactNumber" max="11"/>
                 </label>
 
                 <label class="custom-label">
@@ -1240,7 +1245,7 @@
 
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedForm.contactNumber" />
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedForm.contactNumber" max="11"/>
                 </label>
 
                 <label class="custom-label">
