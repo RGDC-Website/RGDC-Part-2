@@ -354,7 +354,7 @@
                     @*Forms*@
                     <div id="forms" class="row m-0 containerOverflow-2">
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modalAddForm">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk">
@@ -1106,7 +1106,7 @@
 </div>
 
 @*Add form (match post-op modal sizing) *@
-<div id="modal-add-form" class="modal modal-fixed-footer add-form-modal">
+<div id="modalAddForm" class="modal form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Add Form</h5>
 
@@ -1118,29 +1118,10 @@
                 </label>
 
                 <label class="custom-label">
-                    Middle Name
-                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="newForm.middleName" />
-                </label>
-
-                <label class="custom-label">
                     Last Name
                     <input type="text" class="custom-input" placeholder="Last Name" ng-model="newForm.lastName" />
                 </label>
 
-                <label class="custom-label">
-                    Gender
-                    <select class="browser-default custom-input" ng-model="newForm.genderID" ng-options="g.genderID as g.description for g in genderArray">
-                        <option value="" disabled>Select Gender</option>
-                    </select>
-                </label>
-
-                <label class="custom-label">
-                    Date of Birth
-                    <input type="date" class="custom-input" ng-model="newForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                </label>
-            </div>
-
-            <div class="col s12 m6">
                 <label class="custom-label">
                     Civil Status
                     <select class="browser-default custom-input" ng-model="newForm.civilStatus">
@@ -1153,7 +1134,26 @@
 
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="newForm.contactNumber" max="11"/>
+                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="newForm.contactNumber" max="11" />
+                </label>
+
+                <label class="custom-label">
+                    Date of Birth
+                    <input type="date" class="custom-input" ng-model="newForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </label>
+            </div>
+
+            <div class="col s12 m6">
+                <label class="custom-label">
+                    Middle Name
+                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="newForm.middleName" />
+                </label>
+
+                <label class="custom-label">
+                    Gender
+                    <select class="browser-default custom-input" ng-model="newForm.genderID" ng-options="g.genderID as g.description for g in genderArray">
+                        <option value="" disabled>Select Gender</option>
+                    </select>
                 </label>
 
                 <label class="custom-label">
@@ -1198,7 +1198,7 @@
 </div>
 
 @*Edit form (match post-op modal sizing) *@
-<div id="modal-edit-form" class="modal modal-fixed-footer edit-form-modal">
+<div id="modal-edit-form" class="modal  edit-form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
 
