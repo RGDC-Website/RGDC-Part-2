@@ -165,31 +165,28 @@ namespace RGDC_Web_Application.Controllers
         }
 
         [HttpPost]
-        public JsonResult CheckEmail(string email)
+        public JsonResult CheckEmail(string email, int? excludeAccID = null)
         {
             try
             {
+                if (string.IsNullOrWhiteSpace(email))
+                    return Json(new { exists = false }, JsonRequestBehavior.AllowGet);
+
+                var normalized = email.Trim().ToLowerInvariant();
+
                 using (var db = new RGDCContext())
                 {
-                    if (db == null)
-                    {
-                        return Json(new { exists = false, error = "DB context is null" });
-                    }
-                    bool exist = db.tbl_account.Any(u => u.email == email);
+                    var exists = db.tbl_account
+                        .Any(a => a.email != null
+                                  && a.email.Trim().ToLower() == normalized
+                                  && (!excludeAccID.HasValue || a.accID != excludeAccID.Value));
 
-                    return Json(new
-                    {
-                        exists = exist
-                    }, JsonRequestBehavior.AllowGet);
+                    return Json(new { exists = exists }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    exists = false,
-                    error = ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { exists = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -229,6 +226,10 @@ namespace RGDC_Web_Application.Controllers
         [HttpPost]
         public JsonResult signUpAcc(tblAccountModel accDetails)
         {
+            var role = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
+            // Block staff from creating patient records
+            if (role == "1")
+                return Json(new { success = false, message = "Not authorized" }, JsonRequestBehavior.AllowGet);
             try
             {
                 using (var addUser = new RGDCContext())
@@ -248,10 +249,28 @@ namespace RGDC_Web_Application.Controllers
                         lastLogin = DateTime.Now,
                         accCreatedAt = DateTime.Now,
                         accUpdatedAt = DateTime.Now,
-                        photoLink = accDetails.photoLink
+                        photoLink = accDetails.photoLink,
+                        role = accDetails.role > 0 ? accDetails.role : 3
                     };
                     addUser.tbl_account.Add(newData);
                     addUser.SaveChanges();
+
+                    if (newData.role == 3)
+                    {
+                        var patient = new tblPatientModel()
+                        {
+                            accID = newData.accID,
+                            currentPhysician = string.Empty,
+                            referral = string.Empty,
+                            lastVisit = DateTime.Now,
+                            medicalHistory = string.Empty,
+                            medHistUpdate = DateTime.Now
+                        };
+
+                        addUser.tbl_patient.Add(patient);
+                        addUser.SaveChanges();
+                    }
+
                     return Json(new
                     {
                         accID = newData.accID
@@ -265,12 +284,23 @@ namespace RGDC_Web_Application.Controllers
         }
 
         [HttpPost]
-        public void signUpPatient(tblPatientModel accDetails)
+        public JsonResult signUpPatient(tblPatientModel accDetails)
         {
             try
             {
-                using (var addUser = new RGDCContext())
+                using (var db = new RGDCContext())
                 {
+                    var existing = db.tbl_patient.FirstOrDefault(p => p.accID == accDetails.accID);
+                    if (existing != null)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Patient record already exists for this account.",
+                            patientID = existing.patientID
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
                     var newData = new tblPatientModel()
                     {
                         accID = accDetails.accID,
@@ -280,13 +310,25 @@ namespace RGDC_Web_Application.Controllers
                         medicalHistory = accDetails.medicalHistory,
                         medHistUpdate = DateTime.Now
                     };
-                    addUser.tbl_patient.Add(newData);
-                    addUser.SaveChanges();
+
+                    db.tbl_patient.Add(newData);
+                    db.SaveChanges();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Patient inserted successfully.",
+                        patientID = newData.patientID
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"There is an error {ex.Message}");
+                return Json(new
+                {
+                    success = false,
+                    message = ex.Message
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -901,6 +943,8 @@ namespace RGDC_Web_Application.Controllers
                         religion = a.religion,
                         nationality = a.nationality,
                         accCreated = a.accCreatedAt,
+                        occupation = p.occupation,
+                        photoLink = a.photoLink,
                         medHist = p.medicalHistory,
                         medHistUpdate = p.medHistUpdate,
                         lastVisit = p.lastVisit,
@@ -1092,6 +1136,7 @@ namespace RGDC_Web_Application.Controllers
 
                     pat.currentPhysician = string.IsNullOrWhiteSpace(profInfo.currentPhysician) ? pat.currentPhysician : profInfo.currentPhysician;
                     pat.previousPhysician = string.IsNullOrWhiteSpace(profInfo.previousPhysician) ? pat.previousPhysician : profInfo.previousPhysician;
+                    pat.occupation = string.IsNullOrWhiteSpace(profInfo.occupation) ? pat.occupation : profInfo.occupation;
                     pat.guardian = string.IsNullOrWhiteSpace(profInfo.guardian) ? pat.guardian : profInfo.guardian;
                     pat.guardianNumber = string.IsNullOrWhiteSpace(profInfo.guardianNumber) ? pat.guardianNumber : profInfo.guardianNumber;
                     pat.insurance = string.IsNullOrWhiteSpace(profInfo.insurance) ? pat.insurance : profInfo.insurance;
@@ -2241,7 +2286,7 @@ namespace RGDC_Web_Application.Controllers
                     address = accmod.address,
                     civilStatus = accmod.civilStatus,
                     password = "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
-                    //photoLink = accmod.photoLink,
+                    photoLink = string.IsNullOrWhiteSpace(accmod.photoLink) ? null : accmod.photoLink,
                     role = accmod.role,
                     lastLogin = DateTime.Now,
                     accCreatedAt = DateTime.Now,

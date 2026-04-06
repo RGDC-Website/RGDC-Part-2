@@ -30,7 +30,7 @@
                     @*user pfp and name*@
                     <div class="row center">
                         @*lagyan nalang ng src for image source*@
-                        <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:9rem" />
+                        <img ng-src="{{selectedPatient.photoLink || 'https://placehold.co/400'}}" class="circle responsive-img" style="max-width:9rem" />
                     </div>
 
                     @*user name and role*@
@@ -502,7 +502,21 @@
                 @*Email*@
                 <label class="custom-label">
                     Email Address
-                    <input type="text" class="custom-input" placeholder="Email Address" ng-model="selectedPatient.email">
+                    <input type="text"
+                           class="custom-input"
+                           placeholder="Email Address"
+                           ng-model="selectedPatient.email"
+                           ng-change="checkEditPatientEmail()" />
+
+                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
+                        Enter a valid email address
+                    </span>
+                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
+                        Email already taken
+                    </span>
+                    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
+                        Email is valid
+                    </span>
                 </label>
             </div>
 
@@ -521,7 +535,7 @@
                 @*Occupation*@
                 <label class="custom-label">
                     Occupation
-                    <input type="text" class="custom-input" placeholder="Occupation">
+                    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
                 </label>
 
                 @*Religion*@
@@ -539,21 +553,24 @@
                 @*Guardian Contact #*@
                 <label class="custom-label">
                     Guardian's Contact Number
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" ng-model="selectedPatient.guarNum" max="11">
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
                 </label>
 
                 @*Contact #*@
                 <label class="custom-label">
                     Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedPatient.contactNumber" max="11">
+                    <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
                 </label>
             </div>
         </div>
     </div>
+    <input id="patient_photo_input" type="file" accept="image/*" style="display:none"
+           onchange="angular.element(this).scope().onPatientPhotoSelected(this.files)" />
+
 
     @*upload, save, cancel buttons*@
     <div class="modal-footer" style="margin-top:-.3vh !important">
-        <button type="submit" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">UPLOAD NEW ACCOUNT PICTURE</button>
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD NEW ACCOUNT PICTURE</button>        
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
     </div>

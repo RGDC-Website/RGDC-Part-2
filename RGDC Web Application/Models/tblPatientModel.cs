@@ -14,6 +14,7 @@ namespace RGDC_Web_Application.Models
         public string previousPhysician { get; set; }
         public string previousPhysicianOffice { get; set; }
         public string previousPhysicianContact { get; set; }
+        public string occupation { get; set; }
         public string guardian { get; set; }
         public string guardianNumber { get; set; }
         public string insurance { get; set; }
