@@ -29,7 +29,7 @@
 
             @*user pfp and name*@
             <div class="row center sidebar-profile" style="margin-top: 5rem;">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img" />
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfile" />
             </div>
 
             @*user name and role*@
@@ -115,7 +115,7 @@
             @*user pfp and name*@
             <div class="row center" style="margin-top: 5rem;">
                 @*lagyan nalang ng src for image source*@
-                <img src="https://placehold.co/400" class="circle responsive-img" style="max-width:10rem" />
+                <img src="https://placehold.co/400" class="circle responsive-img modal-trigger" data-target="editProfile" style="max-width:10rem" />
             </div>
 
             @*user name and role*@
@@ -157,11 +157,276 @@
         </ul>
 
         @*content*@
-        <div class="col l9 main-content container">
+        @*<div class="col l9 main-content container">*@
+        <div class="col l9 main-content ">
             @RenderBody()
         </div>
     </div>
 
+
+    @*Edit Profile*@
+    <div id="modalEditProfile" class="modal patientInformationForm-modal">
+        <div>
+            <h5 class="modal-form-title">Edit Profile</h5>
+
+            <form>
+                <div class="row">
+                    <div class="col s4">
+                        @*Photo upload*@
+                        <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                            <div class="col s12">
+                                <div class="photo-box">
+                                    <i class="material-icons photo-placeholder-icon">image</i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s8">
+                        <div class="row">
+                            @*First name*@
+                            <div class="col s6">
+                                <p class="custom-label">First Name <span class="required-mark">*</span></p>
+                                <input type="text"
+                                       class="custom-input"
+                                       maxlength="150"
+                                       placeholder="Juan"
+                                       required>
+                            </div>
+                            @*MIddle name*@
+                            <div class="col s6">
+                                <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                                <input type="text"
+                                       class="custom-input"
+                                       maxlength="150"
+                                       placeholder="Mercado"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @*Last name*@
+                            <div class="col s12">
+                                <p class="custom-label">Last Name <span class="required-mark">*</span></p>
+                                <input type="text" class="custom-input"
+                                       maxlength="150"
+                                       placeholder="Dela Cruz"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*Email*@
+                <div class="row">
+                    <div class="col s12">
+                        <p class="custom-label">Email <span class="required-mark">*</span></p>
+                        <input type="text" class="custom-input" l"
+                               maxlength="150"
+                               placeholder="juandlc@gmail.com"
+                               required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @*Gender*@
+                    <div class="col s3">
+                        <p class="custom-label">Gender <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input">
+                            <option value="" disabled selected>Select Gender</option>
+                            <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
+                        </select>
+                    </div>
+                    @*Birthdate*@
+                    <div class="col s3">
+                        <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
+                        <div class="datepicker-wrapper">
+                            <input id="birthDate"
+                                   type="text"
+                                   class="datepicker custom-input"
+                                   readonly
+                                   required>
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        </div>
+                    </div>
+
+                    <div class="col s3">
+                        @*Civil status*@
+                        <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" required>
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="1">Single</option>
+                            <option value="2">Married</option>
+                            <option value="3">Widowed</option>
+                        </select>
+                    </div>
+                    <div class="col s3">
+                        @*Contact number*@
+                        <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
+                        <input id="contactNumber"
+                               type="text"
+                               class="custom-input"
+                               placeholder="09XX-XXX-XXXX"
+                               maxlength="13"
+                               required>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col s4">
+                        @*Occupation*@
+                        <p class="custom-label">Occupation <span class="required-mark">*</span></p>
+                        <input id="occupation"
+                               type="text"
+                               class="custom-input"
+                               placeholder="Doctor"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="col s4">
+                        @*Religion*@
+                        <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                        <input id="religion"
+                               type="text"
+                               class="custom-input"
+                               placeholder="Roman-Catholic"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="col s4">
+                        @*Nationality*@
+                        <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                        <input id="contactNumber"
+                               type="text"
+                               class="custom-input"
+                               placeholder="Filipino"
+                               maxlength="50"
+                               required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s4">
+                        @*Med Insurance*@
+                        <p class="custom-label">Medical Insurance <span class="required-mark">*</span></p>
+                        <input id="occupation"
+                               type="text"
+                               class="custom-input"
+                               placeholder="RGDC Free Dental Ewan"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="col s4">
+                        @*Guardian*@
+                        <p class="custom-label">Guardian <span class="required-mark">*</span></p>
+                        <input id="religion"
+                               type="text"
+                               class="custom-input"
+                               placeholder="Mama"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="col s4">
+                        @*Guardian's Contanct Number'*@
+                        <p class="custom-label">Guardian's Contanct Number <span class="required-mark">*</span></p>
+                        <input id="contactNumber"
+                               type="text"
+                               class="custom-input"
+                               placeholder="09XX-XXX-XXXX"
+                               maxlength="13"
+                               required>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col s12">
+                        @*Address*@
+                        <p class="custom-label">Address <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               class="custom-input"
+                               maxlength="250"
+                               required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    @*Specialization*@
+                    <div class="col s12">
+                        <p class="custom-label">Specialization</p>
+                        <input type="text"
+                               class="custom-input"
+                               maxlength="50">
+                    </div>
+                </div>
+
+                @*New Password*@
+                <div class="forgot-password-container">
+                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                </div>
+
+
+            </form>
+        </div>
+
+        @*Submit or cancel*@
+        <div class="modal-footer footer-center" style="margin-top:2.5vh">
+            <button type="submit" class="edit-btn left" style="font-weight:500;">UPLOAD PHOTO</button>
+            <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
+            <button type="submit" class="edit-btn" style="font-weight:500;">SAVE</button>
+        </div>
+    </div>
+
+    @*Forgot Password*@
+    <div id="modalOTP" class="modal password-modal">
+        <div class="modal-content" style="width:80vh !important">
+            <h5 class="modal-form-title">Verify Your Identity</h5>
+
+            <div class="input-field">
+                <p class="custom-label">Gmail <span class="required-mark">*</span></p>
+                <input type="email"
+                       ng-model="forgot_email"
+                       placeholder="juandelacruz@gmail.com"
+                       required>
+            </div>
+
+            <div class="modal-footer">
+                <button type="submit" class="edit-btn right" style="font-weight: 500; align-items: center; margin: 1vh 0 -3vh 0" ng-click="sendOTP()">SEND OTP</button>
+                <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 2.3vh -3vh 0">CANCEL</button>
+                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" data-target="modalPasswordReset">VERIFY</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPasswordReset" class="modal password-modal">
+        <div class="modal-content" style="width:80vh !important">
+            <h5 class="modal-form-title">Change Password</h5>
+
+                <div class="input-field">
+                    <p class="custom-label">New Password <span class="required-mark">*</span></p>
+                    <input type="password"
+                           ng-model="forgot_newPassword"
+                           placeholder="New password">
+                </div>
+
+                <div class="input-field">
+                    <p class="custom-label">Confirm Password <span class="required-mark">*</span></p>
+                    <input type="password"
+                           ng-model="forgot_confirmPassword"
+                           placeholder="Confirm password">
+                </div>
+
+            <div class="modal-footer">
+                <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 0 -3vh 0">CANCEL</button>
+                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" data-target="modalPasswordReset" ng-click="resetPassword()">CHANGE PASSWORD</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         //Arrow filter (descending and ascending)
@@ -216,9 +481,6 @@
             var tocElement = document.querySelector('.table-of-contents');
             var tocWrapper = document.querySelector('.toc-wrapper');
 
-            M.Pushpin.init(tocWrapper, {
-                top: tocWrapper.offsetTop
-            });
         });
 
         //tabs javascript
