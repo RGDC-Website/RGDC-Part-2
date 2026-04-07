@@ -38,10 +38,6 @@
         // ignore
     }
 
-    $scope.checkAddPatientEmail = function () {
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        $scope.addPatientEmailValid = emailPattern.test($scope.addPatient_email);
-    };
 
     $scope.isAddPatientEmailValid = function () {
         return $scope.addPatientEmailValid;
@@ -621,6 +617,7 @@
                 $scope.currentUserName = returnedData.data.userName || "";
                 $scope.currentUserID = returnedData.data.userID || "";
                 $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
+                $scope.isUserStaff = ($scope.currentUserAuthorization === "1");
                 $scope.currentUserFullName = returnedData.data.fullName || "";
 
                 // BAGONG CODE PARA SA GOOGLE CALENDAR
@@ -721,16 +718,29 @@
         if ($scope.userAuthorization != 3) {
             var getPatientList = RGDCWebApplicationService.getPatientList();
             getPatientList.then(function (patientList) {
-                $scope.patientArrayData = patientList.data || [];
-
-                $scope.patientArrayData = (patientList.data || []).map(patient => {
-                    return {
-                        ...patient,
-                        lastVisitDisplay: patient.lastVisit
-                            ? formatDateToMDY(patient.lastVisit)
-                            : "No visit yet",
-                        };
+                $scope.patientArrayData = (patientList.data || []).map(function (patient) {
+                    return Object.assign({}, patient, {
+                        lastVisitDisplay: patient.lastVisit ? formatDateToMDY(patient.lastVisit) : "No visit yet"
+                    });
                 });
+
+                $timeout(function () {
+                    try {
+                        // If we previously created an instance, try to destroy it first
+                        if (window._adminPatientsDataTableInstance && typeof window._adminPatientsDataTableInstance.destroy === 'function') {
+                            try { window._adminPatientsDataTableInstance.destroy(); } catch (e) { console.warn('destroy DataTable failed', e); }
+                        }
+
+                        // Create DataTable instance after rows are rendered
+                        if (window && typeof DataTable === 'function') {
+                            window._adminPatientsDataTableInstance = new DataTable('#adminPatientsTabTable');
+                        } else {
+                            console.warn('DataTable constructor not found.');
+                        }
+                    } catch (e) {
+                        console.error('Failed to init admin patients DataTable:', e);
+                    }
+                }, 0);
             });
         }
     }
@@ -1060,6 +1070,18 @@
     $scope.updatePatientProfile = function () {
         if (!$scope.selectedPatient) return;
 
+            if ($scope.selectedPatient.email) {
+        // ensure format checked at least once
+        if (!$scope.editPatientEmailValid) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+            return;
+        }
+        if ($scope.editPatientEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is already in use by another account.' });
+            return;
+        }
+    }
+
         var profInfo = {
              patientID: $scope.selectedPatient.patientID,
              accID: $scope.selectedPatient.accID,
@@ -1094,7 +1116,7 @@
                     text: response.data.message || "Profile updated."
                 });
                 $scope.getSelectedPatientDetails();
-                var modal = document.getElementById("modal-patient-info");
+                var modal = document.getElementById("modalEditPatientInfo");
                 if (modal) {
                     if (typeof M !== 'undefined' && M.Modal) {
                         var inst = M.Modal.getInstance(modal);
@@ -2589,6 +2611,12 @@
     }; 
 
     $scope.addPatient = function () {
+        //for staff restriction in adding patients
+        if ($scope.isUserStaff) {
+            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot add patients.' });
+            return;
+        }
+
         //Add email duplication check
         var birthDate = new Date($scope.addPatient_birthDate);
         birthDate.setHours(0, 0, 0, 0); // 00:00:00
@@ -2608,32 +2636,53 @@
                 lastLogin: new Date(),
                 accCreatedAt: new Date(),
                 accUpdatedAt: new Date(),
+                role: 3
             }
             var addPatient = RGDCWebApplicationService.signUp(accountData);
             addPatient.then(function (addPatientID) {
-                var patientData = {
-                    currentPhysician: $scope.addPatient_currentPhysician,
-                    referral: $scope.addPatient_referral,
-                    lastVisit: $scope.addPatient_lastVisit,
-                    medicalHistory: "",
-                    accID: addPatientID.data.accID
+                var accId = addPatientID.data.accID;
 
+                var uploadPromise = Promise.resolve();
+                if ($scope.addPatientPhotoFile) {
+                    uploadPromise = RGDCWebApplicationService.uploadUserPhoto($scope.addPatientPhotoFile, accId)
+                        .then(function (resp) {
+                            // resp.data.success expected from server; log or show message if needed
+                            if (!(resp && resp.data && resp.data.success)) {
+                                console.warn('UploadUserPhoto returned failure', resp && resp.data);
+                                // continue anyway so patient row still created; optionally show alert
+                            }
+                        })
+                        .catch(function (err) {
+                            console.error('uploadUserPhoto error', err);
+                            // continue anyway
+                        });
                 }
-                var addPatientPatient = RGDCWebApplicationService.signUpPatient(patientData);
-                addPatientPatient.then(function () {
-                    var user_email = {
-                        email: $scope.addPatient_email
-                    }
-                    var sendEmail = RGDCWebApplicationService.sendEmail(user_email);
-                    Swal.fire({ icon: 'success', title: 'Add Patient', text: 'Successfully added new patient payment record.' }).then((result) => {
-                        if (result.isConfirmed) {
-                            
-                            window.location.href = "/RGDC/adminPatientsTab";
-                            afterUpdate();
-                          }
-
+                uploadPromise.then(function () {
+                    var patientData = {
+                        currentPhysician: $scope.addPatient_currentPhysician,
+                        referral: $scope.addPatient_referral,
+                        lastVisit: $scope.addPatient_lastVisit,
+                        medicalHistory: "",
+                        accID: accId
+                    };
+                    var addPatientPatient = RGDCWebApplicationService.signUpPatient(patientData);
+                    addPatientPatient.then(function () {
+                        var user_email = {
+                            email: $scope.addPatient_email
+                        };
+                        var sendEmail = RGDCWebApplicationService.sendEmail(user_email);
+                        Swal.fire({ icon: 'success', title: 'Add Patient', text: 'Successfully added new patient payment record.' }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/RGDC/adminPatientsTab";
+                                afterUpdate();
+                            }
+                        });
+                    }).catch(function (err) {
+                        console.error('signUpPatient failed', err);
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create patient record.' });
                     });
-                })
+                });
+
             })
         }    
     }
@@ -2774,6 +2823,16 @@
     }
 
     $scope.addOwner = function () {
+        // validate format / duplicate one more time
+        if (!isValidEmailFormat($scope.owner_email)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email (must contain @, no spaces).' });
+            return;
+        }
+        if ($scope.ownerEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'Email is already taken.' });
+            return;
+        }
+
         var accountData = {
             firstName: $scope.owner_firstName,
             middleName: $scope.owner_middleName,
@@ -2784,26 +2843,23 @@
             birthDate: $scope.owner_birthDate,
             civilStatus: $scope.owner_civilStatus,
             address: $scope.owner_address,
-
-            role: 0
-        }
+            role: 0,
+            photoLink: $scope.ownerUploadedPhotoPath || null
+        };
         var addOwner = RGDCWebApplicationService.addAccount(accountData);
         addOwner.then(function (returnedData) {
             var ownerData = {
                 accID: returnedData.data.accID,
                 specialization: $scope.owner_specialization,
             }
-            console.log(ownerData)
             var addOwnerAcc = RGDCWebApplicationService.addOwner(ownerData);
             addOwnerAcc.then(function (returnedData) {
                 if (returnedData.data.success) {
                     Swal.fire({ icon: 'success', title: 'Add Owner', text: 'Successfully added new owner.' }).then((result) => {
                         if (result.isConfirmed) {
-
                             window.location.href = "/RGDC/adminClinicStaffTab";
                             afterUpdate();
                         }
-
                     });
                 } else {
                     Swal.fire({ icon: 'Error', title: 'Add Owner', text: 'Cannot add new owner.' })
@@ -2813,6 +2869,15 @@
     }
 
     $scope.addDentist = function () {
+        if (!isValidEmailFormat($scope.dentist_email)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email (must contain @, no spaces).' });
+            return;
+        }
+        if ($scope.dentistEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'Email is already taken.' });
+            return;
+        }
+
         var accountData = {
             firstName: $scope.dentist_firstName,
             middleName: $scope.dentist_middleName,
@@ -2837,11 +2902,9 @@
                 if (returnedData.data.success) {
                     Swal.fire({ icon: 'success', title: 'Add Dentist', text: 'Successfully added new dentist.' }).then((result) => {
                         if (result.isConfirmed) {
-
                             window.location.href = "/RGDC/adminClinicStaffTab";
                             afterUpdate();
                         }
-
                     });
                 } else {
                     Swal.fire({ icon: 'Error', title: 'Add Owner', text: 'Cannot add new owner.' })
@@ -2851,6 +2914,15 @@
     }
 
     $scope.addStaff = function () {
+        if (!isValidEmailFormat($scope.staff_email)) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email (must contain @, no spaces).' });
+            return;
+        }
+        if ($scope.staffEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'Email is already taken.' });
+            return;
+        }
+
         var accountData = {
             firstName: $scope.staff_firstName,
             middleName: $scope.staff_middleName,
@@ -2875,11 +2947,9 @@
                 if (returnedData.data.success) {
                     Swal.fire({ icon: 'success', title: 'Add Staff', text: 'Successfully added new staff.' }).then((result) => {
                         if (result.isConfirmed) {
-
                             window.location.href = "/RGDC/adminClinicStaffTab";
                             afterUpdate();
                         }
-
                     });
                 } else {
                     Swal.fire({ icon: 'Error', title: 'Add Staff', text: 'Cannot add new Staff.' })
@@ -2963,37 +3033,58 @@
     }
 
     $scope.editSelectOwner = function (ownerID) {
-        var ownerAcc = {
-            ownerID: ownerID,
-        }
-        var selectOwner = RGDCWebApplicationService.selectOwner(ownerAcc);
-        selectOwner.then(function (returnedData) {
-            $scope.owner = returnedData.data;
-            $scope.owner.birthDate = formatDateToMDY($scope.owner.birthDate);
-        });
-    }
+        var ownerAcc = { ownerID: ownerID };
+        RGDCWebApplicationService.selectOwner(ownerAcc)
+            .then(function (returnedData) {
+                $scope.owner = returnedData.data;
+                $scope.owner.birthDate = formatDateToMDY($scope.owner.birthDate);
+
+                $scope.ownerFirstNameTouched = false;
+                $scope.ownerLastNameTouched = false;
+                $scope.ownerAddressTouched = false;
+                $scope.ownerContactTouched = false;
+                $scope.ownerEmailTouched = false;
+
+                $scope.validateOwnerEditFields && $scope.validateOwnerEditFields();
+                $scope.validateOwnerEmailEdit && $scope.validateOwnerEmailEdit();
+            });
+    };
 
     $scope.editSelectDentist = function (dentistID) {
-        var dentistAcc = {
-            dentistID: dentistID,
-        }
-        var selectDentist = RGDCWebApplicationService.selectDentist(dentistAcc);
-        selectDentist.then(function (returnedData) {
-            $scope.dentist = returnedData.data;
-            $scope.dentist.birthDate = formatDateToMDY($scope.dentist.birthDate);
-        });
-    }
+        var dentistAcc = { dentistID: dentistID };
+        RGDCWebApplicationService.selectDentist(dentistAcc)
+            .then(function (returnedData) {
+                $scope.dentist = returnedData.data;
+                $scope.dentist.birthDate = formatDateToMDY($scope.dentist.birthDate);
+
+                $scope.dentistFirstNameTouched = false;
+                $scope.dentistLastNameTouched = false;
+                $scope.dentistAddressTouched = false;
+                $scope.dentistContactTouched = false;
+                $scope.dentistEmailTouched = false;
+
+                $scope.validateDentistEditFields && $scope.validateDentistEditFields();
+                $scope.validateDentistEmailEdit && $scope.validateDentistEmailEdit();
+            });
+    };
 
     $scope.editSelectStaff = function (staffID) {
-        var staffAcc = {
-            staffID: staffID,
-        }
-        var selectStaff = RGDCWebApplicationService.selectStaff(staffAcc);
-        selectStaff.then(function (returnedData) {
-            $scope.staff = returnedData.data;
-            $scope.staff.birthDate = formatDateToMDY($scope.staff.birthDate);
-        });
-    }
+        var staffAcc = { staffID: staffID };
+        RGDCWebApplicationService.selectStaff(staffAcc)
+            .then(function (returnedData) {
+                $scope.staff = returnedData.data;
+                $scope.staff.birthDate = formatDateToMDY($scope.staff.birthDate);
+
+                $scope.staffFirstNameTouched = false;
+                $scope.staffLastNameTouched = false;
+                $scope.staffAddressTouched = false;
+                $scope.staffContactTouched = false;
+                $scope.staffEmailTouched = false;
+
+                $scope.validateStaffEditFields && $scope.validateStaffEditFields();
+                $scope.validateStaffEmailEdit && $scope.validateStaffEmailEdit();
+            });
+    };
 
     $scope.editOwner = function () {
         var accDet = {
@@ -3007,34 +3098,64 @@
             contactNumber: $scope.owner.contactNumber,
             address: $scope.owner.address,
             civilStatus: $scope.owner.civilStatus,
-        }
+        };
 
         var ownerDet = {
             ownerID: $scope.owner.ownerID,
             specialization: $scope.owner.specialization
+        };
+
+        // validation guard: required fields + email format + not taken
+        $scope.validateOwnerEditFields();
+        $scope.validateOwnerEmailEdit();
+        if (!$scope.ownerFirstNameValid || !$scope.ownerLastNameValid || !$scope.ownerAddressValid) {
+            Swal.fire({ icon: 'error', title: 'Missing required fields', text: 'Please fill in all required fields.' });
+            return;
+        }
+        if (!$scope.ownerEmailFormatValid) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+            return;
+        }
+        if ($scope.ownerEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is used by another account.' });
+            return;
         }
 
-        var editAccount = RGDCWebApplicationService.editAccount(accDet);
-        editAccount.then(function (returnedData) {
-            if (returnedData.data.success) {
-                var editOwner = RGDCWebApplicationService.editOwner(ownerDet);
-                editOwner.then(function (returnedData) {
-                    if (returnedData.data.success) {
-                        Swal.fire({ icon: 'success', title: 'Edit Owner', text: 'Successfully edited Owner Details.' }).then((result) => {
-                            if (result.isConfirmed) {
+        var photoFile = $scope.ownerPhotoFileEdit || null;
+        // If user picked a photo in edit modal, upload it first and set acc photoLink on server
+        var uploadPromise = _maybeUploadAccountPhoto(photoFile, $scope.owner.accID)
+            .catch(function (err) {
+                console.warn('Photo upload failed, proceeding with editAccount', err);
+                return null; // proceed even if upload fails (or change to abort)
+            });
 
-                                window.location.href = "/RGDC/adminClinicStaffTab";
-                                afterUpdate();
-                            }
-
-                        });
-                    } else {
-                        Swal.fire({ icon: 'Error', title: 'Edit Owner', text: 'Cannot edit owner details.' })
-                    }
-                })
-            }
-        })
-    }
+        uploadPromise.then(function (filePath) {
+            // if upload returned path, set model so server side editAccount can also update if needed
+            if (filePath) accDet.photoLink = filePath;
+            var editAccount = RGDCWebApplicationService.editAccount(accDet);
+            editAccount.then(function (returnedData) {
+                if (returnedData.data.success) {
+                    var editOwner = RGDCWebApplicationService.editOwner(ownerDet);
+                    editOwner.then(function (returnedData) {
+                        if (returnedData.data.success) {
+                            Swal.fire({ icon: 'success', title: 'Edit Owner', text: 'Successfully edited Owner Details.' }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/RGDC/adminClinicStaffTab";
+                                    afterUpdate();
+                                }
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Edit Owner', text: 'Cannot edit owner details.' })
+                        }
+                    })
+                }
+            })
+                .catch(function (err) {
+                    console.error('editAccount error', err);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to edit account.' });
+                });
+        });
+    };
     $scope.editDentist = function () {
         var accDet = {
             accID: $scope.dentist.accID,
@@ -3298,6 +3419,826 @@
             })
             .catch(function (err) {
                 console.error('Failed to load analytics data', err);
+            });
+    }
+
+    var PHONE_PATTERN = /^09\d{9}$/;
+
+    //for editing of patient profile email validation
+    var _editPatientEmailTimer = null;
+    $scope.editPatientEmailValid = false;
+    $scope.editPatientEmailTaken = false;
+
+    $scope.checkEditPatientEmail = function () {
+        var email = $scope.selectedPatient && $scope.selectedPatient.email ? $scope.selectedPatient.email.trim() : '';
+        var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        $scope.editPatientEmailValid = pattern.test(email);
+
+        // reset duplicate flag if invalid or empty
+        if (!email || !$scope.editPatientEmailValid) {
+            $scope.editPatientEmailTaken = false;
+            return;
+        }
+
+        // debounce backend check
+        if (_editPatientEmailTimer) clearTimeout(_editPatientEmailTimer);
+        _editPatientEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.selectedPatient && $scope.selectedPatient.accID ? $scope.selectedPatient.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.editPatientEmailTaken = resp && resp.data && resp.data.exists === true;
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkEditPatientEmail error', err);
+                    // don't block save on transient error; treat as not taken
+                    $scope.editPatientEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 300);
+    };
+
+
+    function isValidEmailFormat(email) {
+        if (!email) return false;
+        var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email) && email.indexOf(' ') === -1;
+    }
+
+    var emailCheckTimeouts = {
+        owner: null,
+        dentist: null,
+        staff: null
+    };
+
+    $scope.validateOwnerEmail = function () {
+        $scope.ownerEmailFormatValid = isValidEmailFormat($scope.owner_email);
+        // reset duplicate flag until server says otherwise
+        $scope.ownerEmailTaken = false;
+
+        if ($scope.ownerEmailFormatValid) {
+            // debounce server calls
+            if (emailCheckTimeouts.owner) clearTimeout(emailCheckTimeouts.owner);
+            emailCheckTimeouts.owner = setTimeout(function () {
+                RGDCWebApplicationService.checkEmail($scope.owner_email).then(function (res) {
+                    $scope.$applyAsync(function () {
+                        $scope.ownerEmailTaken = res.data.exists === true;
+                    });
+                });
+            }, 400);
+        }
+    };
+
+    $scope.validateDentistEmail = function () {
+        $scope.dentistEmailFormatValid = isValidEmailFormat($scope.dentist_email);
+        $scope.dentistEmailTaken = false;
+
+        if ($scope.dentistEmailFormatValid) {
+            if (emailCheckTimeouts.dentist) clearTimeout(emailCheckTimeouts.dentist);
+            emailCheckTimeouts.dentist = setTimeout(function () {
+                RGDCWebApplicationService.checkEmail($scope.dentist_email).then(function (res) {
+                    $scope.$applyAsync(function () {
+                        $scope.dentistEmailTaken = res.data.exists === true;
+                    });
+                });
+            }, 400);
+        }
+    };
+
+    $scope.validateStaffEmail = function () {
+        $scope.staffEmailFormatValid = isValidEmailFormat($scope.staff_email);
+        $scope.staffEmailTaken = false;
+
+        if ($scope.staffEmailFormatValid) {
+            if (emailCheckTimeouts.staff) clearTimeout(emailCheckTimeouts.staff);
+            emailCheckTimeouts.staff = setTimeout(function () {
+                RGDCWebApplicationService.checkEmail($scope.staff_email).then(function (res) {
+                    $scope.$applyAsync(function () {
+                        $scope.staffEmailTaken = res.data.exists === true;
+                    });
+                });
+            }, 400);
+        }
+    };
+
+
+    //owner photo uploading for diff user acc types
+    $scope.pickPhoto = function (type) {
+        var id = null;
+        if (type === 'owner' || type === 'ownerAdd') id = 'ownerPhotoInput';
+        else if (type === 'ownerEdit') id = 'ownerPhotoInputEdit';
+        else if (type === 'dentist' || type === 'dentistAdd') id = 'dentistPhotoInput';
+        else if (type === 'dentistEdit') id = 'dentistPhotoInputEdit';
+        else if (type === 'staff' || type === 'staffAdd') id = 'staffPhotoInput';
+        else if (type === 'staffEdit') id = 'staffPhotoInputEdit';
+        if (id) {
+            var el = document.getElementById(id);
+            if (el) el.click();
+        }
+    };
+
+    $scope.onPhotoSelected = function (files, role) {
+        if (!files || !files.length) return;
+
+        var file = files && files[0];
+        if (!file) return;
+
+        // basic checks (if not already present)
+        if (!file.type || !file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'Invalid file', text: 'Please select an image file.' });
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            Swal.fire({ icon: 'error', title: 'File too large', text: 'Max file size is 5 MB.' });
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $scope.$apply(function () {
+                // Support both add and edit type names
+                if (type === 'owner' || type === 'ownerAdd') {
+                    $scope.ownerPhotoPreview = e.target.result;
+                    $scope.ownerPhotoFile = file;
+                } else if (type === 'ownerEdit') {
+                    $scope.ownerPhotoPreviewEdit = e.target.result;
+                    $scope.ownerPhotoFileEdit = file;
+                } else if (type === 'dentist' || type === 'dentistAdd') {
+                    $scope.dentistPhotoPreview = e.target.result;
+                    $scope.dentistPhotoFile = file;
+                } else if (type === 'dentistEdit') {
+                    $scope.dentistPhotoPreviewEdit = e.target.result;
+                    $scope.dentistPhotoFileEdit = file;
+                } else if (type === 'staff' || type === 'staffAdd') {
+                    $scope.staffPhotoPreview = e.target.result;
+                    $scope.staffPhotoFile = file;
+                } else if (type === 'staffEdit') {
+                    $scope.staffPhotoPreviewEdit = e.target.result;
+                    $scope.staffPhotoFileEdit = file;
+                } else {
+                    // fallback: keep existing behavior
+                    $scope.genericPhotoPreview = e.target.result;
+                    $scope.genericPhotoFile = file;
+                }
+            });
+        };
+        reader.readAsDataURL(file);
+
+        // upload immediately
+        var uploader = null;
+        if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadUserPhoto === 'function') {
+            uploader = RGDCWebApplicationService.uploadUserPhoto;
+        } else if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadSignature === 'function') {
+            uploader = RGDCWebApplicationService.uploadSignature;
+        } else {
+            Swal.fire({ icon: 'error', title: 'Upload Not Available', text: 'Upload service is not loaded.' });
+            return;
+        }
+
+        Swal.fire({ title: 'Uploading photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        uploader(file)
+            .then(function (resp) {
+                Swal.close();
+                var data = resp && resp.data ? resp.data : resp;
+                if (data && data.success && data.filePath) {
+                    $scope.$applyAsync(function () {
+                        $scope[role + "UploadedPhotoPath"] = data.filePath;
+                        Swal.fire({ icon: 'success', title: 'Uploaded', text: 'Photo uploaded successfully.' });
+                    });
+                } else {
+                    var msg = (data && data.message) ? data.message : 'Unknown error uploading photo.';
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: msg });
+                }
+            })
+            .catch(function (err) {
+                Swal.close();
+                console.error('uploadUserPhoto error', err);
+                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload photo.' });
+            });
+    };
+
+    //for patient adding and photo uploading in patient information adding
+    var _addPatientEmailTimer = null;
+    $scope.addPatientEmailTaken = false;
+    $scope.addPatientEmailValid = false;
+    $scope.addPatientPhotoFile = null;
+    $scope.addPatientPhotoPreview = null;
+
+    $scope.checkAddPatientEmail = function () {
+        const email = $scope.addPatient_email ? $scope.addPatient_email.trim() : '';
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        $scope.addPatientEmailValid = emailPattern.test(email);
+
+        // reset duplicate flag if format invalid or empty
+        if (!email || !$scope.addPatientEmailValid) {
+            $scope.addPatientEmailTaken = false;
+            return;
+        }
+
+        // debounce server check
+        if (_addPatientEmailTimer) clearTimeout(_addPatientEmailTimer);
+        _addPatientEmailTimer = setTimeout(function () {
+            RGDCWebApplicationService.checkEmail(email, null)
+                .then(function (resp) {
+                    var exists = resp && resp.data && resp.data.exists === true;
+                    $scope.addPatientEmailTaken = exists;
+                    // apply if needed
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('Check email failed', err);
+                    // conservative: treat failure as not taken to avoid blocking (adjust if you prefer)
+                    $scope.addPatientEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 300);
+    };
+
+    $scope.isAddPatientEmailValid = function () {
+        return $scope.addPatientEmailValid && !$scope.addPatientEmailTaken;
+    };
+
+    // Trigger file chooser for patient photo (called by UPLOAD PHOTO button)
+    $scope.triggerAddPatientPhotoInput = function () {
+        var el = document.getElementById('addPatient_photo_input');
+        if (el) el.click();
+    };
+
+    // file input onchange handler
+    $scope.onAddPatientPhotoSelected = function (files) {
+        if (!files || files.length === 0) {
+            $scope.addPatientPhotoFile = null;
+            $scope.addPatientPhotoPreview = null;
+            if (!$scope.$$phase) $scope.$apply();
+            return;
+        }
+        var file = files[0];
+
+        if (!file.type || !file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'Invalid file', text: 'Please select an image file.' });
+            return;
+        }
+        var maxBytes = 5 * 1024 * 1024;
+        if (file.size > maxBytes) {
+            Swal.fire({ icon: 'error', title: 'File too large', text: 'Max file size is 5 MB.' });
+            return;
+        }
+
+        $scope.addPatientPhotoFile = file;
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $scope.addPatientPhotoPreview = e.target.result;
+            if (!$scope.$$phase) $scope.$apply();
+        };
+        reader.readAsDataURL(file);
+    };
+
+
+    //for patient profile picture
+    $scope.triggerPatientPhotoInput = function () {
+        var el = document.getElementById('patient_photo_input');
+        if (el) el.click();
+    };
+
+    // Handler called from the hidden file input onchange
+    $scope.onPatientPhotoSelected = function (files) {
+        if (!files || files.length === 0) return;
+        var file = files[0];
+
+        if (!file.type || !file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'Invalid file', text: 'Please select an image.' });
+            return;
+        }
+        var maxBytes = 5 * 1024 * 1024; // 5MB limit, match server
+        if (file.size > maxBytes) {
+            Swal.fire({ icon: 'error', title: 'File too large', text: 'Max file size is 5MB.' });
+            return;
+        }
+
+        if (!$scope.selectedPatient || !$scope.selectedPatient.accID) {
+            Swal.fire({ icon: 'error', title: 'No account selected', text: 'Select a patient first.' });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Uploading...',
+            text: 'Please wait while we upload the image.',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        RGDCWebApplicationService.uploadUserPhoto(file, $scope.selectedPatient.accID)
+            .then(function (resp) {
+                var data = resp && resp.data ? resp.data : {};
+                if (data.success) {
+                    // update client model so UI reflects new photo immediately
+                    $scope.selectedPatient.photoLink = data.filePath;
+                    // also refresh selected patient details to be safe
+                    $scope.getSelectedPatientDetails();
+                    Swal.fire({ icon: 'success', title: 'Uploaded', text: data.message || 'Photo uploaded.' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: data.message || 'Failed to upload photo.' });
+                }
+            })
+            .catch(function (err) {
+                console.error('uploadUserPhoto error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to upload photo.' });
+            });
+    };
+
+    // Dentists
+    var _dentistEmailTimer = null;
+    $scope.dentistFirstNameValid = true;
+    $scope.dentistLastNameValid = true;
+    $scope.dentistAddressValid = true;
+    $scope.dentistEmailFormatValid = false;
+    $scope.dentistEmailTaken = false;
+
+    $scope.validateDentistEditFields = function () {
+        $scope.dentistFirstNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.firstName);
+        $scope.dentistLastNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.lastName);
+        $scope.dentistAddressValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.address);
+    };
+
+    $scope.validateDentistEmailEdit = function () {
+        var email = $scope.dentist && $scope.dentist.email ? $scope.dentist.email.trim() : '';
+        var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        $scope.dentistEmailFormatValid = pattern.test(email);
+        if (!email || !$scope.dentistEmailFormatValid) {
+            $scope.dentistEmailTaken = false;
+            return;
+        }
+        if (_dentistEmailTimer) clearTimeout(_dentistEmailTimer);
+        _dentistEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.dentist && $scope.dentist.accID ? $scope.dentist.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.dentistEmailTaken = resp && resp.data && resp.data.exists === true;
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkDentistEmail error', err);
+                    $scope.dentistEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.editDentist = function () {
+        var accDet = {
+            accID: $scope.dentist.accID,
+            firstName: $scope.dentist.firstName,
+            middleName: $scope.dentist.middleName,
+            lastName: $scope.dentist.lastName,
+            genderID: $scope.dentist.genderID,
+            birthDate: $scope.dentist.birthDate,
+            email: $scope.dentist.email,
+            contactNumber: $scope.dentist.contactNumber,
+            address: $scope.dentist.address,
+            civilStatus: $scope.dentist.civilStatus
+        };
+
+        var dentistDet = {
+            dentistID: $scope.dentist.dentistID,
+            specialization: $scope.dentist.specialization,
+            branchID: $scope.dentist.branchID
+        };
+
+        // validation guard
+        $scope.validateDentistEditFields();
+        $scope.validateDentistEmailEdit();
+        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid || !$scope.dentistAddressValid) {
+            Swal.fire({ icon: 'error', title: 'Missing required fields', text: 'Please fill in all required fields.' });
+            return;
+        }
+        if (!$scope.dentistEmailFormatValid) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+            return;
+        }
+        if ($scope.dentistEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is used by another account.' });
+            return;
+        }
+
+        var photoFile = $scope.dentistPhotoFileEdit || null;
+        var uploadPromise = _maybeUploadAccountPhoto(photoFile, $scope.dentist.accID)
+            .catch(function (err) {
+                console.warn('Dentist photo upload failed, proceeding with editAccount', err);
+                return null;
+            });
+
+        uploadPromise.then(function (filePath) {
+            if (filePath) accDet.photoLink = filePath;
+            var editAccount = RGDCWebApplicationService.editAccount(accDet);
+            editAccount.then(function (returnedData) {
+                if (returnedData.data.success) {
+                    var editDentist = RGDCWebApplicationService.editDentist(dentistDet);
+                    editDentist.then(function (returnedData) {
+                        if (returnedData.data.success) {
+                            Swal.fire({ icon: 'success', title: 'Edit Dentist', text: 'Successfully edited Dentist Details.' }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/RGDC/adminClinicStaffTab";
+                                    afterUpdate();
+                                }
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Edit Dentist', text: 'Cannot edit dentist details.' });
+                        }
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Edit Account', text: 'Failed to update account.' });
+                }
+            }).catch(function (err) {
+                console.error('editAccount error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to edit account.' });
+            });
+        });
+    };
+
+    // Staff
+    var _staffEmailTimer = null;
+    $scope.staffFirstNameValid = true;
+    $scope.staffLastNameValid = true;
+    $scope.staffAddressValid = true;
+    $scope.staffEmailFormatValid = false;
+    $scope.staffEmailTaken = false;
+
+    $scope.validateStaffEditFields = function () {
+        $scope.staffFirstNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.firstName);
+        $scope.staffLastNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.lastName);
+        $scope.staffAddressValid = $scope.isNonEmpty($scope.staff && $scope.staff.address);
+    };
+
+    $scope.validateStaffEmailEdit = function () {
+        var email = $scope.staff && $scope.staff.email ? $scope.staff.email.trim() : '';
+        var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        $scope.staffEmailFormatValid = pattern.test(email);
+        if (!email || !$scope.staffEmailFormatValid) {
+            $scope.staffEmailTaken = false;
+            return;
+        }
+        if (_staffEmailTimer) clearTimeout(_staffEmailTimer);
+        _staffEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.staff && $scope.staff.accID ? $scope.staff.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.staffEmailTaken = resp && resp.data && resp.data.exists === true;
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkStaffEmail error', err);
+                    $scope.staffEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.editStaff = function () {
+        var accDet = {
+            accID: $scope.staff.accID,
+            firstName: $scope.staff.firstName,
+            middleName: $scope.staff.middleName,
+            lastName: $scope.staff.lastName,
+            genderID: $scope.staff.genderID,
+            birthDate: $scope.staff.birthDate,
+            email: $scope.staff.email,
+            contactNumber: $scope.staff.contactNumber,
+            address: $scope.staff.address,
+            civilStatus: $scope.staff.civilStatus
+        };
+
+        var staffDet = {
+            staffID: $scope.staff.staffID,
+            staffRole: $scope.staff.staffRole,
+            branchID: $scope.staff.branchID
+        };
+
+        // validation guard
+        $scope.validateStaffEditFields();
+        $scope.validateStaffEmailEdit();
+        if (!$scope.staffFirstNameValid || !$scope.staffLastNameValid || !$scope.staffAddressValid) {
+            Swal.fire({ icon: 'error', title: 'Missing required fields', text: 'Please fill in all required fields.' });
+            return;
+        }
+        if (!$scope.staffEmailFormatValid) {
+            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+            return;
+        }
+        if ($scope.staffEmailTaken) {
+            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is used by another account.' });
+            return;
+        }
+
+        var photoFile = $scope.staffPhotoFileEdit || null;
+        var uploadPromise = _maybeUploadAccountPhoto(photoFile, $scope.staff.accID)
+            .catch(function (err) {
+                console.warn('Staff photo upload failed, proceeding with editAccount', err);
+                return null;
+            });
+
+        uploadPromise.then(function (filePath) {
+            if (filePath) accDet.photoLink = filePath;
+            var editAccount = RGDCWebApplicationService.editAccount(accDet);
+            editAccount.then(function (returnedData) {
+                if (returnedData.data.success) {
+                    var editStaff = RGDCWebApplicationService.editStaff(staffDet);
+                    editStaff.then(function (returnedData) {
+                        if (returnedData.data.success) {
+                            Swal.fire({ icon: 'success', title: 'Edit Staff', text: 'Successfully edited Staff Details.' }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "/RGDC/adminClinicStaffTab";
+                                    afterUpdate();
+                                }
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Edit Staff', text: 'Cannot edit staff details.' });
+                        }
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Edit Account', text: 'Failed to update account.' });
+                }
+            }).catch(function (err) {
+                console.error('editAccount error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to edit account.' });
+            });
+        });
+    };
+
+    //for edit modal email validation
+    $scope.isNonEmpty = function (v) {
+        return !!v && String(v).trim().length > 0;
+    };
+
+    // Owner edit validation & debounce email check
+    $scope.ownerFirstNameValid = false;
+    $scope.ownerLastNameValid = false;
+    $scope.ownerAddressValid = false;
+    $scope.ownerContactValid = false;
+    $scope.ownerEmailFormatValid = false;
+    $scope.ownerEmailTaken = false;
+    $scope.ownerFirstNameTouched = false;
+    $scope.ownerLastNameTouched = false;
+    $scope.ownerAddressTouched = false;
+    $scope.ownerContactTouched = false;
+    $scope.ownerEmailTouched = false;
+    var _ownerEditEmailTimer = null;
+    var _ownerAddEmailTimer = null;
+
+    $scope.validateOwnerEditFields = function () {
+        $scope.ownerFirstNameValid = $scope.isNonEmpty($scope.owner && $scope.owner.firstName);
+        $scope.ownerLastNameValid = $scope.isNonEmpty($scope.owner && $scope.owner.lastName);
+        $scope.ownerAddressValid = $scope.isNonEmpty($scope.owner && $scope.owner.address);
+        $scope.ownerContactValid = PHONE_PATTERN.test($scope.owner && $scope.owner.contactNumber || '');
+    };
+
+    $scope.validateOwnerEmailEdit = function () {
+        var email = $scope.owner && $scope.owner.email ? ($scope.owner.email || '').trim() : '';
+        $scope.ownerEmailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!email || !$scope.ownerEmailFormatValid) {
+            $scope.ownerEmailTaken = false;
+            return;
+        }
+
+        if (_ownerEditEmailTimer) clearTimeout(_ownerEditEmailTimer);
+        _ownerEditEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.owner && $scope.owner.accID ? $scope.owner.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.ownerEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkOwnerEmail error', err);
+                    $scope.ownerEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddOwnerEmail = function () {
+        var email = ($scope.owner_email || '').trim();
+        $scope.ownerEmailFormatValid = $scope.hasValidEmail(email);
+
+        if (!email || !$scope.ownerEmailFormatValid) {
+            $scope.ownerEmailTaken = false;
+            return;
+        }
+
+        if (_ownerAddEmailTimer) clearTimeout(_ownerAddEmailTimer);
+        _ownerAddEmailTimer = setTimeout(function () {
+            RGDCWebApplicationService.checkEmail(email, null)
+                .then(function (resp) {
+                    $scope.ownerEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkAddOwnerEmail error', err);
+                    $scope.ownerEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddOwnerContact = function () {
+        const pattern = /^09\d{9}$/;
+        $scope.ownerContactValid = pattern.test($scope.owner_contactNumber || '');
+    };
+
+    $scope.checkAddOwnerAddress = function () {
+        $scope.ownerAddressValid = !!$scope.owner_address && $scope.owner_address.trim().length >= 5;
+    };
+
+    $scope.isAddOwnerFormValid = function () {
+        return $scope.owner_firstName && $scope.owner_lastName &&
+            $scope.ownerEmailFormatValid && !$scope.ownerEmailTaken &&
+            $scope.ownerContactValid && $scope.ownerAddressValid &&
+            $scope.owner_genderID && $scope.owner_birthDate && $scope.owner_civilStatus;
+    };
+
+    // DENTIST add form validation
+    $scope.dentistFirstNameValid = false;
+    $scope.dentistLastNameValid = false;
+    $scope.dentistAddressValid = false;
+    $scope.dentistContactValid = false;
+    $scope.dentistEmailFormatValid = false;
+    $scope.dentistEmailTaken = false;
+    $scope.dentistFirstNameTouched = false;
+    $scope.dentistLastNameTouched = false;
+    $scope.dentistAddressTouched = false;
+    $scope.dentistContactTouched = false;
+    $scope.dentistEmailTouched = false;
+    var _dentistEditEmailTimer = null;
+    var _dentistAddEmailTimer = null;
+
+    $scope.validateDentistEditFields = function () {
+        $scope.dentistFirstNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.firstName);
+        $scope.dentistLastNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.lastName);
+        $scope.dentistAddressValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.address);
+        $scope.dentistContactValid = PHONE_PATTERN.test($scope.dentist && $scope.dentist.contactNumber || '');
+    };
+
+    $scope.validateDentistEmailEdit = function () {
+        var email = $scope.dentist && $scope.dentist.email ? ($scope.dentist.email || '').trim() : '';
+        $scope.dentistEmailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!email || !$scope.dentistEmailFormatValid) {
+            $scope.dentistEmailTaken = false;
+            return;
+        }
+
+        if (_dentistEditEmailTimer) clearTimeout(_dentistEditEmailTimer);
+        _dentistEditEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.dentist && $scope.dentist.accID ? $scope.dentist.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.dentistEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkDentistEmail error', err);
+                    $scope.dentistEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddDentistEmail = function () {
+        var email = ($scope.dentist_email || '').trim();
+        $scope.dentistEmailFormatValid = $scope.hasValidEmail(email);
+
+        if (!email || !$scope.dentistEmailFormatValid) {
+            $scope.dentistEmailTaken = false;
+            return;
+        }
+
+        if (_dentistAddEmailTimer) clearTimeout(_dentistAddEmailTimer);
+        _dentistAddEmailTimer = setTimeout(function () {
+            RGDCWebApplicationService.checkEmail(email, null)
+                .then(function (resp) {
+                    $scope.dentistEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkAddDentistEmail error', err);
+                    $scope.dentistEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddDentistContact = function () {
+        const pattern = /^09\d{9}$/;
+        $scope.dentistContactValid = pattern.test($scope.dentist_contactNumber || '');
+    };
+
+    $scope.checkAddDentistAddress = function () {
+        $scope.dentistAddressValid = !!$scope.dentist_address && $scope.dentist_address.trim().length >= 5;
+    };
+
+    $scope.isAddDentistFormValid = function () {
+        return $scope.dentist_firstName && $scope.dentist_lastName &&
+            $scope.dentistEmailFormatValid && !$scope.dentistEmailTaken &&
+            $scope.dentistContactValid && $scope.dentistAddressValid &&
+            $scope.dentist_genderID && $scope.dentist_birthDate && $scope.dentist_civilStatus;
+    };
+
+    // STAFF add form validation
+    $scope.staffFirstNameValid = false;
+    $scope.staffLastNameValid = false;
+    $scope.staffAddressValid = false;
+    $scope.staffContactValid = false;
+    $scope.staffEmailFormatValid = false;
+    $scope.staffEmailTaken = false;
+    $scope.staffFirstNameTouched = false;
+    $scope.staffLastNameTouched = false;
+    $scope.staffAddressTouched = false;
+    $scope.staffContactTouched = false;
+    $scope.staffEmailTouched = false;
+    var _staffEditEmailTimer = null;
+    var _staffAddEmailTimer = null;
+
+    $scope.validateStaffEditFields = function () {
+        $scope.staffFirstNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.firstName);
+        $scope.staffLastNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.lastName);
+        $scope.staffAddressValid = $scope.isNonEmpty($scope.staff && $scope.staff.address);
+        $scope.staffContactValid = PHONE_PATTERN.test($scope.staff && $scope.staff.contactNumber || '');
+    };
+
+    $scope.validateStaffEmailEdit = function () {
+        var email = $scope.staff && $scope.staff.email ? ($scope.staff.email || '').trim() : '';
+        $scope.staffEmailFormatValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+        if (!email || !$scope.staffEmailFormatValid) {
+            $scope.staffEmailTaken = false;
+            return;
+        }
+
+        if (_staffEditEmailTimer) clearTimeout(_staffEditEmailTimer);
+        _staffEditEmailTimer = setTimeout(function () {
+            var excludeAccID = $scope.staff && $scope.staff.accID ? $scope.staff.accID : null;
+            RGDCWebApplicationService.checkEmail(email, excludeAccID)
+                .then(function (resp) {
+                    $scope.staffEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkStaffEmail error', err);
+                    $scope.staffEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddStaffEmail = function () {
+        var email = ($scope.staff_email || '').trim();
+        $scope.staffEmailFormatValid = $scope.hasValidEmail(email);
+
+        if (!email || !$scope.staffEmailFormatValid) {
+            $scope.staffEmailTaken = false;
+            return;
+        }
+
+        if (_staffAddEmailTimer) clearTimeout(_staffAddEmailTimer);
+        _staffAddEmailTimer = setTimeout(function () {
+            RGDCWebApplicationService.checkEmail(email, null)
+                .then(function (resp) {
+                    $scope.staffEmailTaken = !!(resp && resp.data && resp.data.exists === true);
+                    if (!$scope.$$phase) $scope.$apply();
+                })
+                .catch(function (err) {
+                    console.error('checkAddStaffEmail error', err);
+                    $scope.staffEmailTaken = false;
+                    if (!$scope.$$phase) $scope.$apply();
+                });
+        }, 350);
+    };
+
+    $scope.checkAddStaffContact = function () {
+        const pattern = /^09\d{9}$/;
+        $scope.staffContactValid = pattern.test($scope.staff_contactNumber || '');
+    };
+
+    $scope.checkAddStaffAddress = function () {
+        $scope.staffAddressValid = !!$scope.staff_address && $scope.staff_address.trim().length >= 5;
+    };
+
+    $scope.isAddStaffFormValid = function () {
+        return $scope.staff_firstName && $scope.staff_lastName &&
+            $scope.staffEmailFormatValid && !$scope.staffEmailTaken &&
+            $scope.staffContactValid && $scope.staffAddressValid &&
+            $scope.staff_genderID && $scope.staff_birthDate && $scope.staff_civilStatus;
+    };
+
+    function _maybeUploadAccountPhoto(file, accID) {
+        if (!file) return Promise.resolve(null);
+        return RGDCWebApplicationService.uploadUserPhoto(file, accID)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : resp;
+                if (d && d.success && d.filePath) return d.filePath;
+                throw new Error(d && d.message ? d.message : 'Upload failed');
             });
     }
 });

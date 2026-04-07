@@ -18,6 +18,7 @@ namespace RGDC_Web_Application.Models
         public string contactNumber { get; set; }
         public string address { get; set; }
         public string civilStatus { get; set; }
+        public string occupation { get; set; }
         public string religion { get; set; }
         public string nationality { get; set; }
 

@@ -1,11 +1,11 @@
 ﻿app.service("RGDCWebApplicationService", function ($http) {
 
     //Email Check
-    this.checkEmail = function (email) {
+    this.checkEmail = function (email, excludeAccID) {
         return $http({
             method: 'POST',
-            url: '/RGDC/CheckEmail', 
-            data: { email: email }
+            url: '/RGDC/CheckEmail',
+            data: { email: email, excludeAccID: excludeAccID }
         });
     };
 

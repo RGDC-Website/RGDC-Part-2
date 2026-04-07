@@ -17,7 +17,11 @@
     </div>
 
     <div class="row m-0">
-        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger" data-target="patientInformationFormAdd"><i class="material-icons left">group_add</i>Add Patient</a>
+        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger"
+           data-target="patientInformationFormAdd"
+           ng-show="!isUserStaff">
+            <i class="material-icons left">group_add</i>Add Patient
+        </a>
     </div>
 
     @*patients*@
@@ -27,6 +31,7 @@
                 <th>Patient Name</th>
                 <th>Last Visit</th>
                 <th>Appointments Scheduled</th>
+                @*<th>Archive</th>*@
 
             </tr>
         </thead>
@@ -59,13 +64,16 @@
         <h5 class="modal-form-title">Add Patient</h5>
 
         <form>
+            <input id="addPatient_photo_input" type="file" accept="image/*" style="display:none"
+                   onchange="angular.element(this).scope().onAddPatientPhotoSelected(this.files)" />
             <div class="row">
                 <div class="col s4">
                     @*Photo upload*@
                     <div class="row s4 center-align photo-upload-container">
                         <div class="col s12">
                             <div class="photo-box">
-                                <i class="material-icons photo-placeholder-icon">image</i>
+                                <i class="material-icons photo-placeholder-icon" ng-if="!addPatientPhotoPreview">image</i>
+                                <img ng-if="addPatientPhotoPreview" ng-src="{{addPatientPhotoPreview}}" style="max-width:100%; max-height:100%;" />
                             </div>
                         </div>
                     </div>
@@ -130,12 +138,15 @@
                            required>
 
                     <span class="helper-text" style="color:#d32f2f"
-                          ng-show="addPatient_email && !isAddPatientEmailValid()">
+                          ng-show="addPatient_email && !addPatientEmailValid">
                         Enter a valid email address
                     </span>
-
+                    <span class="helper-text" style="color:#d32f2f"
+                          ng-show="addPatient_email && addPatientEmailValid && addPatientEmailTaken">
+                        Email already taken
+                    </span>
                     <span class="helper-text" style="color:#388e3c"
-                          ng-show="isAddPatientEmailValid()">
+                          ng-show="addPatient_email && addPatientEmailValid && !addPatientEmailTaken">
                         Email is valid
                     </span>
                 </div>
@@ -250,7 +261,7 @@
 
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
+        <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;" ng-click="triggerAddPatientPhotoInput()">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
         <button type="submit"
                 class="edit-btn modal-close"
