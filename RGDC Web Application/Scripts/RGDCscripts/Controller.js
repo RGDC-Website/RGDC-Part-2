@@ -847,25 +847,34 @@
 
                     $scope.selectedPatient = p;
 
-                    // ensure genderArray is loaded; if not, load it so select has options
+                    try {
+                        $scope.loadPatientForms();
+                    } catch (e) {
+                        console.warn('loadPatientForms failed', e);
+                    }
+
                     if (!$scope.genderArray || $scope.genderArray.length === 0) {
                         $scope.getGender();
                     }
 
-                    // Initialize datepicker after patient data loads
                     initializeDatepicker();
                 });
                 var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
                 getPatientTreatment.then(function (patientTreatment) {
-                    $scope.patientTreatments = patientTreatment.data;
-                    console.log($scope.patientTreatments)
+                    $scope.patientTreatments = patientTreatment.data || [];
+
                     $scope.patientTreatments.forEach(function (patient) {
                         if (patient.date) {
-                            patient.date = formatDateToMDY(patient.date)
+                            patient.date = formatDateToMDY(patient.date);
                         }
                     });
-                    
-                })
+
+                    $timeout(function () {
+                        initProgressNotesDataTable({ maxRetries: 30, retryDelay: 120 });
+                    }, 80);
+                }).catch(function (err) {
+                    console.error('getPatientTreatment error', err);
+                });
             } else {
                 console.log("asasa")
                 var getPatientInfo = RGDCWebApplicationService.getOwnPatientDetails();
@@ -936,24 +945,36 @@
 
                     $scope.selectedPatient = p;
 
+                    try {
+                        $scope.loadPatientForms();
+                    } catch (e) {
+                        console.warn('loadPatientForms failed', e);
+                    }
                     
-                    // ensure genderArray is loaded; if not, load it so select has options
                     if (!$scope.genderArray || $scope.genderArray.length === 0) {
                         $scope.getGender();
                     }
 
-                    // Initialize datepicker after patient data loads
+                    try { $scope.loadPatientForms(); } catch (e) { console.warn('loadPatientForms failed', e); }
+
                     initializeDatepicker();
                 });
                 var getPatientTreatment = RGDCWebApplicationService.getPatientTreatment();
                 getPatientTreatment.then(function (patientTreatment) {
-                    $scope.patientTreatments = patientTreatment.data;
+                    $scope.patientTreatments = patientTreatment.data || [];
+
                     $scope.patientTreatments.forEach(function (patient) {
                         if (patient.date) {
-                            patient.date = formatDateToMDY(patient.date)
+                            patient.date = formatDateToMDY(patient.date);
                         }
                     });
-                })
+
+                    $timeout(function () {
+                        initProgressNotesDataTable({ maxRetries: 30, retryDelay: 120 });
+                    }, 80);
+                }).catch(function (err) {
+                    console.error('getPatientTreatment error', err);
+                });
             }
         });
     };
@@ -1417,7 +1438,6 @@
         window.location.href = "/RGDC/logIn";
     }
 
-    // Navigate to the appropriate home based on role
     $scope.goHome = function () {
         if ($scope.isUserPatient) {
             window.location.href = '/RGDC/patientDashboard';
@@ -1429,15 +1449,21 @@
     };
 
     $scope.medicalHistoryUpdate = function () {
+        if ($scope.medHisForm && $scope.medHisForm.$invalid) {
+            try { $scope.medHisForm.$setSubmitted(); } catch (e) { /* ignore */ }
+            Swal.fire({ icon: 'error', title: 'Missing or invalid fields', text: 'Please complete all required medical history fields before saving.' });
+            return;
+        }
+
         var prevPhysicianDetails = {
             previousPhysician: $scope.prevPhy,
             previousPhysicianOffice: $scope.prevPhyOffice,
             previousPhysicianContact: $scope.prevPhyContact
-        }
+        };
         var medHist = {
             history: $scope.medical.history,
             conditions: $scope.medical.conditions
-        }
+        };
         console.log(medHist);
         var updateMedHistIni = RGDCWebApplicationService.updateMedHistIni(prevPhysicianDetails);
         updateMedHistIni.then(function (response) {
@@ -1447,22 +1473,26 @@
                 instance.close();
                 var updateMedHist = RGDCWebApplicationService.updateMedHist(medHist);
                 updateMedHist.then(function (response) {
-                    if ($scope.selectedPatient.signatureLink == null) {
-                        $scope.saveSignature();
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: "Upload Signature",
-                            text: "Unable to edit medical history",
-                        });
-                    }
-                   
-                    if (response.data.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "SUCCESS",
-                            text: "Medical History Updated!"
-                        });
+                    if (response && response.data && response.data.success) {
+                        if (response.data.medHistUpdate) {
+                            $timeout(function () {
+                                $scope.getSelectedPatientDetails();
+                            }, 0);
+                        } else {
+                            $timeout(function () {
+                                $scope.getSelectedPatientDetails();
+                            }, 0);
+                        }
+
+                        if ($scope.selectedPatient.signatureLink == null) {
+                            $scope.saveSignature();
+                        } else {
+                            Swal.fire({
+                                icon: "success",
+                                title: "SUCCESS",
+                                text: "Medical History Updated!"
+                            });
+                        }
                     } else {
                         Swal.fire({
                             icon: "error",
@@ -1470,6 +1500,13 @@
                             text: "Unable to update medical history",
                         });
                     }
+                }).catch(function (err) {
+                    console.error('updateMedHist error', err);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "Unable to update medical history",
+                    });
                 });
             } else {
                 Swal.fire({
@@ -1478,6 +1515,13 @@
                     text: "Unable to update medical history",
                 });
             }
+        }).catch(function (err) {
+            console.error('updateMedHistIni error', err);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Unable to update previous physician information",
+            });
         });
     }
 
@@ -1552,26 +1596,43 @@
         input.click();
     };
 
-    // addForm: upload optional file then POST form metadata to server
     $scope.addForm = function (form) {
-        if (!form) form = $scope.newForm || {};
-        if (!form.firstName || !form.lastName || !form.acceptedTerms) {
-            Swal.fire({ icon: 'error', title: 'Missing fields', text: 'Please complete required fields and accept Terms & Conditions.' });
+        if ($scope.isUserStaff) {
+            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot add forms.' });
             return;
         }
 
+        if (!form) form = $scope.newForm || {};
+
+        var formCtrl = $scope.addFormForm;
+
+        if (formCtrl) {
+            formCtrl.$setSubmitted();
+        }
+
+        var missing = [];
+        if (!form.firstName || String(form.firstName).trim() === '') missing.push('First Name');
+        if (!form.lastName || String(form.lastName).trim() === '') missing.push('Last Name');
+        if (!form.address || String(form.address).trim().length < 5) missing.push('Address (min 5 chars)');
+        if (!form.contactNumber || !$scope.isValidAddFormContact(form.contactNumber)) missing.push('Contact Number (09#########)');
+        if (!form.acceptedTerms) missing.push('Terms & Conditions');
+
+        if (missing.length > 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing or invalid fields',
+                html: 'Please correct the following: <br><strong>' + missing.join(', ') + '</strong>'
+            });
+            return;
+        }
+
+
         var proceed = function (filePath) {
-            // send metadata to server (server should implement /RGDC/AddForm to save the record)
             var payload = {
-                firstName: form.firstName,
-                middleName: form.middleName || '',
-                lastName: form.lastName,
-                genderID: form.genderID || null,
-                birthDate: form.birthDate || null,
-                civilStatus: form.civilStatus || '',
-                contactNumber: form.contactNumber || '',
-                address: form.address || '',
-                acceptedTerms: !!form.acceptedTerms,
+                patientID: $scope.selectedPatient ? ($scope.selectedPatient.patientID || null) : null,
+                dentistID: (form.dentistID || null),
+                createdBy: $scope.currentUserID || null,
+                formatID: form.formatID || 1,
                 formLink: filePath || null
             };
             $http({
@@ -1583,12 +1644,17 @@
                 if (data && data.success) {
                     Swal.fire({ icon: 'success', title: 'Added', text: data.message || 'Form added.' });
                     $scope.getSelectedPatientDetails();
+                    $scope.loadPatientForms();
                     var modal = document.getElementById('modal-add-form');
                     if (modal && typeof M !== 'undefined' && M.Modal) {
                         var inst = M.Modal.getInstance(modal);
                         if (inst) inst.close();
                     }
                     $scope.newForm = {};
+                    if (formCtrl) {
+                        formCtrl.$setPristine();
+                        formCtrl.$setUntouched();
+                    }
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to add form.' });
                 }
@@ -1598,7 +1664,6 @@
             });
         };
 
-        // upload file first if present
         var file = (form._file || $scope._pickedFormFile);
         if (file) {
             Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1620,28 +1685,31 @@
         }
     };
 
-    // saveForm: update an existing form record (server endpoint /RGDC/SaveForm expected)
     $scope.saveForm = function (form) {
         if (!form) form = $scope.selectedForm || {};
-        if (!form.firstName || !form.lastName || !form.acceptedTerms) {
-            Swal.fire({ icon: 'error', title: 'Missing fields', text: 'Please complete required fields and accept Terms & Conditions.' });
+        var formCtrl = $scope.editFormForm;
+        if (formCtrl) formCtrl.$setSubmitted();
+
+        var missing = [];
+        if (!form.firstName || String(form.firstName).trim() === '') missing.push('First Name');
+        if (!form.lastName || String(form.lastName).trim() === '') missing.push('Last Name');
+        if (!form.address || String(form.address).trim().length < 5) missing.push('Address (min 5 chars)');
+        if (!form.contactNumber || !$scope.isValidAddFormContact(form.contactNumber)) missing.push('Contact Number (09#########)');
+        if (!form.acceptedTerms) missing.push('Accept Terms');
+
+        if (missing.length > 0) {
+            Swal.fire({ icon: 'error', title: 'Missing or invalid fields', html: 'Please correct: <br><strong>' + missing.join(', ') + '</strong>' });
             return;
         }
 
-        var proceed = function (filePath) {
+        function proceed(filePath) {
             var payload = {
                 formID: form.formID || null,
-                firstName: form.firstName,
-                middleName: form.middleName || '',
-                lastName: form.lastName,
-                genderID: form.genderID || null,
-                birthDate: form.birthDate || null,
-                civilStatus: form.civilStatus || '',
-                contactNumber: form.contactNumber || '',
-                address: form.address || '',
-                acceptedTerms: !!form.acceptedTerms,
+                dentistID: form.dentistID || null,
+                formatID: form.formatID || 1,
                 formLink: filePath || form.formLink || null
             };
+
             $http({
                 method: 'POST',
                 url: '/RGDC/SaveForm',
@@ -1650,12 +1718,12 @@
                 var data = resp.data || resp;
                 if (data && data.success) {
                     Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Form saved.' });
-                    $scope.getSelectedPatientDetails();
                     var modal = document.getElementById('modal-edit-form');
                     if (modal && typeof M !== 'undefined' && M.Modal) {
                         var inst = M.Modal.getInstance(modal);
                         if (inst) inst.close();
                     }
+                    $scope.loadPatientForms();
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to save form.' });
                 }
@@ -1663,9 +1731,8 @@
                 console.error('SaveForm error', err);
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save form.' });
             });
-        };
+        }
 
-        // if a new file was picked for edit, upload it
         var file = (form._file || $scope._pickedFormFileEdit);
         if (file) {
             Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1687,7 +1754,6 @@
         }
     };
 
-    // postOp helpers: templates, apply, save and print
     $scope.postOp = $scope.postOp || {};
     $scope.postOp.templates = [
         { key: 'simpleExtraction', name: 'Simple Extraction', title: 'Post-Op: Simple Extraction', instructions: '<ul><li>Avoid rinsing for 24 hours.</li><li>Apply ice for first 24 hours.</li><li>Take prescribed medication as directed.</li></ul>' },
@@ -1704,7 +1770,6 @@
         var t = $scope.postOp.templates.find(function (x) { return x.key === selectedKey; });
         if (t) {
             $scope.postOp.title = t.title;
-            // instructions may contain HTML; we store as string
             $scope.postOp.instructions = t.instructions;
         }
     };
@@ -1714,7 +1779,6 @@
             title: $scope.postOp.title,
             instructions: $scope.postOp.instructions
         };
-        // optimistic: server endpoint expected at /RGDC/SavePostOp
         $http({
             method: 'POST',
             url: '/RGDC/SavePostOp',
@@ -1723,7 +1787,6 @@
             var data = resp.data || resp;
             if (data && data.success) {
                 Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Post-Op instructions saved.' });
-                // update UI immediate (store in selectedPatient)
                 if ($scope.selectedPatient) {
                     $scope.selectedPatient.postOpTitle = payload.title;
                     $scope.selectedPatient.postOpInstructions = payload.instructions;
@@ -1743,7 +1806,6 @@
     };
 
     $scope.printPostOp = function () {
-        // Build printable HTML from current postOp model
         var title = $scope.postOp.title || ($scope.selectedPatient && $scope.selectedPatient.postOpTitle) || 'Post-Op Instructions';
         var instructions = $scope.postOp.instructions || ($scope.selectedPatient && $scope.selectedPatient.postOpInstructions) || '<p>No instructions available.</p>';
         var html = '<html><head><title>' + title + '</title>';
@@ -1759,24 +1821,50 @@
         win.document.open();
         win.document.write(html);
         win.document.close();
-        // Wait a moment to ensure content renders, then call print
         setTimeout(function () {
             win.focus();
             win.print();
         }, 400);
     };
 
-    // ---- end new functions ----
 
     $scope.fillMedicalHistoryForm = function (medHistString) {
-        var medHist = JSON.parse(medHistString);
+        var medHistObj = {};
+        try {
+            if (medHistString === null || typeof medHistString === 'undefined' || medHistString === '') {
+                medHistObj = {};
+            } else if (typeof medHistString === 'string') {
+                try {
+                    medHistObj = medHistString.trim() === '' ? {} : JSON.parse(medHistString);
+                } catch (e) {
+                    console.warn('fillMedicalHistoryForm: JSON.parse failed, treating as empty', e);
+                    medHistObj = {};
+                }
+            } else if (typeof medHistString === 'object') {
+                medHistObj = medHistString || {};
+            } else {
+                medHistObj = {};
+            }
+        } catch (e) {
+            console.warn('fillMedicalHistoryForm unexpected error', e);
+            medHistObj = {};
+        }
+
+        medHistObj.history = medHistObj.history || {};
+        medHistObj.conditions = medHistObj.conditions || {};
 
         $scope.medical = $scope.medical || {};
         $scope.medical.history = $scope.medical.history || {};
         $scope.medical.conditions = $scope.medical.conditions || {};
 
-        angular.copy(medHist.history, $scope.medical.history);
-        angular.copy(medHist.conditions, $scope.medical.conditions);
+        try {
+            angular.copy(medHistObj.history, $scope.medical.history);
+            angular.copy(medHistObj.conditions, $scope.medical.conditions);
+        } catch (e) {
+            console.warn('fillMedicalHistoryForm angular.copy failed, applying directly', e);
+            $scope.medical.history = medHistObj.history;
+            $scope.medical.conditions = medHistObj.conditions;
+        }
     }
 
     // --- Edit appointment functionality ---
@@ -3248,101 +3336,172 @@
     }
 
     $scope.addProgressNotes = function () {
-        var progressNotes = {
-            date: $scope.progNote_date,
+        if ($scope.isUserStaff || $scope.currentUserAuthorization === "1") {
+            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot add progress notes.' });
+            return;
+        }
+        if (!$scope.selectedPatient || !$scope.selectedPatient.patientID) {
+            Swal.fire({ icon: 'error', title: 'No patient selected', text: 'Please select a patient.' });
+            return;
+        }
+        if (!$scope.progNote_procedures || !$scope.progNote_procedures.trim()) {
+            Swal.fire({ icon: 'error', title: 'Missing field', text: 'Procedures is required.' });
+            return;
+        }
+        if (!$scope.progNote_accID) {
+            Swal.fire({ icon: 'error', title: 'Missing field', text: 'Dentist is required.' });
+            return;
+        }
+
+        var amount = parseFloat(String($scope.progNote_amount || '0').replace(/[^0-9.]/g, '')) || 0;
+        var paid = parseFloat(String($scope.progNote_paid || '0').replace(/[^0-9.]/g, '')) || 0;
+        var toothNumber = $scope.progNote_toothNumber ? String($scope.progNote_toothNumber).trim() : null;
+
+        var dateValue = $scope.progNote_date || null;
+        if (dateValue && typeof dateValue === 'object' && dateValue.toISOString) {
+            dateValue = dateValue.toISOString();
+        } else if (!dateValue) {
+            dateValue = (new Date()).toISOString();
+        }
+
+        var payload = {
+            date: ($scope.progNote_date && $scope.progNote_date.toISOString) ? $scope.progNote_date.toISOString() : (new Date()).toISOString(),
             patientID: $scope.selectedPatient.patientID,
             accID: $scope.progNote_accID,
-            amount: parseFloat($scope.progNote_amount),
-            paid: parseFloat($scope.progNote_paid) ,
+            amount: parseFloat(String($scope.progNote_amount || '0').replace(/[^0-9.]/g, '')) || 0,
+            paid: parseFloat(String($scope.progNote_paid || '0').replace(/[^0-9.]/g, '')) || 0,
             procedures: $scope.progNote_procedures,
-            toothNumber: $scope.progNote_toothNumber
-        }
-        var addProgNotes = RGDCWebApplicationService.addProgNotes(progressNotes)
-        addProgNotes.then(function (returnedData) {
-                if (returnedData.data.success) {
-                    Swal.fire({ icon: 'success', title: 'Added Progress Notes', text: 'Successfully added progress notes.' }).then((result) => {
-                        if (result.isConfirmed) {
+            toothNumber: $scope.progNote_toothNumber ? String($scope.progNote_toothNumber).trim() : null
+        };
 
-                            window.location.href = "/RGDC/patientProfile";
-                            afterUpdate();
-                        }
-
-                    });
+        RGDCWebApplicationService.addProgNotes(payload)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : {};
+                if (d.success) {
+                    var modal = document.getElementById('modalAddProgNotes');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var mi = M.Modal.getInstance(modal);
+                        if (mi) mi.close();
+                    }
+                    refreshPatientTreatments();
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Add Progress Notes', text: 'Cannot add progress notes.' })
+                    Swal.fire({ icon: 'error', title: 'Error', text: d.message || 'Failed to add progress note.' });
                 }
-            
-        })
-    }
+            })
+            .catch(function (err) {
+                console.error('addProgNotes error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add progress note.' });
+            });
+    };
+
 
     $scope.selectEditProg = function (trtPlanID) {
-        var trtPlan = {
-            trtPlanID: trtPlanID,
-        }
-        var selectPlan = RGDCWebApplicationService.selectPlan(trtPlan);
-        selectPlan.then(function (returnedData) {
-            console.log(returnedData.data)
-            $scope.progNote = returnedData.data;
-            $scope.progNote.accID = Number(returnedData.data.accID);
-            $scope.progNote.date = formatDateToMDY($scope.progNote.date);
-        });
-    }
+        var trtPlan = { trtPlanID: trtPlanID };
+
+        RGDCWebApplicationService.selectPlan(trtPlan)
+            .then(function (returnedData) {
+                var d = returnedData && returnedData.data ? returnedData.data : {};
+
+                $scope.progNote = angular.copy(d);
+
+                $scope.progNote.accID = d.accID ? Number(d.accID) : null;
+
+                var dateVal = d.date;
+                var dateObj = null;
+
+                if (dateVal) {
+
+                    if (typeof dateVal === 'string' && /\/Date\((\d+)\)\//.test(dateVal)) {
+                        var m = dateVal.match(/\/Date\((\d+)\)\//);
+                        if (m && m[1]) dateObj = new Date(parseInt(m[1], 10));
+                    } else {
+                        var parsed = new Date(dateVal);
+                        if (!isNaN(parsed)) {
+                            dateObj = parsed;
+                        } else if (typeof parseJsonDateToJsDate === 'function') {
+                            dateObj = parseJsonDateToJsDate(dateVal);
+                        }
+                    }
+                }
+
+                $scope.progNote.date = dateObj || null;
+            })
+            .catch(function (err) {
+                console.error('selectPlan error', err);
+            });
+    };
 
     $scope.editProgressNotes = function () {
-        $scope.editProgressNotes = function () {
-
-            var updatedProgNote = {
-                trtPlanID: $scope.progNote.trtPlanID,
-                accID: parseInt($scope.progNote.accID),
-                date: $scope.progNote.date,
-                toothNumber: $scope.progNote.toothNumber,
-                procedures: $scope.progNote.procedures,
-                amount: parseFloat($scope.progNote.amount),
-                paid: parseFloat($scope.progNote.paid)
-            };
-
-            var editRequest = RGDCWebApplicationService.editProgressNotes(updatedProgNote);
-            editRequest.then(function (returnedData) {
-                if (returnedData.data.success) {
-                    Swal.fire({ icon: 'success', title: 'Edited Progress Notes', text: 'Successfully edited progress notes.' }).then((result) => {
-                        if (result.isConfirmed) {
-
-                            window.location.href = "/RGDC/patientProfile";
-                            afterUpdate();
-                        }
-
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Edit Progress Notes', text: 'Cannot edit progress notes.' })
-                }
-            });
+        if (!$scope.progNote || !$scope.progNote.trtPlanID) {
+            Swal.fire({ icon: 'error', title: 'Missing', text: 'No progress note selected to edit.' });
+            return;
         }
-    }
+        if (!$scope.progNote.procedures || !$scope.progNote.procedures.trim()) {
+            Swal.fire({ icon: 'error', title: 'Missing field', text: 'Procedures is required.' });
+            return;
+        }
+        if (!$scope.progNote.accID) {
+            Swal.fire({ icon: 'error', title: 'Missing field', text: 'Dentist is required.' });
+            return;
+        }
+
+        $scope.progNote.amount = parseFloat(String($scope.progNote.amount || '0').replace(/[^0-9.]/g, '')) || 0;
+        $scope.progNote.paid = parseFloat(String($scope.progNote.paid || '0').replace(/[^0-9.]/g, '')) || 0;
+        $scope.progNote.toothNumber = $scope.progNote.toothNumber ? String($scope.progNote.toothNumber).trim() : null;
+
+        if ($scope.progNote && $scope.progNote.date && $scope.progNote.date.toISOString) {
+            $scope.progNote.date = $scope.progNote.date.toISOString();
+        }
+        RGDCWebApplicationService.editProgressNotes($scope.progNote)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : {};
+                if (d.success) {
+                    var modal = document.getElementById('modalEditProgNote');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var mi = M.Modal.getInstance(modal);
+                        if (mi) mi.close();
+                    }
+                    refreshPatientTreatments();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: d.message || 'Failed to update progress note.' });
+                }
+            })
+            .catch(function (err) {
+                console.error('editProgressNotes error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to update progress note.' });
+            });
+    };
 
     $scope.selectDeleteProg = function (trtPlanID) {
-        $scope.trtPlanID = trtPlanID;
-    }
+        $scope.selectedTrtPlanID = trtPlanID;
+    };
 
     $scope.deleteProgressNotes = function () {
-        var trtPlan = {
-            trtPlanID: $scope.trtPlanID,
+        if (!$scope.selectedTrtPlanID) {
+            Swal.fire({ icon: 'error', title: 'Missing', text: 'No progress note selected to delete.' });
+            return;
         }
-        var deletePlan = RGDCWebApplicationService.deletePlan(trtPlan);
-        deletePlan.then(function (returnedData) {
-            if (returnedData.data.success) {
-                Swal.fire({ icon: 'success', title: 'Deleted Progress Notes', text: 'Successfully deleted progress notes.' }).then((result) => {
-                    if (result.isConfirmed) {
 
-                        window.location.href = "/RGDC/patientProfile";
-                        afterUpdate();
+        var payload = { trtPlanID: $scope.selectedTrtPlanID };
+        RGDCWebApplicationService.deletePlan(payload)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : {};
+                if (d.success) {
+                    var modal = document.getElementById('modalDeleteProgNote');
+                    if (modal && typeof M !== 'undefined' && M.Modal) {
+                        var mi = M.Modal.getInstance(modal);
+                        if (mi) mi.close();
                     }
-
-                });
-            } else {
-                Swal.fire({ icon: 'error', title: 'Delete Progress Notes', text: 'Cannot delete progress notes.' })
-            }
-        });
-    }
+                    refreshPatientTreatments();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: d.message || 'Failed to delete progress note.' });
+                }
+            })
+            .catch(function (err) {
+                console.error('deletePlan error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete progress note.' });
+            });
+    };
 
     $scope.overview = {};
     $scope.getOverviewData = function () {
@@ -4241,4 +4400,372 @@
                 throw new Error(d && d.message ? d.message : 'Upload failed');
             });
     }
+
+
+    //for datatable nung progress notes
+    function initProgressNotesDataTable(opts) {
+        opts = opts || {};
+        var maxRetries = opts.maxRetries || 30;
+        var retryDelay = opts.retryDelay || 120;
+        var attempt = 0;
+
+        function tryInit() {
+            attempt++;
+
+            if (typeof DataTable === 'undefined') {
+                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+                console.warn('DataTable lib not available for #progressNotes.');
+                return;
+            }
+
+            var tables = document.querySelectorAll('table#progressNotes');
+            if (!tables || tables.length === 0) {
+                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+                console.warn('#progressNotes element not found.');
+                return;
+            }
+
+            var tblElem = tables[0];
+            for (var i = 1; i < tables.length; i++) {
+                try { tables[i].parentNode.removeChild(tables[i]); } catch (e) {}
+            }
+
+            var tbody = tblElem.querySelector('tbody');
+            var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
+            if (!hasRows && attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+
+            try {
+                if (window.progressNotesTable && typeof window.progressNotesTable.destroy === 'function') {
+                    try { window.progressNotesTable.destroy(); } catch (e) { console.warn('destroy previous DataTable failed', e); }
+                    window.progressNotesTable = null;
+                }
+
+                var parent = tblElem.parentNode;
+                if (parent) {
+                    Array.prototype.slice.call(parent.children).forEach(function (ch) {
+                        if (ch === tblElem) return;
+                        if (ch.querySelector && ch.querySelector('#progressNotes')) {
+                            try { parent.removeChild(ch); } catch (_) { }
+                            return;
+                        }
+                        try {
+                            var cls = ch.className || '';
+                            if (typeof cls === 'string' && cls.indexOf('dataTable') !== -1) {
+                                try { parent.removeChild(ch); } catch (_) { }
+                            }
+                        } catch (e) {}
+                    });
+                }
+
+                window.progressNotesTable = new DataTable(tblElem, {
+                    searchable: true,
+                    fixedHeight: false,
+                    perPage: 5,
+                    perPageSelect: [5, 10, 25, 50],
+                    labels: {
+                        placeholder: "Search procedures, tooth #, dentist...",
+                        perPage: "{select} entries per page",
+                        noRows: "No progress notes found",
+                        info: "Showing {start} to {end} of {rows} entries"
+                    }
+                });
+            } catch (e) {
+                console.warn('Error initializing #progressNotes DataTable', e);
+            }
+        }
+
+        tryInit();
+    }
+
+
+    //para mag reload yuung table sa progress notes kada add or edit
+    $scope.progressNotesReady = true;
+    function refreshPatientTreatments(callback) {
+        $scope.progressNotesReady = false;
+
+        RGDCWebApplicationService.getPatientTreatment()
+            .then(function (resp) {
+                $scope.patientTreatments = resp && resp.data ? resp.data : [];
+                $scope.patientTreatments.forEach(function (pt) {
+                    if (pt.date) pt.date = formatDateToMDY(pt.date);
+                });
+
+                $timeout(function () {
+                    $scope.progressNotesReady = true;
+                    $timeout(function () {
+                        initProgressNotesDataTable({ maxRetries: 30, retryDelay: 120 });
+                        if (typeof callback === 'function') callback();
+                    }, 60);
+                }, 40);
+            })
+            .catch(function (err) {
+                console.error('refreshPatientTreatments error', err);
+                $scope.progressNotesReady = true;
+                if (typeof callback === 'function') callback(err);
+            });
+    }
+
+    //for validation of adding forms in the patient profile
+    $scope.isValidAddFormContact = function (num) {
+        if (!num) return false;
+        return /^09\d{9}$/.test(String(num));
+    };
+
+    //for displaying of forms
+    $scope.patientForms = [];
+    $scope.patientFormsReady = true;
+
+    $scope.loadPatientForms = function () {
+        try {
+            if (window.patientFormsTable) {
+                try {
+                    if (window.patientFormsTableType === 'jquery' && window.patientFormsTable.destroy) {
+                        window.patientFormsTable.destroy(true);
+                    } else if (window.patientFormsTableType === 'simple' && window.patientFormsTable.destroy) {
+                        window.patientFormsTable.destroy();
+                    }
+                } catch (e) {}
+                window.patientFormsTable = null;
+                window.patientFormsTableType = null;
+            }
+
+            var tblEl = document.querySelector('#patientForms');
+            if (tblEl && window.jQuery && jQuery.fn && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblEl)) {
+                try { jQuery(tblEl).DataTable().clear().destroy(true); } catch (e) {}
+            }
+
+            if (tblEl && tblEl.parentNode) {
+                try {
+                    Array.prototype.slice.call(tblEl.parentNode.children).forEach(function (ch) {
+                        if (ch === tblEl) return;
+                        var cls = ch.className || '';
+                        if (typeof cls === 'string' && (cls.indexOf('dataTable') !== -1 || cls.indexOf('dataTables_wrapper') !== -1)) {
+                            try { ch.parentNode.removeChild(ch); } catch (e) {}
+                        }
+                    });
+                } catch (e) {}
+            }
+        } catch (e) { console.warn('Pre-clean patientForms error', e); }
+
+        $scope.patientFormsReady = false;
+
+        RGDCWebApplicationService.getPatientForms()
+            .then(function (resp) {
+                var data = resp.data || [];
+                if (!Array.isArray(data)) {
+                    $scope.patientForms = [];
+                    $timeout(function () { $scope.patientFormsReady = true; }, 0);
+                    return;
+                }
+
+                var mapped = data.map(function (f) {
+                    var jsDate = parseJsonDateToJsDate(f.date);
+                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
+                    return {
+                        formID: f.formID,
+                        formLink: f.formLink,
+                        date: dateStr,
+                        dentistName: f.dentistName || "",
+                        createdBy: f.createdBy || null,
+                        formatID: f.formatID || null,
+                        firstName: f.firstName || '',
+                        lastName: f.lastName || '',
+                        contactNumber: f.contactNumber || '',
+                        address: f.address || ''
+                    };
+                });
+
+                $timeout(function () {
+                    $scope.patientForms = mapped;
+                    $scope.patientFormsReady = true;
+
+                    $timeout(function () {
+                        try {
+                            initPatientFormsDataTable({ maxRetries: 30, retryDelay: 120 });
+                        } catch (e) {
+                            console.warn('initPatientFormsDataTable call failed', e);
+                        }
+                    }, 60);
+                }, 0);
+            })
+            .catch(function (err) {
+                console.error('Failed to load patient forms', err);
+                $scope.patientForms = [];
+                $timeout(function () { $scope.patientFormsReady = true; }, 0);
+            });
+    };
+
+
+    function initPatientFormsDataTable(opts) {
+        opts = opts || {};
+        var maxRetries = opts.maxRetries || 30;
+        var retryDelay = opts.retryDelay || 120;
+        var attempt = 0;
+
+        function tryInit() {
+            attempt++;
+
+            var hasJQueryDT = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable);
+            var hasSimpleDT = typeof window.DataTable !== 'undefined';
+
+            if (!hasJQueryDT && !hasSimpleDT) {
+                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+                console.warn('No DataTable library found for #patientForms explicit init.');
+                return;
+            }
+
+            var tblElem = document.querySelector('#patientForms');
+            if (!tblElem) {
+                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+                console.warn('#patientForms element not found for explicit init.');
+                return;
+            }
+
+            var tbody = tblElem.querySelector('tbody');
+            var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
+            if (!hasRows && attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+
+            try {
+                try {
+                    if (window.patientFormsTable) {
+                        if (window.patientFormsTableType === 'jquery') {
+                            try { window.patientFormsTable.destroy(true); } catch (e) { /* ignore */ }
+                        } else if (window.patientFormsTableType === 'simple') {
+                            try { window.patientFormsTable.destroy(); } catch (e) { /* ignore */ }
+                        }
+                        window.patientFormsTable = null;
+                        window.patientFormsTableType = null;
+                    } else if (hasJQueryDT && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblElem)) {
+                        try { jQuery(tblElem).DataTable().destroy(true); } catch (e) { /* ignore */ }
+                    }
+                } catch (e) {}
+
+                if (hasJQueryDT) {
+                    try {
+                        var jq = jQuery(tblElem).DataTable({
+                            searching: true,
+                            paging: true,
+                            info: true,
+                            pageLength: 5,
+                            lengthMenu: [5, 10, 25, 50],
+                            language: { searchPlaceholder: "Search forms, dentist..." },
+                            destroy: true
+                        });
+                        window.patientFormsTable = jq;
+                        window.patientFormsTableType = 'jquery';
+                        return;
+                    } catch (e) {
+                        console.warn('jQuery DataTables init failed in explicit helper', e);
+                    }
+                }
+
+                if (hasSimpleDT) {
+                    try {
+                        var s = new DataTable(tblElem, {
+                            searchable: true,
+                            fixedHeight: false,
+                            perPage: 5,
+                            perPageSelect: [5, 10, 25, 50],
+                            labels: {
+                                placeholder: "Search forms, dentist...",
+                                perPage: "{select} entries per page",
+                                noRows: "No forms found",
+                                info: "Showing {start} to {end} of {rows} entries"
+                            }
+                        });
+                        window.patientFormsTable = s;
+                        window.patientFormsTableType = 'simple';
+                    } catch (e) {
+                        console.warn('Simple-DataTables init failed in explicit helper', e);
+                    }
+                }
+            } catch (e) {
+                console.warn('initPatientFormsDataTable error', e);
+            }
+        }
+
+        tryInit();
+    }
+
+    //for forms editing
+    $scope.selectEditForm = function (formID) {
+        if (!formID) return;
+        var f = ($scope.patientForms || []).find(function (x) { return x.formID == formID; });
+        if (!f) {
+            console.warn('selectEditForm: form not found in client cache', formID);
+            return;
+        }
+
+        $scope.selectedForm = angular.copy(f) || {};
+        $scope.selectedForm.firstName = $scope.selectedForm.firstName || '';
+        $scope.selectedForm.lastName = $scope.selectedForm.lastName || '';
+        $scope.selectedForm.middleName = $scope.selectedForm.middleName || '';
+        $scope.selectedForm.contactNumber = $scope.selectedForm.contactNumber || '';
+        $scope.selectedForm.address = $scope.selectedForm.address || '';
+        $scope.selectedForm.acceptedTerms = !!$scope.selectedForm.acceptedTerms;
+
+        // clear any picked file state
+        $scope._pickedFormFileEdit = null;
+        if ($scope.selectedForm && $scope.selectedForm.formLink) {
+            $scope.selectedForm.formLinkPreview = $scope.selectedForm.formLink;
+        }
+
+        try { $scope.getDentists(); } catch (e) {}
+
+        $timeout(function () {
+            var modalElem = document.getElementById('modal-edit-form');
+            if (modalElem) {
+                var inst = M.Modal.getInstance(modalElem);
+                if (!inst) inst = M.Modal.init(modalElem);
+                inst.open();
+            }
+        }, 60);
+    };
+
+    //for forms deletion
+    $scope.selectDeleteForm = function (formID) {
+        $scope.deleteFormID = formID;
+        $timeout(function () {
+            var modal = document.getElementById('modal-delete-form');
+            if (modal) {
+                var inst = M.Modal.getInstance(modal);
+                if (!inst) inst = M.Modal.init(modal);
+                inst.open();
+            }
+        }, 40);
+    };
+
+    // perform deletion
+    $scope.deleteFormThis = function () {
+        if ($scope.isUserStaff) {
+            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot delete forms.' });
+            return;
+        }
+
+        if (!$scope.deleteFormID) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No form selected.' });
+            return;
+        }
+        RGDCWebApplicationService.deleteForm($scope.deleteFormID)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : resp;
+                if (d && d.success) {
+                    Swal.fire({ icon: 'success', title: 'Deleted', text: d.message || 'Form deleted.' }).then(function () {
+                        var modal = document.getElementById('modal-delete-form');
+                        if (modal && typeof M !== 'undefined' && M.Modal) {
+                            var mi = M.Modal.getInstance(modal);
+                            if (mi) mi.close();
+                        }
+                        $scope.loadPatientForms();
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (d && d.message) ? d.message : 'Failed to delete form.' });
+                }
+            })
+            .catch(function (err) {
+                console.error('deleteForm error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete form.' });
+            });
+    };
+
 });

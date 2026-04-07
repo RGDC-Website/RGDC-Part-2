@@ -533,4 +533,27 @@
     };
 
 
+
+    this.addProgNotes = function (progressNotes) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addProgNotes",
+            data: progressNotes
+        });
+    };
+
+
+    //displaying of forms
+    this.getPatientForms = function () {
+        return $http.get("/RGDC/GetPatientForms");
+    };
+
+    // Delete form
+    this.deleteForm = function (formID) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/DeleteForm",
+            data: { formID: formID }
+        });
+    };
 });

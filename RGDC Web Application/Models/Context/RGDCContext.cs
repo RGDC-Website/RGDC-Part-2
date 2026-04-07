@@ -20,7 +20,7 @@ namespace RGDC_Web_Application.Models.Context
         public virtual DbSet<tblBranchModel> tbl_branch { get; set; }
         public virtual DbSet<tblDentistModel> tbl_dentist { get; set; }
         public virtual DbSet<tblFormatModel> tbl_format { get; set; }
-        public virtual DbSet<tblFormModel> tbl_form { get; set; }
+        public virtual DbSet<tblFormModel> tblFormModels { get; set; }
         public virtual DbSet<tblGenderModel> tbl_gender { get; set; }
         public virtual DbSet<tblOwnerModel> tbl_owner { get; set; }
         public virtual DbSet<tblPatientModel> tbl_patient { get; set; }
@@ -30,8 +30,6 @@ namespace RGDC_Web_Application.Models.Context
         public virtual DbSet<tblStaffModel> tbl_staff { get; set; }
         public virtual DbSet<tblTreatmentPlanModel> tbl_treatmentplan { get; set; }
         public virtual DbSet<tblImagesModel> tbl_images { get; set; }
-
-
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
