@@ -1167,6 +1167,10 @@ select.browser-default.custom-input {
     overflow: hidden;
 }
 
+#modal-add-form .modal-content {
+    padding-bottom: 5.5rem;
+}
+
 .edit-form-modal {
     background-color: #e0e0e0 !important;
     border-radius: 15px !important;
@@ -1535,3 +1539,21 @@ body .main-content {
     .modal.appt-modal.small {
         max-width: 420px !important;
     }
+
+.valid-input {
+    border: 1px solid #4CAF50 !important;
+    box-shadow: 0 0 0 0 transparent !important;
+}
+
+.invalid-input {
+    border: 1px solid #F44336 !important;
+    box-shadow: 0 0 0 0 transparent !important;
+}
+
+/* small helper error text */
+.helper-text.error-text {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    display: block;
+    margin-top: 4px;
+}

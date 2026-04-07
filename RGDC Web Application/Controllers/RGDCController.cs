@@ -1288,9 +1288,10 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "Patient not found" }, JsonRequestBehavior.AllowGet);
 
                 patient.medicalHistory = jsonString;
+                patient.medHistUpdate = DateTime.Now;
                 db.SaveChanges();
 
-                return Json(new { success = true, jsonstring = jsonString }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true, jsonstring = jsonString, medHistUpdate = patient.medHistUpdate }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -2718,13 +2719,52 @@ namespace RGDC_Web_Application.Controllers
         [HttpPost]
         public JsonResult addProgNotes(tblTreatmentPlanModel model)
         {
-            using (var db = new RGDCContext())
+            var role = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
+            if (role == "1")
+                return Json(new { success = false, message = "Not authorized" }, JsonRequestBehavior.AllowGet);
+
+            if (model == null)
+                return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
+
+            if (model == null)
+                return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
+
+            if (model.patientID <= 0)
+                return Json(new { success = false, message = "Missing or invalid patientID." }, JsonRequestBehavior.AllowGet);
+
+            if (model.accID <= 0)
+                return Json(new { success = false, message = "Missing or invalid accID (dentist)." }, JsonRequestBehavior.AllowGet);
+
+            if (string.IsNullOrWhiteSpace(model.procedures))
+                return Json(new { success = false, message = "Procedures is required." }, JsonRequestBehavior.AllowGet);
+
+            DateTime noteDate;
+            try
             {
-                try
+                noteDate = (model.date == default(DateTime)) ? DateTime.Now : model.date;
+                noteDate = noteDate.Date.Add(DateTime.Now.TimeOfDay);
+            }
+            catch
+            {
+                noteDate = DateTime.Now;
+            }
+
+            try
+            {
+                using (var db = new RGDCContext())
                 {
+                    var patientExists = db.tbl_patient.Any(p => p.patientID == model.patientID);
+                    var accExists = db.tbl_account.Any(a => a.accID == model.accID);
+
+                    if (!patientExists)
+                        return Json(new { success = false, message = $"Patient not found (patientID={model.patientID})." }, JsonRequestBehavior.AllowGet);
+
+                    if (!accExists)
+                        return Json(new { success = false, message = $"Account / Dentist not found (accID={model.accID})." }, JsonRequestBehavior.AllowGet);
+
                     var note = new tblTreatmentPlanModel
                     {
-                        date = model.date.Date.Add(DateTime.Now.TimeOfDay),
+                        date = noteDate,
                         patientID = model.patientID,
                         accID = model.accID,
                         amount = model.amount,
@@ -2738,15 +2778,11 @@ namespace RGDC_Web_Application.Controllers
 
                     return Json(new { success = true }, JsonRequestBehavior.AllowGet);
                 }
-
-                catch (Exception ex)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = ex.InnerException
-                    }, JsonRequestBehavior.AllowGet);
-                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine("addProgNotes error: " + ex.ToString());
+                return Json(new { success = false, message = "Server error adding progress note." }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -2938,6 +2974,145 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        //for adding of forms
+        [HttpPost]
+        public JsonResult AddForm(tblFormModel model)
+        {
+            if (model == null)
+                return Json(new { success = false, message = "Invalid payload." }, JsonRequestBehavior.AllowGet);
+
+            if (model.patientID <= 0)
+            {
+                try
+                {
+                    if (Session["selectedPatientID"] != null)
+                        model.patientID = Convert.ToInt32(Session["selectedPatientID"]);
+                }
+                catch { }
+            }
+
+            if (model.patientID <= 0)
+                return Json(new { success = false, message = "No patient selected." }, JsonRequestBehavior.AllowGet);
+
+            if (string.IsNullOrWhiteSpace(model.formLink))
+                return Json(new { success = false, message = "No file provided." }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                model.formCreatedAt = DateTime.Now;
+                model.formUpdatedAt = DateTime.Now;
+                try
+                {
+                    model.createdBy = Session["userID"] != null ? Convert.ToInt32(Session["userID"]) : 0;
+                }
+                catch { model.createdBy = 0; }
+
+                if (model.formatID == 0) model.formatID = 1;
+
+                using (var db = new Models.Context.RGDCContext())
+                {
+                    db.tblFormModels.Add(model);
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true, message = "Form saved.", formID = model.formID }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Server error: " + ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        //displaying of forms in the table
+        [HttpGet]
+        public JsonResult GetPatientForms()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var sessionVal = Session["SelectedPatientID"];
+                    if (sessionVal == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                    if (!int.TryParse(sessionVal.ToString(), out int pid)) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                    var result = (
+                        from f in db.tblFormModels
+                        join d in db.tbl_dentist on f.dentistID equals d.dentistID into dj
+                        from d in dj.DefaultIfEmpty()
+                        join da in db.tbl_account on (d != null ? d.accID : 0) equals da.accID into daj
+                        from da in daj.DefaultIfEmpty()
+                        where f.patientID == pid
+                        orderby f.formCreatedAt descending
+                        select new
+                        {
+                            formID = f.formID,
+                            formLink = f.formLink,
+                            date = f.formCreatedAt,
+                            dentistName = da != null ? (da.firstName + " " + da.lastName) : null,
+                            createdBy = f.createdBy,
+                            formatID = f.formatID
+                        }
+                    ).ToList();
+
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SaveForm(tblFormModel model)
+        {
+            if (model == null || model.formID <= 0)
+                return Json(new { success = false, message = "Invalid payload." }, JsonRequestBehavior.AllowGet);
+
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var existing = db.tblFormModels.FirstOrDefault(x => x.formID == model.formID);
+                    if (existing == null)
+                        return Json(new { success = false, message = "Form not found." }, JsonRequestBehavior.AllowGet);
+
+                    existing.dentistID = model.dentistID > 0 ? model.dentistID : existing.dentistID;
+                    existing.formLink = string.IsNullOrWhiteSpace(model.formLink) ? existing.formLink : model.formLink;
+                    existing.formatID = model.formatID > 0 ? model.formatID : existing.formatID;
+                    existing.formUpdatedAt = DateTime.Now;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Form updated.", formID = existing.formID }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DeleteForm(int formID)
+        {
+            if (formID <= 0) return Json(new { success = false, message = "Invalid formID" });
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var existing = db.tblFormModels.FirstOrDefault(f => f.formID == formID);
+                    if (existing == null) return Json(new { success = false, message = "Form not found" });
+                    db.tblFormModels.Remove(existing);
+                    db.SaveChanges();
+                    return Json(new { success = true, message = "Form deleted." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }
 
