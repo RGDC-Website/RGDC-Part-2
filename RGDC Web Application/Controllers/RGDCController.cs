@@ -279,7 +279,8 @@ namespace RGDC_Web_Application.Controllers
             }
             catch (Exception ex)
             {
-                throw new ArgumentException($"There is an error {ex.Message}");
+                var inner = ex.InnerException?.InnerException?.Message;
+                throw new Exception(inner ?? ex.Message);
             }
         }
 
@@ -702,10 +703,10 @@ namespace RGDC_Web_Application.Controllers
                     mail.To.Add(email);
                     mail.Subject = "Password for your account!";
                     mail.Body = $"Your Password is Default123, please change it immediately on your next login.";
-                    mail.From = new MailAddress("jmlzpnt@gmail.com");
+                    mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-                    smtp.Credentials = new NetworkCredential("jmlzpnt@gmail.com", "jubxxcrsgyleffin");
+                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
 
@@ -925,7 +926,7 @@ namespace RGDC_Web_Application.Controllers
                         prevPhyContact = p.previousPhysicianContact,
                         guar = p.guardian,
                         guarNum = p.guardianNumber,
-                        insurance = p.insurance,
+                        occupation = p.occupation,
                         referral = p.referral,
                         dentalChartLink = p.dentalChartLink,
                         signatureLink = p.signatureLink,
@@ -943,7 +944,6 @@ namespace RGDC_Web_Application.Controllers
                         religion = a.religion,
                         nationality = a.nationality,
                         accCreated = a.accCreatedAt,
-                        occupation = p.occupation,
                         photoLink = a.photoLink,
                         medHist = p.medicalHistory,
                         medHistUpdate = p.medHistUpdate,
@@ -982,7 +982,6 @@ namespace RGDC_Web_Application.Controllers
                                 prevPhyContact = p.previousPhysicianContact,
                                 guar = p.guardian,
                                 guarNum = p.guardianNumber,
-                                insurance = p.insurance,
                                 referral = p.referral,
                                 dentalChartLink = p.dentalChartLink,
                                 signatureLink = p.signatureLink,
@@ -1139,7 +1138,6 @@ namespace RGDC_Web_Application.Controllers
                     pat.occupation = string.IsNullOrWhiteSpace(profInfo.occupation) ? pat.occupation : profInfo.occupation;
                     pat.guardian = string.IsNullOrWhiteSpace(profInfo.guardian) ? pat.guardian : profInfo.guardian;
                     pat.guardianNumber = string.IsNullOrWhiteSpace(profInfo.guardianNumber) ? pat.guardianNumber : profInfo.guardianNumber;
-                    pat.insurance = string.IsNullOrWhiteSpace(profInfo.insurance) ? pat.insurance : profInfo.insurance;
                     pat.referral = string.IsNullOrWhiteSpace(profInfo.referral) ? pat.referral : profInfo.referral;
                     if (profInfo.lastVisit.HasValue) pat.lastVisit = profInfo.lastVisit.Value;
                     if (profInfo.nextVisit.HasValue) pat.nextVisit = profInfo.nextVisit.Value;
@@ -2286,7 +2284,7 @@ namespace RGDC_Web_Application.Controllers
                     contactNumber = accmod.contactNumber,
                     address = accmod.address,
                     civilStatus = accmod.civilStatus,
-                    password = "e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7",
+                    password = passwordHash("Default123"),
                     photoLink = string.IsNullOrWhiteSpace(accmod.photoLink) ? null : accmod.photoLink,
                     role = accmod.role,
                     lastLogin = DateTime.Now,
@@ -2458,6 +2456,34 @@ namespace RGDC_Web_Application.Controllers
                 db.SaveChanges();
 
                 return Json(new { success = true, message = "Staff deleted successfully." },
+                            JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult deletePatient(tblPatientModel patMod)
+        {
+            using (var db = new RGDCContext())
+            {
+                var existing = db.tbl_patient.Find(patMod.patientID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Patient not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_patient.Remove(existing);
+
+                var existingAcc = db.tbl_account.Find(patMod.accID);
+                if (existing == null)
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Patient not found."
+                    }, JsonRequestBehavior.AllowGet);
+                db.tbl_account.Remove(existingAcc);
+                db.SaveChanges();
+
+                return Json(new { success = true, message = "Patient deleted successfully." },
                             JsonRequestBehavior.AllowGet);
             }
         }

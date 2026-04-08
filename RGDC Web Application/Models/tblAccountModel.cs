@@ -15,7 +15,7 @@ namespace RGDC_Web_Application.Models
         public DateTime birthDate { get; set; }
         public string email { get; set; }
         public string contactNumber { get; set; }
-        public string address { get; set; }
+        public string address { get; set; } 
         public string civilStatus { get; set; }
         public string religion { get; set; }
         public string nationality { get; set; }

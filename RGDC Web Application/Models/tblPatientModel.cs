@@ -17,7 +17,6 @@ namespace RGDC_Web_Application.Models
         public string occupation { get; set; }
         public string guardian { get; set; }
         public string guardianNumber { get; set; }
-        public string insurance { get; set; }
         public int postOpID { get; set; }
         public string medicalHistory { get; set; }
         public DateTime medHistUpdate { get; set; }

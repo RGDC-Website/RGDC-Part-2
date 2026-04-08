@@ -28,8 +28,12 @@
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-            <div class="row center sidebar-profile" style="margin-top: 5rem;">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfile" />
+            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserAdmin">
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfile"/>
+            </div>
+
+            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserPatient">
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger"/>
             </div>
 
             @*user name and role*@
@@ -385,20 +389,20 @@
     @*Forgot Password*@
     <div id="modalOTP" class="modal password-modal">
         <div class="modal-content" style="width:80vh !important">
-            <h5 class="modal-form-title">Verify Your Identity</h5>
+            <h5 class="modal-form-title">Change Password</h5>
 
             <div class="input-field">
-                <p class="custom-label">Gmail <span class="required-mark">*</span></p>
+                <p class="custom-label">OTP <span class="required-mark">*</span></p>
                 <input type="email"
-                       ng-model="forgot_email"
+                       ng-model="forget_OTP"
                        placeholder="juandelacruz@gmail.com"
                        required>
             </div>
 
             <div class="modal-footer">
-                <button type="submit" class="edit-btn right" style="font-weight: 500; align-items: center; margin: 1vh 0 -3vh 0" ng-click="sendOTP()">SEND OTP</button>
+                <button type="submit" class="edit-btn right" style="font-weight: 500; align-items: center; margin: 1vh 0 -3vh 0" ng-click="sendOTPPassword()">SEND OTP</button>
                 <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 2.3vh -3vh 0">CANCEL</button>
-                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" data-target="modalPasswordReset">VERIFY</button>
+                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="OTPverify()">VERIFY</button>
             </div>
         </div>
     </div>

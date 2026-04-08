@@ -18,6 +18,7 @@
     $scope.showPatientForm = false;
     $scope.isUserOwner = false;
     $scope.isUserAdmin = false;
+    $scope.isUserStaff = false;
     $scope.isUserPatient = false;
     $scope.medical = {
         history: {
@@ -360,6 +361,27 @@
             });
     }
 
+    $scope.deletePatientThis = function () {
+        var patAcc = {
+            patientID: $scope.selectedPatient.patientID,
+            accID: $scope.selectedPatient.accID
+        }
+        var deletePatient = RGDCWebApplicationService.deletePatient(patAcc);
+        deletePatient.then(function (returnedData) {
+            if (returnedData.data.success) {
+                Swal.fire({ icon: 'success', title: 'Delete Patient', text: 'Successfully deleted patient account.' }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        window.location.href = "/RGDC/adminPatientsTab";
+                        afterUpdate();
+                    }
+
+                });
+            }
+        });
+
+    }
+
     $scope.signUpRemove = function () {
         var modal = document.getElementById("patientInformationForm");
         if (modal) {
@@ -617,8 +639,8 @@
                 $scope.currentUserName = returnedData.data.userName || "";
                 $scope.currentUserID = returnedData.data.userID || "";
                 $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
-                $scope.isUserStaff = ($scope.currentUserAuthorization === "1");
                 $scope.currentUserFullName = returnedData.data.fullName || "";
+                console.log($scope.currentUserName)
 
                 // BAGONG CODE PARA SA GOOGLE CALENDAR
                 $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
@@ -630,8 +652,11 @@
                     $scope.userRole = "Owner"
                 } else if ($scope.currentUserAuthorization == "1" || $scope.currentUserAuthorization == "2") {
                     $scope.isUserAdmin = true;
-                    if ($scope.currentUserAuthorization == "1")
+                    if ($scope.currentUserAuthorization == "1") {
                         $scope.userRole = "Dental Staff"
+                        $scope.isUserStaff = true;
+                    }
+                       
                     else
                         $scope.userRole = "Dentist"
                 } else if ($scope.currentUserAuthorization == "3") {
@@ -876,7 +901,6 @@
                     console.error('getPatientTreatment error', err);
                 });
             } else {
-                console.log("asasa")
                 var getPatientInfo = RGDCWebApplicationService.getOwnPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
                 
@@ -1124,7 +1148,6 @@
              previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
              guardian: $scope.selectedPatient.guar,
              guardianNumber: $scope.selectedPatient.guarNum,
-             insurance: $scope.selectedPatient.insurance,
              referral: $scope.selectedPatient.referral
          };
 
@@ -3074,7 +3097,7 @@
         $scope.staffTBDeleted = staffID;
         $scope.accTBDeleted = accID;
     }
-
+    
     $scope.deleteStaff = function () {
         var staffAcc = {
             staffID: $scope.staffTBDeleted,

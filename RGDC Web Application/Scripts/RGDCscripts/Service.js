@@ -276,6 +276,15 @@
         });
     };
 
+
+    this.deletePatient = function (patAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/deletePatient",
+            data: patAcc
+        });
+    };
+
     this.deleteDentist = function (dentistAcc) {
         return $http({
             method: "post",
