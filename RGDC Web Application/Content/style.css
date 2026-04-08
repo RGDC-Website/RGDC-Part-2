@@ -1254,6 +1254,16 @@ select.browser-default.custom-input {
     margin: auto !important;
 }
 
+.appt-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 75vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+}
+
 
 /*para sa profile pic*/
 .sidebar-profile {
@@ -1315,130 +1325,4 @@ body .main-content {
     .appt-action-buttons .material-icons {
         font-size: 1.05rem;
         line-height: 1;
-    }
-
-/*para sa appt creation modal*/
-
-.modal.appt-modal,
-.modal.appt-modal.centered-modal {
-    max-width: 560px !important;
-    width: 92% !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    padding: 0 !important;
-    box-sizing: border-box;
-}
-
-    .modal.appt-modal .modal-content {
-        padding: 18px 20px !important;
-    }
-
-
-    .modal.appt-modal .row {
-        margin-bottom: 0.5rem;
-    }
-
-
-    .modal.appt-modal .custom-label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        color: #5d4037;
-    }
-
-    .modal.appt-modal .custom-input {
-        height: auto !important;
-        padding: 0.6rem 0.9rem !important;
-        line-height: 1.2 !important;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        box-sizing: border-box;
-        font-size: 0.95rem;
-    }
-
-
-    .modal.appt-modal select.custom-input.browser-default,
-    .modal.appt-modal select.browser-default {
-        height: auto !important;
-        padding: 0.55rem 0.75rem !important;
-        line-height: normal !important;
-    }
-
-    .modal.appt-modal .datepicker-wrapper {
-        position: relative;
-    }
-
-    .modal.appt-modal .modal-footer {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        padding: 12px 18px !important;
-        box-shadow: none;
-    }
-
-        .modal.appt-modal .modal-footer .cancel-btn {
-            margin-right: auto;
-        }
-
-    .modal.appt-modal .input-field {
-        padding-top: 0.25rem;
-    }
-
-        .modal.appt-modal .input-field label,
-        .modal.appt-modal .custom-label {
-            position: static !important;
-            transform: none !important;
-            display: block !important;
-            margin: 0 0 0.45rem 0 !important;
-            line-height: 1.2;
-            font-weight: 600;
-            color: #5d4037;
-        }
-
-    .modal.appt-modal .custom-input,
-    .modal.appt-modal input[type="text"],
-    .modal.appt-modal select.browser-default,
-    .modal.appt-modal select.custom-input,
-    .modal.appt-modal .select-wrapper,
-    .modal.appt-modal .select-dropdown {
-        box-sizing: border-box !important;
-        width: 100% !important;
-        height: 3rem !important;
-        padding: 0.55rem 0.9rem !important;
-        line-height: 1.2 !important;
-        border-radius: 8px !important;
-        border: 1px solid #ddd !important;
-        background-color: #fff !important;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        appearance: none;
-    }
-
-    .modal.appt-modal .datepicker-wrapper {
-        position: relative;
-    }
-
-        .modal.appt-modal .datepicker-wrapper .datepicker-icon {
-            position: absolute;
-            right: 0.7rem;
-            top: 0.7rem;
-            cursor: pointer;
-        }
-
-    .modal.appt-modal .modal-footer {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        padding: 12px 18px !important;
-    }
-
-        .modal.appt-modal .modal-footer .cancel-btn {
-            margin-right: auto;
-        }
-
-    .modal.appt-modal.small {
-        max-width: 420px !important;
     }
