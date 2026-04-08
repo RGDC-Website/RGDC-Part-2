@@ -565,4 +565,12 @@
             data: { formID: formID }
         });
     };
+
+    this.saveDentistSignature = function (imagePath) {
+        return $http({
+            method: "POST",
+            url: "/RGDC/SaveDentistSignature",
+            data: { imagePath: imagePath }
+        });
+    };
 });
