@@ -730,6 +730,10 @@ namespace RGDC_Web_Application.Controllers
 
                 if (password.Length < 8)
                     return Json(new { success = false, message = "Password must be at least 8 characters long" });
+                if (!password.Any(char.IsUpper))
+                    return Json(new { success = false, message = "Password must contain at least 1 uppercase letter" });
+                if (!password.Any(ch => !char.IsLetterOrDigit(ch)))
+                    return Json(new { success = false, message = "Password must contain at least 1 special character" });
 
                 user.password = passwordHash(password);
                 db.SaveChanges();
