@@ -9,6 +9,8 @@
 
     $scope.currentUserName = "";
     $scope.currentUserID = "";
+    $scope.currentUserPhoto = ""; 
+    $scope.currentUserSignature = "";
     const STRENGTH = {
         WEAK: 'Weak',
         FAIR: 'Fair',
@@ -634,13 +636,15 @@
     }
 
     $scope.getSessionVariables = function () {
-            return RGDCWebApplicationService.getSessionVariable()
+        return RGDCWebApplicationService.getSessionVariable()
             .then(function (returnedData) {
                 $scope.currentUserName = returnedData.data.userName || "";
                 $scope.currentUserID = returnedData.data.userID || "";
                 $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
                 $scope.currentUserFullName = returnedData.data.fullName || "";
-                console.log($scope.currentUserName)
+
+                // assign photo returned from server into scope
+                $scope.currentUserPhoto = returnedData.data.userPhoto || "";
 
                 // BAGONG CODE PARA SA GOOGLE CALENDAR
                 $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
@@ -656,15 +660,15 @@
                         $scope.userRole = "Dental Staff"
                         $scope.isUserStaff = true;
                     }
-                       
+
                     else
                         $scope.userRole = "Dentist"
                 } else if ($scope.currentUserAuthorization == "3") {
                     $scope.isUserPatient = true;
                     $scope.userRole = "Patient"
                 }
-             return $scope.currentUserAuthorization;
-        });
+                return $scope.currentUserAuthorization;
+            });
     }
 
     $scope.checkAuthEmail = function () {
@@ -4788,6 +4792,152 @@
             .catch(function (err) {
                 console.error('deleteForm error', err);
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete form.' });
+            });
+    };
+
+    $scope._pickedAccountPhotoFile = null;
+    $scope.accountPhotoPreview = null;
+
+    $scope.pickAccountPhotoFile = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) { document.body.removeChild(input); return; }
+
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+                document.body.removeChild(input);
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    $scope.accountPhotoPreview = evt.target.result;
+                    $scope._pickedAccountPhotoFile = file;
+                });
+            };
+            reader.readAsDataURL(file);
+
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    $scope.saveAccountPhoto = function () {
+        var file = $scope._pickedAccountPhotoFile;
+        if (!file) {
+            Swal.fire({ icon: 'error', title: 'No Image', text: 'Pick an image first.' });
+            return;
+        }
+
+        Swal.fire({ title: 'Uploading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        // Use uploadUserPhoto service which will also update account.photoLink on server
+        RGDCWebApplicationService.uploadUserPhoto(file)
+            .then(function (resp) {
+                Swal.close();
+                var data = resp && resp.data ? resp.data : resp;
+                if (data && data.success && data.filePath) {
+                    // update UI: session photo and modal preview
+                    $scope.accountPhotoPreview = data.filePath;
+                    $scope._pickedAccountPhotoFile = null;
+
+                    // refresh session variables so header/profile shows new photo
+                    try { $scope.getSessionVariables(); } catch (e) { }
+
+                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Profile photo updated.' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (data && data.message) ? data.message : 'Unknown error uploading photo.' });
+                }
+            })
+            .catch(function (err) {
+                Swal.close();
+                console.error('UploadUserPhoto error', err);
+                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload profile photo.' });
+            });
+    };
+
+    // Dentist signature upload for account (preview + save)
+    $scope._pickedAccountSignatureFile = null;
+    $scope.accountSignaturePreview = null;
+
+    $scope.pickAccountSignatureFile = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) { document.body.removeChild(input); return; }
+
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+                document.body.removeChild(input);
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $scope.$apply(function () {
+                    $scope.accountSignaturePreview = evt.target.result;
+                    $scope._pickedAccountSignatureFile = file;
+                });
+            };
+            reader.readAsDataURL(file);
+
+            document.body.removeChild(input);
+        };
+
+        input.click();
+    };
+
+    $scope.saveAccountSignature = function () {
+        var file = $scope._pickedAccountSignatureFile;
+        if (!file) {
+            Swal.fire({ icon: 'error', title: 'No Image', text: 'Pick an image first.' });
+            return;
+        }
+
+        Swal.fire({ title: 'Uploading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        // reuse uploadSignature uploader
+        var uploader = RGDCWebApplicationService.uploadSignature || RGDCWebApplicationService.uploadFile;
+
+        uploader(file)
+            .then(function (resp) {
+                var data = resp && resp.data ? resp.data : resp;
+                if (data && data.success && data.filePath) {
+                    // Save to dentist record
+                    return RGDCWebApplicationService.saveDentistSignature(data.filePath)
+                        .then(function (saveResp) {
+                            Swal.close();
+                            var s = saveResp && saveResp.data ? saveResp.data : saveResp;
+                            if (s && s.success) {
+                                $scope.accountSignaturePreview = data.filePath;
+                                $scope._pickedAccountSignatureFile = null;
+                                Swal.fire({ icon: 'success', title: 'Saved', text: 'Signature saved.' });
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Save Failed', text: (s && s.message) ? s.message : 'Failed to save signature.' });
+                            }
+                        });
+                } else {
+                    Swal.close();
+                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (data && data.message) ? data.message : 'Unknown error uploading signature.' });
+                }
+            })
+            .catch(function (err) {
+                Swal.close();
+                console.error('Upload or save dentist signature error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to upload/save signature.' });
             });
     };
 

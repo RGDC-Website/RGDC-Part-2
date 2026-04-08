@@ -2157,29 +2157,23 @@ namespace RGDC_Web_Application.Controllers
                 if (file == null || file.ContentLength == 0)
                     return Json(new { success = false, message = "No file provided." });
 
+                // Validate image MIME type
                 if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                     return Json(new { success = false, message = "Invalid file type. Image required." });
 
-                var maxBytes = 5 * 1024 * 1024;
-                if (file.ContentLength > maxBytes)
-                    return Json(new { success = false, message = "File too large. Max 5 MB." });
-
-                var accIdVal = Request.Form["accID"];
-                if (string.IsNullOrEmpty(accIdVal) || !int.TryParse(accIdVal, out int accID))
-                {
-                    return Json(new { success = false, message = "Missing or invalid accID." });
-                }
-
                 string uploadPath = Server.MapPath("~/Content/Uploads/");
-                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
 
                 string fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
                 string filePath = Path.Combine(uploadPath, fileName);
                 file.SaveAs(filePath);
+
                 string relativePath = "/Content/Uploads/" + fileName;
 
                 using (var db = new RGDCContext())
                 {
+                    // Save to tbl_images
                     var imgData = new tblImagesModel()
                     {
                         imageName = fileName,
@@ -2190,19 +2184,49 @@ namespace RGDC_Web_Application.Controllers
                     db.tbl_images.Add(imgData);
                     db.SaveChanges();
 
-                    var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
-                    if (acc != null)
+                    // Update account photoLink. Accept optional accID form value or fallback to session UserID
+                    int accID = 0;
+                    if (Request.Form["accID"] != null && int.TryParse(Request.Form["accID"], out accID))
                     {
-                        acc.photoLink = relativePath;
-                        db.SaveChanges();
+                        // use provided accID
                     }
-                }
+                    else
+                    {
+                        var sessionUser = Session["UserID"];
+                        if (sessionUser != null && int.TryParse(sessionUser.ToString(), out int sAcc))
+                        {
+                            accID = sAcc;
+                        }
+                    }
 
-                return Json(new { success = true, message = "Photo uploaded and linked to account.", filePath = relativePath });
+                    if (accID > 0)
+                    {
+                        var acc = db.tbl_account.FirstOrDefault(a => a.accID == accID);
+                        if (acc != null)
+                        {
+                            acc.photoLink = relativePath;
+                            acc.accUpdatedAt = DateTime.Now;
+                            db.SaveChanges();
+                        }
+                    }
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Photo uploaded successfully.",
+                        filePath = relativePath,
+                        imageID = imgData.imageID,
+                        accID = accID
+                    });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error uploading photo: {ex.Message}" });
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error uploading photo: {ex.Message}"
+                });
             }
         }
         public ActionResult getClinicStaff()
@@ -3137,6 +3161,57 @@ namespace RGDC_Web_Application.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SaveDentistSignature(string imagePath)
+        {
+            if (string.IsNullOrWhiteSpace(imagePath))
+                return Json(new { success = false, message = "No image path provided." });
+
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var sessionUser = Session["UserID"];
+                    if (sessionUser == null || !int.TryParse(sessionUser.ToString(), out int accID))
+                        return Json(new { success = false, message = "User session expired." });
+
+                    // Try dentist record
+                    var dentist = db.tbl_dentist.FirstOrDefault(d => d.accID == accID);
+                    if (dentist != null)
+                    {
+                        dentist.signature = imagePath;
+                        db.SaveChanges();
+                        return Json(new { success = true, message = "Signature saved for dentist.", filePath = imagePath });
+                    }
+
+                    // Try owner record
+                    var owner = db.tbl_owner.FirstOrDefault(o => o.accID == accID);
+                    if (owner != null)
+                    {
+                        owner.signature = imagePath;
+                        db.SaveChanges();
+                        return Json(new { success = true, message = "Signature saved for owner.", filePath = imagePath });
+                    }
+
+                    // Try staff record
+                    var staff = db.tbl_staff.FirstOrDefault(s => s.accID == accID);
+                    if (staff != null)
+                    {
+                        staff.signature = imagePath;
+                        db.SaveChanges();
+                        return Json(new { success = true, message = "Signature saved for staff.", filePath = imagePath });
+                    }
+
+                    // No role-specific record found
+                    return Json(new { success = false, message = "User role record not found to save signature." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error saving signature: {ex.Message}" });
             }
         }
     }
