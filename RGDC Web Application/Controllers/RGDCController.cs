@@ -264,7 +264,8 @@ namespace RGDC_Web_Application.Controllers
                             referral = string.Empty,
                             lastVisit = DateTime.Now,
                             medicalHistory = string.Empty,
-                            medHistUpdate = DateTime.Now
+                            medHistUpdate = DateTime.Now,
+                            lastUpdated = DateTime.Now
                         };
 
                         addUser.tbl_patient.Add(patient);
@@ -309,7 +310,8 @@ namespace RGDC_Web_Application.Controllers
                         referral = accDetails.referral,
                         lastVisit = accDetails.lastVisit,
                         medicalHistory = accDetails.medicalHistory,
-                        medHistUpdate = DateTime.Now
+                        medHistUpdate = DateTime.Now,
+                        lastUpdated = DateTime.Now
                     };
 
                     db.tbl_patient.Add(newData);
@@ -476,91 +478,63 @@ namespace RGDC_Web_Application.Controllers
             { "grant_type", "authorization_code" }
         };
 
-                var content = new FormUrlEncodedContent(values);
-                var response = await client.PostAsync("https://oauth2.googleapis.com/token", content);
+                var response = await client.PostAsync("https://oauth2.googleapis.com/token",
+                                   new FormUrlEncodedContent(values));
 
                 if (!response.IsSuccessStatusCode)
+                    return Content(await response.Content.ReadAsStringAsync());
+
+                var tokenData = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(
+                                    await response.Content.ReadAsStringAsync());
+
+                if (!tokenData.ContainsKey("access_token"))
+                    return RedirectToAction("", "RGDC");
+
+                string accessToken = tokenData["access_token"];
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var userInfo = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(
+                                   await client.GetStringAsync("https://www.googleapis.com/oauth2/v2/userinfo"));
+
+                string email = userInfo["email"].ToString();
+
+                // Set Forms Auth cookie
+                System.Web.Security.FormsAuthentication.SetAuthCookie(email, false);
+
+                // Secure session cookie
+                if (Response.Cookies["ASP.NET_SessionId"] != null)
                 {
-                    var errorBody = await response.Content.ReadAsStringAsync();
-                    return Content(errorBody);
+                    Response.Cookies["ASP.NET_SessionId"].HttpOnly = true;
+                    Response.Cookies["ASP.NET_SessionId"].Secure = Request.IsSecureConnection;
                 }
-                var jsonResponse = await response.Content.ReadAsStringAsync();
 
-                var serializer = new Newtonsoft.Json.JsonSerializer();
-                var tokenData = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(jsonResponse);
-
-                if (tokenData.ContainsKey("access_token"))
-                {
-                    string accessToken = tokenData["access_token"];
-
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                    var userInfoJson = await client.GetStringAsync("https://www.googleapis.com/oauth2/v2/userinfo");
-                    var userInfo = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(userInfoJson);
-
-                    System.Web.Security.FormsAuthentication.SetAuthCookie(userInfo["email"], false);
-
-                    if (Response.Cookies["ASP.NET_SessionId"] != null)
-                    {
-                        Response.Cookies["ASP.NET_SessionId"].HttpOnly = true;
-                        Response.Cookies["ASP.NET_SessionId"].Secure = Request.IsSecureConnection;
-                    }
-
-
-                    Session["UserEmail"] = userInfo["email"];
-                    Session["IsLoggedIn"] = true;
-
-                    using (var db = new RGDCContext())
-                    {
-                        string email = Session["UserEmail"] as string;
-                        bool exist = db.tbl_account.Any(u => u.email == email);
-                        if (exist)
-                        {
-                            var user = db.tbl_account.FirstOrDefault(u => u.email == email);
-
-                            if (user != null)
-                            {
-                                // Set session variables
-                                Session["UserID"] = user.accID;
-                                Session["UserName"] = user.firstName;
-                                Session["UserFullName"] = user.firstName + " " + user.lastName;
-                                Session["UserAuthorization"] = user.role;
-                                Session["IsLoggedIn"] = true;
-                                Session["UserPhoto"] = user.photoLink ?? "";
-                                return RedirectToAction("adminDashboard", "RGDC");
-                            }
-                            else
-                            {
-                                return RedirectToAction("signUp", "RGDC");
-                            }
-                        }
-                    }
-
-                }
-            }
-
-            using (var db = new RGDCContext())
-            {
-                string email = Session["UserEmail"] as string;
-                bool exist = db.tbl_account.Any(u => u.email == email);
-                if (exist)
+ 
+                using (var db = new RGDCContext())
                 {
                     var user = db.tbl_account.FirstOrDefault(u => u.email == email);
 
-                    if (user != null)
+                    if (user == null)
                     {
-                        // Set session variables
-                        Session["UserID"] = user.accID;
-                        Session["UserName"] = user.firstName;
-                        Session["UserFullName"] = user.firstName + " " + user.lastName;
-                        Session["UserAuthorization"] = user.role;
-                        Session["IsLoggedIn"] = true;
-                        return RedirectToAction("adminDashboard", "RGDC");
+
+                        Session["UserEmail"] = email;
+                        Session["IsLoggedIn"] = false;
+                        return RedirectToAction("signUp", "RGDC");
                     }
+
+
+                    Session["UserID"] = user.accID;
+                    Session["UserEmail"] = email;
+                    Session["UserName"] = user.firstName;
+                    Session["UserFullName"] = user.firstName + " " + user.lastName;
+                    Session["UserAuthorization"] = user.role;
+                    Session["UserPhoto"] = user.photoLink ?? "";
+                    Session["IsLoggedIn"] = true;
+
+                    return RedirectToAction("adminDashboard", "RGDC");
                 }
-                return RedirectToAction("", "RGDC");
             }
         }
-
         public JsonResult getSessionVariable()
         {
             try
@@ -744,7 +718,7 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "OTP expired. Please request a new one." });
                 }
 
-                if (!string.Equals(sessionEmail, email, StringComparison.OrdinalIgnoreCase) || sessionOtp != otp)
+                if (!string.Equals(sessionEmail, email, StringComparison.OrdinalIgnoreCase) && sessionOtp != otp)
                 {
                     return Json(new { success = false, message = "Invalid OTP or email" });
                 }
@@ -782,6 +756,7 @@ namespace RGDC_Web_Application.Controllers
                         accID = p.accID,
                         patientName = a.firstName + " " + a.lastName,
                         lastVisit = p.lastVisit,
+
                         // count upcoming/pending appointments for this patient
                         appointmentsScheduled = db.tbl_appointment.Count(ap => ap.patientID == p.patientID && (ap.status == "Requested" || ap.status == "Scheduled"))
                     }
@@ -1139,6 +1114,7 @@ namespace RGDC_Web_Application.Controllers
                     pat.guardian = string.IsNullOrWhiteSpace(profInfo.guardian) ? pat.guardian : profInfo.guardian;
                     pat.guardianNumber = string.IsNullOrWhiteSpace(profInfo.guardianNumber) ? pat.guardianNumber : profInfo.guardianNumber;
                     pat.referral = string.IsNullOrWhiteSpace(profInfo.referral) ? pat.referral : profInfo.referral;
+                    pat.lastUpdated = DateTime.Now;
                     if (profInfo.lastVisit.HasValue) pat.lastVisit = profInfo.lastVisit.Value;
                     if (profInfo.nextVisit.HasValue) pat.nextVisit = profInfo.nextVisit.Value;
 
@@ -1205,6 +1181,7 @@ namespace RGDC_Web_Application.Controllers
                     if (patient != null)
                     {
                         patient.dentalChartLink = relativePath;
+                        patient.lastUpdated = DateTime.Now;
                         db.SaveChanges();
 
                         return Json(new
@@ -1287,6 +1264,7 @@ namespace RGDC_Web_Application.Controllers
 
                 patient.medicalHistory = jsonString;
                 patient.medHistUpdate = DateTime.Now;
+                patient.lastUpdated = DateTime.Now;
                 db.SaveChanges();
 
                 return Json(new { success = true, jsonstring = jsonString, medHistUpdate = patient.medHistUpdate }, JsonRequestBehavior.AllowGet);
@@ -1312,6 +1290,7 @@ namespace RGDC_Web_Application.Controllers
                 patient.previousPhysician = prevPhys.previousPhysician;
                 patient.previousPhysicianOffice = prevPhys.previousPhysicianOffice;
                 patient.previousPhysicianContact = prevPhys.previousPhysicianContact;
+                patient.lastUpdated = DateTime.Now;
 
                 db.SaveChanges();
 
@@ -2800,6 +2779,15 @@ namespace RGDC_Web_Application.Controllers
                     };
 
                     db.tbl_treatmentplan.Add(note);
+                    var patientLastUpdated = db.tbl_patient.Where(p => p.patientID == model.patientID).Select(p => p.lastUpdated).FirstOrDefault();
+                    if (noteDate > patientLastUpdated)
+                    {
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
+                        if (patient != null)
+                        {
+                            patient.lastUpdated = noteDate;
+                        }
+                    }
                     db.SaveChanges();
 
                     return Json(new { success = true }, JsonRequestBehavior.AllowGet);
@@ -2866,7 +2854,8 @@ namespace RGDC_Web_Application.Controllers
                 existing.procedures = model.procedures;
                 existing.amount = model.amount;
                 existing.paid = model.paid;
-
+                var patientLastUpdated = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
+                patientLastUpdated.lastUpdated = model.date > patientLastUpdated.lastUpdated ? model.date : patientLastUpdated.lastUpdated;
                 db.SaveChanges();
 
                 return Json(new
@@ -2883,7 +2872,6 @@ namespace RGDC_Web_Application.Controllers
             {
                 var existing = db.tbl_treatmentplan
                     .FirstOrDefault(t => t.trtPlanID == trtPlan.trtPlanID);
-
                 if (existing == null)
                 {
                     return Json(new

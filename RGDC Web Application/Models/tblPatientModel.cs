@@ -25,5 +25,6 @@ namespace RGDC_Web_Application.Models
         public string signatureLink { get; set; }
         public DateTime nextVisit { get; set; }
         public DateTime lastVisit { get; set; }
+        public DateTime lastUpdated { get; set; }
     }
 }

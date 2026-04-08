@@ -16,6 +16,7 @@ namespace RGDC_Web_Application
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            InactiveAccountCleaner.Start();
         }
     }
 }

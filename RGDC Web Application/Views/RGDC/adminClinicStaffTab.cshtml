@@ -165,7 +165,7 @@
                     <div class="row">
                         @*First name*@
                         <div class="col s6">
-                            <p class="custom-label" >First Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    ng-model="owner_firstName"
                                    class="custom-input"
@@ -175,7 +175,7 @@
                         </div>
                         @*MIddle name*@
                         <div class="col s6">
-                            <p class="custom-label" >Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    ng-model="owner_middleName"
                                    class="custom-input"
@@ -187,7 +187,7 @@
                     <div class="row">
                         @*Last name*@
                         <div class="col s12">
-                            <p class="custom-label" >Last Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
                                    ng-model="owner_lastName"
                                    maxlength="150"
@@ -274,6 +274,32 @@
             </div>
 
             <div class="row">
+
+
+                <div class="col s6">
+                    @*Religion*@
+                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                    <input id="religion"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Roman-Catholic"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s6">
+                    @*Nationality*@
+                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Filipino"
+                           maxlength="50"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="col s12">
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <input ng-model="owner_address"
@@ -290,7 +316,7 @@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
                     <input type="text"
-                            ng-model="owner_specialization"
+                           ng-model="owner_specialization"
                            class="custom-input"
                            maxlength="50">
                 </div>
@@ -459,6 +485,32 @@
             </div>
 
             <div class="row">
+
+
+                <div class="col s6">
+                    @*Religion*@
+                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                    <input id="religion"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Roman-Catholic"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s6">
+                    @*Nationality*@
+                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Filipino"
+                           maxlength="50"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
                 @*Specialization*@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
@@ -555,30 +607,30 @@
             </div>
 
             @*Email*@
-        <div class="row">
-            <div class="col s12">
-                <p class="custom-label">Email <span class="required-mark">*</span></p>
-                <input type="text" class="custom-input"
-                       ng-model="staff_email"
-                       maxlength="150"
-                       placeholder="juandlc@gmail.com"
-                       ng-change="checkAddStaffEmail()"
-                       ng-class="{
+            <div class="row">
+                <div class="col s12">
+                    <p class="custom-label">Email <span class="required-mark">*</span></p>
+                    <input type="text" class="custom-input"
+                           ng-model="staff_email"
+                           maxlength="150"
+                           placeholder="juandlc@gmail.com"
+                           ng-change="checkAddStaffEmail()"
+                           ng-class="{
                    'input-valid': staffEmailFormatValid && !staffEmailTaken,
                    'input-invalid': staff_email && !staffEmailFormatValid
                }"
-                       required>
-                <p class="helper-text" style="margin-top:.4rem;">
-                    <span ng-show="staff_email"
-                          ng-style="{'color': staffEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
-                        {{ staffEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
-                    </span>
-                    <span ng-show="staffEmailFormatValid && staffEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
-                        Email already taken
-                    </span>
-                </p>
+                           required>
+                    <p class="helper-text" style="margin-top:.4rem;">
+                        <span ng-show="staff_email"
+                              ng-style="{'color': staffEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
+                            {{ staffEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
+                        </span>
+                        <span ng-show="staffEmailFormatValid && staffEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
+                            Email already taken
+                        </span>
+                    </p>
+                </div>
             </div>
-        </div>
 
             <div class="row">
                 @*Gender*@
@@ -613,19 +665,19 @@
                         <option value="3">Widowed</option>
                     </select>
                 </div>
-                    <div class="col s3">
-                        <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                        <input id="staffContactNumber"
-                               ng-model="staff_contactNumber"
-                               type="text"
-                               class="custom-input"
-                               placeholder="09XX-XXX-XXXX"
-                               maxlength="11"
-                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                               ng-change="checkAddStaffContact()"
-                               ng-class="{'input-valid': staffContactValid, 'input-invalid': staff_contactNumber && !staffContactValid}"
-                               required>
-                    </div>
+                <div class="col s3">
+                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
+                    <input id="staffContactNumber"
+                           ng-model="staff_contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="09XX-XXX-XXXX"
+                           maxlength="11"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           ng-change="checkAddStaffContact()"
+                           ng-class="{'input-valid': staffContactValid, 'input-invalid': staff_contactNumber && !staffContactValid}"
+                           required>
+                </div>
             </div>
 
             <div class="row">
@@ -636,6 +688,32 @@
                            maxlength="250"
                            ng-change="checkAddStaffAddress()"
                            ng-class="{'input-valid': staffAddressValid, 'input-invalid': staff_address && !staffAddressValid}"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+
+
+                <div class="col s6">
+                    @*Religion*@
+                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                    <input id="religion"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Roman-Catholic"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s6">
+                    @*Nationality*@
+                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Filipino"
+                           maxlength="50"
                            required>
                 </div>
             </div>

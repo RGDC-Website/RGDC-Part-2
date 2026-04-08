@@ -633,19 +633,65 @@
         });
     }
 
+    $scope.getSessionVariables = function (retryCount) {
+        retryCount = retryCount || 0; 
+
+        var publicRoutes = ["/RGDC", "/RGDC/signUp", "/RGDC/ExternalLogin"];
+        var currentPath = window.location.pathname;
+        if (publicRoutes.some(function (route) { return currentPath === route; })) {
+            return;
+        }
+
+
+        return RGDCWebApplicationService.getSessionVariable()
+            .then(function (returnedData) {
+                if (!returnedData.data || returnedData.data.success === false) {
+                    if (retryCount < 3) {
+                        console.warn("Session not ready, retrying...", retryCount);
+                        return $timeout(function () {
+                            return $scope.getSessionVariables(retryCount + 1);
+                        }, 500); // wait 500ms then retry
+                    } else {
+                        window.location.href = "/RGDC"; // give up, redirect to login
+                    }
+                    return;
+                }
+
+                $scope.currentUserName = returnedData.data.userName || "";
+                $scope.currentUserID = returnedData.data.userID || "";
+                $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
+                $scope.currentUserFullName = returnedData.data.fullName || "";
+                $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
+                $scope.googleConnected = !!returnedData.data.googleRefreshTokenPresent;
+
+                if ($scope.currentUserAuthorization == "0") {
+                    $scope.isUserOwner = true;
+                    $scope.isUserAdmin = true;
+                    $scope.userRole = "Owner";
+                } else if ($scope.currentUserAuthorization == "1" || $scope.currentUserAuthorization == "2") {
+                    $scope.isUserAdmin = true;
+                    $scope.userRole = $scope.currentUserAuthorization == "1" ? "Dental Staff" : "Dentist";
+                    $scope.isUserStaff = $scope.currentUserAuthorization == "1";
+                } else if ($scope.currentUserAuthorization == "3") {
+                    $scope.isUserPatient = true;
+                    $scope.userRole = "Patient";
+                }
+
+                return $scope.currentUserAuthorization;
+            });
+    }
+
     $scope.getSessionVariables = function () {
-            return RGDCWebApplicationService.getSessionVariable()
+        return RGDCWebApplicationService.getSessionVariable()
             .then(function (returnedData) {
                 $scope.currentUserName = returnedData.data.userName || "";
                 $scope.currentUserID = returnedData.data.userID || "";
                 $scope.currentUserAuthorization = returnedData.data.userAuthorization || "";
                 $scope.currentUserFullName = returnedData.data.fullName || "";
                 console.log($scope.currentUserName)
-
                 // BAGONG CODE PARA SA GOOGLE CALENDAR
                 $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
                 $scope.googleConnected = !!returnedData.data.googleRefreshTokenPresent;
-
                 if ($scope.currentUserAuthorization == "0") {
                     $scope.isUserOwner = true;
                     $scope.isUserAdmin = true;
@@ -656,15 +702,15 @@
                         $scope.userRole = "Dental Staff"
                         $scope.isUserStaff = true;
                     }
-                       
+
                     else
                         $scope.userRole = "Dentist"
                 } else if ($scope.currentUserAuthorization == "3") {
                     $scope.isUserPatient = true;
                     $scope.userRole = "Patient"
                 }
-             return $scope.currentUserAuthorization;
-        });
+                return $scope.currentUserAuthorization;
+            });
     }
 
     $scope.checkAuthEmail = function () {
@@ -726,16 +772,29 @@
             otp: $scope.forgot_otp
         }
         var resetPassword = RGDCWebApplicationService.resetPassword(forgot_info);
-        resetPassword.then(function () {
-            var modal = document.getElementById("password-modal");
-            if (modal) {
-                modal.style.display = "none";
-            }
-            Swal.fire({
-                icon: "success",
-                title: "Password Changed Successfully",
-                text: "Log In with your new password!",
-            });
+        resetPassword.then(function (returnedData) {
+            if (returnedData.data.success) {
+                var modal = document.getElementById("password-modal");
+                if (modal) {
+                    modal.style.display = "none";
+                }
+                Swal.fire({
+                    icon: "success",
+                    title: "Password Changed Successfully",
+                    text: "Log In with your new password!",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC";
+                        afterUpdate();
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Password Not Changed",
+                    text: returnedData.data.message,
+                });
+            }   
         });
     };
 
