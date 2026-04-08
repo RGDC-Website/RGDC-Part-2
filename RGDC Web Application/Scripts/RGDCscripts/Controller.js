@@ -2846,7 +2846,7 @@
                             email: $scope.addPatient_email
                         };
                         var sendEmail = RGDCWebApplicationService.sendEmail(user_email);
-                        Swal.fire({ icon: 'success', title: 'Add Patient', text: 'Successfully added new patient payment record.' }).then((result) => {
+                        Swal.fire({ icon: 'success', title: 'Add Patient', text: 'Successfully added new patient.' }).then((result) => {
                             if (result.isConfirmed) {
                                 window.location.href = "/RGDC/adminPatientsTab";
                                 afterUpdate();

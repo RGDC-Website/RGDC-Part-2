@@ -718,7 +718,8 @@ namespace RGDC_Web_Application.Controllers
                     return Json(new { success = false, message = "OTP expired. Please request a new one." });
                 }
 
-                if (!string.Equals(sessionEmail, email, StringComparison.OrdinalIgnoreCase) && sessionOtp != otp)
+                if (!string.Equals(sessionEmail, email, StringComparison.OrdinalIgnoreCase) ||
+                    !string.Equals(sessionOtp, otp, StringComparison.Ordinal))
                 {
                     return Json(new { success = false, message = "Invalid OTP or email" });
                 }
