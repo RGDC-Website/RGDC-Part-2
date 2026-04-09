@@ -5308,89 +5308,99 @@
     }
 
     $scope.updateTimeOptions = function () {
-        $scope.timeOptions = [];
+        $scope.timeOptions = $scope.timeOptions || [];
 
-        if (!$scope.newApptRequest || !$scope.newApptRequest.dateTime) {
-            return;
-        }
+        try {
+            // require date and dentist to compute meaningful options
+            if (!$scope.newApptRequest || !$scope.newApptRequest.dateTime || !$scope.newApptRequest.dentistID) {
+                $scope.timeOptions = [];
+                return;
+            }
 
-        // ensure date is a Date object
-        var baseDate = $scope.newApptRequest.dateTime;
-        if (typeof baseDate === 'string') {
-            baseDate = new Date(baseDate);
-        }
-        if (!(baseDate instanceof Date) || isNaN(baseDate.getTime())) {
-            return;
-        }
+            var selectedDate = (typeof $scope.newApptRequest.dateTime === 'string') ? new Date($scope.newApptRequest.dateTime) : new Date($scope.newApptRequest.dateTime);
+            if (isNaN(selectedDate.getTime())) {
+                $scope.timeOptions = [];
+                return;
+            }
 
-        var startHour = 8;
-        var endHour = 17;
-        var interval = 30;
+            var dentistID = (typeof $scope.newApptRequest.dentistID !== 'undefined' && $scope.newApptRequest.dentistID !== null)
+                ? parseInt($scope.newApptRequest.dentistID, 10)
+                : null;
+            if (!dentistID) {
+                $scope.timeOptions = [];
+                return;
+            }
 
-        var slots = generateTimeSlots(startHour, endHour, interval);
+            // normalize date to midnight of selected day
+            var year = selectedDate.getFullYear();
+            var month = selectedDate.getMonth();
+            var day = selectedDate.getDate();
 
-        // helper: check if a given slot (time string) is already taken for selected dentist on the date
-        function slotIsTaken(slotTimeStr) {
-            try {
-                // build a Date object for this slot on the selected day
-                var slotDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
-                var m = slotTimeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-                if (!m) return false;
-                var hh = parseInt(m[1], 10);
-                var mm = parseInt(m[2], 10);
-                var mer = m[3] ? m[3].toUpperCase() : '';
-                if (mer) {
-                    if (mer === 'PM' && hh !== 12) hh += 12;
-                    if (mer === 'AM' && hh === 12) hh = 0;
+            var durationMs = ($scope._apptDurationMinutes || 120) * 60 * 1000;
+            var slotIntervalMs = ($scope._slotIntervalMinutes || 30) * 60 * 1000;
+
+            // earliest start at business start hour
+            var startDate = new Date(year, month, day, $scope._businessStartHour, 0, 0, 0);
+            // latest start so appointment finishes by business end hour
+            var latestStart = new Date(year, month, day, $scope._businessEndHour, 0, 0, 0);
+            latestStart = new Date(latestStart.getTime() - durationMs);
+
+            var candidates = [];
+            for (var t = startDate.getTime(); t <= latestStart.getTime(); t += slotIntervalMs) {
+                candidates.push(new Date(t));
+            }
+
+            // gather existing appointments for same dentist on selected day
+            var existing = Array.isArray($scope.adminAppointments) ? $scope.adminAppointments : [];
+            var existingForDentist = existing.filter(function (a) {
+                try {
+                    var aDate = a.dateTimeObj || parseJsonDateToJsDate(a.dateTime);
+                    if (!aDate) return false;
+                    return (parseInt(a.dentistID, 10) === dentistID) &&
+                        aDate.getFullYear() === year &&
+                        aDate.getMonth() === month &&
+                        aDate.getDate() === day;
+                } catch (e) {
+                    return false;
                 }
-                slotDate.setHours(hh, mm, 0, 0);
+            }).map(function (a) {
+                return a.dateTimeObj || parseJsonDateToJsDate(a.dateTime);
+            }).filter(Boolean);
 
-                var dentistID = $scope.newApptRequest.dentistID ? parseInt($scope.newApptRequest.dentistID, 10) : null;
+            // filter out any candidate that would overlap existing appointment (duration considered)
+            var allowed = candidates.filter(function (slot) {
+                var sMs = slot.getTime();
+                var sEnd = sMs + durationMs;
 
-                var appts = Array.isArray($scope.adminAppointments) ? $scope.adminAppointments : [];
+                for (var i = 0; i < existingForDentist.length; i++) {
+                    var a = existingForDentist[i];
+                    var aMs = (a instanceof Date) ? a.getTime() : (new Date(a)).getTime();
+                    var aEnd = aMs + durationMs;
 
-                return appts.some(function (a) {
-                    if (!a || !a.dateTimeObj) return false;
+                    // overlap if slot starts before existing end AND slot end after existing start
+                    if (sMs < aEnd && sEnd > aMs) {
+                        return false; // overlapping -> reject slot
+                    }
+                }
+                return true;
+            });
 
-                    // If dentistID is selected, only consider appointments for that dentist
-                    if (dentistID && a.dentistID && parseInt(a.dentistID, 10) !== dentistID) return false;
-
-                    var d = a.dateTimeObj;
-                    return d.getFullYear() === slotDate.getFullYear() &&
-                        d.getMonth() === slotDate.getMonth() &&
-                        d.getDate() === slotDate.getDate() &&
-                        d.getHours() === slotDate.getHours() &&
-                        d.getMinutes() === slotDate.getMinutes();
-                });
-            } catch (e) {
-                console.warn('slotIsTaken error', e);
-                return false;
-            }
-        }
-
-        // filter out taken slots
-        var available = slots.filter(function (s) {
-            return !slotIsTaken(s);
-        });
-
-        $scope.timeOptions = available;
-        if (!available || available.length === 0) {
-            $scope.newApptRequest.time = "";
-        } else {
-            if (!$scope.newApptRequest.time || $scope.timeOptions.indexOf($scope.newApptRequest.time) === -1) {
-                $scope.newApptRequest.time = "";
-            }
+            // format to strings consistent with other code (e.g., "8:00 AM")
+            $scope.timeOptions = allowed.map(function (d) {
+                return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            });
+        } catch (ex) {
+            console.error('updateTimeOptions error', ex);
+            $scope.timeOptions = [];
         }
     };
 
-    $scope.$watch('newApptRequest.dateTime', function (newVal, oldVal) {
-        $scope.updateTimeOptions();
-    });
 
-    $scope.$watch('newApptRequest.dentistID', function (newVal, oldVal) {
-        if ($scope.newApptRequest && $scope.newApptRequest.dateTime) {
-            $scope.updateTimeOptions();
-        }
+    $scope.$watch('newApptRequest.dateTime', function (nv, ov) {
+        try { $scope.updateTimeOptions(); } catch (e) { console.warn('watch date updateTimeOptions failed', e); }
+    });
+    $scope.$watch('newApptRequest.dentistID', function (nv, ov) {
+        try { $scope.updateTimeOptions(); } catch (e) { console.warn('watch dentist updateTimeOptions failed', e); }
     });
 
     function initDataTableSafe(selector, instanceName) {
@@ -5581,4 +5591,10 @@
                 window.location.href = '/RGDC';
             });
     };
+
+
+    $scope._apptDurationMinutes = 120;
+    $scope._slotIntervalMinutes = 30;
+    $scope._businessStartHour = 8;
+    $scope._businessEndHour = 18;
 });

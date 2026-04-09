@@ -278,7 +278,7 @@
 
                     <select id="addApptPatient" class="custom-input browser-default" ng-model="newApptRequest.patientID" required>
                         <option value="">Select Patient</option>
-                        <option ng-repeat="patient in patientArray" value="{{patient.patientID}}">{{patient.patientName}}</option>
+                        <option ng-repeat="patient in patientArray" ng-value="patient.patientID">{{patient.patientName}}</option>
                     </select>
                 </div>
             </div>
