@@ -7,7 +7,12 @@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*back button*@
         <div class="col m8 l8" style="margin-top: 7px;">
-            <a href="/RGDC/adminPatientsTab" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Back to Patients Tab"><i class="material-icons brown-text lighten-1 left">arrow_back</i></a>
+            <a href="" ng-click="onBackFromPatientProfile($event)"
+               class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped"
+               data-position="bottom"
+               data-tooltip="Back">
+                <i class="material-icons brown-text lighten-1 left">arrow_back</i>
+            </a>
         </div>
 
         @*refresh and logout buttons*@
@@ -42,8 +47,12 @@
                 <div class="card-content">
                     @*user pfp and name*@
                     <div class="row center">
-                        @*lagyan nalang ng src for image source*@
-                        <img ng-src="{{selectedPatient.photoLink || 'https://placehold.co/400'}}" class="circle responsive-img" style="max-width:9rem" />
+                        <img ng-if="selectedPatient"
+                             ng-src="{{ getSafePhotoUrl() }}"
+                             class="circle responsive-img"
+                             style="max-width:9rem"
+                             alt="Profile"
+                             onerror="this.onerror=null;this.src='https://placehold.co/400'" />
                     </div>
 
                     @*user name and role*@
@@ -323,12 +332,12 @@
                                     <td>{{patientTreatment.paid}}</td>
                                     <td>{{patientTreatment.amount - patientTreatment.paid}}</td>
                                     <td>
-                                        <a href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger"
+                                        <a ng-show="isUserAdmin && !isUserStaff" href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger"
                                            data-target="modalDeleteProgNote" data-position="bottom" data-tooltip="Delete Progress Note">
                                             <i class="material-icons brown-text lighten-1" ng-click="selectDeleteProg(patientTreatment.trtPlanID)">delete</i>
                                         </a>
 
-                                        <a href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
+                                        <a ng-show="isUserAdmin" href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
                                            data-target="modalEditProgNote" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important">
                                             <i class="material-icons brown-text lighten-1" ng-click="selectEditProg(patientTreatment.trtPlanID)">edit</i>
                                         </a>

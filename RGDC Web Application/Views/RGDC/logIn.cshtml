@@ -27,16 +27,19 @@
                 </div>
 
                 @*Password*@
-                <div class="input-field">
-                    <p class="custom-label">Password <span class="required-mark">*</span></p>
-                    <input id="password"
-                           ng-model="login_password"
-                           type="password"
-                           placeholder="Password"
-                           maxlength="150"
-                           oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
-                           required>
-                </div>
+            <div class="input-field password-field">
+                <p class="custom-label">Password <span class="required-mark">*</span></p>
+                <input id="password"
+                       ng-model="login_password"
+                       ng-attr-type="{{ showLoginPassword ? 'text' : 'password' }}"
+                       placeholder="Password"
+                       maxlength="150"
+                       oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
+                       required>
+                <i class="material-icons password-toggle" ng-click="toggleLoginPassword()" title="Show/Hide password">
+                    {{ showLoginPassword ? 'visibility_off' : 'visibility' }}
+                </i>
+            </div>
 
                 @*Forgot password?*@
                 <div class="forgot-password-container">

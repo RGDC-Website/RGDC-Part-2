@@ -1055,30 +1055,52 @@ namespace RGDC_Web_Application.Controllers
             if (string.IsNullOrWhiteSpace(imagePath))
                 return Json(new { success = false, message = "No image path provided." });
 
-            var sessionVal = Session["SelectedPatientID"];
-            if (sessionVal == null) return Json(new { success = false, message = "No patient selected." });
-
-            if (!int.TryParse(sessionVal.ToString(), out int patientID))
-                return Json(new { success = false, message = "Invalid patient ID." });
-
-            try
+            // Try SelectedPatientID first, otherwise use logged-in user's account to find patient
+            object sessionSelected = Session["SelectedPatientID"];
+            int patientID = 0;
+            using (var db = new RGDCContext())
             {
-                using (var db = new RGDCContext())
+                if (sessionSelected != null && int.TryParse(sessionSelected.ToString(), out int spid))
                 {
-                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
-                    if (patient == null)
-                        return Json(new { success = false, message = "Patient not found." });
+                    patientID = spid;
+                }
+                else
+                {
+                    // Fallback for patient users updating their own record
+                    var sessionUser = Session["UserID"];
+                    if (sessionUser == null)
+                    {
+                        return Json(new { success = false, message = "No patient selected." });
+                    }
+                    if (!int.TryParse(sessionUser.ToString(), out int accId))
+                    {
+                        return Json(new { success = false, message = "Invalid session user." });
+                    }
 
+                    var patientByAcc = db.tbl_patient.FirstOrDefault(p => p.accID == accId);
+                    if (patientByAcc == null)
+                        return Json(new { success = false, message = "Patient record not found for current user." });
+
+                    patientID = patientByAcc.patientID;
+                }
+
+                var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+                if (patient == null)
+                    return Json(new { success = false, message = "Patient not found." });
+
+                try
+                {
                     // store signature link on patient record
                     patient.signatureLink = imagePath;
+                    patient.lastUpdated = DateTime.Now;
                     db.SaveChanges();
 
                     return Json(new { success = true, message = "Signature saved to patient record.", filePath = imagePath });
                 }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Error saving signature to patient: {ex.Message}" });
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = $"Error saving signature to patient: {ex.Message}" });
+                }
             }
         }
 
@@ -1256,12 +1278,29 @@ namespace RGDC_Web_Application.Controllers
 
             using (var db = new RGDCContext())
             {
-                var sessionVal = Session["SelectedPatientID"];
-                if (sessionVal == null)
-                    return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
+                // Resolve patientID: prefer SelectedPatientID (admin view), fallback to logged-in user's patient record
+                object sessionVal = Session["SelectedPatientID"];
+                int pid = 0;
+                if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int spid))
+                {
+                    pid = spid;
+                }
+                else
+                {
+                    // fallback for patient user updating their own record
+                    var sessionUser = Session["UserID"];
+                    if (sessionUser == null)
+                        return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
 
-                if (!int.TryParse(sessionVal.ToString(), out int pid))
-                    return Json(new { success = false, message = "Invalid patient ID" }, JsonRequestBehavior.AllowGet);
+                    if (!int.TryParse(sessionUser.ToString(), out int accId))
+                        return Json(new { success = false, message = "Invalid session user" }, JsonRequestBehavior.AllowGet);
+
+                    var patientByAcc = db.tbl_patient.FirstOrDefault(p => p.accID == accId);
+                    if (patientByAcc == null)
+                        return Json(new { success = false, message = "Patient record not found for current user" }, JsonRequestBehavior.AllowGet);
+
+                    pid = patientByAcc.patientID;
+                }
 
                 var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == pid);
                 if (patient == null)
@@ -1281,12 +1320,28 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
-                var sessionVal = Session["SelectedPatientID"];
-                if (sessionVal == null)
-                    return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
+                // Resolve patientID: prefer SelectedPatientID (admin view), fallback to logged-in user's patient record
+                object sessionVal = Session["SelectedPatientID"];
+                int pid = 0;
+                if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int spid))
+                {
+                    pid = spid;
+                }
+                else
+                {
+                    var sessionUser = Session["UserID"];
+                    if (sessionUser == null)
+                        return Json(new { success = false, message = "Session expired" }, JsonRequestBehavior.AllowGet);
 
-                if (!int.TryParse(sessionVal.ToString(), out int pid))
-                    return Json(new { success = false, message = "Invalid patient ID" }, JsonRequestBehavior.AllowGet);
+                    if (!int.TryParse(sessionUser.ToString(), out int accId))
+                        return Json(new { success = false, message = "Invalid session user" }, JsonRequestBehavior.AllowGet);
+
+                    var patientByAcc = db.tbl_patient.FirstOrDefault(p => p.accID == accId);
+                    if (patientByAcc == null)
+                        return Json(new { success = false, message = "Patient record not found for current user" }, JsonRequestBehavior.AllowGet);
+
+                    pid = patientByAcc.patientID;
+                }
 
                 var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == pid);
                 if (patient == null)
@@ -1302,33 +1357,72 @@ namespace RGDC_Web_Application.Controllers
                 return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
         }
+
+
+        [HttpGet]
         public JsonResult getPatientTreatment()
         {
             using (var db = new RGDCContext())
             {
-                var result = (
-            from t in db.tbl_treatmentplan
-            join p in db.tbl_patient
-                on t.patientID equals p.patientID
-            join pa in db.tbl_account   // patient account
-                on p.accID equals pa.accID
-            join da in db.tbl_account   // dentist account
-                on t.accID equals da.accID
-            select new
-            {
-                trtPlanID = t.trtPlanID,
-                date = t.date,
-                procedures = t.procedures,
-                toothNumber = t.toothNumber,
-                accID = pa.accID,
-                patientName = pa.firstName + " " + pa.lastName,
-                dentist = da.firstName + " " + da.lastName, // ✅ correct source
-                amount = t.amount,
-                paid = t.paid
-            }
-        ).ToList();
+                try
+                {
+                    // Resolve current session user and role
+                    var sessionVal = Session["UserID"];
+                    var userRoleObj = Session["UserAuthorization"];
+                    int? userID = null;
+                    int role = -1;
+                    if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int uid)) userID = uid;
+                    if (userRoleObj != null && int.TryParse(userRoleObj.ToString(), out int r)) role = r;
 
-                return Json(result, JsonRequestBehavior.AllowGet);
+                    // Base query with joins (keep shape)
+                    var baseQuery = from t in db.tbl_treatmentplan
+                                    join p in db.tbl_patient on t.patientID equals p.patientID
+                                    join pa in db.tbl_account on p.accID equals pa.accID
+                                    join da in db.tbl_account on t.accID equals da.accID
+                                    select new
+                                    {
+                                        trtPlanID = t.trtPlanID,
+                                        date = t.date,
+                                        procedures = t.procedures,
+                                        toothNumber = t.toothNumber,
+                                        accID = pa.accID,
+                                        patientName = pa.firstName + " " + pa.lastName,
+                                        dentist = da.firstName + " " + da.middleName + " " + da.lastName,
+                                        amount = t.amount,
+                                        paid = t.paid,
+                                        patientAccID = pa.accID,
+                                        dentistAccID = da.accID,
+                                        patientID = p.patientID
+                                    };
+
+                    // If current user is a patient, restrict to their records only
+                    if (role == 3 && userID.HasValue)
+                    {
+                        baseQuery = baseQuery.Where(x => x.patientAccID == userID.Value);
+                    }
+
+                    // Owner and other roles keep full view; additional role-based filters can be added here
+
+                    var result = baseQuery.ToList()
+                        .Select(x => new
+                        {
+                            trtPlanID = x.trtPlanID,
+                            date = x.date,
+                            procedures = x.procedures,
+                            toothNumber = x.toothNumber,
+                            accID = x.accID,
+                            patientName = x.patientName,
+                            dentist = x.dentist,
+                            amount = x.amount,
+                            paid = x.paid
+                        }).ToList();
+
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+                }
             }
         }
 
@@ -2408,13 +2502,11 @@ namespace RGDC_Web_Application.Controllers
                 if (file == null || file.ContentLength == 0)
                     return Json(new { success = false, message = "No file provided." });
 
-                // Validate image MIME type
                 if (!file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                     return Json(new { success = false, message = "Invalid file type. Image required." });
 
                 string uploadPath = Server.MapPath("~/Content/Uploads/");
-                if (!Directory.Exists(uploadPath))
-                    Directory.CreateDirectory(uploadPath);
+                if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
 
                 string fileName = Guid.NewGuid().ToString("N") + Path.GetExtension(file.FileName);
                 string filePath = Path.Combine(uploadPath, fileName);
@@ -2422,9 +2514,15 @@ namespace RGDC_Web_Application.Controllers
 
                 string relativePath = "/Content/Uploads/" + fileName;
 
+                // optionally the client may include accID in formData
+                int accID = 0;
+                if (!string.IsNullOrEmpty(Request.Form["accID"]))
+                {
+                    int.TryParse(Request.Form["accID"], out accID);
+                }
+
                 using (var db = new RGDCContext())
                 {
-                    // Save to tbl_images
                     var imgData = new tblImagesModel()
                     {
                         imageName = fileName,
@@ -2433,22 +2531,6 @@ namespace RGDC_Web_Application.Controllers
                         updatedAt = DateTime.Now
                     };
                     db.tbl_images.Add(imgData);
-                    db.SaveChanges();
-
-                    // Update account photoLink. Accept optional accID form value or fallback to session UserID
-                    int accID = 0;
-                    if (Request.Form["accID"] != null && int.TryParse(Request.Form["accID"], out accID))
-                    {
-                        // use provided accID
-                    }
-                    else
-                    {
-                        var sessionUser = Session["UserID"];
-                        if (sessionUser != null && int.TryParse(sessionUser.ToString(), out int sAcc))
-                        {
-                            accID = sAcc;
-                        }
-                    }
 
                     if (accID > 0)
                     {
@@ -2457,27 +2539,23 @@ namespace RGDC_Web_Application.Controllers
                         {
                             acc.photoLink = relativePath;
                             acc.accUpdatedAt = DateTime.Now;
-                            db.SaveChanges();
                         }
                     }
+
+                    db.SaveChanges();
 
                     return Json(new
                     {
                         success = true,
                         message = "Photo uploaded successfully.",
                         filePath = relativePath,
-                        imageID = imgData.imageID,
-                        accID = accID
+                        imageID = imgData.imageID
                     });
                 }
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = $"Error uploading photo: {ex.Message}"
-                });
+                return Json(new { success = false, message = $"Error uploading photo: {ex.Message}" });
             }
         }
         public ActionResult getClinicStaff()
@@ -2613,7 +2691,7 @@ namespace RGDC_Web_Application.Controllers
                     accID = dentistmod.accID,
                     specialization = dentistmod.specialization,
                     branchID = dentistmod.branchID,
-                    //signature = ownermod.signature
+                    //signature = dentistmod.signature
                 };
 
                 db.tbl_dentist.Add(newDentist);
@@ -2636,7 +2714,7 @@ namespace RGDC_Web_Application.Controllers
                     accID = staffmod.accID,
                     staffRole = staffmod.staffRole,
                     branchID = staffmod.branchID,
-                    //signature = ownermod.signature
+                    //signature = staffmod.signature
                 };
 
                 db.tbl_staff.Add(newStaff);

@@ -168,6 +168,34 @@
         $scope.emailChecks.noSpace = !/\s/.test(email);
         const atIndex = email.indexOf('@');
         $scope.emailChecks.hasDotAfterAt = atIndex > -1 && email.indexOf('.', atIndex) > atIndex + 1;
+
+        if (!$scope.emailValid) {
+            $scope.emailTaken = false;
+            if (_emailCheckTimeout) {
+                $timeout.cancel(_emailCheckTimeout);
+                _emailCheckTimeout = null;
+            }
+            return;
+        }
+
+        if (_emailCheckTimeout) $timeout.cancel(_emailCheckTimeout);
+        _emailCheckTimeout = $timeout(function () {
+            RGDCWebApplicationService.checkEmail(email)
+                .then(function (resp) {
+                    try {
+                        $scope.emailTaken = !!(resp && resp.data && resp.data.exists);
+                    } catch (e) {
+                        $scope.emailTaken = false;
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Email existence check failed', err);
+                    $scope.emailTaken = false;
+                })
+                .finally(function () {
+                    _emailCheckTimeout = null;
+                });
+        }, 400);
     };
 
     $scope.$watch('signUp_email', function () {
@@ -217,24 +245,51 @@
 
 
     $scope.signUpInitial = function () {
+        if (!$scope.signUp_email || !$scope.hasValidEmail($scope.signUp_email)) {
+            Swal.fire({ icon: "error", title: "Invalid Email", text: "Enter a valid email address" });
+            return;
+        }
 
-        var getEmail = RGDCWebApplicationService.checkEmail($scope.signUp_email);
-        getEmail.then(function (returnedData) {
-            if (!returnedData.data.exists) {
-                var modal = document.getElementById("patientInformationForm");
-                if (modal) {
-                    modal.style.display = "block";
+        RGDCWebApplicationService.checkEmail($scope.signUp_email)
+            .then(function (returnedData) {
+                if (!returnedData || !returnedData.data) {
+                    Swal.fire({ icon: "error", title: "Error", text: "Unable to verify email." });
+                    return;
                 }
+
+                if (!returnedData.data.exists) {
+                    var elem = document.getElementById("modalPatientInformationForm");
+                    if (!elem) {
+                        elem = document.getElementById("patientInformationForm");
+                    }
+                    if (elem) {
+                        try {
+                            if (typeof M !== 'undefined' && M && M.Modal) {
+                                var instance = M.Modal.getInstance(elem);
+                                if (!instance) instance = M.Modal.init(elem, {});
+                                instance.open();
+                            } else {
+                                elem.style.display = "block";
+                            }
+                        } catch (e) {
+                            elem.style.display = "block";
+                        }
+                    } else {
+                        var trigger = document.querySelector('[data-target="modalPatientInformationForm"]');
+                        if (trigger) trigger.click();
+                    }
                 } else {
                     Swal.fire({
                         icon: "error",
                         title: "Email is already in use",
                         text: "Enter another email address",
                     });
-                    return;
-                
-            }
-        });
+                }
+            })
+            .catch(function (err) {
+                console.error('Email check failed', err);
+                Swal.fire({ icon: "error", title: "Error", text: "Failed to verify email." });
+            });
     };
 
     $scope.loadPastAppointments = function () {
@@ -418,11 +473,20 @@
     }
 
     $scope.signUpRemove = function () {
-        var modal = document.getElementById("patientInformationForm");
-        if (modal) {
-            modal.style.display = "none";
+        var elem = document.getElementById("modalPatientInformationForm") || document.getElementById("patientInformationForm");
+        if (!elem) return;
+        try {
+            if (typeof M !== 'undefined' && M && M.Modal) {
+                var instance = M.Modal.getInstance(elem);
+                if (!instance) instance = M.Modal.init(elem, {});
+                instance.close();
+            } else {
+                elem.style.display = "none";
+            }
+        } catch (e) {
+            elem.style.display = "none";
         }
-    }
+    };
 
     $scope.getGender = function () {
         // load gender lookup from server
@@ -578,23 +642,59 @@
                     lastLogin: new Date(),
                     accCreatedAt: new Date(),
                     accUpdatedAt: new Date(),
-                }
+                };
+
+                accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
 
                 if ($scope.signUp_agreement == true) {
+                    // show progress modal
+                    Swal.fire({
+                        title: 'Creating account...',
+                        allowOutsideClick: false,
+                        didOpen: function () {
+                            Swal.showLoading();
+                        }
+                    });
+
                     var signUp = RGDCWebApplicationService.signUp(accountData);
                     signUp.then(function (signUpID) {
+                        var accID = signUpID && signUpID.data && signUpID.data.accID;
+                        if (!accID) {
+                            Swal.close();
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
+                            return;
+                        }
+
                         var patientData = {
                             currentPhysician: $scope.signUp_currentPhysician,
                             referral: $scope.signUp_referral,
                             lastVisit: $scope.signUp_lastVisit,
                             medicalHistory: "",
-                            accID: signUpID.data.accID
+                            accID: accID
+                        };
 
-                        }
                         var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
                         signUpPatient.then(function () {
-                            window.location.href = "/RGDC/logIn";
+                            try { $scope.signUpRemove(); } catch (e) { }
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Account Created',
+                                text: 'Your account has been created successfully.',
+                                confirmButtonText: 'Go to Login'
+                            }).then(function () {
+                                window.location.href = "/RGDC/logIn";
+                            });
+                        }).catch(function (err) {
+                            Swal.close();
+                            console.error('signUpPatient failed', err);
+                            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save patient information. Contact support.' });
                         });
+                    }).catch(function (err) {
+                        Swal.close();
+                        console.error('signUp failed', err);
+                        var message = (err && err.data && err.data.message) || 'Failed to create account. Please try again.';
+                        Swal.fire({ icon: 'error', title: 'Error', text: message });
                     });
                 } else {
                     Swal.fire({
@@ -602,7 +702,6 @@
                         title: "Read and Accept the Following:",
                         text: "Terms and Conditions & Data Privacy Policy",
                     });
-
                 }
             }
             else {
@@ -613,9 +712,11 @@
                 });
             }
         } catch (e) {
-            console.log(e.message)
+            console.log(e.message);
+            Swal.close();
+            Swal.fire({ icon: 'error', title: 'Error', text: 'An unexpected error occurred.' });
         }
-    }
+    };
 
     $scope.login = function () {
 
@@ -923,7 +1024,6 @@
 
     $scope.getSelectedPatientDetails = function () {
         $scope.getSessionVariables().then(function (auth) {
-                    // session auth loaded
             if ($scope.currentUserAuthorization != 3) {
                 var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
@@ -931,7 +1031,20 @@
 
                     var p = patientInfo.data;
 
-                    // format visit dates (existing)
+                    try {
+                        var resolvedPhoto = '';
+                        if (p && p.photoLink) resolvedPhoto = p.photoLink;
+                        else if (p && p.userPhoto) resolvedPhoto = p.userPhoto;
+                        else if (p && p.photo) resolvedPhoto = p.photo;
+                        else if (p && p.accPhoto) resolvedPhoto = p.accPhoto;
+                        else if (p && p.account && p.account.photoLink) resolvedPhoto = p.account.photoLink;
+                        else if (p && p.acc && p.acc.photoLink) resolvedPhoto = p.acc.photoLink;
+                        p.photoLink = (typeof resolvedPhoto === 'string') ? resolvedPhoto.trim() : (resolvedPhoto || '');
+                    } catch (e) {
+                        p.photoLink = p.photoLink || '';
+                    }
+
+                    // format visit dates
                     if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
                     if (p.nextVisit) p.nextVisit = formatDateToMDY(p.nextVisit);
                     if (p.medHistUpdate) p.medHistUpdate = formatDateToMDYTime(p.medHistUpdate);
@@ -953,9 +1066,7 @@
                     if (p.birthDate) {
                         var birthJs = parseJsonDateToJsDate(p.birthDate);
                         if (birthJs) {
-                            // Store raw date for datepicker
                             p.birthDateRaw = birthJs;
-                            // Format for display
                             p.birthDate = birthJs.toLocaleDateString("en-US", {
                                 month: "long",
                                 day: "numeric",
@@ -1021,10 +1132,23 @@
             } else {
                 var getPatientInfo = RGDCWebApplicationService.getOwnPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
-                
+
                     if (!patientInfo || !patientInfo.data) return;
 
                     var p = patientInfo.data;
+
+                    try {
+                        var resolvedPhoto = '';
+                        if (p && p.photoLink) resolvedPhoto = p.photoLink;
+                        else if (p && p.userPhoto) resolvedPhoto = p.userPhoto;
+                        else if (p && p.photo) resolvedPhoto = p.photo;
+                        else if (p && p.accPhoto) resolvedPhoto = p.accPhoto;
+                        else if (p && p.account && p.account.photoLink) resolvedPhoto = p.account.photoLink;
+                        else if (p && p.acc && p.acc.photoLink) resolvedPhoto = p.acc.photoLink;
+                        p.photoLink = (typeof resolvedPhoto === 'string') ? resolvedPhoto.trim() : (resolvedPhoto || '');
+                    } catch (e) {
+                        p.photoLink = p.photoLink || '';
+                    }
 
                     // format visit dates (existing)
                     if (p.lastVisit) p.lastVisit = formatDateToMDY(p.lastVisit);
@@ -1080,7 +1204,7 @@
                             });
                         }
 
-                        
+
                     } else {
                         p.accCreated = "";
                     }
@@ -1092,7 +1216,7 @@
                     } catch (e) {
                         console.warn('loadPatientForms failed', e);
                     }
-                    
+
                     if (!$scope.genderArray || $scope.genderArray.length === 0) {
                         $scope.getGender();
                     }
@@ -3187,8 +3311,10 @@
             birthDate: $scope.dentist_birthDate,
             civilStatus: $scope.dentist_civilStatus,
             address: $scope.dentist_address,
-            role: 1
-        }
+            role: 1,
+            photoLink: $scope.dentistUploadedPhotoPath || null
+        };
+
         var addDentist = RGDCWebApplicationService.addAccount(accountData);
         addDentist.then(function (returnedData) {
             var dentistData = {
@@ -3232,8 +3358,10 @@
             birthDate: $scope.staff_birthDate,
             civilStatus: $scope.staff_civilStatus,
             address: $scope.staff_address,
-            role: 2
-        }
+            role: 2,
+            photoLink: $scope.staffUploadedPhotoPath || null
+        };
+
         var addStaff = RGDCWebApplicationService.addAccount(accountData);
         addStaff.then(function (returnedData) {
             var staffData = {
@@ -3893,99 +4021,125 @@
 
 
     //owner photo uploading for diff user acc types
-    $scope.pickPhoto = function (type) {
-        var id = null;
-        if (type === 'owner' || type === 'ownerAdd') id = 'ownerPhotoInput';
-        else if (type === 'ownerEdit') id = 'ownerPhotoInputEdit';
-        else if (type === 'dentist' || type === 'dentistAdd') id = 'dentistPhotoInput';
-        else if (type === 'dentistEdit') id = 'dentistPhotoInputEdit';
-        else if (type === 'staff' || type === 'staffAdd') id = 'staffPhotoInput';
-        else if (type === 'staffEdit') id = 'staffPhotoInputEdit';
-        if (id) {
-            var el = document.getElementById(id);
-            if (el) el.click();
+    $scope.pickPhoto = function (role) {
+        var idMap = {
+            owner: 'ownerPhotoInput',
+            ownerEdit: 'ownerPhotoInputEdit',
+            dentist: 'dentistPhotoInput',
+            dentistEdit: 'dentistPhotoInputEdit',
+            staff: 'staffPhotoInput',
+            staffEdit: 'staffPhotoInputEdit'
+        };
+        var inputId = idMap[role] || idMap.owner;
+        var input = document.getElementById(inputId);
+        if (!input) {
+            // fallback: create a temporary input if markup missing
+            input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.style.display = 'none';
+            input.onchange = function () { angular.element(this).scope().onPhotoSelected(this.files, role); };
+            document.body.appendChild(input);
+            input.click();
+            // remove later
+            setTimeout(function () { if (input && input.parentNode) input.parentNode.removeChild(input); }, 2000);
+            return;
         }
+        try { input.click(); } catch (e) { console.error('pickPhoto click failed', e); }
     };
 
     $scope.onPhotoSelected = function (files, role) {
-        if (!files || !files.length) return;
-
-        var file = files && files[0];
-        if (!file) return;
-
-        // basic checks (if not already present)
+        if (!files || files.length === 0) return;
+        var file = files[0];
         if (!file.type || !file.type.startsWith('image/')) {
-            Swal.fire({ icon: 'error', title: 'Invalid file', text: 'Please select an image file.' });
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            Swal.fire({ icon: 'error', title: 'File too large', text: 'Max file size is 5 MB.' });
+            Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
             return;
         }
 
         var reader = new FileReader();
-        reader.onload = function (e) {
+        reader.onload = function (evt) {
+            // assign preview & picked file into scope
             $scope.$apply(function () {
-                // Support both add and edit type names
-                if (type === 'owner' || type === 'ownerAdd') {
-                    $scope.ownerPhotoPreview = e.target.result;
-                    $scope.ownerPhotoFile = file;
-                } else if (type === 'ownerEdit') {
-                    $scope.ownerPhotoPreviewEdit = e.target.result;
-                    $scope.ownerPhotoFileEdit = file;
-                } else if (type === 'dentist' || type === 'dentistAdd') {
-                    $scope.dentistPhotoPreview = e.target.result;
-                    $scope.dentistPhotoFile = file;
-                } else if (type === 'dentistEdit') {
-                    $scope.dentistPhotoPreviewEdit = e.target.result;
-                    $scope.dentistPhotoFileEdit = file;
-                } else if (type === 'staff' || type === 'staffAdd') {
-                    $scope.staffPhotoPreview = e.target.result;
-                    $scope.staffPhotoFile = file;
-                } else if (type === 'staffEdit') {
-                    $scope.staffPhotoPreviewEdit = e.target.result;
-                    $scope.staffPhotoFileEdit = file;
-                } else {
-                    // fallback: keep existing behavior
-                    $scope.genericPhotoPreview = e.target.result;
-                    $scope.genericPhotoFile = file;
+                switch (role) {
+                    case 'owner':
+                        $scope.ownerPhotoPreview = evt.target.result;
+                        $scope._pickedOwnerPhotoFile = file;
+                        break;
+                    case 'ownerEdit':
+                        $scope.ownerPhotoPreviewEdit = evt.target.result;
+                        $scope._pickedOwnerPhotoFileEdit = file;
+                        break;
+                    case 'dentist':
+                        $scope.dentistPhotoPreview = evt.target.result;
+                        $scope._pickedDentistPhotoFile = file;
+                        break;
+                    case 'dentistEdit':
+                        $scope.dentistPhotoPreviewEdit = evt.target.result;
+                        $scope._pickedDentistPhotoFileEdit = file;
+                        break;
+                    case 'staff':
+                        $scope.staffPhotoPreview = evt.target.result;
+                        $scope._pickedStaffPhotoFile = file;
+                        break;
+                    case 'staffEdit':
+                        $scope.staffPhotoPreviewEdit = evt.target.result;
+                        $scope._pickedStaffPhotoFileEdit = file;
+                        break;
+                    default:
+                        $scope.ownerPhotoPreview = evt.target.result;
+                        $scope._pickedOwnerPhotoFile = file;
                 }
             });
-        };
-        reader.readAsDataURL(file);
 
-        // upload immediately
-        var uploader = null;
-        if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadUserPhoto === 'function') {
-            uploader = RGDCWebApplicationService.uploadUserPhoto;
-        } else if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadSignature === 'function') {
-            uploader = RGDCWebApplicationService.uploadSignature;
-        } else {
-            Swal.fire({ icon: 'error', title: 'Upload Not Available', text: 'Upload service is not loaded.' });
-            return;
-        }
+            // Optionally upload immediately and store returned path on scope (role + "UploadedPhotoPath")
+            var uploader = null;
+            if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadUserPhoto === 'function') {
+                uploader = RGDCWebApplicationService.uploadUserPhoto;
+            } else if (RGDCWebApplicationService && typeof RGDCWebApplicationService.uploadSignature === 'function') {
+                uploader = RGDCWebApplicationService.uploadSignature;
+            }
 
-        Swal.fire({ title: 'Uploading photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            if (!uploader) {
+                // no uploader available — leave preview and picked file only
+                return;
+            }
 
-        uploader(file)
-            .then(function (resp) {
-                Swal.close();
-                var data = resp && resp.data ? resp.data : resp;
-                if (data && data.success && data.filePath) {
-                    $scope.$applyAsync(function () {
-                        $scope[role + "UploadedPhotoPath"] = data.filePath;
+            Swal.fire({ title: 'Uploading photo...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            // call uploader; some implementations accept (file, accId), some accept (file)
+            var uploadPromise;
+            try {
+                uploadPromise = uploader(file);
+            } catch (e) {
+                // fallback: try calling with a second param as null
+                try { uploadPromise = uploader(file, null); } catch (ex) { uploadPromise = Promise.reject(ex); }
+            }
+
+            uploadPromise
+                .then(function (resp) {
+                    Swal.close();
+                    var data = resp && resp.data ? resp.data : resp;
+                    if (data && data.success && data.filePath) {
+                        // store returned path on scope for later use (add/edit flows read this)
+                        $scope.$applyAsync(function () {
+                            try {
+                                $scope[role + "UploadedPhotoPath"] = data.filePath;
+                            } catch (e) { /* safe guard */ }
+                        });
                         Swal.fire({ icon: 'success', title: 'Uploaded', text: 'Photo uploaded successfully.' });
-                    });
-                } else {
-                    var msg = (data && data.message) ? data.message : 'Unknown error uploading photo.';
-                    Swal.fire({ icon: 'error', title: 'Upload failed', text: msg });
-                }
-            })
-            .catch(function (err) {
-                Swal.close();
-                console.error('uploadUserPhoto error', err);
-                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload photo.' });
-            });
+                    } else {
+                        var msg = (data && data.message) ? data.message : 'Unknown error uploading photo.';
+                        Swal.fire({ icon: 'error', title: 'Upload failed', text: msg });
+                    }
+                })
+                .catch(function (err) {
+                    Swal.close();
+                    console.error('uploadUserPhoto error', err);
+                    Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload photo.' });
+                });
+        };
+
+        reader.readAsDataURL(file);
     };
 
     //for patient adding and photo uploading in patient information adding
@@ -5312,4 +5466,119 @@
             }
         }, 60);
     }
+
+    // Password visibility toggles
+    $scope.showLoginPassword = false;
+    $scope.showSignUpPassword = false;
+    $scope.showSignUpConfPassword = false;
+    $scope.showForgotPassword = false;
+
+    $scope.toggleLoginPassword = function () {
+        $scope.showLoginPassword = !$scope.showLoginPassword;
+    };
+
+    $scope.toggleSignUpPassword = function () {
+        $scope.showSignUpPassword = !$scope.showSignUpPassword;
+    };
+
+    $scope.toggleSignUpConfPassword = function () {
+        $scope.showSignUpConfPassword = !$scope.showSignUpConfPassword;
+    };
+
+    $scope.toggleForgotPassword = function () {
+        $scope.showForgotPassword = !$scope.showForgotPassword;
+    };
+
+    $scope._uploadedSignUpPhotoPath = $scope._uploadedSignUpPhotoPath || null;
+    $scope.signupPhotoPreview = $scope.signupPhotoPreview || null;
+
+    $scope.pickSignUpPhoto = function () {
+        var fileInput = document.getElementById('signUpPhotoInput');
+        if (fileInput) fileInput.click();
+    };
+
+
+    $scope.onSignUpPhotoSelected = function (files) {
+        if (!files || files.length === 0) return;
+        var file = files[0];
+
+        if (!file.type.startsWith('image/')) {
+            Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+            return;
+        }
+        var maxSizeMB = 5;
+        if (file.size > maxSizeMB * 1024 * 1024) {
+            Swal.fire({ icon: 'error', title: 'File Too Large', text: 'Max allowed size is ' + maxSizeMB + ' MB.' });
+            return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                $scope.$apply(function () {
+                    $scope.signupPhotoPreview = e.target.result;
+                });
+            } catch (ex) {
+                $scope.signupPhotoPreview = e.target.result;
+                try { $scope.$digest(); } catch (x) { }
+            }
+        };
+        reader.readAsDataURL(file);
+
+
+        RGDCWebApplicationService.uploadSignature(file)
+            .then(function (resp) {
+                var path = '';
+                if (resp && resp.data) {
+                    path = resp.data.filePath || resp.data.path || resp.data.imagePath || resp.data.url || '';
+                }
+                $scope._uploadedSignUpPhotoPath = path;
+            })
+            .catch(function (err) {
+                console.error('Upload failed', err);
+                Swal.fire({ icon: 'error', title: 'Upload Failed', text: 'Failed to upload photo.' });
+            });
+    };
+
+    //for email duplication checker signup
+    var _emailCheckTimeout = null;
+
+    $scope.getSafePhotoUrl = function () {
+        var placeholder = 'https://placehold.co/400';
+        try {
+            var p = ($scope.selectedPatient && $scope.selectedPatient.photoLink) ? String($scope.selectedPatient.photoLink).trim() : '';
+            if (!p) return placeholder;
+            if (/^https?:\/\//i.test(p)) return p;
+            if (p.charAt(0) === '/') return window.location.origin + p;
+            return window.location.origin + '/' + p;
+        } catch (e) {
+            return placeholder;
+        }
+    };
+
+
+    $scope.onBackFromPatientProfile = function (evt) {
+        if (evt && evt.preventDefault) evt.preventDefault();
+
+        function navigate() {
+            if ($scope.isUserPatient) {
+                window.location.href = '/RGDC/adminDashboard';
+            } else {
+                window.location.href = '/RGDC/adminPatientsTab';
+            }
+        }
+
+        if (typeof $scope.isUserPatient !== 'undefined' && $scope.isUserPatient !== null) {
+            navigate();
+            return;
+        }
+
+        $scope.getSessionVariables()
+            .then(function () {
+                navigate();
+            })
+            .catch(function () {
+                window.location.href = '/RGDC';
+            });
+    };
 });

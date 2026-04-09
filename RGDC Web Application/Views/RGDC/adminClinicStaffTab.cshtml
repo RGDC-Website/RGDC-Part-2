@@ -353,10 +353,10 @@
                         <div class="col s12">
                             <div class="photo-box" ng-click="pickPhoto('dentist')" style="cursor:pointer;">
                                 <img ng-if="dentistPhotoPreview" ng-src="{{dentistPhotoPreview}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
-                                <i class="material-icons photo-placeholder-icon" ng-if="!ownerPhotoPreview">image</i>
+                                <i class="material-icons photo-placeholder-icon" ng-if="!dentistPhotoPreview">image</i>
                             </div>
-                            <input id="ownerPhotoInput" type="file" accept="image/*" style="display:none"
-                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'owner')" />
+                            <input id="dentistPhotoInput" type="file" accept="image/*" style="display:none"
+                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'dentist')" />
                         </div>
                     </div>
                 </div>
@@ -561,10 +561,10 @@
                         <div class="col s12">
                             <div class="photo-box" ng-click="pickPhoto('staff')" style="cursor:pointer;">
                                 <img ng-if="staffPhotoPreview" ng-src="{{staffPhotoPreview}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
-                                <i class="material-icons photo-placeholder-icon" ng-if="!ownerPhotoPreview">image</i>
+                                <i class="material-icons photo-placeholder-icon" ng-if="!staffPhotoPreview">image</i>
                             </div>
-                            <input id="ownerPhotoInput" type="file" accept="image/*" style="display:none"
-                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'owner')" />
+                            <input id="staffPhotoInput" type="file" accept="image/*" style="display:none"
+                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'staff')" />
                         </div>
                     </div>
                 </div>
@@ -760,9 +760,8 @@
 @*EDIT Owner Information Form*@
 <div id="ownerInformationFormEdit" class="modal patientInformationForm-modal">
 
-    <input id="ownerPhotoInputEdit" type="file" accept="image/*" style="display:none"
-           onchange="angular.element(this).scope().onPhotoSelected(this.files, 'ownerEdit')" />
-
+    <input id="ownerPhotoInput" type="file" accept="image/*" style="display:none"
+           onchange="angular.element(this).scope().onPhotoSelected(this.files, 'owner')" />
     <div>
         <h5 class="modal-form-title">Edit Owner Profile</h5>
 
