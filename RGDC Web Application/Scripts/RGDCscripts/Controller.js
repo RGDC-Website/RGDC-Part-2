@@ -1123,6 +1123,10 @@
 
                     $scope.selectedPatient = p;
 
+                    $scope.editPatientEmailValid = $scope.hasValidEmail(($scope.selectedPatient && $scope.selectedPatient.email) ? $scope.selectedPatient.email.trim() : '');
+                    $scope.editPatientEmailTaken = false;
+                    try { $scope.checkEditPatientEmail(); } catch (e) { /* safe */ }
+
                     try {
                         $scope.loadPatientForms();
                     } catch (e) {
@@ -1232,6 +1236,10 @@
                     }
 
                     $scope.selectedPatient = p;
+
+                    $scope.editPatientEmailValid = $scope.hasValidEmail(($scope.selectedPatient && $scope.selectedPatient.email) ? $scope.selectedPatient.email.trim() : '');
+                    $scope.editPatientEmailTaken = false;
+                    try { $scope.checkEditPatientEmail(); } catch (e) { /* safe */ }
 
                     try {
                         $scope.loadPatientForms();
