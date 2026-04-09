@@ -54,7 +54,13 @@
                         @*table content*@
                         <tbody>
                             <tr ng-if="(!adminAppointments || adminAppointments.length === 0)">
-                                <td colspan="7" class="center-align">No scheduled appointments found.</td>
+                                <td class="center-align">No scheduled appointments found.</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
                             </tr>
                             <tr ng-repeat="appt in adminAppointments track by appt.apptID" data-href="#" title="View patient record" class="clkPointer">
                                 <td>{{appt.date}}</td>
@@ -101,56 +107,62 @@
             <div id="req" class="containerOverflow-2 row m-0">
                 <p class="bold brown-text lighten-1" style="margin-bottom: -3vh; font-size:1.5rem;">Requested Appointments</p>
                 @*admin requested appointments table*@
-                <div class="row responsive-data-table-div">
-                    <table id="adminRequestedAppointment" class="hover tblClk">
-                        @*table headers*@
-                        <thead>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Purpose</th>
-                                <th>Dentist</th>
-                                <th>Patient</th>
-                                <th colspan="2">Status</th>
-                            </tr>
-                        </thead>
-                        @*table content*@
-                        <tbody>
-                            <tr ng-if="(!requestedAppointments || requestedAppointments.length === 0)">
-                                <td colspan="7" class="center-align">No requested appointments found.</td>
-                            </tr>
-                            <tr ng-repeat="appt in requestedAppointments track by appt.apptID">
-                                <td>{{appt.date}}</td>
-                                <td>{{appt.time}}</td>
-                                <td>{{appt.purpose}}</td>
-                                <td>{{appt.dentistName}}</td>
-                                <td>{{appt.patientName}}</td>
-                                <td>{{appt.displayStatus || appt.status}}</td>
-                                <td style="text-align:center; vertical-align:middle;">
-                                    <div style="display:flex; flex-direction:column; align-items:center;">
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px">
-                                            <i class="material-icons tiny">check</i>
-                                        </a>
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny">
-                                            <i class="material-icons tiny">close</i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        @*table footer*@
-                        <tfoot>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Purpose</th>
-                                <th>Dentist</th>
-                                <th>Patient</th>
-                                <th colspan="2">Status</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+            <div class="row responsive-data-table-div">
+                <table id="adminRequestedAppointment" class="hover tblClk">
+                    @*table headers*@
+                    <thead>
+                        <tr class="brown-text lighten-1">
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Purpose</th>
+                            <th>Dentist</th>
+                            <th>Patient</th>
+                            <th colspan="2">Status</th>
+                        </tr>
+                    </thead>
+                    @*table content*@
+                    <tbody>
+                        <tr ng-if="(!requestedAppointments || requestedAppointments.length === 0)">
+                            <td class="center-align">No requested appointments found.</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr ng-repeat="appt in requestedAppointments track by appt.apptID">
+                            <td>{{appt.date}}</td>
+                            <td>{{appt.time}}</td>
+                            <td>{{appt.purpose}}</td>
+                            <td>{{appt.dentistName}}</td>
+                            <td>{{appt.patientName}}</td>
+                            <td>{{appt.displayStatus || appt.status}}</td>
+                            <td style="text-align:center; vertical-align:middle;">
+                                <div style="display:flex; flex-direction:column; align-items:center;">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px">
+                                        <i class="material-icons tiny">check</i>
+                                    </a>
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny">
+                                        <i class="material-icons tiny">close</i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    @*table footer*@
+                    <tfoot>
+                        <tr class="brown-text lighten-1">
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Purpose</th>
+                            <th>Dentist</th>
+                            <th>Patient</th>
+                            <th colspan="2">Status</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
             </div>
 
 
