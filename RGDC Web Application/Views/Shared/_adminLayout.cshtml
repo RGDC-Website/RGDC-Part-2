@@ -24,11 +24,11 @@
 <body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
         @*sidebar nav*@
-        <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text sidebar-fixed" style="min-height: 100vh; position: fixed;">
+        <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-            <div class="row center sidebar-profile" style="margin-top: 5rem;">
+            <div class="row center sidebar-profile" style="margin-top: 2rem;">
                 <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfile" />
             </div>
 
@@ -40,13 +40,16 @@
 
             @*Calendaryo CODESSS*@
             <div class="row center" style="margin-top: 0.5rem;">
-                <div class="google-sync" style="display:inline-block; margin-left:0;">
+                <div class="google-sync" style="display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-left:0;">
                     <label style="vertical-align: middle;">
                         <input type="checkbox" ng-model="googleCalendarEnabled" ng-change="toggleGoogleCalendar(googleCalendarEnabled)" />
-                        <span style="vertical-align: middle; margin-left:0.5rem;">Save appointments to Google Calendar</span>
+                        <span style="vertical-align: middle; margin-left:0.5rem; font-size:.95rem; color:lightgray">Save appointments to Google Calendar</span>
                     </label>
-                    <button class="btn small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
                 </div>
+            </div>
+
+            <div class="row center">
+                <button class="btn-small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
             </div>
 
             @*nav tabs*@
@@ -73,7 +76,7 @@
 
 
             @*date and time at the bottom of the screen*@
-            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+            <div class="row center" style="margin-top: 4rem; padding-bottom: 2rem;">
                 <span id="currentDate">Loading date...</span>
                 <span id="currentTime">Loading time...</span>
             </div>
@@ -382,7 +385,7 @@
         </div>
     </div>
 
-    @*Forgot Password*@
+    @*NEW Password*@
     <div id="modalOTP" class="modal password-modal">
         <div class="modal-content" style="width:80vh !important">
             <h5 class="modal-form-title">Verify Your Identity</h5>
@@ -390,8 +393,17 @@
             <div class="input-field">
                 <p class="custom-label">Gmail <span class="required-mark">*</span></p>
                 <input type="email"
+                       class="custom-input"
                        ng-model="forgot_email"
                        placeholder="juandelacruz@gmail.com"
+                       required>
+            </div>
+
+            <div class="input-field">
+                <p class="custom-label">OTP Code <span class="required-mark">*</span></p>
+                <input type="email"
+                       class="custom-input"
+                       placeholder="Insert OTP code sent to your email to verify"
                        required>
             </div>
 
@@ -410,6 +422,7 @@
                 <div class="input-field">
                     <p class="custom-label">New Password <span class="required-mark">*</span></p>
                     <input type="password"
+                           class="custom-input"
                            ng-model="forgot_newPassword"
                            placeholder="New password">
                 </div>
@@ -417,6 +430,7 @@
                 <div class="input-field">
                     <p class="custom-label">Confirm Password <span class="required-mark">*</span></p>
                     <input type="password"
+                           class="custom-input"
                            ng-model="forgot_confirmPassword"
                            placeholder="Confirm password">
                 </div>
