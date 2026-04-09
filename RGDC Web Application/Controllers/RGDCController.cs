@@ -1353,104 +1353,239 @@ namespace RGDC_Web_Application.Controllers
         {
             using (var db = new RGDCContext())
             {
-                // Auto-move past scheduled appointments to Done if their datetime has passed
                 try
                 {
-                    var now = DateTime.Now;
-                    var toMarkDone = db.tbl_appointment.Where(a => a.status == "Scheduled" && a.dateTime < now).ToList();
-                    if (toMarkDone.Any())
+                    // Auto-move past scheduled appointments to Done if their datetime has passed
+                    try
                     {
-                        foreach (var a in toMarkDone)
+                        var now = DateTime.Now;
+                        var toMarkDone = db.tbl_appointment.Where(a => a.status == "Scheduled" && a.dateTime < now).ToList();
+                        if (toMarkDone.Any())
                         {
-                            a.status = "Done";
+                            foreach (var a in toMarkDone) a.status = "Done";
+                            db.SaveChanges();
                         }
-                        db.SaveChanges();
                     }
-                }
-                catch
-                {
-                    // ignore any errors here to avoid breaking the listing
-                }
-                var result = (
-                    from appt in db.tbl_appointment
-                        // patient join: appointment.patientID -> tbl_patient.patientID -> tbl_account (patient acc)
-                    join pat in db.tbl_patient on appt.patientID equals pat.patientID into patj
-                    from pat in patj.DefaultIfEmpty()
-                    join patAcc in db.tbl_account on pat.accID equals patAcc.accID into patAccj
-                    from patAcc in patAccj.DefaultIfEmpty()
-
-                        // dentist join: appointment.dentistID -> tbl_dentist.dentistID -> tbl_account (dentist acc)
-                    join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID into dentj
-                    from dent in dentj.DefaultIfEmpty()
-                    join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
-                    from dentAcc in dentAccj.DefaultIfEmpty()
-
-                    where appt.status == "Scheduled"
-                    orderby appt.dateTime
-                    select new
+                    catch
                     {
-                        apptID = appt.apptID,
-                        dentistID = appt.dentistID,
-                        patientID = appt.patientID,
-                        dateTime = appt.dateTime,
-                        date = appt.dateTime, 
-                        time = appt.dateTime, 
-                        purpose = appt.reason,
-                        dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
-                        patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
-                        status = appt.status,
-                        displayStatus = appt.status == "Scheduled" ? "Scheduled" :
-                                        (appt.status == "Done" ? "Completed/Done" :
-                                        (appt.status == "Requested" ? ((patAcc != null && appt.createdBy == patAcc.accID) ? "Requested by Patient" : ((dentAcc != null && appt.createdBy == dentAcc.accID) ? "Requested by Dentist" : "Requested")) : appt.status)),
-                        remarks = appt.remarks,
-                        procedureID = appt.procedureID
+                        // ignore any errors here to avoid breaking the listing
+                    }
+
+                    // Resolve session user and role
+                    var sessionVal = Session["UserID"];
+                    var userRoleObj = Session["UserAuthorization"];
+                    if (sessionVal == null || userRoleObj == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                    if (!int.TryParse(sessionVal.ToString(), out int userID)) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                    if (!int.TryParse(userRoleObj.ToString(), out int role)) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                    // Build base query with joins and include patient/dentist account IDs to compute displayStatus safely
+                    var baseQuery = from appt in db.tbl_appointment
+                                    join pat in db.tbl_patient on appt.patientID equals pat.patientID into patj
+                                    from pat in patj.DefaultIfEmpty()
+                                    join patAcc in db.tbl_account on pat.accID equals patAcc.accID into patAccj
+                                    from patAcc in patAccj.DefaultIfEmpty()
+                                    join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID into dentj
+                                    from dent in dentj.DefaultIfEmpty()
+                                    join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID into dentAccj
+                                    from dentAcc in dentAccj.DefaultIfEmpty()
+                                    where appt.status == "Scheduled"
+                                    select new
+                                    {
+                                        apptID = appt.apptID,
+                                        dentistID = appt.dentistID,
+                                        patientID = appt.patientID,
+                                        dateTime = appt.dateTime,
+                                        purpose = appt.reason,
+                                        dentistAccFirst = dentAcc != null ? dentAcc.firstName : null,
+                                        dentistAccLast = dentAcc != null ? dentAcc.lastName : null,
+                                        dentistAccID = dentAcc != null ? (int?)dentAcc.accID : null,
+                                        patientAccFirst = patAcc != null ? patAcc.firstName : null,
+                                        patientAccLast = patAcc != null ? patAcc.lastName : null,
+                                        patientAccID = patAcc != null ? (int?)patAcc.accID : null,
+                                        dentBranchID = dent != null ? (int?)dent.branchID : null,
+                                        status = appt.status,
+                                        remarks = appt.remarks,
+                                        procedureID = appt.procedureID,
+                                        createdBy = appt.createdBy
+                                    };
+
+                    IEnumerable<dynamic> filtered;
+
+                    if (role == 0)
+                    {
+                        // Owner: return all
+                        filtered = baseQuery.OrderBy(x => x.dateTime).ToList();
+                    }
+                    else if (role == 1)
+                    {
+                        // Dentist: return only appointments for this dentist (match dentist.accID == userID)
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.accID == userID);
+                        if (dentist == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                        filtered = baseQuery.Where(x => x.dentistID == dentist.dentistID).OrderBy(x => x.dateTime).ToList();
+                    }
+                    else if (role == 2)
+                    {
+                        // Staff: return appointments for dentists in the same branch as this staff
+                        var staff = db.tbl_staff.FirstOrDefault(s => s.accID == userID);
+                        if (staff == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                        filtered = baseQuery.Where(x => x.dentBranchID.HasValue && x.dentBranchID.Value == staff.branchID)
+                                            .OrderBy(x => x.dateTime).ToList();
+                    }
+                    else if (role == 3)
+                    {
+                        // Patient: return only appointments for this patient
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.accID == userID);
+                        if (patient == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                        filtered = baseQuery.Where(x => x.patientID == patient.patientID).OrderBy(x => x.dateTime).ToList();
+                    }
+                    else
+                    {
+                        // Unknown role: return empty
+                        return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                    }
+
+                    // Project to expected shape, compute displayStatus safely using the pre-fetched account IDs
+                    var result = filtered.Select(a => new
+                    {
+                        apptID = a.apptID,
+                        dentistID = a.dentistID,
+                        patientID = a.patientID,
+                        dateTime = a.dateTime,
+                        date = a.dateTime,
+                        time = a.dateTime,
+                        purpose = a.purpose,
+                        dentistName = (a.dentistAccFirst != null && a.dentistAccLast != null) ? (a.dentistAccFirst + " " + a.dentistAccLast) : null,
+                        patientName = (a.patientAccFirst != null && a.patientAccLast != null) ? (a.patientAccFirst + " " + a.patientAccLast) : null,
+                        status = a.status,
+                        displayStatus = a.status == "Scheduled" ? "Scheduled"
+                                        : (a.status == "Done" ? "Completed/Done"
+                                        : (a.status == "Requested"
+                                            ? ((a.patientAccID.HasValue && a.createdBy == a.patientAccID.Value) ? "Requested by Patient"
+                                                                                                         : ((a.dentistAccID.HasValue && a.createdBy == a.dentistAccID.Value) ? "Requested by Dentist" : "Requested"))
+                                            : a.status)),
+                        remarks = a.remarks,
+                        procedureID = a.procedureID
                     }).ToList();
 
-                return Json(result, JsonRequestBehavior.AllowGet);
+                    return Json(result, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+                }
             }
         }
         public JsonResult getPayments()
         {
-            using (var db = new RGDCContext())
+            try
             {
-                var result = (
-                    from pay in db.tbl_payment
-                    join p in db.tbl_patient on pay.patientID equals p.patientID
-                    join pa in db.tbl_account on p.accID equals pa.accID
-                    join d in db.tbl_dentist on pay.dentistID equals d.dentistID
-                    join da in db.tbl_account on d.accID equals da.accID  // dentist account
-                    select new
+                var sessionVal = Session["UserID"];
+                var userRole = Session["UserAuthorization"];
+
+                if (sessionVal == null || userRole == null)
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(sessionVal.ToString(), out int userID))
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                if (!int.TryParse(userRole.ToString(), out int role))
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                using (var db = new RGDCContext())
+                {
+                    // Build base query (entities kept so we can apply role filters)
+                    var baseQuery = from pay in db.tbl_payment
+                                    join p in db.tbl_patient on pay.patientID equals p.patientID
+                                    join pa in db.tbl_account on p.accID equals pa.accID
+                                    join d in db.tbl_dentist on pay.dentistID equals d.dentistID
+                                    join da in db.tbl_account on d.accID equals da.accID
+                                    select new
+                                    {
+                                        // Patient info
+                                        patientID = p.patientID,
+                                        accID = p.accID,
+                                        patientName = pa.firstName + " " + pa.lastName,
+                                        birthDate = pa.birthDate,
+                                        photoLink = pa.photoLink,
+                                        guardian = p.guardian,
+                                        guardianNumber = p.guardianNumber,
+                                        nextVisit = p.nextVisit,
+                                        lastVisit = p.lastVisit,
+
+                                        // Dentist info
+                                        dentistID = d.dentistID,
+                                        dentistAccID = da.accID,
+                                        dentistName = da.firstName + " " + da.middleName + " " + da.lastName,
+                                        dentistSpecialization = d.specialization,
+                                        branchID = d.branchID,
+
+                                        // Payment info
+                                        paymentID = pay.paymentID,
+                                        description = pay.description,
+                                        paymentMethod = pay.paymentMethod,
+                                        paymentDate = pay.paymentDate,
+                                        cost = pay.cost,
+                                        discount = pay.discount,
+                                        amountPaid = pay.amountPaid,
+                                        amountDue = pay.amountDue
+                                    };
+
+                    // Apply role-based filtering:
+                    // - Owner (role == 0) : see all
+                    // - Dentist (role == 1) : see only payments assigned to them
+                    // - Staff (role == 2) : see payments for dentists in their branch
+                    // - Patient (role == 3) : see only their own payments
+                    IEnumerable<object> resultList;
+
+                    if (role == 0)
                     {
-                        // Patient info
-                        patientID = p.patientID,
-                        accID = p.accID,
-                        patientName = pa.firstName + " " + pa.lastName,
-                        birthDate = pa.birthDate,
-                        photoLink = pa.photoLink,
-                        guardian = p.guardian,
-                        guardianNumber = p.guardianNumber,
-                        nextVisit = p.nextVisit,
-                        lastVisit = p.lastVisit,
-
-                        // Dentist info
-                        dentistID = d.dentistID,
-                        dentistName = da.firstName + " " + da.middleName + " " + da.lastName,
-                        dentistSpecialization = d.specialization,
-                        branchID = d.branchID,
-
-                        // Payment info
-                        paymentID = pay.paymentID,
-                        description = pay.description,
-                        paymentMethod = pay.paymentMethod,
-                        paymentDate = pay.paymentDate,
-                        cost = pay.cost,
-                        discount = pay.discount,
-                        amountPaid = pay.amountPaid,
-                        amountDue = pay.amountDue
+                        resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
                     }
-                ).ToList();
+                    else if (role == 1)
+                    {
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.accID == userID);
+                        if (dentist == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
 
-                return Json(result, JsonRequestBehavior.AllowGet);
+                        resultList = baseQuery
+                            .Where(x => x.dentistID == dentist.dentistID)
+                            .OrderBy(x => x.paymentDate)
+                            .ToList();
+                    }
+                    else if (role == 2)
+                    {
+                        var staff = db.tbl_staff.FirstOrDefault(s => s.accID == userID);
+                        if (staff == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                        resultList = baseQuery
+                            .Where(x => x.branchID == staff.branchID)
+                            .OrderBy(x => x.paymentDate)
+                            .ToList();
+                    }
+                    else if (role == 3)
+                    {
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.accID == userID);
+                        if (patient == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                        resultList = baseQuery
+                            .Where(x => x.patientID == patient.patientID)
+                            .OrderBy(x => x.paymentDate)
+                            .ToList();
+                    }
+                    else
+                    {
+                        return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+                    }
+
+                    return Json(resultList, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -1668,7 +1803,8 @@ namespace RGDC_Web_Application.Controllers
 
                 using (var db = new RGDCContext())
                 {
-                    if (role == 2)
+                    // Dentist role is '1' in this application (owner/admin/staff/patient mapping follows acc.role)
+                    if (role == 1)
                     {
                         // Dentist - get appointments where:
                         // - dentistID matches current dentist (recipient)
@@ -1694,9 +1830,9 @@ namespace RGDC_Web_Application.Controllers
                                     purpose = appt.reason,
                                     patientName = patAcc.firstName + " " + patAcc.lastName,
                                     dentistName = "",
-                                    status = appt.status, // No change
-                                    createdBy = appt.createdBy, // No change
-                                    displayStatus = appt.status == "Requested" ? (appt.createdBy == patAcc.accID ? "Requested by Patient" : "Requested by Dentist") : appt.status // No change
+                                    status = appt.status,
+                                    createdBy = appt.createdBy,
+                                    displayStatus = appt.status == "Requested" ? (appt.createdBy == patAcc.accID ? "Requested by Patient" : "Requested by Dentist") : appt.status
                                 }
                             ).ToList();
 
@@ -1891,6 +2027,69 @@ namespace RGDC_Web_Application.Controllers
             return Redirect(authUrl);
         }
 
+        private async Task SyncExistingAppointmentsForAccountAsync(int accId, int role, string refreshToken)
+        {
+            try
+            {
+                using (var db2 = new RGDCContext())
+                {
+                    var apptIds = new List<int>();
+
+                    // If account is a dentist, sync scheduled appts for that dentist
+                    if (role == 1)
+                    {
+                        var dentist = db2.tbl_dentist.FirstOrDefault(d => d.accID == accId);
+                        if (dentist != null)
+                        {
+                            apptIds.AddRange(db2.tbl_appointment
+                                .Where(a => a.dentistID == dentist.dentistID
+                                            && a.status == "Scheduled"
+                                            && (a.remarks == null || !a.remarks.Contains("googleEventId:")))
+                                .Select(a => a.apptID)
+                                .ToList());
+                        }
+                    }
+
+                    // If account is a patient, sync scheduled appts for that patient
+                    if (role == 3)
+                    {
+                        var patient = db2.tbl_patient.FirstOrDefault(p => p.accID == accId);
+                        if (patient != null)
+                        {
+                            apptIds.AddRange(db2.tbl_appointment
+                                .Where(a => a.patientID == patient.patientID
+                                            && a.status == "Scheduled"
+                                            && (a.remarks == null || !a.remarks.Contains("googleEventId:")))
+                                .Select(a => a.apptID)
+                                .ToList());
+                        }
+                    }
+
+                    apptIds = apptIds.Distinct().ToList();
+
+                    foreach (var apptId in apptIds)
+                    {
+                        try
+                        {
+                            // Reuse existing helper to create and persist Google event id
+                            await CreateGoogleEventForAccountAsync(null, apptId, accId, refreshToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            // log in production - swallow here to continue with other appointments
+                            System.Diagnostics.Trace.WriteLine($"SyncExistingAppointmentsForAccountAsync: failed apptId={apptId} error={ex.Message}");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // log failure of background sync
+                System.Diagnostics.Trace.WriteLine("SyncExistingAppointmentsForAccountAsync failed: " + ex.ToString());
+            }
+        }
+
+
         [HttpGet]
         public async Task<ActionResult> GoogleAuthCallback(string code, string state)
         {
@@ -1908,7 +2107,6 @@ namespace RGDC_Web_Application.Controllers
             TokenResponse token;
             try
             {
-                // Assign the result to the 'token' variable declared above
                 token = await flow.ExchangeCodeForTokenAsync("user", code, redirect, CancellationToken.None);
             }
             catch (System.Exception ex)
@@ -1929,11 +2127,80 @@ namespace RGDC_Web_Application.Controllers
                             acc.googleRefreshToken = token.RefreshToken;
                         acc.googleCalendarEnabled = true;
                         db.SaveChanges();
+
+                        // Background sync: create events for existing scheduled appointments that were created before connect
+                        // We only create events where remarks does NOT already contain a googleEventId marker.
+                        var refresh = acc.googleRefreshToken;
+                        var savedAccId = acc.accID;
+                        var savedRole = acc.role;
+
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                using (var db2 = new RGDCContext())
+                                {
+                                    var apptIds = new List<int>();
+
+                                    // If account is a dentist, sync scheduled appts for that dentist
+                                    if (savedRole == 1)
+                                    {
+                                        var dentist = db2.tbl_dentist.FirstOrDefault(d => d.accID == savedAccId);
+                                        if (dentist != null)
+                                        {
+                                            apptIds.AddRange(db2.tbl_appointment
+                                                .Where(a => a.dentistID == dentist.dentistID
+                                                            && a.status == "Scheduled"
+                                                            && (a.remarks == null || !a.remarks.Contains("googleEventId:")))
+                                                .Select(a => a.apptID)
+                                                .ToList());
+                                        }
+                                    }
+
+                                    // If account is a patient, sync scheduled appts for that patient
+                                    if (savedRole == 3)
+                                    {
+                                        var patient = db2.tbl_patient.FirstOrDefault(p => p.accID == savedAccId);
+                                        if (patient != null)
+                                        {
+                                            apptIds.AddRange(db2.tbl_appointment
+                                                .Where(a => a.patientID == patient.patientID
+                                                            && a.status == "Scheduled"
+                                                            && (a.remarks == null || !a.remarks.Contains("googleEventId:")))
+                                                .Select(a => a.apptID)
+                                                .ToList());
+                                        }
+                                    }
+
+                                    // Optionally: owner/admin could be handled here if desired.
+                                    apptIds = apptIds.Distinct().ToList();
+
+                                    foreach (var apptId in apptIds)
+                                    {
+                                        try
+                                        {
+                                            // Uses the existing helper that refreshes token and inserts event, it persists event id in remarks
+                                            await CreateGoogleEventForAccountAsync(null, apptId, savedAccId, refresh);
+                                        }
+                                        catch
+                                        {
+                                            // swallow per-appointment errors; consider logging in production
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                // swallow background sync errors; consider logging
+                            }
+                        });
                     }
                 }
             }
+
             return Content("<script>try{window.opener.postMessage({ type: 'google-auth-success' }, '*');}catch(e){} window.close();</script>", "text/html");
         }
+
 
         [HttpPost]
         public async Task<JsonResult> CreateGoogleEvent(int apptID)
