@@ -37,9 +37,15 @@
                     <span class="helper-text" style="color: #d32f2f;" ng-show="!emailValid && signUp_email">
                         Enter a valid email address (e.g. "juandlc@gmail.com")
                     </span>
-                    <span class="helper-text" style="color: #388e3c;" ng-show="emailValid">
+
+                    <span class="helper-text" style="color: #d32f2f;" ng-show="emailTaken && signUp_email">
+                        Email is already taken
+                    </span>
+
+                    <span class="helper-text" style="color: #388e3c;" ng-show="emailValid && !emailTaken">
                         Email is valid
                     </span>
+
                     <div style="text-align:left; margin-top:6px;" ng-show="(active=='email') && signUp_email">
                         <small>Email format checks:</small>
                         <ul style="list-style:none; padding-left:0; margin:4px 0 0 0; font-size:0.85rem; text-align:left;">
@@ -51,53 +57,61 @@
                 </div>
 
                 @* Password Field *@
-                <div class="input-field">
-                    <input id="password"
-                           ng-focus="active='password'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_password"
-                           type="password"
-                           placeholder="Password*"
-                           maxlength="50"
-                           ng-change="checkPasswordStrength()"
-                           ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
-                           required>
+            <div class="input-field password-field">
+                <input id="password"
+                       ng-focus="active='password'"
+                       ng-blur="active = ''"
+                       ng-model="signUp_password"
+                       ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
+                       placeholder="Password*"
+                       maxlength="50"
+                       ng-change="checkPasswordStrength()"
+                       ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
+                       required>
 
-                    <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
-                        Strength: <strong>{{ passwordStrength }}</strong>
-                    </span>
+                <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
+                    {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
+                </i>
 
-                    <div class="password-requirements" ng-show="(active=='password') && signUp_password">
-                        <small>Password must include:</small>
-                        <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
-                            <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
-                        </ul>
-                    </div>
+                <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
+                    Strength: <strong>{{ passwordStrength }}</strong>
+                </span>
+
+                <div class="password-requirements" ng-show="(active=='password') && signUp_password">
+                    <small>Password must include:</small>
+                    <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
+                        <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
+                    </ul>
                 </div>
+            </div>
 
                 @* Confirm Password Field *@
-                <div class="input-field">
-                    <input id="confPassword"
-                           ng-focus="active='confPassword'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_confPassword"
-                           type="password"
-                           placeholder="Confirm password*"
-                           maxlength="50"
-                           ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
-                           required>
+            <div class="input-field password-field">
+                <input id="confPassword"
+                       ng-focus="active='confPassword'"
+                       ng-blur="active = ''"
+                       ng-model="signUp_confPassword"
+                       ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
+                       placeholder="Confirm password*"
+                       maxlength="50"
+                       ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
+                       required>
 
-                    <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
-                        Passwords do not match
-                    </span>
-                    <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
-                        Passwords matched
-                    </span>
-                </div>
+                <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                    {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
+                </i>
+
+                <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
+                    Passwords do not match
+                </span>
+                <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
+                    Passwords matched
+                </span>
+            </div>
 
                 @*Already have an account*@
                 <div class="forgot-password-container">
@@ -105,8 +119,7 @@
                 </div>
 
                 @*Sign up BTN*@
-                <button class="logSignBtn modal-trigger"
-                        data-target="modalPatientInformationForm"
+                <button class="logSignBtn"
                         type="button"
                         ng-click="signUpInitial()"
                         ng-disabled="!isFormValid()">
@@ -143,6 +156,11 @@
                                 <img ng-if="signupPhotoPreview || _uploadedSignUpPhotoPath" ng-src="{{ signupPhotoPreview || _uploadedSignUpPhotoPath }}" alt="Profile" />
                                 <i class="material-icons photo-placeholder-icon" ng-if="!signupPhotoPreview && !_uploadedSignUpPhotoPath">image</i>
                             </div>
+                            <input type="file"
+                                   id="signUpPhotoInput"
+                                   accept="image/*"
+                                   style="display:none"
+                                   onchange="angular.element(this).scope().onSignUpPhotoSelected(this.files)" />
                         </div>
                     </div>
                 </div>
@@ -227,7 +245,7 @@
                            type="text"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
-                           maxlength="13"
+                           maxlength="11"
                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                            ng-class="{ 'input-valid': isContactFieldValid(), 'input-invalid': signUp_contactNumber && !isContactFieldValid() }"
                            required>
