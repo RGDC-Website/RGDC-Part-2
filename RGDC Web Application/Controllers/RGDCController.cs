@@ -539,6 +539,10 @@ namespace RGDC_Web_Application.Controllers
         {
             try
             {
+                if (Session["IsLoggedIn"] == null || !(bool)Session["IsLoggedIn"])
+                {
+                    RedirectToAction("login", "RGDC");
+                }
                 if (Session["UserName"] == null || Session["UserFullName"] == null || Session["UserAuthorization"] == null)
                 {
                     return Json(new { success = false, message = "User session expired." }, JsonRequestBehavior.AllowGet);
@@ -2944,6 +2948,42 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        public JsonResult getStaffData()
+        {
+            var accID = Session["userID"] != null ? Convert.ToInt32(Session["userID"]) : 0;
+            using (var db = new RGDCContext())
+            {
+                var result = (
+                   from a in db.tbl_account
+                   join s in db.tbl_staff on a.accID equals s.accID
+                   where a.accID == accID
+                   select new
+                    {
+                        // staff    
+                        staffID = s.staffID,
+                        accID = s.accID,
+                        staffRole = s.staffRole,
+                        branchID = s.branchID,
+                        signature = s.signature,
+
+                        // ACCOUNT (matches your ng-model)
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
+                        genderID = a.genderID,
+                        birthDate = a.birthDate,
+                        email = a.email,
+                        contactNumber = a.contactNumber,
+                        address = a.address,
+                        civilStatus = a.civilStatus,
+                        photoLink = a.photoLink
+                    }
+                ).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public JsonResult updateAccount(tblAccountModel accmod)
         {
             using (var db = new RGDCContext())
@@ -3318,7 +3358,7 @@ namespace RGDC_Web_Application.Controllers
 
                 // Patients per month (last 6 months)
                 var patientsPerMonth = (from a in allAccounts
-                                        where a.accCreatedAt >= sixMonthsAgo
+                                        where a.accCreatedAt >= sixMonthsAgo && a.role == 3
                                         group a by new { a.accCreatedAt.Year, a.accCreatedAt.Month } into g
                                         orderby g.Key.Year, g.Key.Month
                                         select new
