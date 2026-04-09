@@ -17,6 +17,7 @@
         GOOD: 'Good',
         STRONG: 'Strong'
     };
+    $scope.staff;
     $scope.showPatientForm = false;
     $scope.isUserOwner = false;
     $scope.isUserAdmin = false;
@@ -335,12 +336,32 @@
         var paymentData = {
             paymentID: paymentID
         }
+
+        $scope.editSubmitted = true;
+
+        if (!$scope.paymentInfo.patientID || !$scope.paymentInfo.dentistID || !$scope.paymentInfo.paymentDate ||
+            !$scope.paymentInfo.paymentMethod || !$scope.paymentInfo.cost ||
+            !$scope.paymentInfo.amountPaid || !$scope.paymentInfo.amountDue ||
+            !$scope.paymentInfo.description) {
+            return;
+        }
+
+        if (parseFloat($scope.paymentInfo.amountDue) < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Amount',
+                text: 'Total amount due should not go below 0.',
+                confirmButtonColor: '#795548'
+            });
+            return;
+        }
         var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
         getPaymentInfo.then(function (payment) {
             $scope.paymentInfo = payment.data;
             if ($scope.paymentInfo.paymentDate) {
                 $scope.paymentInfo.paymentDate = formatDateToMDY($scope.paymentInfo.paymentDate)
             }
+            console.log($scope.paymentInfo.patientID)
         });
     }
 
@@ -565,7 +586,7 @@
     }
 
     $scope.login = function () {
-
+        console.log($scope.login_password)
         if (!$scope.login_email || $scope.login_email.trim() === "") {
             Swal.fire({
                 icon: "error",
@@ -643,6 +664,7 @@
         if (publicRoutes.some(function (route) { return currentPath === route; })) {
             return;
         }
+        console.log("sess")
 
 
         return RGDCWebApplicationService.getSessionVariable()
@@ -672,8 +694,8 @@
                     $scope.userRole = "Owner";
                 } else if ($scope.currentUserAuthorization == "1" || $scope.currentUserAuthorization == "2") {
                     $scope.isUserAdmin = true;
-                    $scope.userRole = $scope.currentUserAuthorization == "1" ? "Dental Staff" : "Dentist";
-                    $scope.isUserStaff = $scope.currentUserAuthorization == "1";
+                    $scope.userRole = $scope.currentUserAuthorization == "2" ? "Dental Staff" : "Dentist";
+                    $scope.isUserStaff = $scope.currentUserAuthorization == "2";
                 } else if ($scope.currentUserAuthorization == "3") {
                     $scope.isUserPatient = true;
                     $scope.userRole = "Patient";
@@ -2739,6 +2761,23 @@
             createdBy: $scope.currentUserID         
         };
 
+        $scope.addSubmitted = true;
+
+        if (!$scope.selectedPatient || !$scope.selectedDentist || !$scope.paymentDate ||
+            !$scope.paymentMethod || !$scope.paymentCost || !$scope.paymentDue ||
+            !$scope.paymentPaid || !$scope.paymentDescription) {
+            return; 
+        }
+        if (parseFloat($scope.paymentDue) < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Amount',
+                text: 'Total amount due should not go below 0.',
+                confirmButtonColor: '#795548'
+            });
+            return;
+        }
+
         RGDCWebApplicationService.addPayment(paymentData).then(function (response) {
             if (response.data.success) {
                 Swal.fire({ icon: 'success', title: 'Added', text: 'Successfully added payment record.' }).then((result) => {
@@ -3225,6 +3264,15 @@
             });
     };
 
+    $scope.getStaffData = function () {
+        RGDCWebApplicationService.getStaffData()
+            .then(function (returnedData) {
+                $scope.staff = returnedData.data;
+                $scope.staff.birthDate = formatDateToMDY($scope.staff.birthDate);
+            });
+            console.log($scope.staff)
+    }
+
     $scope.editSelectDentist = function (dentistID) {
         var dentistAcc = { dentistID: dentistID };
         RGDCWebApplicationService.selectDentist(dentistAcc)
@@ -3373,6 +3421,8 @@
         })
     }
     $scope.editStaff = function () {
+
+        $scope.editStaffSubmitted = true;
         var accDet = {
             accID: $scope.staff.accID,
             firstName: $scope.staff.firstName,
@@ -5000,5 +5050,17 @@
                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to upload/save signature.' });
             });
     };
+    $scope.viewPayRec = function (paymentID) {
+        var paymentData = {
+            paymentID: paymentID
+        }
+        var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
+        getPaymentInfo.then(function (payment) {
+            $scope.paymentInfo = payment.data;
+            if ($scope.paymentInfo.paymentDate) {
+                $scope.paymentInfo.paymentDate = formatDateToMDY($scope.paymentInfo.paymentDate)
+            }
+        });
+    }
 
 });

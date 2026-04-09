@@ -1564,3 +1564,14 @@ body .main-content {
     display: block;
     margin-top: 4px;
 }
+
+css.validation-msg {
+    color: red;
+    font-size: 0.75rem;
+    margin-top: 2px;
+    display: block;
+}
+
+.invalid-input {
+    border-bottom: 1px solid red !important;
+}

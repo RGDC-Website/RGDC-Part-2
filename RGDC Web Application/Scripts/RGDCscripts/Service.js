@@ -309,12 +309,25 @@
         });
     };
 
+    this.selectDentist = function (dentistAcc) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectDentist",
+            data: dentistAcc
+        });
+    };
+
     this.selectStaff = function (staffAcc) {
         return $http({
             method: "post",
             url: "/RGDC/selectStaff",
             data: staffAcc
         });
+    };
+
+
+    this.getStaffData = function () {
+        return $http.get("/RGDC/getStaffData");
     };
 
     this.editAccount = function (accDet) {
