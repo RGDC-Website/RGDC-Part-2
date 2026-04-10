@@ -62,6 +62,14 @@
         });
     }
 
+    this.verifyOTP = function (otp) {
+        return $http({
+            method: "post",
+            url: "/RGDC/verifyOTP",
+            data: otp
+        });
+    }
+
     this.sendEmail = function (user_email) {
         return $http({
             method: "post",
@@ -325,9 +333,25 @@
         });
     };
 
-
     this.getStaffData = function () {
-        return $http.get("/RGDC/getStaffData");
+        return $http({
+            method: "post",
+            url: "/RGDC/getStaffData",
+        });
+    };
+
+    this.getOwnerData = function () {
+        return $http({
+            method: "post",
+            url: "/RGDC/getOwnerData",
+        });
+    };
+
+    this.getDentistData = function () {
+        return $http({
+            method: "post",
+            url: "/RGDC/getDentistData",
+        });
     };
 
     this.editAccount = function (accDet) {

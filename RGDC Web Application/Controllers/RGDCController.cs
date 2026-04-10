@@ -7,7 +7,6 @@ using Google.Apis.Services;
 using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
-using System.Data.Entity;
 using Newtonsoft.Json;
 using RGDC_Web_Application.Models;
 using RGDC_Web_Application.Models.Context;
@@ -15,6 +14,7 @@ using RGDC_Web_Application.Models.Map;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -22,6 +22,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mail;
+using System.Reflection.Emit;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text;
@@ -537,6 +538,7 @@ namespace RGDC_Web_Application.Controllers
         }
         public JsonResult getSessionVariable()
         {
+        
             try
             {
                 if (Session["IsLoggedIn"] == null || !(bool)Session["IsLoggedIn"])
@@ -643,8 +645,8 @@ namespace RGDC_Web_Application.Controllers
                     // SEND EMAIL
                     MailMessage mail = new MailMessage();
                     mail.To.Add(email);
-                    mail.Subject = "Password Reset OTP";
-                    mail.Body = $"Your OTP is: {otp}";
+                    mail.Subject = "[RGDC Clinic] Your One-Time Password (OTP) for Password Reset";
+                    mail.Body = $"Hello,\r\n\r\nWe received a request to reset the password for your RGDC account. Use the code below to complete the process.\r\n{otp}\r\n\r\nIf you did not request this change, please ignore this email or contact the clinic administrator immediately to secure your account.\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
                     mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -679,8 +681,26 @@ namespace RGDC_Web_Application.Controllers
                     // SEND EMAIL
                     MailMessage mail = new MailMessage();
                     mail.To.Add(email);
-                    mail.Subject = "Password for your account!";
-                    mail.Body = $"Your Password is Default123, please change it immediately on your next login.";
+                    mail.Subject = "Welcome to RGDC Dental Clinic - Your New Account Credentials";
+                    mail.IsBodyHtml = true;
+
+                    mail.Body = $@"
+Hello,
+
+Welcome to the RGDC Dental Clinic Management System. Your account has been successfully created.
+
+--------------------------------------------------
+LOGIN DETAILS:
+Default Password: Default123
+--------------------------------------------------
+
+IMPORTANT SECURITY NOTICE:
+For your protection, you are required to change this password immediately upon your first login.
+
+If you did not request this account, please contact the clinic administrator.
+
+Thank you,
+RGDC Dental Clinic Team";
                     mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -771,6 +791,38 @@ namespace RGDC_Web_Application.Controllers
                     }
                 ).ToList();
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        public JsonResult verifyOTP(string otpCode)
+        {
+            // 1. Check if session exists
+            if (Session["RESET_OTP"] == null || Session["RESET_OTP_EXPIRY"] == null)
+            {
+                return Json(new { success = false, message = "No active reset request found. Please resend OTP." });
+            }
+
+            // 2. Check Expiry
+            DateTime expiry = (DateTime)Session["RESET_OTP_EXPIRY"];
+            if (DateTime.Now > expiry)
+            {
+                // Clear session if expired
+                Session["RESET_OTP"] = null;
+                return Json(new { success = false, message = "OTP has expired. Please request a new one." });
+            }
+
+            // 3. Compare OTP
+            string storedOtp = Session["RESET_OTP"].ToString();
+            if (storedOtp == otpCode)
+            {
+                // Optional: Set a flag that the user is verified to proceed to the actual reset
+                Session["IS_OTP_VERIFIED"] = true;
+
+                return Json(new { success = true, message = "OTP verified successfully." });
+            }
+            else
+            {
+                return Json(new { success = false, message = "Invalid OTP code. Please try again." });
             }
         }
 
@@ -2950,7 +3002,17 @@ namespace RGDC_Web_Application.Controllers
 
         public JsonResult getStaffData()
         {
-            var accID = Session["userID"] != null ? Convert.ToInt32(Session["userID"]) : 0;
+
+            var sessionUserID = Session["userID"];
+
+            if (sessionUserID == null)
+            {
+                // Return null or an error if the user isn't logged in
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+
+            int accID = Convert.ToInt32(sessionUserID);
+
             using (var db = new RGDCContext())
             {
                 var result = (
@@ -2979,6 +3041,89 @@ namespace RGDC_Web_Application.Controllers
                         photoLink = a.photoLink
                     }
                 ).FirstOrDefault();
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult getOwnerData()
+        {
+            // Retrieve ID from Session
+            var sessionUserID = Session["userID"];
+            if (sessionUserID == null)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+
+            int accID = Convert.ToInt32(sessionUserID);
+
+            using (var db = new RGDCContext())
+            {
+                var result = (from a in db.tbl_account
+                              join o in db.tbl_owner on a.accID equals o.accID
+                              where a.accID == accID
+                              select new
+                              {
+                                  accID = a.accID,
+                                  firstName = a.firstName,
+                                  middleName = a.middleName,
+                                  lastName = a.lastName,
+                                  email = a.email,
+                                  genderID = a.genderID,
+                                  birthDate = a.birthDate,
+                                  contactNumber = a.contactNumber,
+                                  address = a.address,
+                                  civilStatus = a.civilStatus,
+                                  photoLink = a.photoLink,
+                                  religion = a.religion,
+                                  nationality = a.nationality,
+
+                                  ownerID = o.ownerID,
+                                  specialization = o.specialization,
+                              }).FirstOrDefault();
+
+                return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+public JsonResult getDentistData()
+        {
+            // Retrieve ID from Session
+            var sessionUserID = Session["userID"];
+            if (sessionUserID == null)
+            {
+                return Json(null, JsonRequestBehavior.AllowGet);
+            }
+
+            int accID = Convert.ToInt32(sessionUserID);
+
+            using (var db = new RGDCContext())
+            {
+                var result = (from a in db.tbl_account
+                              join d in db.tbl_dentist on a.accID equals d.accID
+                              where a.accID == accID
+                              select new
+                              {
+                                  // Account Table Fields
+                                  accID = a.accID,
+                                  firstName = a.firstName,
+                                  middleName = a.middleName,
+                                  lastName = a.lastName,
+                                  email = a.email,
+                                  genderID = a.genderID,
+                                  birthDate = a.birthDate,
+                                  contactNumber = a.contactNumber,
+                                  address = a.address,
+                                  civilStatus = a.civilStatus,
+                                  photoLink = a.photoLink,
+                                  religion = a.religion,
+                                  nationality = a.nationality,
+
+                                  // Dentist Table Fields
+                                  dentistID = d.dentistID,
+                                  specialization = d.specialization,
+                                  branchID = d.branchID
+                                    // Example field for professional tax receipt
+                              }).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -3007,6 +3152,9 @@ namespace RGDC_Web_Application.Controllers
                 existing.email = accmod.email;
                 existing.contactNumber = accmod.contactNumber;
                 existing.address = accmod.address;
+                existing.nationality = accmod.nationality;
+                existing.religion = accmod.nationality;
+                existing.photoLink = accmod.photoLink;
                 existing.civilStatus = accmod.civilStatus;
                 existing.accUpdatedAt = DateTime.Now;
 

@@ -809,7 +809,10 @@
             });
         });
     }
-
+    $scope.getData = function () {
+        $scope.getBranch();
+        $scope.getGender();
+    }
     $scope.getSessionVariables = function (retryCount) {
         retryCount = retryCount || 0; 
 
@@ -907,7 +910,15 @@
     };
 
     $scope.sendOTP = function () {
-        if (!$scope.forgot_email) {
+        if ($scope.dentist.email!= null) {
+            $scope.forgot_email = $scope.dentist.email;
+        } else if ($scope.owner.email != null) {
+            $scope.forgot_email = $scope.owner.email;
+        } else if ($scope.staff.email != null) {
+            $scope.forgot_email = $scope.staff.email;
+        }
+
+        else if (!$scope.forgot_email) {
             Swal.fire({
                 icon: "error",
                 title: "Email is Required",
@@ -938,6 +949,40 @@
         });
     };
 
+    $scope.verifyOTP = function () {
+        var otpCode = {
+            otpCode: $scope.forget_OTP
+        }
+        var verifyOTP = RGDCWebApplicationService.verifyOTP(otpCode);
+        verifyOTP.then(function (response) {
+            if (response.data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Verification Failed',
+                    text: response.data.message || 'The OTP you entered is incorrect.',
+                    confirmButtonColor: '#d33'
+                });
+                // 1. Get the instance of the OTP modal and close it
+                var otpElem = document.getElementById('modalOTP');
+                var otpInstance = M.Modal.getInstance(otpElem);
+                otpInstance.close();
+
+                // 2. Get the instance of the Reset modal and open it
+                var resetElem = document.getElementById('modalPasswordReset');
+                var resetInstance = M.Modal.getInstance(resetElem);
+                resetInstance.open();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Verification Failed',
+                    text: response.data.message || 'The OTP you entered is incorrect.',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        });
+    }
+
+  
     $scope.resetPassword = function () {
 
         if ($scope.forgot_newPassword !== $scope.forgot_confirmPassword) {
@@ -3522,8 +3567,23 @@
                 $scope.staff = returnedData.data;
                 $scope.staff.birthDate = formatDateToMDY($scope.staff.birthDate);
             });
-            console.log($scope.staff)
     }
+
+    $scope.getOwnerData = function () {
+        RGDCWebApplicationService.getOwnerData()
+            .then(function (returnedData) {
+                $scope.owner = returnedData.data;
+                $scope.owner.birthDate = formatDateToMDY($scope.owner.birthDate);
+            });
+    }
+    $scope.getDentistData = function () {
+        RGDCWebApplicationService.getDentistData()
+            .then(function (returnedData) {
+                $scope.dentist = returnedData.data;
+                $scope.dentist.birthDate = formatDateToMDY($scope.dentist.birthDate);
+            });
+    }
+
 
     $scope.editSelectDentist = function (dentistID) {
         var dentistAcc = { dentistID: dentistID };
@@ -3614,10 +3674,14 @@
                     editOwner.then(function (returnedData) {
                         if (returnedData.data.success) {
                             Swal.fire({ icon: 'success', title: 'Edit Owner', text: 'Successfully edited Owner Details.' }).then((result) => {
-                                if (result.isConfirmed) {
+                                if ($scope.isUserOwner) {
                                     window.location.href = "/RGDC/adminClinicStaffTab";
                                     afterUpdate();
+                                } else {
+                                    window.location.href = "/RGDC/adminDashboard";
+                                    afterUpdate();
                                 }
+
                             });
                         } else {
                             Swal.fire({ icon: 'error', title: 'Edit Owner', text: 'Cannot edit owner details.' })
@@ -3631,90 +3695,9 @@
                 });
         });
     };
-    $scope.editDentist = function () {
-        var accDet = {
-            accID: $scope.dentist.accID,
-            firstName: $scope.dentist.firstName,
-            middleName: $scope.dentist.middleName,
-            lastName: $scope.dentist.lastName,
-            genderID: $scope.dentist.genderID,
-            birthDate: $scope.dentist.birthDate,
-            email: $scope.dentist.email,
-            contactNumber: $scope.dentist.contactNumber,
-            address: $scope.dentist.address,
-            civilStatus: $scope.dentist.civilStatus,
-        }
 
-        var dentistDet = {
-            dentistID: $scope.dentist.dentistID,
-            specialization: $scope.dentist.specialization,
-            branchID: $scope.dentist.branchID
-        }
 
-        var editAccount = RGDCWebApplicationService.editAccount(accDet);
-        editAccount.then(function (returnedData) {
-            if (returnedData.data.success) {
-                var editDentist = RGDCWebApplicationService.editDentist(dentistDet);
-                editDentist.then(function (returnedData) {
-                    if (returnedData.data.success) {
-                        Swal.fire({ icon: 'success', title: 'Edit Dentist', text: 'Successfully edited Dentist Details.' }).then((result) => {
-                            if (result.isConfirmed) {
 
-                                window.location.href = "/RGDC/adminClinicStaffTab";
-                                afterUpdate();
-                            }
-
-                        });
-                    } else {
-                        Swal.fire({ icon: 'Error', title: 'Edit Dentist', text: 'Cannot edit dentist details.' })
-                    }
-                })
-            }
-        })
-    }
-    $scope.editStaff = function () {
-
-        $scope.editStaffSubmitted = true;
-        var accDet = {
-            accID: $scope.staff.accID,
-            firstName: $scope.staff.firstName,
-            middleName: $scope.staff.middleName,
-            lastName: $scope.staff.lastName,
-            genderID: $scope.staff.genderID,
-            birthDate: $scope.staff.birthDate,
-            email: $scope.staff.email,
-            contactNumber: $scope.staff.contactNumber,
-            address: $scope.staff.address,
-            civilStatus: $scope.staff.civilStatus,
-        }
-
-        var staffDet = {
-            staffID: $scope.staff.staffID,
-            staffRole: $scope.staff.staffRole,
-            branchID: $scope.staff.branchID
-        }
-
-        var editAccount = RGDCWebApplicationService.editAccount(accDet);
-        editAccount.then(function (returnedData) {
-            if (returnedData.data.success) {
-                var editStaff = RGDCWebApplicationService.editStaff(staffDet);
-                editStaff.then(function (returnedData) {
-                    if (returnedData.data.success) {
-                        Swal.fire({ icon: 'success', title: 'Edit Staff', text: 'Successfully edited Staff Details.' }).then((result) => {
-                            if (result.isConfirmed) {
-
-                                window.location.href = "/RGDC/adminClinicStaffTab";
-                                afterUpdate();
-                            }
-
-                        });
-                    } else {
-                        Swal.fire({ icon: 'Error', title: 'Edit Staff', text: 'Cannot edit staff details.' })
-                    }
-                })
-            }
-        })
-    }
 
     $scope.getDentistOwner = function () {
         var getDentistOwner = RGDCWebApplicationService.getDentistOwner();
@@ -4413,8 +4396,14 @@
                         if (returnedData.data.success) {
                             Swal.fire({ icon: 'success', title: 'Edit Dentist', text: 'Successfully edited Dentist Details.' }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = "/RGDC/adminClinicStaffTab";
-                                    afterUpdate();
+                                    if ($scope.isUserOwner) {
+                                        window.location.href = "/RGDC/adminClinicStaffTab";
+                                        afterUpdate();
+                                    } else {
+                                        window.location.href = "/RGDC/adminDashboard";
+                                        afterUpdate();
+                                    }
+                                    
                                 }
                             });
                         } else {
@@ -4480,7 +4469,9 @@
             email: $scope.staff.email,
             contactNumber: $scope.staff.contactNumber,
             address: $scope.staff.address,
-            civilStatus: $scope.staff.civilStatus
+            civilStatus: $scope.staff.civilStatus,
+            nationality: $scope.staff.nationality,
+            religion: $scope.staff.religion
         };
 
         var staffDet = {
@@ -4522,8 +4513,13 @@
                         if (returnedData.data.success) {
                             Swal.fire({ icon: 'success', title: 'Edit Staff', text: 'Successfully edited Staff Details.' }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href = "/RGDC/adminClinicStaffTab";
-                                    afterUpdate();
+                                    if ($scope.isUserOwner) {
+                                        window.location.href = "/RGDC/adminClinicStaffTab";
+                                        afterUpdate();
+                                    } else {
+                                        window.location.href = "/RGDC/adminDashboard";
+                                    }
+                                    
                                 }
                             });
                         } else {
@@ -5643,4 +5639,85 @@
                 window.location.href = '/RGDC';
             });
     };
+    //temp post op
+    // postOp helpers: templates, apply, save and print
+    $scope.postOp = $scope.postOp || {};
+    $scope.postOp.templates = [
+        { key: 'simpleExtraction', name: 'Simple Extraction', title: 'Post-Op: Simple Extraction', instructions: '<ul><li>Avoid rinsing for 24 hours.</li><li>Apply ice for first 24 hours.</li><li>Take prescribed medication as directed.</li></ul>' },
+        { key: 'surgicalExtraction', name: 'Surgical Extraction', title: 'Post-Op: Surgical Extraction', instructions: '<ul><li>Keep head elevated for 48 hours.</li><li>No strenuous activity for 7 days.</li><li>Follow-up in 5 days.</li></ul>' },
+        { key: 'general', name: 'General Instructions', title: 'Post-Op Instructions', instructions: '<p>Maintain oral hygiene. Use soft diet for 48 hours. If bleeding persists, contact clinic.</p>' }
+    ];
+    $scope.postOp.selectedTemplate = null;
+    $scope.postOp.title = '';
+    $scope.postOp.instructions = '';
+
+    $scope.postOp.applyTemplate = function () {
+        var selectedKey = $scope.postOp.selectedTemplate;
+        if (!selectedKey) return;
+        var t = $scope.postOp.templates.find(function (x) { return x.key === selectedKey; });
+        if (t) {
+            $scope.postOp.title = t.title;
+            // instructions may contain HTML; we store as string
+            $scope.postOp.instructions = t.instructions;
+        }
+    };
+
+    $scope.savePostOp = function () {
+        var payload = {
+            title: $scope.postOp.title,
+            instructions: $scope.postOp.instructions
+        };
+        // optimistic: server endpoint expected at /RGDC/SavePostOp
+        $http({
+            method: 'POST',
+            url: '/RGDC/SavePostOp',
+            data: payload
+        }).then(function (resp) {
+            var data = resp.data || resp;
+            if (data && data.success) {
+                Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Post-Op instructions saved.' });
+                // update UI immediate (store in selectedPatient)
+                if ($scope.selectedPatient) {
+                    $scope.selectedPatient.postOpTitle = payload.title;
+                    $scope.selectedPatient.postOpInstructions = payload.instructions;
+                }
+                var modal = document.getElementById('modal-edit-postOp');
+                if (modal && typeof M !== 'undefined' && M.Modal) {
+                    var inst = M.Modal.getInstance(modal);
+                    if (inst) inst.close();
+                }
+            } else {
+                Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to save post-op.' });
+            }
+        }).catch(function (err) {
+            console.error('SavePostOp error', err);
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save post-op.' });
+        });
+    };
+
+    $scope.printPostOp = function () {
+        // Build printable HTML from current postOp model
+        var title = $scope.postOp.title || ($scope.selectedPatient && $scope.selectedPatient.postOpTitle) || 'Post-Op Instructions';
+        var instructions = $scope.postOp.instructions || ($scope.selectedPatient && $scope.selectedPatient.postOpInstructions) || '<p>No instructions available.</p>';
+        var html = '<html><head><title>' + title + '</title>';
+        html += '<style>body{font-family: Arial, Helvetica, sans-serif; padding:20px;} h1{font-size:1.4rem;} .content{margin-top:10px;}</style></head><body>';
+        html += '<h1>' + title + '</h1><div class="content">' + instructions + '</div>';
+        html += '</body></html>';
+
+        var win = window.open('', '_blank', 'width=900,height=700');
+        if (!win) {
+            Swal.fire({ icon: 'error', title: 'Popup blocked', text: 'Please allow popups for this site to print.' });
+            return;
+        }
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        // Wait a moment to ensure content renders, then call print
+        setTimeout(function () {
+            win.focus();
+            win.print();
+        }, 400);
+    };
+
+    // ---- end new functions ----
 });

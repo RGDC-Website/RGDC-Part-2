@@ -1351,7 +1351,7 @@
 </div>
 
 @*Edit form (match post-op modal sizing) *@
-<div id="modal-edit-form" class="modal  edit-form-modal">
+<!--<div id="modal-edit-form" class="modal  edit-form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
 
@@ -1446,7 +1446,7 @@
         <button class="modal-close cancel-btn" style="font-weight: 500;">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight: 500;" ng-click="deleteFormThis()">DELETE</button>
     </div>
-</div>
+</div>-->
 
 @*Edit Post Op*@
 <div id="modal-edit-form" class="modal modal-fixed-footer edit-form-modal">
@@ -1527,11 +1527,48 @@
         <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFileForEdit()">PICK FILE</button>
         <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px"
-                + ng-click="saveForm(selectedForm)"
-                + ng-disabled="editFormForm.$invalid">
+                
+                ng-click="saveForm(selectedForm)"
+                 ng-disabled="editFormForm.$invalid">
             SAVE
 
         </button>
+    </div>
+    @*Edit Post Op*@
+    <div id="modal-edit-postOp" class="modal modal-fixed-footer edit-postOp-modal">
+        <div class="modal-content">
+            <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
+
+            <div class="row">
+                <div class="col s12 m4">
+                    <label class="custom-label">
+                        Template
+                        <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
+                            <option value="" disabled selected>Select template</option>
+                        </select>
+                    </label>
+
+                    <label class="custom-label" style="margin-top:8px;">
+                        Title
+                        <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
+                    </label>
+                </div>
+
+                <div class="col s12 m8">
+                    <label class="custom-label">
+                        Instructions
+                        <textarea ng-model="postOp.instructions" style="flex: 1; height: 420px; padding-top: 10px; background-color:white; width:100%"></textarea>
+                        <p class="small-muted" style="margin-top:6px;">You can paste formatted HTML here if your editor pipeline supports it.</p>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer footer-center">
+            <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
+            <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="printPostOp()">PRINT</button>
+            <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="savePostOp()">SAVE</button>
+        </div>
     </div>
 </div>
 
