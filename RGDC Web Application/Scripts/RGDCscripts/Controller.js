@@ -910,6 +910,12 @@
     };
 
     $scope.sendOTP = function () {
+        $scope.dentist;
+        $scope.owner;
+        $scope.staff;
+        $scope.dentist.email = "";
+        $scope.owner.email = "";
+        $scope.staff.email = "";
         if ($scope.dentist.email!= null) {
             $scope.forgot_email = $scope.dentist.email;
         } else if ($scope.owner.email != null) {
