@@ -21,7 +21,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
 @*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
-<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
+<body id="body">
     <div class="row" style="margin: 0;" ng-init="getSessionVariables()">
         @*sidebar nav*@
         <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
@@ -168,7 +168,7 @@
 
 
     @*Edit Profile*@
-    <div id="modalEditProfile" class="modal patientInformationForm-modal">
+    <div id="modalEditProfile" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh">
         <div>
             <h5 class="modal-form-title">Edit Profile</h5>
 
@@ -262,6 +262,7 @@
                             <option value="3">Widowed</option>
                         </select>
                     </div>
+
                     <div class="col s3">
                         @*Contact number*@
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
@@ -274,6 +275,17 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col s12">
+                        @*Address*@
+                        <p class="custom-label">Address <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               class="custom-input"
+                               maxlength="250"
+                               required>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col s4">
@@ -345,15 +357,26 @@
                     </div>
                 </div>
 
-
                 <div class="row">
-                    <div class="col s12">
-                        @*Address*@
-                        <p class="custom-label">Address <span class="required-mark">*</span></p>
-                        <input id="address"
+                    <div class="col s6">
+                        @*Current Physician*@
+                        <p class="custom-label">Current Physician <span class="required-mark">*</span></p>
+                        <input id="occupation"
                                type="text"
                                class="custom-input"
-                               maxlength="250"
+                               placeholder="Current Physician"
+                               maxlength="50"
+                               required>
+                    </div>
+
+                    <div class="col s6">
+                        @*Referral (if nay)*@
+                        <p class="custom-label">Referral <span class="required-mark">*</span></p>
+                        <input id="religion"
+                               type="text"
+                               class="custom-input"
+                               placeholder="Referral"
+                               maxlength="50"
                                required>
                     </div>
                 </div>
@@ -368,11 +391,44 @@
                     </div>
                 </div>
 
-                @*New Password*@
-                <div class="forgot-password-container">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                <div class="row">
+                    <div class="col s6">
+                        @*Start of Shift*@
+                        <p class="custom-label">Start of Shift <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" required>
+                            <option value="" disabled selected>Select Time </option>
+                            <option value="1">8:30 AM</option>
+                            <option value="2">9:30 AM</option>
+                            <option value="3">10:30 AM</option>
+                        </select>
+                    </div>
+
+                    <div class="col s6">
+                        @*End of Shift*@
+                        <p class="custom-label">End of Shift <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" required>
+                            <option value="" disabled selected>Select Time</option>
+                            <option value="1">8:30 AM</option>
+                            <option value="2">9:30 AM</option>
+                            <option value="3">10:30 AM</option>
+                        </select>
+                    </div>
                 </div>
 
+                <div class="row">
+                    @*Branch*@
+                    <div class="col s12">
+                        <p class="custom-label">Branch</p>
+                        <input type="text"
+                               class="custom-input"
+                               maxlength="50">
+                    </div>
+                </div>
+
+                @*New Password*@
+                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                </div>
 
             </form>
         </div>
