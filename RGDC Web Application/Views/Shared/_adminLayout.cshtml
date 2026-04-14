@@ -743,7 +743,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.tooltipped');
             var instances = M.Tooltip.init(elems, {
-                    exitDelay: -5
+                    exitDelay: 5
             });
         });
 
@@ -893,10 +893,14 @@
         @* admin past appts table *@
         //new DataTable('#adminPastAppointment');
 
-        @*patient profile table - progress notes*@
-            //new DataTable('#progressNotes');
-        @*patient profile table - forms*@
-        //new DataTable('#patientForms');
+        //admin clinic staff-owner
+        new DataTable('#adminClinicStaffTabTableOwner');
+        //admin clinic staff-dentist
+        new DataTable('#adminClinicStaffTabTableDentist');
+        //admin clinic staff-staff
+        new DataTable('#adminClinicStaffTabTableStaff');
+
+
 
         //clickeable DataTables
         const financeTblRows = document.querySelectorAll(".tableClk tbody tr");
