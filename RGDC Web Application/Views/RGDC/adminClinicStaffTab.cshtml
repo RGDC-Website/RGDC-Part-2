@@ -148,192 +148,38 @@
     <div>
         <h5 class="modal-form-title">Add New Owner</h5>
 
-        <form>
-            <div class="row">
-                <div class="col s4">
-                    @*Photo upload*@
-                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
-                        <div class="col s12">
-                            <div class="photo-box" ng-click="pickPhoto('owner')" style="cursor:pointer;">
-                                <img ng-if="ownerPhotoPreview" ng-src="{{ownerPhotoPreview}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
-                                <i class="material-icons photo-placeholder-icon" ng-if="!ownerPhotoPreview">image</i>
-                            </div>
-                            <input id="ownerPhotoInput" type="file" accept="image/*" style="display:none"
-                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'owner')" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col s8">
-                    <div class="row">
-                        @*First name*@
-                        <div class="col s6">
-                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   ng-model="owner_firstName"
-                                   class="custom-input"
-                                   maxlength="150"
-                                   placeholder="Juan"
-                                   required>
-                        </div>
-                        @*MIddle name*@
-                        <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   ng-model="owner_middleName"
-                                   class="custom-input"
-                                   maxlength="150"
-                                   placeholder="Mercado"
-                                   required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        @*Last name*@
-                        <div class="col s12">
-                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
-                            <input type="text" class="custom-input"
-                                   ng-model="owner_lastName"
-                                   maxlength="150"
-                                   placeholder="Dela Cruz"
-                                   required>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @*Email*@
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Email <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input"
-                           ng-model="owner_email"
-                           maxlength="150"
-                           placeholder="juandlc@gmail.com"
-                           ng-change="checkAddOwnerEmail()"
-                           ng-focus="showOwnerEmailHint = true"
-                           ng-class="{
+        @*Email*@
+        <div class="row">
+            <div class="col s12">
+                <p class="custom-label">Email <span class="required-mark">*</span></p>
+                <input type="text" class="custom-input"
+                       ng-model="owner_email"
+                       maxlength="150"
+                       placeholder="juandlc@gmail.com"
+                       ng-change="checkAddOwnerEmail()"
+                       ng-focus="showOwnerEmailHint = true"
+                       ng-class="{
                        'input-valid': ownerEmailFormatValid && !ownerEmailTaken,
                        'input-invalid': owner_email && !ownerEmailFormatValid
                    }"
-                           required>
-                    <p class="helper-text" style="margin-top:.4rem;">
-                        <span ng-show="owner_email"
-                              ng-style="{'color': ownerEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
-                            {{ ownerEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
-                        </span>
-                        <span ng-show="ownerEmailFormatValid && ownerEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
-                            Email already taken
-                        </span>
-                    </p>
-                </div>
+                       required>
+                <p class="helper-text" style="margin-top:.4rem;">
+                    <span ng-show="owner_email"
+                          ng-style="{'color': ownerEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
+                        {{ ownerEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
+                    </span>
+                    <span ng-show="ownerEmailFormatValid && ownerEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
+                        Email already taken
+                    </span>
+                </p>
             </div>
-
-            <div class="row">
-                @*Gender*@
-                <div class="col s3">
-                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="owner_genderID">
-                        <option value="" disabled selected>Select Gender</option>
-                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
-                    </select>
-                </div>
-                @*Birthdate*@
-                <div class="col s3">
-                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
-                    <div class="datepicker-wrapper">
-                        <input id="birthDate"
-                               ng-model="owner_birthDate"
-                               type="text"
-                               class="datepicker custom-input"
-                               readonly
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
-                    </div>
-                </div>
-
-                <div class="col s3">
-                    @*Civil status*@
-                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required ng-model="owner_civilStatus">
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="1">Single</option>
-                        <option value="2">Married</option>
-                        <option value="3">Widowed</option>
-                    </select>
-                </div>
-                <div class="col s3">
-                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                    <input id="ownerContactNumber"
-                           ng-model="owner_contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="09XX-XXX-XXXX"
-                           maxlength="11"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                           ng-change="checkAddOwnerContact()"
-                           ng-class="{'input-valid': ownerContactValid, 'input-invalid': owner_contactNumber && !ownerContactValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-
-
-                <div class="col s6">
-                    @*Religion*@
-                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <input id="religion"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Roman-Catholic"
-                           maxlength="50"
-                           required>
-                </div>
-
-                <div class="col s6">
-                    @*Nationality*@
-                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <input id="contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Filipino"
-                           maxlength="50"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <input ng-model="owner_address"
-                           class="custom-input"
-                           maxlength="250"
-                           ng-change="checkAddOwnerAddress()"
-                           ng-class="{'input-valid': ownerAddressValid, 'input-invalid': owner_address && !ownerAddressValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                @*Specialization*@
-                <div class="col s12">
-                    <p class="custom-label">Specialization</p>
-                    <input type="text"
-                           ng-model="owner_specialization"
-                           class="custom-input"
-                           maxlength="50">
-                </div>
-
-            </div>
-
-
-        </form>
+        </div>
     </div>
+
 
     @*Submit or cancel*@
         <div class="modal-footer" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickPhoto('owner')">UPLOAD PHOTO</button>
-            <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
             <button type="submit"
                     class="edit-btn modal-close"
                     ng-click="addOwner()"
@@ -348,200 +194,36 @@
     <div>
         <h5 class="modal-form-title">Add New Dentist</h5>
 
-        <form>
-            <div class="row">
-                <div class="col s4">
-                    @*Photo upload*@
-                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
-                        <div class="col s12">
-                            <div class="photo-box" ng-click="pickPhoto('dentist')" style="cursor:pointer;">
-                                <img ng-if="dentistPhotoPreview" ng-src="{{dentistPhotoPreview}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
-                                <i class="material-icons photo-placeholder-icon" ng-if="!dentistPhotoPreview">image</i>
-                            </div>
-                            <input id="dentistPhotoInput" type="file" accept="image/*" style="display:none"
-                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'dentist')" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col s8">
-                    <div class="row">
-                        @*First name*@
-                        <div class="col s6">
-                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   class="custom-input"
-                                   ng-model="dentist_firstName"
-                                   maxlength="150"
-                                   placeholder="Juan"
-                                   required>
-                        </div>
-                        @*MIddle name*@
-                        <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   ng-model="dentist_middleName"
-                                   class="custom-input"
-                                   maxlength="150"
-                                   placeholder="Mercado"
-                                   required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        @*Last name*@
-                        <div class="col s12">
-                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
-                            <input type="text" class="custom-input"
-                                   maxlength="150"
-                                   ng-model="dentist_lastName"
-                                   placeholder="Dela Cruz"
-                                   required>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            @*Email*@
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Email <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input"
-                           ng-model="dentist_email"
-                           maxlength="150"
-                           placeholder="juandlc@gmail.com"
-                           ng-change="checkAddDentistEmail()"
-                           ng-class="{
+        @*Email*@
+        <div class="row">
+            <div class="col s12">
+                <p class="custom-label">Email <span class="required-mark">*</span></p>
+                <input type="text" class="custom-input"
+                       ng-model="dentist_email"
+                       maxlength="150"
+                       placeholder="juandlc@gmail.com"
+                       ng-change="checkAddDentistEmail()"
+                       ng-class="{
                        'input-valid': dentistEmailFormatValid && !dentistEmailTaken,
                        'input-invalid': dentist_email && !dentistEmailFormatValid
                    }"
-                           required>
-                    <p class="helper-text" style="margin-top:.4rem;">
-                        <span ng-show="dentist_email"
-                              ng-style="{'color': dentistEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
-                            {{ dentistEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
-                        </span>
-                        <span ng-show="dentistEmailFormatValid && dentistEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
-                            Email already taken
-                        </span>
-                    </p>
-                </div>
+                       required>
+                <p class="helper-text" style="margin-top:.4rem;">
+                    <span ng-show="dentist_email"
+                          ng-style="{'color': dentistEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
+                        {{ dentistEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
+                    </span>
+                    <span ng-show="dentistEmailFormatValid && dentistEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
+                        Email already taken
+                    </span>
+                </p>
             </div>
-
-            <div class="row">
-                @*Gender*@
-                <div class="col s3">
-                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="dentist_genderID">
-                        <option value="" disabled selected>Select Gender</option>
-                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
-                    </select>
-                </div>
-                @*Birthdate*@
-                <div class="col s3">
-                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
-                    <div class="datepicker-wrapper">
-                        <input id="birthDate"
-                               type="text"
-                               ng-model="dentist_birthDate"
-                               class="datepicker custom-input"
-                               readonly
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
-                    </div>
-                </div>
-
-                <div class="col s3">
-                    @*Civil status*@
-                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required ng-model="dentist_civilStatus">
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="1">Single</option>
-                        <option value="2">Married</option>
-                        <option value="3">Widowed</option>
-                    </select>
-                </div>
-                <div class="col s3">
-                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                    <input id="dentistContactNumber"
-                           ng-model="dentist_contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="09XX-XXX-XXXX"
-                           maxlength="11"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                           ng-change="checkAddDentistContact()"
-                           ng-class="{'input-valid': dentistContactValid, 'input-invalid': dentist_contactNumber && !dentistContactValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <input ng-model="dentist_address"
-                           class="custom-input"
-                           maxlength="250"
-                           ng-change="checkAddDentistAddress()"
-                           ng-class="{'input-valid': dentistAddressValid, 'input-invalid': dentist_address && !dentistAddressValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-
-
-                <div class="col s6">
-                    @*Religion*@
-                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <input id="religion"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Roman-Catholic"
-                           maxlength="50"
-                           required>
-                </div>
-
-                <div class="col s6">
-                    @*Nationality*@
-                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <input id="contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Filipino"
-                           maxlength="50"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                @*Specialization*@
-                <div class="col s12">
-                    <p class="custom-label">Specialization</p>
-                    <input type="text"
-                           ng-model="dentist_specialization"
-                           class="custom-input"
-                           maxlength="50">
-                </div>
-
-            </div>
-            <div class="row">
-                @*Branch*@
-                <div class="col s12">
-                    <p class="custom-label">Branch</p>
-                    <select class="browser-default custom-input" ng-model="dentist_branchID">
-                        <option value="" disabled selected>Select Branch</option>
-                        <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
-                    </select>
-                </div>
-
-            </div>
-        </form>
+        </div>
     </div>
 
     @*Submit or cancel*@
         <div class="modal-footer" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickPhoto('dentist')">UPLOAD PHOTO</button>
-            <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
             <button type="submit"
                     class="edit-btn modal-close"
                     ng-click="addDentist()"
@@ -555,59 +237,6 @@
 <div id="staffInformationFormAdd" class="modal patientInformationForm-modal">
     <div>
         <h5 class="modal-form-title">Add New Staff</h5>
-
-        <form>
-            <div class="row">
-                <div class="col s4">
-                    @*Photo upload*@
-                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
-                        <div class="col s12">
-                            <div class="photo-box" ng-click="pickPhoto('staff')" style="cursor:pointer;">
-                                <img ng-if="staffPhotoPreview" ng-src="{{staffPhotoPreview}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
-                                <i class="material-icons photo-placeholder-icon" ng-if="!staffPhotoPreview">image</i>
-                            </div>
-                            <input id="staffPhotoInput" type="file" accept="image/*" style="display:none"
-                                   onchange="angular.element(this).scope().onPhotoSelected(this.files, 'staff')" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col s8">
-                    <div class="row">
-                        @*First name*@
-                        <div class="col s6">
-                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   ng-model="staff_firstName"
-                                   class="custom-input"
-                                   maxlength="150"
-                                   placeholder="Juan"
-                                   required>
-                        </div>
-                        @*MIddle name*@
-                        <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
-                            <input type="text"
-                                   ng-model="staff_middleName"
-                                   class="custom-input"
-                                   maxlength="150"
-                                   placeholder="Mercado"
-                                   required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        @*Last name*@
-                        <div class="col s12">
-                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
-                            <input type="text" class="custom-input"
-                                   ng-model="staff_lastName"
-                                   maxlength="150"
-                                   placeholder="Dela Cruz"
-                                   required>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             @*Email*@
             <div class="row">
@@ -635,121 +264,12 @@
                 </div>
             </div>
 
-            <div class="row">
-                @*Gender*@
-                <div class="col s3">
-                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="staff_genderID">
-                        <option value="" disabled selected>Select Gender</option>
-                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
-                    </select>
-                </div>
-                @*Birthdate*@
-                <div class="col s3">
-                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
-                    <div class="datepicker-wrapper">
-                        <input id="birthDate"
-                               ng-model="staff_birthDate"
-                               type="text"
-                               class="datepicker custom-input"
-                               readonly
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
-                    </div>
-                </div>
-
-                <div class="col s3">
-                    @*Civil status*@
-                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required ng-model="staff_civilStatus">
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="1">Single</option>
-                        <option value="2">Married</option>
-                        <option value="3">Widowed</option>
-                    </select>
-                </div>
-                <div class="col s3">
-                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                    <input id="staffContactNumber"
-                           ng-model="staff_contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="09XX-XXX-XXXX"
-                           maxlength="11"
-                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                           ng-change="checkAddStaffContact()"
-                           ng-class="{'input-valid': staffContactValid, 'input-invalid': staff_contactNumber && !staffContactValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <input ng-model="staff_address"
-                           class="custom-input"
-                           maxlength="250"
-                           ng-change="checkAddStaffAddress()"
-                           ng-class="{'input-valid': staffAddressValid, 'input-invalid': staff_address && !staffAddressValid}"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-
-
-                <div class="col s6">
-                    @*Religion*@
-                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <input id="religion"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Roman-Catholic"
-                           maxlength="50"
-                           required>
-                </div>
-
-                <div class="col s6">
-                    @*Nationality*@
-                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <input id="contactNumber"
-                           type="text"
-                           class="custom-input"
-                           placeholder="Filipino"
-                           maxlength="50"
-                           required>
-                </div>
-            </div>
-
-            <div class="row">
-                @*Clinic Role*@
-                <div class="col s12">
-                    <p class="custom-label">Clinic Role</p>
-                    <input type="text"
-                           ng-model="staff_staffRole"
-                           class="custom-input"
-                           maxlength="50">
-                </div>
-
-            </div>
-
-            <div class="row">
-                @*Branch*@
-                <div class="col s12">
-                    <p class="custom-label">Branch</p>
-                    <select class="browser-default custom-input" ng-model="staff_branchID">
-                        <option value="" disabled selected>Select Branch</option>
-                        <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
-                    </select>
-                </div>
-            </div>
-        </form>
+            
     </div>
 
     @*Submit or cancel*@
         <div class="modal-footer" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickPhoto('staff')">UPLOAD PHOTO</button>
-            <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
             <button type="submit"
                     class="edit-btn modal-close"
                     ng-click="addStaff()"
