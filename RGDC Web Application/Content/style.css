@@ -1463,15 +1463,21 @@ css.validation-msg {
     .password-field input {
         padding-right: 44px; /* space for the icon; tweak if needed */
         box-sizing: border-box;
+        margin-bottom: 0 !important;
+    }
+
+    .password-wrapper{
+        position: relative;
+        display:block;
     }
 
     /* Use top:0; bottom:0; margin:auto to vertically center against the input height */
     .password-field .password-toggle {
         position: absolute;
         right: 10px;
-        top: 0;
-        bottom: 0;
-        margin: auto;
+        top: 0 !important;
+        bottom: 0 !important;
+        margin: auto !important;
         height: 20px; /* glyph height; adjust to match input height */
         display: flex;
         align-items: center;
