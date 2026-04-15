@@ -43,6 +43,10 @@ namespace RGDC_Web_Application.Controllers
             return View();
         }
 
+        public ActionResult signUpStaff()
+        {
+            return View();
+        }
         public JsonResult GetCurrentDentist()
         {
             try

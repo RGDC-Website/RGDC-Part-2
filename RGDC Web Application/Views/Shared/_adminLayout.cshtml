@@ -24,22 +24,22 @@
 <body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController" ng-init="getSessionVariables()">
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
-        <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text sidebar-fixed" style="min-height: 100vh; position: fixed;">
+        <div class="col hide-on-small-only m3 l3 brown lighten-1 z-depth-3 white-text" style="min-height: 100vh; position: fixed;">
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserStaff">
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
                 <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
             </div>
 
-            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
                 <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
             </div>
-            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserOwner">
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserOwner">
                 <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileOwner" />
             </div>
 
-            <div class="row center sidebar-profile" style="margin-top: 5rem;" ng-show="isUserPatient">
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
                 <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" />
             </div>
 
@@ -51,14 +51,18 @@
 
             @*Calendaryo CODESSS*@
             <div class="row center" style="margin-top: 0.5rem;">
-                <div class="google-sync" style="display:inline-block; margin-left:0;">
+                <div class="google-sync" style="display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-left: 0;">
                     <label style="vertical-align: middle;">
                         <input type="checkbox" ng-model="googleCalendarEnabled" ng-change="toggleGoogleCalendar(googleCalendarEnabled)" />
-                        <span style="vertical-align: middle; margin-left:0.5rem;">Save appointments to Google Calendar</span>
+                        <span style="vertical-align: middle; margin-left: 0.5rem; font-size: .95rem; color: lightgray">Save appointments to Google Calendar</span>
                     </label>
-                    <button class="btn small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
+
                 </div>
             </div>
+            <div class="row center">
+                <button class="btn-small brown lighten-4 brown-text" ng-click="connectGoogle()" ng-if="!googleConnected" style="margin-left:0.5rem">Connect Google</button>
+            </div>
+
 
             @*nav tabs*@
             <div style="margin-top: 2rem; padding-left: 3rem; padding-right: 3rem;">
@@ -84,7 +88,7 @@
 
 
             @*date and time at the bottom of the screen*@
-            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+            <div class="row center" style="margin-top: 4rem; padding-bottom: 2rem;">
                 <span id="currentDate">Loading date...</span>
                 <span id="currentTime">Loading time...</span>
             </div>
@@ -177,7 +181,7 @@
 
 
     @*Edit Profile Owner*@
-    <div id="modalEditProfileOwner" class="modal patientInformationForm-modal" ng-init="getOwnerData()">
+    <div id="modalEditProfileOwner" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getOwnerData()">
         <div>
             <h5 class="modal-form-title">Edit Profile</h5>
 
@@ -280,24 +284,24 @@
                     </div>
                 </div>
 
-                <!--<div class="row">-->
+                <div class="row">
                     @*Religion*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.religion"
                                placeholder="Roman-Catholic" maxlength="50"
                                ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
-                    </div>-->
+                    </div>
                     @*Nationality*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.nationality"
                                placeholder="Filipino" maxlength="50"
                                ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
                     </div>
-                </div>-->
+                </div>
 
                 <div class="row">
                     @*Address*@
@@ -318,9 +322,9 @@
                     </div>
                 </div>
 
-                @*<div class="forgot-password-container">
+                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
                     <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>*@
+                </div>
             </form>
         </div>
 
@@ -435,24 +439,24 @@
                     </div>
                 </div>
 
-                <!--<div class="row">-->
+                <div class="row">
                     @*Religion*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.religion"
                                placeholder="Roman-Catholic" maxlength="50"
                                ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.religion">Religion is required.</span>
-                    </div>-->
+                    </div>
                     @*Nationality*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.nationality"
                                placeholder="Filipino" maxlength="50"
                                ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.nationality">Nationality is required.</span>
                     </div>
-                </div>-->
+                </div>
 
                 <div class="row">
                     @*Address*@
@@ -483,9 +487,9 @@
                     </div>
                 </div>
 
-                @*<div class="forgot-password-container">
+                <div class="forgot-password-container">
                     <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>*@
+                </div>
             </form>
         </div>
 
@@ -600,24 +604,24 @@
                     </div>
                 </div>
 
-                <!--<div class="row">-->
+                <div class="row">
                     @*Religion*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="staff.religion"
                                placeholder="Roman-Catholic" maxlength="50"
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
-                    </div>-->
+                    </div>
                     @*Nationality*@
-                    <!--<div class="col s6">
+                    <div class="col s6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="staff.nationality"
                                placeholder="Filipino" maxlength="50"
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.nationality">Nationality is required.</span>
                     </div>
-                </div>-->
+                </div>
 
                 <div class="row">
                     @*Address*@
@@ -649,20 +653,20 @@
                     </div>
                 </div>
 
-                @*<div class="forgot-password-container">
+                <div class="forgot-password-container">
                     <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>*@
+                </div>
             </form>
         </div>
 
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
             <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFile()">UPLOAD PHOTO</button>
-            @*<button type="button" class="edit-btn left" style="font-weight:500; margin-left:8px;" ng-click="pickAccountSignatureFile()">UPLOAD SIGNATURE</button>*@
+            <button type="button" class="edit-btn left" style="font-weight:500; margin-left:8px;" ng-click="pickAccountSignatureFile()">UPLOAD SIGNATURE</button>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editStaffSubmitted = false">CANCEL</button>
             <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editStaff()">SAVE</button>
         </div>
     </div>
-    @*Forgot Password*@
+    @*NEW Password*@
     <div id="modalOTP" class="modal password-modal">
         <div class="modal-content" style="width:80vh !important">
             <h5 class="modal-form-title">Change Password</h5>
