@@ -24,18 +24,18 @@
         </div>
     </div>
     @*DELETE PATIENT Record*@
-<div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Patient Record</h5>
+    <div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
+        <div class="modal-content">
+            <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Patient Record</h5>
 
-        <p class="custom-label">Are you sure you want to delete this patient record?</p>
-    </div>
+            <p class="custom-label">Are you sure you want to delete this patient record?</p>
+        </div>
 
-    <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePatientThis()">DELETE</button>
+        <div class="modal-footer">
+            <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+            <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePatientThis()">DELETE</button>
+        </div>
     </div>
-</div>
 
     @*content*@
     <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
@@ -63,7 +63,7 @@
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
                         <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit || "---"}}</p>
-                        <button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;"data-target="modalDeletePatient">DELETE</button>
+                        <button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>
                         <button class="edit-btn right modal-trigger" data-target="modalEditPatientInfo">EDIT</button>
                     </div>
                 </div>
@@ -96,7 +96,7 @@
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">REFERRAL</p>
                                 <p class="brown-text lighten-1">{{selectedPatient.referral}}</p>
-                            </div>                            
+                            </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ACCOUNT CREATION</p>
                                 <p class="brown-text lighten-1">{{selectedPatient.accCreated}}</p>
@@ -129,7 +129,7 @@
                             </div>
 
                         </div>
-                      
+
 
                     </div>
                 </div>
@@ -138,7 +138,7 @@
 
         @*right column------------------------------------------------------------------------------------------------------------------------------------*@
         <div class="col m8 l8" style="padding-right: 0">
-            <div class="card grey lighten-2" >
+            <div class="card grey lighten-2">
                 <nav class="nav-extended grey lighten-2 z-depth-0">
                     <div class="nav-content p-1">
                         <ul class="tabs tabs-transparent center-tabs">
@@ -375,54 +375,54 @@
                     </div>
 
                     @*Forms*@
-                <div id="forms" class="row m-0">
-                    <div class="row">
-                        <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                    <div id="forms" class="row m-0">
+                        <div class="row">
+                            <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                        </div>
+
+                        <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
+                            @*table headers*@
+                            <thead>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th>Form</th>
+                                    <th colspan="2">Dentist</th>
+                                </tr>
+                            </thead>
+                            @*table content*@
+                            <tbody>
+                                <tr ng-repeat="f in patientForms track by f.formID">
+                                    <td>{{f.date}}</td>
+                                    <td>
+                                        <a ng-href="{{f.formLink}}" target="_blank" rel="noopener">View Form</a>
+                                    </td>
+                                    <td>{{f.dentistName || '---'}}</td>
+                                    <td>
+                                        <a ng-show="isUserAdmin && !isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger"
+                                           ng-click="selectDeleteForm && selectDeleteForm(f.formID)" data-target="modalDeleteForm" data-position="bottom" data-tooltip="Delete Form">
+                                            <i class="material-icons brown-text lighten-1">delete</i>
+                                        </a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
+                                           ng-click="selectEditForm && selectEditForm(f.formID)" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important">
+                                            <i class="material-icons brown-text lighten-1">edit</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            @*table footer*@
+                            <tfoot>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th>Form</th>
+                                    <th>Dentist</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
 
-                    <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
-                        @*table headers*@
-                        <thead>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Form</th>
-                                <th colspan="2">Dentist</th>
-                            </tr>
-                        </thead>
-                        @*table content*@
-                        <tbody>
-                            <tr ng-repeat="f in patientForms track by f.formID">
-                                <td>{{f.date}}</td>
-                                <td>
-                                    <a ng-href="{{f.formLink}}" target="_blank" rel="noopener">View Form</a>
-                                </td>
-                                <td>{{f.dentistName || '---'}}</td>
-                                <td>
-                                    <a ng-show="isUserAdmin && !isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger"
-                                       ng-click="selectDeleteForm && selectDeleteForm(f.formID)" data-target="modal-delete-form" data-position="bottom" data-tooltip="Delete Form">
-                                        <i class="material-icons brown-text lighten-1">delete</i>
-                                    </a>
-                                    <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
-                                       ng-click="selectEditForm && selectEditForm(f.formID)" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important">
-                                        <i class="material-icons brown-text lighten-1">edit</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                        @*table footer*@
-                        <tfoot>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Form</th>
-                                <th>Dentist</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-
                     @*post op*@
-                    <div id="postOp" class="row m-0 containerOverflow-2">
+                    <div id="postOp" class="row m-0 ">
 
                         <div class="row">
                             <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
@@ -437,8 +437,18 @@
                         </div>
                         @*edit and delete buttons*@
                         <div class="row m-0 left">
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped modal-trigger" data-target="modal-edit-postOp" data-position="bottom" data-tooltip="Edit Post Op" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger" data-target="modal-delete-postOp" data-position="bottom" data-tooltip="Delete Post Op">
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped modal-trigger"
+                               data-target="modalEditPostOp"
+                               data-position="bottom"
+                               data-tooltip="Edit Post Op"
+                               style="margin-right: 0.5rem !important">
+                                <i class="material-icons brown-text lighten-1">edit</i>
+                            </a>
+
+                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger"
+                               data-target="modalDeletePostOp"
+                               data-position="bottom"
+                               data-tooltip="Delete Post Op">
                                 <i class="material-icons brown-text lighten-1">delete</i>
                             </a>
                         </div>
@@ -1208,367 +1218,194 @@
     </div>
 </div>
 
-@*Add form (match post-op modal sizing) *@
-<div id="modal-add-form" class="modal modal-fixed-footer add-form-modal">
+
+@*ADD form *@
+<div id="modalAddForm" class="modal form-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Form</h5>
-        <form name="addFormForm" novalidate ng-submit="addForm(newForm)">
-            <div class="row">
-                <div class="col s12 m6">
-                    <label class="custom-label">
-                        First Name
-                        <input name="firstName"
-                               type="text"
-                               class="custom-input"
-                               placeholder="First Name"
-                               ng-model="newForm.firstName"
-                               required
-                               ng-class="{'valid-input': addFormForm.firstName.$dirty && !addFormForm.firstName.$invalid, 'invalid-input': addFormForm.firstName.$dirty && addFormForm.firstName.$invalid}" />
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.firstName.$dirty && addFormForm.firstName.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Middle Name
-                        <input name="middleName"
-                               type="text"
-                               class="custom-input"
-                               placeholder="Middle Name"
-                               ng-model="newForm.middleName" />
-                    </label>
-
-                    <label class="custom-label">
-                        Last Name
-                        <input name="lastName"
-                               type="text"
-                               class="custom-input"
-                               placeholder="Last Name"
-                               ng-model="newForm.lastName"
-                               required
-                               ng-class="{'valid-input': addFormForm.lastName.$dirty && !addFormForm.lastName.$invalid, 'invalid-input': addFormForm.lastName.$dirty && addFormForm.lastName.$invalid}" />
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.lastName.$dirty && addFormForm.lastName.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Gender
-                        <select class="browser-default custom-input" ng-model="newForm.genderID" ng-options="g.genderID as g.description for g in genderArray" required
-                                name="gender"
-                                ng-class="{'valid-input': addFormForm.gender.$dirty && !addFormForm.gender.$invalid, 'invalid-input': addFormForm.gender.$dirty && addFormForm.gender.$invalid}">
-                            <option value="" disabled>Select Gender</option>
-                        </select>
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.gender.$dirty && addFormForm.gender.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Date of Birth
-                        <input name="birthDate" type="date" class="custom-input" ng-model="newForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" required
-                               ng-class="{'valid-input': addFormForm.birthDate.$dirty && !addFormForm.birthDate.$invalid, 'invalid-input': addFormForm.birthDate.$dirty && addFormForm.birthDate.$invalid}" />
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.birthDate.$dirty && addFormForm.birthDate.$invalid">This field is required</span>
-                </div>
-
-                <div class="col s12 m6">
-                    <label class="custom-label">
-                        Civil Status
-                        <select class="browser-default custom-input" ng-model="newForm.civilStatus" name="civilStatus" required
-                                ng-class="{'valid-input': addFormForm.civilStatus.$dirty && !addFormForm.civilStatus.$invalid, 'invalid-input': addFormForm.civilStatus.$dirty && addFormForm.civilStatus.$invalid}">
-                            <option value="" disabled selected>Select Status</option>
-                            <option value="Single">Single</option>
-                            <option value="Married">Married</option>
-                            <option value="Widowed">Widowed</option>
-                        </select>
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.civilStatus.$dirty && addFormForm.civilStatus.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Contact Number
-                        <input name="contactNumber"
-                               type="text"
-                               class="custom-input"
-                               placeholder="09XXXXXXXXX"
-                               ng-model="newForm.contactNumber"
-                               required
-                               ng-pattern="/^09\d{9}$/"
-                               maxlength="11"
-                               oninput="this.value = this.value.replace(/[^0-9]/g,'')"
-                               ng-class="{'valid-input': addFormForm.contactNumber.$dirty && !addFormForm.contactNumber.$invalid, 'invalid-input': addFormForm.contactNumber.$dirty && addFormForm.contactNumber.$invalid}" />
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.contactNumber.$dirty && addFormForm.contactNumber.$error.required">This field is required</span>
-                    <span class="helper-text error-text" ng-show="addFormForm.contactNumber.$dirty && addFormForm.contactNumber.$error.pattern">Enter a valid contact number (09#########)</span>
-
-                    <label class="custom-label">
-                        Address
-                        <input name="address"
-                               type="text"
-                               class="custom-input"
-                               placeholder="Address"
-                               ng-model="newForm.address"
-                               required
-                               ng-minlength="5"
-                               ng-class="{'valid-input': addFormForm.address.$dirty && !addFormForm.address.$invalid, 'invalid-input': addFormForm.address.$dirty && addFormForm.address.$invalid}" />
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.address.$dirty && addFormForm.address.$error.required">This field is required</span>
-                    <span class="helper-text error-text" ng-show="addFormForm.address.$dirty && addFormForm.address.$error.minlength">Address must be at least 5 characters</span>
-
-                    <label class="custom-label">
-                        Upload form file / image (optional)
-                        <input type="file" class="custom-input" onchange="angular.element(this).scope().pickFormFile(this)" />
-                    </label>
-                </div>
-            </div>
-
-            <div class="row" style="margin-top:8px;">
-                <div class="col s12 m6">
-                    <div class="row m-0 center" style="margin-top:8px;">
-                        <img ng-if="newForm.previewLink" ng-src="{{newForm.previewLink}}" style="max-height: 14rem;" alt="Form Preview" />
-                        <img ng-if="!newForm.previewLink" src="https://placehold.co/2550x3300" style="max-height: 14rem;" alt="Placeholder" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Terms & Submit area -->
-            <div class="row" style="margin-top: 6px;">
-                <div class="col s12">
-                    <label style="display:flex; align-items:center; gap:10px;">
-                        <input name="acceptedTerms" type="checkbox" class="filled-in" ng-model="newForm.acceptedTerms" required />
-                        <span>I agree to the terms and conditions</span>
-                    </label>
-                    <span class="helper-text error-text" ng-show="addFormForm.acceptedTerms.$dirty && addFormForm.acceptedTerms.$invalid">You must accept terms & conditions</span>
-                </div>
-            </div>
-
-        </form>
-    </div>
-
-    <div class="modal-footer footer-center">
-        <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFile()">PICK FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px"
-                ng-click="addForm(newForm)"
-                ng-disabled="addFormForm.$invalid">
-            ADD
-        </button>
-    </div>
-</div>
-
-@*Edit form (match post-op modal sizing) *@
-<!--<div id="modal-edit-form" class="modal  edit-form-modal">
-    <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
+        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Add Form</h5>
 
         <div class="row">
-            <div class="col s12 m6">
+            <div class="col s12">
                 <label class="custom-label">
-                    First Name
-                    <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedForm.firstName" />
-                </label>
-
-                <label class="custom-label">
-                    Middle Name
-                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedForm.middleName" />
-                </label>
-
-                <label class="custom-label">
-                    Last Name
-                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedForm.lastName" />
-                </label>
-
-                <label class="custom-label">
-                    Gender
-                    <select class="browser-default custom-input" ng-model="selectedForm.genderID" ng-options="g.genderID as g.description for g in genderArray">
-                        <option value="" disabled>Select Gender</option>
-                    </select>
-                </label>
-            </div>
-
-            <div class="col s12 m6">
-                <label class="custom-label">
-                    Date of Birth
-                    <input type="date" class="custom-input" ng-model="selectedForm.birthDate" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                </label>
-
-                <label class="custom-label">
-                    Civil Status
-                    <select class="browser-default custom-input" ng-model="selectedForm.civilStatus">
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="Single">Single</option>
-                        <option value="Married">Married</option>
-                        <option value="Widowed">Widowed</option>
-                    </select>
-                </label>
-
-                <label class="custom-label">
-                    Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" ng-model="selectedForm.contactNumber" max="11" />
-                </label>
-
-                <label class="custom-label">
-                    Address
-                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedForm.address" />
+                    Patient
+                    <input type="text" class="custom-input" placeholder="[This Patient]" />
                 </label>
             </div>
         </div>
 
-        <div class="row" style="margin-top:8px;">
-            <div class="col s12 m6">
+        <div class="row">
+            <div class="col s12">
                 <label class="custom-label">
-                    Terms &amp; Conditions
-                    <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
-                        <label style="display:flex; align-items:center;">
-                            <input type="checkbox" class="filled-in" ng-model="selectedForm.acceptedTerms" />
-                            <span>I agree to the terms and conditions</span>
-                        </label>
-                    </div>
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist..." />
                 </label>
             </div>
+        </div>
 
-            <div class="col s12 m6">
-                <div class="row m-0 center" style="margin-top:8px;">
-                    <img ng-if="selectedForm.formLink" ng-src="{{selectedForm.formLink}}" style="max-height: 14rem;" alt="Form Preview" />
-                    <img ng-if="!selectedForm.formLink" src="https://placehold.co/2550x3300" style="max-height: 14rem;" alt="Placeholder" />
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Date
+                </label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Form
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                </label>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:1.5vh">
+            <div class="row m-0 center">
+                <img id="dentalChartModalImg"
+                     img src="https://placehold.co/2550x3300"
+                     alt="Dental Chart"
+                     style="max-height: 25rem" />
             </div>
         </div>
     </div>
 
-    <div class="modal-footer footer-center">
-        <button type="submit" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFileForEdit()">UPLOAD FORM</button>
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="saveForm(selectedForm)" ng-disabled="!selectedForm.firstName || !selectedForm.lastName || !selectedForm.acceptedTerms">SAVE</button>
+    <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
+        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+        <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">ADD</button>
     </div>
 </div>
 
-<div id="modal-delete-form" class="modal progNotes-modal" style="width:30% !important; padding:0 !important">
+@*EDIT form *@
+<div id="modalEditForm" class="modal form-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Form</h5>
+        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Edit Form</h5>
+
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" placeholder="[This Patient]" />
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" placeholder="Dentist..." />
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Date
+                </label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Form
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                </label>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:1.5vh">
+            <div class="row m-0 center">
+                <img id="dentalChartModalImg"
+                     img src="https://placehold.co/2550x3300"
+                     alt="Dental Chart"
+                     style="max-height: 25rem" />
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer" style="margin: -2vh 0 3vh 0 !important">
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
+        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+        <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">SAVE</button>
+    </div>
+</div>
+
+
+@*DELETE form *@
+<div id="modalDeleteForm" class="modal form-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Delete Form</h5>
+
         <p class="custom-label">Are you sure you want to delete this form?</p>
     </div>
+
     <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500;">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight: 500;" ng-click="deleteFormThis()">DELETE</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
     </div>
-</div>-->
+</div>
 
 @*Edit Post Op*@
-<div id="modal-edit-form" class="modal modal-fixed-footer edit-form-modal">
+<div id="modalEditPostOp" class="modal postOp-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Form</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
 
-        <form name="editFormForm" novalidate>
-            <div class="row">
-                <div class="col s12 m6">
-                    <label class="custom-label">
-                        First Name
-                        <input name="firstName" type="text" class="custom-input" placeholder="First Name" ng-model="selectedForm.firstName"
-                               + required ng-class="{'valid-input': editFormForm.firstName.$dirty && !editFormForm.firstName.$invalid, 'invalid-input': editFormForm.firstName.$dirty && editFormForm.firstName.$invalid}" />
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Template
+                    <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
+                        <option value="" disabled selected>Select template</option>
+                    </select>
+                </label>
 
-                    </label>
-                    <span class="helper-text error-text" ng-show="editFormForm.firstName.$dirty && editFormForm.firstName.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Middle Name
-                        <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedForm.middleName" />
-
-                    </label>
-
-                    <label class="custom-label">
-                        Last Name
-                        <input name="lastName" type="text" class="custom-input" placeholder="Last Name" ng-model="selectedForm.lastName" required
-                               + ng-class="{'valid-input': editFormForm.lastName.$dirty && !editFormForm.lastName.$invalid, 'invalid-input': editFormForm.lastName.$dirty && editFormForm.lastName.$invalid}" />
-
-                    </label>
-                    <span class="helper-text error-text" ng-show="editFormForm.lastName.$dirty && editFormForm.lastName.$invalid">This field is required</span>
-
-                    <label class="custom-label">
-                        Contact Number
-                        <input name="contactNumber" type="text" class="custom-input" placeholder="09XXXXXXXXX" ng-model="selectedForm.contactNumber" required ng-pattern="/^09\d{9}$/"
-                               maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g,'')"
-                               ng-class="{'valid-input': editFormForm.contactNumber.$dirty && !editFormForm.contactNumber.$invalid, 'invalid-input': editFormForm.contactNumber.$dirty && editFormForm.contactNumber.$invalid}" />
-
-                    </label>
-                    <span class="helper-text error-text" ng-show="editFormForm.contactNumber.$dirty && editFormForm.contactNumber.$error.pattern">Enter a valid contact number (09#########)</span>
-
-                </div>
-
-                <div class="col s12 m6">
-                    <label class="custom-label">
-                        Dentist (optional)
-                        <select class="browser-default custom-input" ng-model="selectedForm.dentistID" ng-options="d.dentistID as d.dentistName for d in dentistArray">
-
-                            <option value="">Select Dentist (optional)</option>
-
-                        </select>
-
-                    </label>
-
-                    <label class="custom-label">
-                        Upload form file / image (optional)
-                        <input type="file" class="custom-input" onchange="angular.element(this).scope().pickFormFileForEdit(this)" />
-
-                    </label>
-
-                    <div class="row m-0 center" style="margin-top:8px;">
-                        <img ng-if="selectedForm.formLinkPreview" ng-src="{{selectedForm.formLinkPreview}}" style="max-height: 14rem;" alt="Form Preview" />
-                        <img ng-if="!selectedForm.formLinkPreview" src="https://placehold.co/2550x3300" style="max-height: 14rem;" alt="Placeholder" />
-
-                    </div>
-
-                    <label style="display:flex; align-items:center; gap:10px; margin-top:8px;">
-                        <input name="acceptedTerms" type="checkbox" class="filled-in" ng-model="selectedForm.acceptedTerms" required />
-                        <span>I agree to the terms and conditions</span>
-
-                    </label>
-                    <span class="helper-text error-text" ng-show="editFormForm.acceptedTerms.$dirty && editFormForm.acceptedTerms.$invalid">You must accept terms & conditions</span>
-                </div>
-            </div>
-
-        </form>
-    </div>
-    <div class="modal-footer footer-center">
-        <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="pickFormFileForEdit()">PICK FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px"
-                
-                ng-click="saveForm(selectedForm)"
-                 ng-disabled="editFormForm.$invalid">
-            SAVE
-
-        </button>
-    </div>
-    @*Edit Post Op*@
-    <div id="modal-edit-postOp" class="modal modal-fixed-footer edit-postOp-modal">
-        <div class="modal-content">
-            <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
-
-            <div class="row">
-                <div class="col s12 m4">
-                    <label class="custom-label">
-                        Template
-                        <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
-                            <option value="" disabled selected>Select template</option>
-                        </select>
-                    </label>
-
-                    <label class="custom-label" style="margin-top:8px;">
-                        Title
-                        <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
-                    </label>
-                </div>
-
-                <div class="col s12 m8">
-                    <label class="custom-label">
-                        Instructions
-                        <textarea ng-model="postOp.instructions" style="flex: 1; height: 420px; padding-top: 10px; background-color:white; width:100%"></textarea>
-                        <p class="small-muted" style="margin-top:6px;">You can paste formatted HTML here if your editor pipeline supports it.</p>
-                    </label>
-                </div>
+                <label class="custom-label" style="margin-top:8px;">
+                    Title
+                    <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
+                </label>
             </div>
         </div>
 
-        <div class="modal-footer footer-center">
-            <button class="modal-close cancel-btn" style="font-weight:500;">CANCEL</button>
-            <button type="button" class="edit-btn left" style="font-weight:500; margin-left:20px" ng-click="printPostOp()">PRINT</button>
-            <button type="button" class="edit-btn" style="font-weight:500; margin-right:20px" ng-click="savePostOp()">SAVE</button>
+        <div class="row">
+            <div class="col s12">
+                <label class="custom-label">
+                    Instructions
+                    <textarea ng-model="postOp.instructions" style="flex: 1; height: 45vh; padding-top: 10px; background-color:white; width:100%"></textarea>
+                    <p class="small-muted" style="margin-top:.2vh;">You can paste formatted HTML here if your editor pipeline supports it.</p>
+                </label>
+            </div>
         </div>
+    </div>
+
+    <div class="modal-footer" style="margin-top:-1vh">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">SAVE</button>
+    </div>
+</div>
+
+
+@*DELETE Post Op *@
+<div id="modalDeletePostOp" class="modal postOp-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Delete Post Operation Instructions?</h5>
+
+        <p class="custom-label">Are you sure you want to delete this post operation instructions?</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
     </div>
 </div>
 
@@ -1595,6 +1432,7 @@
         bottom: 0;
         width: 100%;
     }
+
     .invalid-input {
         border: 1px solid #d32f2f !important;
     }

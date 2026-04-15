@@ -313,6 +313,7 @@
     <Content Include="Views\RGDC\contactUsPage.cshtml" />
     <Content Include="Views\RGDC\faqPage.cshtml" />
     <Content Include="Views\RGDC\GoogleAuthCallBack.cshtml" />
+    <Content Include="Views\RGDC\signUpStaff.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

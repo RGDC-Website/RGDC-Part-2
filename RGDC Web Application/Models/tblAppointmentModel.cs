@@ -13,7 +13,7 @@ namespace RGDC_Web_Application.Models
         public int createdBy { get; set; }
         public DateTime dateTime { get; set; }
         public string reason { get; set; }
-        public int procedures { get; set; }
+        public int procedureID { get; set; }
         public string remarks { get; set; }
         public string status { get; set; }
         public DateTime schedCreatedAt { get; set; }
