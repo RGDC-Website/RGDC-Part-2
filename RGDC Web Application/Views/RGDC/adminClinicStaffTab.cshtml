@@ -378,7 +378,7 @@
                         </div>
                         @*MIddle name*@
                         <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Middle Name</p>
                             <input type="text"
                                    ng-model="owner.middleName"
                                    class="custom-input"
@@ -488,7 +488,7 @@
             <div class="row">
                 @*Specialization*@
                 <div class="col s12">
-                    <p class="custom-label">Specialization</p>
+                    <p class="custom-label">Specialization <span class="required-mark">*</span></p>
                     <input type="text" ng-model="owner.specialization" class="custom-input" maxlength="50" />
                 </div>
             </div>
@@ -550,7 +550,7 @@
                                    ng-class="{'input-valid': dentistFirstNameTouched && dentistFirstNameValid, 'input-invalid': dentistFirstNameTouched && !dentistFirstNameValid}" />
                         </div>
                         <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Middle Name</p>
                             <input type="text" ng-model="dentist.middleName" class="custom-input" maxlength="150" placeholder="Mercado" required />
                         </div>
                     </div>
@@ -650,13 +650,13 @@
 
             <div class="row">
                 <div class="col s12">
-                    <p class="custom-label">Specialization</p>
+                    <p class="custom-label">Specialization <span class="required-mark">*</span></p>
                     <input type="text" ng-model="dentist.specialization" class="custom-input" maxlength="50" />
                 </div>
             </div>
             <div class="row">
                 <div class="col s12">
-                    <p class="custom-label">Branch</p>
+                    <p class="custom-label">Branch <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="dentist.branchID" ng-options="b.branchID as b.description for b in branchArray">
                         <option value="" disabled selected>Select Branch</option>
                     </select>
@@ -719,7 +719,7 @@
                                    ng-class="{'input-valid': staffFirstNameTouched && staffFirstNameValid, 'input-invalid': staffFirstNameTouched && !staffFirstNameValid}" />
                         </div>
                         <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Middle Name</p>
                             <input type="text" ng-model="staff.middleName" class="custom-input" maxlength="150" placeholder="Mercado" required />
                         </div>
                     </div>
@@ -816,13 +816,13 @@
 
             <div class="row">
                 <div class="col s12">
-                    <p class="custom-label">Clinic Role</p>
+                    <p class="custom-label">Clinic Role <span class="required-mark">*</span></p>
                     <input type="text" ng-model="staff.staffRole" class="custom-input" maxlength="50" />
                 </div>
             </div>
             <div class="row">
                 <div class="col s12">
-                    <p class="custom-label">Branch</p>
+                    <p class="custom-label">Branch <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="staff.branchID" ng-options="b.branchID as b.description for b in branchArray">
                         <option value="" disabled selected>Select Branch</option>
                     </select>

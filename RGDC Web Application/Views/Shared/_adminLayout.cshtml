@@ -194,7 +194,7 @@
                             </div>
                             @*Middle name*@
                             <div class="col s6">
-                                <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                                <p class="custom-label">Middle Name </p>
                                 <input type="text" class="custom-input" ng-model="owner.middleName"
                                        placeholder="Mercado" maxlength="150"
                                        ng-class="{'invalid-input': editOwnerSubmitted && !owner.middleName}">
@@ -301,7 +301,7 @@
                 <div class="row">
                     @*Specialization*@
                     <div class="col s12">
-                        <p class="custom-label">Specialization</p>
+                        <p class="custom-label">Specialization <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.specialization" maxlength="50" placeholder="General Dentistry">
                     </div>
                 </div>
@@ -318,8 +318,10 @@
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editOwner()">SAVE</button>
         </div>
     </div>
+
+
     @*Edit Profile Dentist*@
-    <div id="modalEditProfileDentist" class="modal patientInformationForm-modal" ng-init="getDentistData()">
+    <div id="modalEditProfileDentist" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getDentistData()">
         <div>
             <h5 class="modal-form-title">Edit Profile</h5>
 
@@ -349,7 +351,7 @@
                             </div>
                             @*Middle name*@
                             <div class="col s6">
-                                <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                                <p class="custom-label">Middle Name </p>
                                 <input type="text" class="custom-input" ng-model="dentist.middleName"
                                        maxlength="150" placeholder="Mercado"
                                        ng-class="{'invalid-input': editDentistSubmitted && !dentist.middleName}">
@@ -456,14 +458,14 @@
                 <div class="row">
                     @*Specialization*@
                     <div class="col s12">
-                        <p class="custom-label">Specialization</p>
+                        <p class="custom-label">Specialization <span class="required-mark">*</span></p>
                         <input type="text" ng-model="dentist.specialization" class="custom-input" maxlength="50" placeholder="Orthodontics">
                     </div>
                 </div>
                 <div class="row">
                     @*Branch*@
                     <div class="col s12">
-                        <p class="custom-label">Branch</p>
+                        <p class="custom-label">Branch <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.branchID"
                                 ng-options="b.branchID as b.description for b in branchArray">
                             <option value="" disabled selected>Select Branch</option>
@@ -471,8 +473,8 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
                 </div>
             </form>
         </div>
@@ -484,8 +486,10 @@
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">SAVE</button>
         </div>
     </div>
+
+
     @*Edit Profile Staff*@
-    <div id="modalEditProfileStaff" class="modal patientInformationForm-modal" ng-init="getStaffData()">
+    <div id="modalEditProfileStaff" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getStaffData()">
         <div>
             <h5 class="modal-form-title">Edit Profile</h5>
 
@@ -514,7 +518,7 @@
                             </div>
                             @*Middle name*@
                             <div class="col s6">
-                                <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                                <p class="custom-label">Middle Name </p>
                                 <input type="text" class="custom-input" ng-model="staff.middleName"
                                        maxlength="150" placeholder="Mercado"
                                        ng-class="{'invalid-input': editStaffSubmitted && !staff.middleName}">
@@ -621,7 +625,7 @@
                 <div class="row">
                     @*Clinic Role*@
                     <div class="col s12">
-                        <p class="custom-label">Clinic Role</p>
+                        <p class="custom-label">Clinic Role <span class="required-mark">*</span></p>
                         <input type="text" ng-model="staff.staffRole" class="custom-input" maxlength="50">
                     </div>
                 </div>
@@ -629,7 +633,7 @@
                 <div class="row">
                     @*Branch*@
                     <div class="col s12">
-                        <p class="custom-label">Branch</p>
+                        <p class="custom-label">Branch <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="staff.branchID">
                             <option value="" disabled selected>Select Branch</option>
                             <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
@@ -637,22 +641,22 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
                 </div>
             </form>
         </div>
 
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
             <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFile()">UPLOAD PHOTO</button>
-            <button type="button" class="edit-btn left" style="font-weight:500; margin-left:8px;" ng-click="pickAccountSignatureFile()">UPLOAD SIGNATURE</button>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editStaffSubmitted = false">CANCEL</button>
             <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editStaff()">SAVE</button>
         </div>
     </div>
+
     @*NEW Password*@
     <div id="modalOTP" class="modal password-modal">
-        <div class="modal-content" style="width:80vh !important">
+        <div class="modal-content" style="width:50vh !important">
             <h5 class="modal-form-title">Change Password</h5>
 
             <div class="input-field">
@@ -669,13 +673,13 @@
             <div class="modal-footer">
                 <button type="submit" class="edit-btn right" style="font-weight: 500; align-items: center; margin: 1vh 0 -3vh 0" ng-click="sendOTP()">SEND OTP</button>
                 <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 2.3vh -3vh 0">CANCEL</button>
-                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="OTPverify()">VERIFY</button>
+                <button type="submit" class="edit-btn modal-trigger" data-target="modalPasswordReset" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="OTPverify()">VERIFY</button>
             </div>
         </div>
     </div>
 
     <div id="modalPasswordReset" class="modal password-modal">
-        <div class="modal-content" style="width:80vh !important">
+        <div class="modal-content" style="width:50vh !important">
             <h5 class="modal-form-title">Change Password</h5>
 
             <div class="input-field">
@@ -694,7 +698,7 @@
 
             <div class="modal-footer">
                 <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 0 -3vh 0">CANCEL</button>
-                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" data-target="modalPasswordReset" ng-click="resetPassword()">CHANGE PASSWORD</button>
+                <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="resetPassword()">CHANGE PASSWORD</button>
             </div>
         </div>
     </div>

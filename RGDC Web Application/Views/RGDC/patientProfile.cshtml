@@ -362,7 +362,7 @@
                     <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger white-text" >UPLOAD CHART</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger white-text" data-target="modalDentalChart" >UPLOAD CHART</a>
                         </div>
 
                         <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
@@ -405,7 +405,7 @@
                     @*Forms*@
                     <div id="forms" class="row m-0">
                         <div class="row">
-                            <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modal-add-form">ADD FORM</a>
+                            <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modalAddForm">ADD FORM</a>
                         </div>
 
                         <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
@@ -498,6 +498,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     First Name
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedPatient.firstName">
                 </label>
             </div>
@@ -514,6 +515,7 @@
             <div class="col s4">
                 <label class="custom-label">
                     Last Name
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedPatient.lastName">
                 </label>
             </div>
@@ -525,6 +527,7 @@
                 @*Gender*@
                 <label class="custom-label">
                     Gender
+                    <span class="required-mark">*</span>
                     <select class="browser-default custom-input"
                             ng-model="selectedPatient.genderID"
                             ng-options="g.genderID as g.description for g in genderArray"
@@ -535,7 +538,7 @@
 
 
                 @*Birthdate*@
-                <label class="custom-label">Birth Date</label>
+                <label class="custom-label">Birth Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
                     <input id="birthDate"
                            ng-model="selectedPatient.birthDateRaw"
@@ -548,48 +551,53 @@
 
 
                 @*Address*@
-                <label class="custom-label">
-                    Address
-                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
-                </label>
+            <label class="custom-label">
+                Address
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
+            </label>
 
                 @*Nationality*@
-                <label class="custom-label">
-                    Nationality
-                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
-                </label>
+            <label class="custom-label">
+                Nationality
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
+            </label>
 
                 @*Guardian*@
-                <label class="custom-label">
-                    Guardian
-                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
-                </label>
+            <label class="custom-label">
+                Guardian
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
+            </label>
 
                 @*Email*@
-                <label class="custom-label">
-                    Email Address
-                    <input type="text"
-                           class="custom-input"
-                           placeholder="Email Address"
-                           ng-model="selectedPatient.email"
-                           ng-change="checkEditPatientEmail()" />
+            <label class="custom-label">
+                Email Address
+                <span class="required-mark">*</span>
+                <input type="text"
+                       class="custom-input"
+                       placeholder="Email Address"
+                       ng-model="selectedPatient.email"
+                       ng-change="checkEditPatientEmail()" />
 
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
-                        Enter a valid email address
-                    </span>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
-                        Email already taken
-                    </span>
-                    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
-                        Email is valid
-                    </span>
-                </label>
+                <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
+                    Enter a valid email address
+                </span>
+                <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
+                    Email already taken
+                </span>
+                <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
+                    Email is valid
+                </span>
+            </label>
             </div>
 
             <div class="col s6">
                 @*Civil status*@
                 <label class="custom-label">
                     Civil Status
+                    <span class="required-mark">*</span>
                     <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
@@ -599,47 +607,53 @@
                 </label>
 
                 @*Occupation*@
-                <label class="custom-label">
-                    Occupation
-                    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
-                </label>
+            <label class="custom-label">
+                Occupation
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
+            </label>
 
                 @*Religion*@
-                <label class="custom-label">
-                    Religion
-                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
-                </label>
+            <label class="custom-label">
+                Religion
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
+            </label>
 
                 @*Medical Insurance*@
-                <label class="custom-label">
-                    Medical Insurance
-                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
-                </label>
+            <label class="custom-label">
+                Medical Insurance
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
+            </label>
 
                 @*Guardian Contact #*@
-                <label class="custom-label">
-                    Guardian's Contact Number
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
-                </label>
+            <label class="custom-label">
+                Guardian's Contact Number
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
+            </label>
 
                 @*Contact #*@
-                <label class="custom-label">
-                    Contact Number
-                    <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
-                </label>
+            <label class="custom-label">
+                Contact Number
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
+            </label>
             </div>
         </div>
     </div>
+
     @*New Password*@
-    <div class="forgot-password-container" ng-show="isUserPatient">
-        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+    <div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;"">
+        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
     </div>
     <input id="patient_photo_input" type="file" accept="image/*" style="display:none"
            onchange="angular.element(this).scope().onPatientPhotoSelected(this.files)" />
 
 
     @*upload, save, cancel buttons*@
-    <div class="modal-footer" style="margin-top:-.3vh !important">
+    <div class="modal-footer">
         <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD NEW ACCOUNT PICTURE</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
@@ -656,7 +670,7 @@
                 @*previous physician info*@
                 <div class="row" style="padding: 0 10px; flex:1">
                     <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin:0 0 -15px 0;">
-                        <span>Name of previous physician:</span>
+                        <span>Name of previous physician:<span class="required-mark">*</span></span>
                         <input name="prevPhy" type="text" class="custom-input" style="flex: 1;" placeholder="Name of previous physician"
                                ng-model="prevPhy"
                                required
@@ -667,7 +681,7 @@
                     </span>
 
                     <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 -15px 0;">
-                        <span>Physician's office:</span>
+                        <span>Physician's office:<span class="required-mark">*</span></span>
                         <input name="prevPhyOffice" type="text" class="custom-input" style="flex: 1;" placeholder="Physician's office"
                                ng-model="prevPhyOffice" required ng-minlength="3">
                     </p>
@@ -676,7 +690,7 @@
                     </span>
 
                     <p style="display: flex; align-items: center; white-space: nowrap; gap: 10px; margin: -15px 0 5px 0;">
-                        <span>Physician's contact:</span>
+                        <span>Physician's contact:<span class="required-mark">*</span></span>
                         <input name="prevPhyContact" type="text" class="custom-input" style="flex: 1;" placeholder="Physician's contact"
                                ng-model="prevPhyContact"
                                required
@@ -695,7 +709,7 @@
             <ol class="medical-questions">
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Are you in good health?</span>
+                        <span>Are you in good health?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right:-25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="goodHealth" value="Yes" type="radio" class="with-gap" ng-model="medical.history.goodHealth" required />
@@ -712,7 +726,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Are you under medical treatment now?</span>
+                        <span>Are you under medical treatment now?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="underTreatment" type="radio" value="Yes" class="with-gap" ng-model="medical.history.underTreatment" required />
@@ -729,7 +743,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Have you ever had a serious illness or surgical operation?</span>
+                        <span>Have you ever had a serious illness or surgical operation?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="seriousIllness" type="radio" value="Yes" class="with-gap" ng-model="medical.history.seriousIllness" required />
@@ -746,7 +760,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Have you ever been hospitalized?</span>
+                        <span>Have you ever been hospitalized?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="hospitalized" type="radio" value="Yes" class="with-gap" ng-model="medical.history.hospitalized" required />
@@ -763,7 +777,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Are you taking prescription/non-prescription medication?</span>
+                        <span>Are you taking prescription/non-prescription medication?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="prescription" type="radio" value="Yes" class="with-gap" ng-model="medical.history.prescription" required />
@@ -780,7 +794,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Are you taking tobacco products?</span>
+                        <span>Are you taking tobacco products?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="tobacco" type="radio" value="Yes" class="with-gap" ng-model="medical.history.tobacco" required />
@@ -797,7 +811,7 @@
 
                 <li>
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <span>Do you use alcohol, cocaine, or other dangerous drugs?</span>
+                        <span>Do you use alcohol, cocaine, or other dangerous drugs?<span class="required-mark">*</span></span>
                         <div style="display: flex; gap: 15px; margin-right: -25px;">
                             <label style="display: flex; align-items: center;">
                                 <input name="drugs" type="radio" value="Yes" class="with-gap" ng-model="medical.history.drugs" required />
@@ -814,7 +828,7 @@
 
                 <li style="margin: -10px 0 10px 0;">
                     <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                        <span>Allergies:</span>
+                        <span>Allergies:<span class="required-mark">*</span></span>
                         <input name="allergies" type="text" class="custom-input" style="flex: 1; margin-right: -30px;" placeholder="Allergies..." ng-model="medical.history.allergies" required>
                     </div>
                     <span class="helper-text" style="color:#d32f2f" ng-show="medHisForm.allergies.$invalid && (medHisForm.allergies.$touched || medHisForm.$submitted)">Allergies is required</span>
@@ -822,14 +836,14 @@
 
                 <li style="margin: -24px 0 0 0;">
                     <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                        <span>Bleeding time:</span>
+                        <span>Bleeding time:<span class="required-mark">*</span></span>
                         <input name="bleedingTime" type="text" class="custom-input" style="flex: 1; margin-right: -50.5px;" placeholder="Bleeding time..." ng-model="medical.history.bleedingTime" required>
                     </div>
                     <span class="helper-text" style="color:#d32f2f" ng-show="medHisForm.bleedingTime.$invalid && (medHisForm.bleedingTime.$touched || medHisForm.$submitted)">Bleeding time is required</span>
                 </li>
 
                 <li ng-show="selectedPatient.genderID == 1">
-                    For women only:
+                    For women only:<span class="required-mark">*</span>
                     <div class="women-only-options">
                         <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
                         <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
@@ -839,13 +853,13 @@
 
                 <li style="margin: -10px 0 10px 0;">
                     <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                        <span>Blood pressure:</span>
+                        <span>Blood pressure:<span class="required-mark">*</span></span>
                         <input type="text" class="custom-input" ng-model="medical.history.bloodPressure" style="flex: 1; margin-right: -30px;" placeholder="Blood pressure...">
                     </div>
                 </li>
                 <li style="margin: -25px 0 0 0;">
                     <div style="display: flex; align-items: center; white-space: nowrap; gap: 10px;">
-                        <span>Blood type:</span>
+                        <span>Blood type:<span class="required-mark">*</span></span>
                         <input name="bloodType" type="text" class="custom-input" ng-model="medical.history.bloodType" style="flex: 1; margin-right: -30px;" placeholder="Blood Type..." required>
                     </div>
                     <span class="helper-text" style="color:#d32f2f" ng-show="medHisForm.bloodType.$invalid && (medHisForm.bloodType.$touched || medHisForm.$submitted)">Blood type is required</span>
@@ -1041,7 +1055,7 @@
                     <i ng-if="!(signaturePreview || selectedPatient.signatureLink)" class="material-icons">image</i>
                 </div>
                 <div class="signature-line"></div>
-                <span class="signature-label">Signature</span>
+                <span class="signature-label">Signature<span class="required-mark">*</span></span>
             </div>
 
             @*upload, save, cancel buttons*@
@@ -1067,7 +1081,7 @@
             <div class="row">
                 <div class="col s6">
                     @*Date*@
-                    <label class="custom-label">Date</label>
+                    <label class="custom-label">Date <span class="required-mark">*</span></label>
                     <div class="datepicker-wrapper">
                         <input id="date" name="date" type="text" class="datepicker custom-input" placeholder="Date"
                                ng-model="progNote_date" required>
@@ -1078,24 +1092,26 @@
                     </span>
 
                     @*Dentist*@
-                    <label class="custom-label" ng-init="getDentistOwner()">
-                        Dentist
-                        <select name="dentist" ng-model="progNote_accID" class="browser-default custom-input"
-                                ng-options="d.accID as d.fullName for d in dentistArrays track by d.accID" required>
-                            <option value="" disabled selected>Select Dentist</option>
-                        </select>
-                    </label>
+                <label class="custom-label" ng-init="getDentistOwner()">
+                    Dentist
+                    <span class="required-mark">*</span>
+                    <select name="dentist" ng-model="progNote_accID" class="browser-default custom-input"
+                            ng-options="d.accID as d.fullName for d in dentistArrays track by d.accID" required>
+                        <option value="" disabled selected>Select Dentist</option>
+                    </select>
+                </label>
                     <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.dentist.$invalid && (addProgForm.dentist.$touched || addProgForm.$submitted)">
                         Dentist is required
                     </span>
 
                     @*Amount*@
-                    <label class="custom-label">
-                        Amount
-                        <input name="amount" type="number" class="custom-input" placeholder="Amount"
-                               ng-model="progNote_amount" step="0.01" min="0" required
-                               oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
-                    </label>
+                <label class="custom-label">
+                    Amount
+                    <span class="required-mark">*</span>
+                    <input name="amount" type="number" class="custom-input" placeholder="Amount"
+                           ng-model="progNote_amount" step="0.01" min="0" required
+                           oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
+                </label>
                     <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.amount.$invalid && (addProgForm.amount.$touched || addProgForm.$submitted)">
                         <span ng-show="addProgForm.amount.$error.required">Amount is required</span>
                         <span ng-show="addProgForm.amount.$error.number || addProgForm.amount.$error.min">Enter a valid non-negative amount</span>
@@ -1106,6 +1122,7 @@
                     @*Procedures*@
                     <label class="custom-label">
                         Procedures
+                        <span class="required-mark">*</span>
                         <input name="procedures" type="text" class="custom-input" placeholder="Procedures"
                                ng-model="progNote_procedures" required>
                     </label>
@@ -1123,12 +1140,13 @@
 
 
                     @*Paid*@
-                    <label class="custom-label">
-                        Paid
-                        <input name="paid" type="number" class="custom-input" placeholder="Paid"
-                               ng-model="progNote_paid" step="0.01" min="0" required
-                               oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
-                    </label>
+                <label class="custom-label">
+                    Paid
+                    <span class="required-mark">*</span>
+                    <input name="paid" type="number" class="custom-input" placeholder="Paid"
+                           ng-model="progNote_paid" step="0.01" min="0" required
+                           oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
+                </label>
                     <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.paid.$invalid && (addProgForm.paid.$touched || addProgForm.$submitted)">
                         <span ng-show="addProgForm.paid.$error.required">Paid is required</span>
                         <span ng-show="addProgForm.paid.$error.number || addProgForm.paid.$error.min">Enter a valid non-negative paid amount</span>
@@ -1158,33 +1176,36 @@
         <div class="row">
             <div class="col s6">
                 @*Date*@
-                <label class="custom-label">Date</label>
+                <label class="custom-label">Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote.date">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
                 @*Dentist*@
-                <label class="custom-label">
-                    Dentist
-                    <select ng-model="progNote.accID"
-                            class="browser-default custom-input"
-                            ng-options="d.accID as d.fullName for d in dentistArrays">
-                        <option value="">Select Dentist</option>
-                    </select>
-                </label>
+            <label class="custom-label">
+                Dentist
+                <span class="required-mark">*</span>
+                <select ng-model="progNote.accID"
+                        class="browser-default custom-input"
+                        ng-options="d.accID as d.fullName for d in dentistArrays">
+                    <option value="">Select Dentist</option>
+                </select>
+            </label>
 
                 @*Amount*@
-                <label class="custom-label">
-                    Amount
-                    <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote.amount">
-                </label>
+            <label class="custom-label">
+                Amount
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote.amount">
+            </label>
             </div>
 
             <div class="col s6">
                 @*Procedures*@
                 <label class="custom-label">
                     Procedures
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Procedures" ng-model="progNote.procedures">
                 </label>
 
@@ -1195,10 +1216,11 @@
                 </label>
 
                 @*Paid*@
-                <label class="custom-label">
-                    Paid
-                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
-                </label>
+            <label class="custom-label">
+                Paid
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
+            </label>
             </div>
         </div>
     </div>
@@ -1224,9 +1246,9 @@
 </div>
 
 @*Dental Chart modal*@
-<div id="modalDentalChart" class="modal dentalChart-modal py-2">
+<div id="modalDentalChart" class="modal dentalChart-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Edit Dental Chart</h5>
+        <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Upload Dental Chart</h5>
 
         <div class="row">
             <div class="row m-0 center">
@@ -1255,7 +1277,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Patient
+                    Patient<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="[This Patient]" />
                 </label>
             </div>
@@ -1264,7 +1286,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Dentist
+                    Dentist<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Dentist..." />
                 </label>
             </div>
@@ -1273,7 +1295,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Date
+                    Date<span class="required-mark">*</span>
                 </label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
@@ -1285,7 +1307,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Form
+                    Form<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
@@ -1316,7 +1338,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Patient
+                    Patient<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="[This Patient]" />
                 </label>
             </div>
@@ -1325,7 +1347,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Dentist
+                    Dentist<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Dentist..." />
                 </label>
             </div>
@@ -1334,7 +1356,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Date
+                    Date<span class="required-mark">*</span>
                 </label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
@@ -1346,7 +1368,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Form
+                    Form<span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
@@ -1392,14 +1414,14 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Template
+                    Template<span class="required-mark">*</span>
                     <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
                         <option value="" disabled selected>Select template</option>
                     </select>
                 </label>
 
                 <label class="custom-label" style="margin-top:8px;">
-                    Title
+                    Title<span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
                 </label>
             </div>
@@ -1408,7 +1430,7 @@
         <div class="row">
             <div class="col s12">
                 <label class="custom-label">
-                    Instructions
+                    Instructions<span class="required-mark">*</span>
                     <textarea ng-model="postOp.instructions" style="flex: 1; height: 45vh; padding-top: 10px; background-color:white; width:100%"></textarea>
                     <p class="small-muted" style="margin-top:.2vh;">You can paste formatted HTML here if your editor pipeline supports it.</p>
                 </label>
@@ -1437,87 +1459,3 @@
     </div>
 </div>
 
-<style>
-    #modal-add-form.modal,
-    #modal-edit-form.modal {
-        width: 90% !important;
-        max-width: 1100px !important;
-        height: 85vh !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-    }
-
-    #modal-add-form .modal-content,
-    #modal-edit-form .modal-content {
-        height: calc(100% - 64px);
-        overflow-y: auto;
-    }
-
-    #modal-add-form .modal-footer,
-    #modal-edit-form .modal-footer {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-    }
-
-    .invalid-input {
-        border: 1px solid #d32f2f !important;
-    }
-
-    .valid-input {
-        border: 1px solid #388e3c !important;
-    }
-
-    .error-text {
-        color: #d32f2f;
-        font-size: 0.9rem;
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        if (typeof M === 'undefined' || !M.Datepicker) return;
-
-        var dateElems = document.querySelectorAll('.datepicker');
-        var dateOptions = {
-            format: 'mmmm dd, yyyy',
-            yearRange: 100,
-            showClearBtn: true,
-            container: document.body
-        };
-
-        var instances = M.Datepicker.init(dateElems, dateOptions);
-        document.querySelectorAll('.datepicker-icon, .datepicker-trigger').forEach(function (icon) {
-            icon.addEventListener('click', function (e) {
-                var input = icon.closest('.datepicker-wrapper') ? icon.closest('.datepicker-wrapper').querySelector('.datepicker') : null;
-                if (!input) {
-                    var sib = icon.previousElementSibling || icon.nextElementSibling;
-                    if (sib && sib.classList && sib.classList.contains('datepicker')) input = sib;
-                }
-                if (input) {
-                    var inst = M.Datepicker.getInstance(input);
-                    if (inst) inst.open();
-                    else input.focus();
-                }
-            });
-        });
-
-        var modalElems = document.querySelectorAll('.modal');
-        modalElems.forEach(function (modal) {
-            modal.addEventListener('modalOpen', function () {
-            });
-
-            try {
-                var mi = M.Modal.getInstance(modal);
-                if (mi) {
-                    var origOpen = mi.open;
-                    mi.open = function () {
-                        M.Datepicker.init(dateElems, dateOptions);
-                        origOpen.apply(mi, arguments);
-                    };
-                }
-            } catch (_) { /* ignore if modal instance unavailable */ }
-        });
-    });
-</script>

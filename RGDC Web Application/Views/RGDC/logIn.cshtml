@@ -27,25 +27,25 @@
                 </div>
 
                 @*Password*@
-            <div class="input-field password-field">
-                <p class="custom-label">Password <span class="required-mark">*</span></p>
-                <div class="password-wrapper">
-                    <i class="material-icons password-toggle tiny" ng-click="toggleLoginPassword()" title="Show/Hide password" style="">
-                        {{ showLoginPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
-                    <input id="password"
-                           ng-model="login_password"
-                           ng-attr-type="{{ showLoginPassword ? 'text' : 'password' }}"
-                           placeholder="Password"
-                           maxlength="150"
-                           oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
-                           required>
+                <div class="input-field password-field">
+                    <p class="custom-label">Password <span class="required-mark">*</span></p>
+                    <div class="password-wrapper">
+                        <i class="material-icons password-toggle tiny" ng-click="toggleLoginPassword()" title="Show/Hide password" style="">
+                            {{ showLoginPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                        <input id="password"
+                               ng-model="login_password"
+                               ng-attr-type="{{ showLoginPassword ? 'text' : 'password' }}"
+                               placeholder="Password"
+                               maxlength="150"
+                               oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
+                               required>
+                    </div>
                 </div>
-            </div>
 
                 @*Forgot password?*@
                 <div class="forgot-password-container">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modal-password">Forgot password?</a>
+                    <a href="#" class="forgot-link modal-trigger right" style="margin: -1vh 0 2vh 0" data-target="modal-password">Forgot password?</a>
                 </div>
 
                 @*Log in BTN*@
@@ -76,29 +76,46 @@
 
 </div>
 
-@*Forgot Password*@
+@*forgot Password*@
 <div id="modal-password" class="modal password-modal">
-    <div class="modal-content" style="width:80vh !important">
-        <h5 class="modal-form-title">Reset Your Password</h5>
+    <div class="modal-content" style="width:50vh !important">
+        <h5 class="modal-form-title">Reset Password</h5>
 
+        @*Email*@
         <div class="input-field">
-            <p class="custom-label">Gmail <span class="required-mark">*</span></p>
-            <input type="email"
-                   ng-model="forgot_email"
+            <p class="custom-label">Email <span class="required-mark">*</span></p>
+            <input id="email"
+                   ng-model=""
+                   type="email"
                    placeholder="juandelacruz@gmail.com"
+                   maxlength="150"
+                   oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
                    required>
         </div>
 
-        <button type="submit" class="edit-btn right" style="font-weight: 500; align-items:center" ng-click="sendOTP()">SEND OTP</button>
-
-        <hr style="margin-top:6vh">
-
+        @*OTP*@
         <div class="input-field">
             <p class="custom-label">OTP Code <span class="required-mark">*</span></p>
             <input type="text"
-                   ng-model="forgot_otp"
-                   placeholder="Enter OTP">
+                   ng-model="forget_OTP"
+                   placeholder="000000"
+                   maxlength="6"
+                   oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"
+                   inputmode="numeric"
+                   required>
         </div>
+
+        <div class="modal-footer">
+            <button type="submit" class="edit-btn right" style="font-weight: 500; align-items: center; margin: 1vh 0 -3vh 0" ng-click="sendOTP()">SEND OTP</button>
+            <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 1vh -3vh 0">CANCEL</button>
+            <button type="submit" class="edit-btn modal-trigger" data-target="modalPasswordReset" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="OTPverify()">VERIFY</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalPasswordReset" class="modal password-modal">
+    <div class="modal-content" style="width:50vh !important">
+        <h5 class="modal-form-title">Set New Password</h5>
 
         <div class="input-field">
             <p class="custom-label">New Password <span class="required-mark">*</span></p>
@@ -113,13 +130,12 @@
                    ng-model="forgot_confirmPassword"
                    placeholder="Confirm password">
         </div>
-    </div>
 
-    <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="resetPassword()">RESET</button>
+        <div class="modal-footer">
+            <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 0 -3vh 0">CANCEL</button>
+            <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="resetPassword()">SET NEW PASSWORD</button>
+        </div>
     </div>
 </div>
-
 
 

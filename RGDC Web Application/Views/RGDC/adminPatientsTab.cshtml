@@ -16,11 +16,12 @@
         </div>
     </div>
 
-    <div class="row m-0">
-        <a class="waves-effect waves-light btn left brown lighten-4 medBtn modal-trigger"
+    <div class="row m-0 ">
+        <a class="edit-btn modal-trigger left white-text"
+           style="margin-bottom:1.8vh"
            data-target="patientInformationFormAdd"
            ng-show="!isUserStaff">
-            <i class="material-icons left">group_add</i>Add Patient
+            <i class="material-icons left">group_add</i>ADD PATIENT
         </a>
     </div>
 
@@ -54,9 +55,6 @@
 </div>
 
 
-
-
-
 @*Patient information form*@
 <div id="patientInformationFormAdd" class="modal patientInformationForm-modal">
     <div>
@@ -66,14 +64,20 @@
             <input id="addPatient_photo_input" type="file" accept="image/*" style="display:none"
                    onchange="angular.element(this).scope().onAddPatientPhotoSelected(this.files)" />
             <div class="row">
+
                 <div class="col s4">
                     @*Photo upload*@
-                    <div class="row s4 center-align photo-upload-container">
+                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                         <div class="col s12">
                             <div class="photo-box">
+                                <img ng-if="addPatientPhotoPreview" ng-src="{{addPatientPhotoPreview}}" alt="Profile" />
                                 <i class="material-icons photo-placeholder-icon" ng-if="!addPatientPhotoPreview">image</i>
-                                <img ng-if="addPatientPhotoPreview" ng-src="{{addPatientPhotoPreview}}" style="max-width:100%; max-height:100%;" />
                             </div>
+                            <input type="file"
+                                   id="signUpPhotoInput"
+                                   accept="image/*"
+                                   style="display:none"
+                                   onchange="angular.element(this).scope().onSignUpPhotoSelected(this.files)" />
                         </div>
                     </div>
                 </div>
@@ -93,7 +97,7 @@
                         </div>
                         @*MIddle name*@
                         <div class="col s6">
-                            <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
+                            <p class="custom-label">Middle Name</p>
                             <input type="text"
                                    class="custom-input"
                                    ng-model="addPatient_middleName"
@@ -218,9 +222,44 @@
             </div>
 
             <div class="row">
+                <div class="col s4">
+                    @*Occupation*@
+                    <p class="custom-label">Occupation <span class="required-mark">*</span></p>
+                    <input id="occupation"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Doctor"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s4">
+                    @*Religion*@
+                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                    <input id="religion"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Roman-Catholic"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s4">
+                    @*Nationality*@
+                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           type="text"
+                           class="custom-input"
+                           placeholder="Filipino"
+                           maxlength="50"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
                 @*Current physician*@
                 <div class="col s4">
-                    <p class="custom-label">Current Physician</p>
+                    <p class="custom-label">Current Physician <span class="required-mark">*</span></p>
                     <input type="text"
                            ng-model="addPatient_currentPhysician"
                            class="custom-input"
@@ -239,7 +278,7 @@
                 </div>
                 @*Last visit*@
                 <div class="col s4">
-                    <p class="custom-label">Last Visit</p>
+                    <p class="custom-label">Last Visit <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input ng-model="addPatient_lastVisit"
                                type="text"
@@ -247,8 +286,7 @@
                                readonly
                                ng-class="{
                               'input-valid': addPatient_lastVisit,
-                              'input-invalid': addPatient_lastVisit === ''
-       }"
+                              'input-invalid': addPatient_lastVisit === ''}"
                                required>
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
@@ -257,6 +295,7 @@
             </div>
         </form>
     </div>
+
 
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
