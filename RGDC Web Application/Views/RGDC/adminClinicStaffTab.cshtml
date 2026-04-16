@@ -9,7 +9,7 @@
         <div class="col m8 l8"  ng-init="getClinicStaff()"><h4 class="bold">Clinic Staff</h4></div>
         @*refresh and logout buttons*@
         <div class="col m4 l4">
-            <span class="right">
+            <span class="right hide-on-small-only">
                 <div class="col valign-wrapper"><a href="#adminClinicStaffTab" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
                 <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
@@ -23,6 +23,7 @@
                     <li class="tab px-1"><a class="brown-text p-0" href="#Owner">Owner</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Dentist">Dentist</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Staff">Staff</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#Pending">Pending</a></li>
                 </ul>
             </div>
         </nav>
@@ -31,10 +32,17 @@
 
             <div id="Owner" class="containerOverflow-2 row m-0" n>
                 <div class="row m-0">
-                    <p class="bold brown-text lighten-1" style="font-size:1.8rem; margin-bottom:1.7vh">Owner</p>
-                    <a class="edit-btn modal-trigger right white-text" style="margin-top: -4.5vh" data-target="ownerInformationFormAdd">
-                        <i class="material-icons left white-text">group_add</i>Add Owner
-                    </a>
+                    <div class="col s12 m6 l6 valign-wrapper p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
+                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="text" selected>text</option>
+                        </select>
+                    </div>
+                    <div class="col s12 m6 l6">
+                        <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="ownerInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Owner
+                        </a>
+                    </div>
                 </div>
                 @*Owner Table*@
                 <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
@@ -66,15 +74,22 @@
 
             <div id="Dentist" class="containerOverflow-2 row m-0">
                 <div class="row m-0">
-                    <p class="bold brown-text lighten-1" style="font-size:1.8rem; margin-bottom:1.7vh">Dentist</p>
-                    <a class="edit-btn modal-trigger right white-text" style="margin-top: -4.5vh" data-target="dentistInformationFormAdd">
-                        <i class="material-icons white-text left">group_add</i>Add Dentist
-                    </a>
+                    <div class="col s12 m6 l6 valign-wrapper p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
+                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="text" selected>text</option>
+                        </select>
+                    </div>
+                    <div class="col s12 m6 l6">
+                        <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="dentistInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Dentist
+                        </a>
+                    </div>
                 </div>
                 @*Dentist Table*@
                 <table id="adminClinicStaffTabTableDentist" class="hover tableClk">
                     <thead>
-                        <tr class="brown-text lighten-1" >
+                        <tr class="brown-text lighten-1">
                             <th>Name</th>
                             <th>Specialization</th>
                             <th colspan="2">Branch</th>
@@ -88,7 +103,7 @@
                             <td>{{dentist.description}}</td>
                             <td>
                                 <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteDentist(dentist.dentistID, dentist.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="dentistInformationFormEdit" title="View Account Details" style="margin-right: 0.5rem !important" ><i class="material-icons brown-text lighten-1" ng-click="editSelectDentist(dentist.dentistID)">visibility</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="dentistInformationFormEdit" title="View Account Details" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1" ng-click="editSelectDentist(dentist.dentistID)">visibility</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -104,8 +119,17 @@
 
             <div id="Staff" class="containerOverflow-2 row m-0">
                 <div class="row m-0">
-                    <p class="bold brown-text lighten-1" style="font-size:1.8rem; margin-bottom:1.7vh">Staff</p>
-                    <a class="edit-btn modal-trigger right white-text" style="margin-top: -4.5vh" data-target="staffInformationFormAdd"><i class="material-icons white-text left">group_add</i>Add Staff</a>
+                    <div class="col s12 m6 l6 valign-wrapper p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
+                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="text" selected>text</option>
+                        </select>
+                    </div>
+                    <div class="col s12 m6 l6">
+                        <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="staffInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Staff
+                        </a>
+                    </div>
                 </div>
                 @*Staff Table*@
                 <table id="adminClinicStaffTabTableStaff" class="hover tableClk">
@@ -137,6 +161,40 @@
                     </tfoot>
                 </table>
             </div>
+            
+            @*pending*@
+            <div id="Pending" class="containerOverflow-2 row m-0">
+                <div class="row m-0">
+                    <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Pending</p>
+                </div>
+                @*pending Table*@
+                <table id="adminClinicStaffTabTablePending" class="hover tableClk">
+                    <thead>
+                        <tr class="brown-text lighten-1">
+                            <th>Email</th>
+                            <th colspan="2">Role</th>
+                        </tr>
+                    </thead>
+                    @*table content*@
+                    <tbody>
+                        <tr data-href="#">
+                            <td>email@gmail.com</td>
+                            <td>Role</td>
+                            <td>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Delete Request"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteStaff(staff.staffID, staff.accID)">delete</i></a>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="brown-text lighten-1">
+                            <th>Email</th>
+                            <th colspan="2">Role</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+
         </div>
     </div>
 
