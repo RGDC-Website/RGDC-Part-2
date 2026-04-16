@@ -266,6 +266,9 @@ mb-3 {
 .ml-2 {
     margin-left: 2rem;
 }
+.x-1{
+    margin:0 2rem 0 2rem !important;
+}
 
 .clkPointer {
     cursor: pointer !important;
