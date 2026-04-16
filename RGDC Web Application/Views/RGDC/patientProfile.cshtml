@@ -362,15 +362,43 @@
                     <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
                         <div class="row">
-                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger" data-target="modalDentalChart">EDIT CHART</a>
+                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger white-text" >UPLOAD CHART</a>
                         </div>
 
-                        <div class="row m-0 center">
+                        <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
+                            <thead>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th colspan="2">Type</th>
+                                </tr>
+                            </thead>
+                            @*table content*@
+                            <tbody>
+                                <tr data-href="#">
+                                    <td>XX/XX/XXXX</td>
+                                    <td>Xray</td>
+                                    <td>
+                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" data-position="bottom" data-tooltip="Archive Dental Chart"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteOwner(owner.ownerID, owner.accID)">archive</i></a>
+                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalDentalChart" data-position="bottom" data-tooltip="View Dental Chart" style="margin-right: 0.5rem !important" ng-click="editSelectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="brown-text lighten-1">
+                                    <th>Date</th>
+                                    <th colspan="2">Type</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+
+                        @*change into modal
+                            <div class="row m-0 center">
                             <img id="dentalChartMain"
                                  ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
                                  alt="Dental Chart"
                                  class="materialboxed responsive-img" />
-                        </div>
+                        </div>*@
 
                     </div>
 
@@ -1196,7 +1224,7 @@
 </div>
 
 @*Dental Chart modal*@
-<div id="modalDentalChart" class="modal dentalChart-modal">
+<div id="modalDentalChart" class="modal dentalChart-modal py-2">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Edit Dental Chart</h5>
 
