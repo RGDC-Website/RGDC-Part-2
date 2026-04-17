@@ -17,6 +17,7 @@ namespace RGDC_Web_Application.Models.Context
 
         public virtual DbSet<tblAccountModel> tbl_account { get; set; }
         public virtual DbSet<tblAppointmentModel> tbl_appointment { get; set; }
+        public virtual DbSet<tblAddAccountModel> tbl_addAccount { get; set; }
         public virtual DbSet<tblBranchModel> tbl_branch { get; set; }
         public virtual DbSet<tblDentistModel> tbl_dentist { get; set; }
         public virtual DbSet<tblFormatModel> tbl_format { get; set; }
@@ -38,6 +39,7 @@ namespace RGDC_Web_Application.Models.Context
             modelBuilder.Configurations.Add(new tblAppointmentMap());
             modelBuilder.Configurations.Add(new tblBranchMap());
             modelBuilder.Configurations.Add(new tblDentistMap());
+            modelBuilder.Configurations.Add(new tblAddAccountMap());
             modelBuilder.Configurations.Add(new tblFormatMap());
             modelBuilder.Configurations.Add(new tblFormMap());
             modelBuilder.Configurations.Add(new tblGenderMap());

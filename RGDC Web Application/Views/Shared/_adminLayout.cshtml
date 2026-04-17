@@ -28,15 +28,14 @@
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
-            </div>
-
+        <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
+            <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
+        </div>
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
+                <img ng-src="{{ dentist.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
             </div>
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserOwner">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileOwner" />
+                <img ng-src="{{ owner.photoLink  || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileOwner" />
             </div>
 
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
@@ -152,16 +151,7 @@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
                 <span>Month DD, YYYY | </span>
                 <span>00:00 AM</span>
-            </div>
-
-            <li><a href="~/RGDC/adminDashboard" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">home</i>Home</a></li>
-            <li><a href="~/RGDC/patientStaff" ng-show="isUserOwner" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">assignment_ind</i>Clinic Staff</a></li>
-            <li><a href="~/RGDC/patientProfile" ng-show="isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Profile</a></li>
-            <li><a href="~/RGDC/adminPatientsTab" ng-show="isUserAdmin" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">group</i>Patients</a></li>
-            <li><a href="#!" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">calendar_today</i>Appointments</a></li>
-            <li><a href="~/RGDC/adminFinance" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
-            <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
-            <li><a href="#!" class="white-text valign-wrapper navText dropdown-trigger" data-target="contactDropdown"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
+            </div>  
             <ul id="contactDropdown" class="dropdown-content brown lighten-1">
                 <li>
                     <a href="#!" class="white-text">one</a>
@@ -191,8 +181,12 @@
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
-                                    <img ng-if="owner.photoLink" ng-src="{{ owner.photoLink }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;" />
-                                    <i ng-if="!owner.photoLink" class="material-icons photo-placeholder-icon">image</i>
+                                    <img ng-if="ownerAccountPhotoPreview || owner.photoLink"
+                                         ng-src="{{ownerAccountPhotoPreview || owner.photoLink}}"
+                                         alt="Profile"
+                                         style="width:100%;height:100%;object-fit:cover;" />
+                                    <i ng-if="!ownerAccountPhotoPreview && !owner.photoLink"
+                                       class="material-icons photo-placeholder-icon">image</i>
                                 </div>
                             </div>
                         </div>
@@ -235,6 +229,7 @@
                     <div class="col s12">
                         <p class="custom-label">Email <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.email"
+                               disabled
                                placeholder="juandlc@gmail.com" maxlength="150"
                                ng-class="{'invalid-input': editOwnerSubmitted && !owner.email}">
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.email">Email is required.</span>
@@ -329,7 +324,7 @@
         </div>
 
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFile()">UPLOAD PHOTO</button>
+            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileOwner()">UPLOAD PHOTO</button>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editOwnerSubmitted = false">CANCEL</button>
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editOwner()">SAVE</button>
         </div>
@@ -346,8 +341,12 @@
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
-                                    <img ng-if="dentist.photoLink" ng-src="{{ dentist.photoLink }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;" />
-                                    <i ng-if="!dentist.photoLink" class="material-icons photo-placeholder-icon">image</i>
+                                    <img ng-if="dentistAccountPhotoPreview || dentist.photoLink"
+                                         ng-src="{{dentistAccountPhotoPreview || dentist.photoLink}}"
+                                         alt="Profile"
+                                         style="width:100%;height:100%;object-fit:cover;" />
+                                    <i ng-if="!dentistAccountPhotoPreview && !dentist.photoLink"
+                                       class="material-icons photo-placeholder-icon">image</i>
                                 </div>
                             </div>
                         </div>
@@ -390,6 +389,7 @@
                     <div class="col s12">
                         <p class="custom-label">Email <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.email"
+                               disabled
                                maxlength="150" placeholder="juandlc@gmail.com"
                                ng-class="{'invalid-input': editDentistSubmitted && !dentist.email}">
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.email">Email is required.</span>
@@ -495,7 +495,7 @@
 
         @*Footer Actions*@
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFile()">UPLOAD PHOTO</button>
+            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editDentistSubmitted = false">CANCEL</button>
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">SAVE</button>
         </div>
@@ -511,8 +511,12 @@
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
-                                    <img ng-if="staff.photoLink" ng-src="{{ staff.photoLink }}" alt="Profile" style="width:100%;height:100%;object-fit:cover;" />
-                                    <i ng-if="!staff.photoLink" class="material-icons photo-placeholder-icon">image</i>
+                                    <img ng-if="staffAccountPhotoPreview || staff.photoLink"
+                                         ng-src="{{staffAccountPhotoPreview || staff.photoLink}}"
+                                         alt="Profile"
+                                         style="width:100%;height:100%;object-fit:cover;" />
+                                    <i ng-if="!staffAccountPhotoPreview && !staff.photoLink"
+                                       class="material-icons photo-placeholder-icon">image</i>
                                 </div>
                             </div>
                         </div>
@@ -555,6 +559,7 @@
                     <div class="col s12">
                         <p class="custom-label">Email <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="staff.email"
+                               disabled
                                maxlength="150" placeholder="juandlc@gmail.com"
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.email}">
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.email">Email is required.</span>
@@ -646,9 +651,9 @@
                     @*Branch*@
                     <div class="col s12">
                         <p class="custom-label">Branch</p>
-                        <select class="browser-default custom-input" ng-model="staff.branchID">
+                        <select class="browser-default custom-input" ng-model="staff.branchID"
+                                ng-options="b.branchID as b.description for b in branchArray">
                             <option value="" disabled selected>Select Branch</option>
-                            <option ng-repeat="branch in branchArray" value="{{branch.branchID}}">{{branch.description}}</option>
                         </select>
                     </div>
                 </div>
@@ -660,12 +665,13 @@
         </div>
 
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFile()">UPLOAD PHOTO</button>
-            <button type="button" class="edit-btn left" style="font-weight:500; margin-left:8px;" ng-click="pickAccountSignatureFile()">UPLOAD SIGNATURE</button>
+            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileStaff()">UPLOAD PHOTO</button>
+            @*<button type="button" class="edit-btn left" style="font-weight:500; margin-left:8px;" ng-click="pickAccountSignatureFile()">UPLOAD SIGNATURE</button>*@
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editStaffSubmitted = false">CANCEL</button>
             <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="editStaff()">SAVE</button>
         </div>
     </div>
+
     @*NEW Password*@
     <div id="modalOTP" class="modal password-modal">
         <div class="modal-content" style="width:80vh !important">

@@ -30,6 +30,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
+using System.Web.Management;
 using System.Web.Mvc;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -195,6 +196,60 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult checkAddQueue(tblAddAccountModel signUpStaffData)
+           
+        {
+            try
+            {
+                var email = signUpStaffData.email;
+                var code = signUpStaffData.code;
+                if (string.IsNullOrWhiteSpace(email))
+                    return Json(new { exists = false }, JsonRequestBehavior.AllowGet);
+
+                var normalized = email.Trim().ToLowerInvariant();
+
+                using (var db = new RGDCContext())
+                {
+                    var addAccountRecord = db.tbl_addAccount.FirstOrDefault(a => a.email != null && a.email.Trim().ToLower() == normalized);
+
+                    if (addAccountRecord == null)
+                    {
+                        return Json(new
+                        {
+                            exists = false,
+                            message = "Email not found in registration queue."
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    if (!string.IsNullOrWhiteSpace(code))
+                    {
+                        var codeNormalized = code.Trim();
+
+                        if (addAccountRecord.code != codeNormalized)
+                        {
+                            return Json(new
+                            {
+                                exists = true,
+                                codeValid = false,
+                                message = "Invalid OTP code. Please check and try again."
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+                    }
+                    return Json(new
+                    {
+                        exists = true,
+                        codeValid = true,
+                        message = "Email and OTP code verified successfully.",
+                        permission = addAccountRecord.permission
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                }
+            catch (Exception ex)
+            {
+                return Json(new { exists = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         public JsonResult getGender()
         {
             try
@@ -212,6 +267,11 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+        public JsonResult getCurrentUserPhoto()
+        {
+            var photoLink = Session["UserPhoto"].ToString();
+            return Json(photoLink, JsonRequestBehavior.AllowGet);
+        }
         public JsonResult getBranch()
         {
             try
@@ -248,6 +308,8 @@ namespace RGDC_Web_Application.Controllers
                         birthDate = accDetails.birthDate,
                         email = accDetails.email,
                         contactNumber = accDetails.contactNumber,
+                        religion = accDetails.religion,
+                        nationality = accDetails.nationality,
                         address = accDetails.address,
                         civilStatus = accDetails.civilStatus,
                         password = passwordHash(accDetails.password),
@@ -255,7 +317,8 @@ namespace RGDC_Web_Application.Controllers
                         accCreatedAt = DateTime.Now,
                         accUpdatedAt = DateTime.Now,
                         photoLink = accDetails.photoLink,
-                        role = accDetails.role > 0 ? accDetails.role : 3
+                        role = accDetails.role,
+                        permission = accDetails.permission
                     };
                     addUser.tbl_account.Add(newData);
                     addUser.SaveChanges();
@@ -390,6 +453,7 @@ namespace RGDC_Web_Application.Controllers
                         Session["UserName"] = user.firstName;
                         Session["UserFullName"] = user.firstName + " " + user.lastName;
                         Session["UserAuthorization"] = user.role;
+                        Session["UserPermission"] = user.permission;
                         Session["IsLoggedIn"] = true;
                         Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
 
@@ -576,6 +640,7 @@ namespace RGDC_Web_Application.Controllers
                     userName = Session["UserName"].ToString(),
                     fullName = Session["UserFullName"].ToString(),
                     userAuthorization = Session["UserAuthorization"].ToString(),
+                    userPermission = Session["UserPermission"].ToString(),
                     userPhoto = userPhoto,
                     googleCalendarEnabled = googleCalendarEnabled,
                     googleRefreshTokenPresent = googleRefreshTokenPresent
@@ -650,7 +715,7 @@ namespace RGDC_Web_Application.Controllers
                     MailMessage mail = new MailMessage();
                     mail.To.Add(email);
                     mail.Subject = "[RGDC Clinic] Your One-Time Password (OTP) for Password Reset";
-                    mail.Body = $"Hello,\r\n\r\nWe received a request to reset the password for your RGDC account. Use the code below to complete the process.\r\n{otp}\r\n\r\nIf you did not request this change, please ignore this email or contact the clinic administrator immediately to secure your account.\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                    mail.Body = $"Hello,\r\n\r\nWe received a request to reset the password for your RGDC account. Use the code below to complete the process.\r\nBOLD{otp}BOLD\r\n\r\nIf you did not request this change, please ignore this email or contact the clinic administrator immediately to secure your account.\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
                     mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -1321,6 +1386,7 @@ RGDC Dental Clinic Team";
             Session.Remove("UserName");
             Session.Remove("UserFullName");
             Session.Remove("UserAuthorization");
+            Session.Remove("UserPermission");
             Session.Remove("IsLoggedIn");
             Session.Remove("SelectedPatientID");
             Session.Remove("RESET_OTP");
@@ -2634,6 +2700,7 @@ RGDC Dental Clinic Team";
 
                 var owners = (from o in db.tbl_owner
                               join a in db.tbl_account on o.accID equals a.accID
+                              where a.isArchived == 0
                               select new
                               {
                                   o.ownerID,
@@ -2646,6 +2713,7 @@ RGDC Dental Clinic Team";
                 var dentists = (from d in db.tbl_dentist
                                 join a in db.tbl_account on d.accID equals a.accID
                                 join g in db.tbl_branch on d.branchID equals g.branchID
+                                where a.isArchived == 0
                                 select new
                                 {
                                     d.dentistID,
@@ -2660,6 +2728,7 @@ RGDC Dental Clinic Team";
                 var staff = (from s in db.tbl_staff
                              join a in db.tbl_account on s.accID equals a.accID
                              join g in db.tbl_branch on s.branchID equals g.branchID
+                             where a.isArchived == 0
                              select new
                              {
                                  s.staffID,
@@ -2717,9 +2786,55 @@ RGDC Dental Clinic Team";
                 }, JsonRequestBehavior.AllowGet);
             }
         }
-
         [HttpPost]
-        public JsonResult addOwner(tblOwnerModel ownermod)
+        public JsonResult addOwner(tblAddAccountModel ownerEmail)
+        {
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            using (var db = new RGDCContext())
+            {
+                var existingAccount = db.tbl_addAccount.FirstOrDefault(a => a.email == ownerEmail.email);
+
+                if (existingAccount != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Email is already processing. Please use a different email.",
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                var ownerAdd = new tblAddAccountModel
+                {
+                    email = ownerEmail.email,
+                    permission = 0,
+                    code = otp,
+                    addCreatedAt = DateTime.Now,
+                    addUpdatedAt = DateTime.Now,
+                };
+                db.tbl_addAccount.Add(ownerAdd);
+                db.SaveChanges();
+                // SEND EMAIL
+                MailMessage mail = new MailMessage();
+                mail.To.Add(ownerEmail.email);
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
+                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Owner for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                smtp.EnableSsl = true;
+                smtp.Send(mail);
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner registration initiated successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+
+            [HttpPost]
+        public JsonResult signUpOwner(tblOwnerModel ownermod)
         {
             using (var db = new RGDCContext())
             {
@@ -2742,7 +2857,55 @@ RGDC Dental Clinic Team";
         }
 
         [HttpPost]
-        public JsonResult addDentist(tblDentistModel dentistmod)
+        public JsonResult addDentist(tblAddAccountModel dentistEmail)
+        {
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            using (var db = new RGDCContext())
+            {
+                var existingAccount = db.tbl_addAccount.FirstOrDefault(a => a.email == dentistEmail.email);
+
+                if (existingAccount != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Email is already processing. Please use a different email.",
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                var dentistAdd = new tblAddAccountModel
+                {
+                    email = dentistEmail.email,
+                    permission = 1,
+                    code = otp,
+                    addCreatedAt = DateTime.Now,
+                    addUpdatedAt = DateTime.Now,
+                };
+                db.tbl_addAccount.Add(dentistAdd);
+                db.SaveChanges();
+                // SEND EMAIL
+                MailMessage mail = new MailMessage();
+                mail.To.Add(dentistEmail.email);
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
+                mail.Body = $"Hello,\r\n\r\nYou may now signup as a Dentist for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                smtp.EnableSsl = true;
+                smtp.Send(mail);
+                return Json(new
+                {
+                    success = true,
+                    message = "Dentist registration initiated successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult signUpDentist(tblDentistModel dentistmod)
         {
             using (var db = new RGDCContext())
             {
@@ -2764,8 +2927,73 @@ RGDC Dental Clinic Team";
                 }, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public JsonResult removeFromQueue(string email)
+        {
+            using (var db = new RGDCContext())
+            {
+                var emailQueue = db.tbl_addAccount.FirstOrDefault(x => x.email == email);
+
+                if (emailQueue != null)
+                {
+                    db.tbl_addAccount.Remove(emailQueue);
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpPost]
-        public JsonResult addStaff(tblStaffModel staffmod)
+        public JsonResult addStaff(tblAddAccountModel staffEmail)
+        {
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            using (var db = new RGDCContext())
+            {
+                var existingAccount = db.tbl_addAccount.FirstOrDefault(a => a.email == staffEmail.email);
+
+                if (existingAccount != null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Email is already processing. Please use a different email.",
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                var ownerAdd = new tblAddAccountModel
+                {
+                    email = staffEmail.email,
+                    permission = 2,
+                    code = otp,
+                    addCreatedAt = DateTime.Now,
+                    addUpdatedAt = DateTime.Now,
+                };
+                db.tbl_addAccount.Add(ownerAdd);
+                db.SaveChanges();
+                // SEND EMAIL
+                MailMessage mail = new MailMessage();
+                mail.To.Add(staffEmail.email);
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
+                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Dental Staff for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
+                smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                smtp.EnableSsl = true;
+                smtp.Send(mail);
+                return Json(new
+                {
+                    success = true,
+                    message = "Staff registration initiated successfully.",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+        }
+
+        [HttpPost]
+        public JsonResult signUpStaff(tblStaffModel staffmod)
         {
             using (var db = new RGDCContext())
             {
@@ -2787,33 +3015,30 @@ RGDC Dental Clinic Team";
                 }, JsonRequestBehavior.AllowGet);
             }
         }
-
         [HttpPost]
         public JsonResult deleteOwner(tblOwnerModel ownermod)
         {
             using (var db = new RGDCContext())
             {
-                var existing = db.tbl_owner.Find(ownermod.ownerID);
-                if (existing == null)
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Owner not found."
-                    }, JsonRequestBehavior.AllowGet);
-                db.tbl_owner.Remove(existing);
-
                 var existingAcc = db.tbl_account.Find(ownermod.accID);
-                if (existing == null)
+                if (existingAcc == null)
+                {
                     return Json(new
                     {
                         success = false,
-                        message = "Owner not found."
+                        message = "Account not found."
                     }, JsonRequestBehavior.AllowGet);
-                db.tbl_account.Remove(existingAcc);
+                }
+
+                existingAcc.isArchived = 1;
+
                 db.SaveChanges();
 
-                return Json(new { success = true, message = "Owner deleted successfully." },
-                            JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner account archived successfully."
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -2821,27 +3046,25 @@ RGDC Dental Clinic Team";
         {
             using (var db = new RGDCContext())
             {
-                var existing = db.tbl_dentist.Find(dentistmod.dentistID);
-                if (existing == null)
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Dentist not found."
-                    }, JsonRequestBehavior.AllowGet);
-                db.tbl_dentist.Remove(existing);
-
                 var existingAcc = db.tbl_account.Find(dentistmod.accID);
-                if (existing == null)
+                if (existingAcc == null)
+                {
                     return Json(new
                     {
                         success = false,
-                        message = "Dentist not found."
+                        message = "Account not found."
                     }, JsonRequestBehavior.AllowGet);
-                db.tbl_account.Remove(existingAcc);
+                }
+
+                existingAcc.isArchived = 1;
+
                 db.SaveChanges();
 
-                return Json(new { success = true, message = "Dentist deleted successfully." },
-                            JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner account archived successfully."
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -2849,27 +3072,25 @@ RGDC Dental Clinic Team";
         {
             using (var db = new RGDCContext())
             {
-                var existing = db.tbl_staff.Find(staffmod.staffID);
-                if (existing == null)
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Staff not found."
-                    }, JsonRequestBehavior.AllowGet);
-                db.tbl_staff.Remove(existing);
-
                 var existingAcc = db.tbl_account.Find(staffmod.accID);
-                if (existing == null)
+                if (existingAcc == null)
+                {
                     return Json(new
                     {
                         success = false,
-                        message = "Staff not found."
+                        message = "Account not found."
                     }, JsonRequestBehavior.AllowGet);
-                db.tbl_account.Remove(existingAcc);
+                }
+
+                existingAcc.isArchived = 1;
+
                 db.SaveChanges();
 
-                return Json(new { success = true, message = "Staff deleted successfully." },
-                            JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    success = true,
+                    message = "Owner account archived successfully."
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -2925,6 +3146,8 @@ RGDC Dental Clinic Team";
                         email = a.email,
                         contactNumber = a.contactNumber,
                         address = a.address,
+                        nationality = a.nationality,
+                        religion = a.religion,
                         civilStatus = a.civilStatus,
                         photoLink = a.photoLink
                     }
@@ -2961,7 +3184,9 @@ RGDC Dental Clinic Team";
                         contactNumber = a.contactNumber,
                         address = a.address,
                         civilStatus = a.civilStatus,
-                        photoLink = a.photoLink
+                        photoLink = a.photoLink,
+                        nationality = a.nationality,
+                        religion = a.religion,
                     }
                 ).FirstOrDefault();
 
@@ -2994,6 +3219,8 @@ RGDC Dental Clinic Team";
                         birthDate = a.birthDate,
                         email = a.email,
                         contactNumber = a.contactNumber,
+                        nationality = a.nationality,
+                        religion = a.religion,
                         address = a.address,
                         civilStatus = a.civilStatus,
                         photoLink = a.photoLink
@@ -3031,7 +3258,8 @@ RGDC Dental Clinic Team";
                         staffRole = s.staffRole,
                         branchID = s.branchID,
                         signature = s.signature,
-
+                        nationality = a.nationality,
+                        religion = a.religion,
                         // ACCOUNT (matches your ng-model)
                         firstName = a.firstName,
                         middleName = a.middleName,

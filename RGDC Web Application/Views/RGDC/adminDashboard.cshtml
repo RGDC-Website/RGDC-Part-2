@@ -18,7 +18,7 @@
     </div>
 
     @*overview*@
-    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin">
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="!isUserPatient">
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">OVERVIEW</p>
 
         @*overview cards*@
@@ -146,7 +146,7 @@
     </div>
 
     @*analytics*@
-    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="isUserAdmin" ng-init="getAnalyticsData()"  >
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="!isUserPatient" ng-init="getAnalyticsData()"  >
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">ANALYTICS</p>
         <div class="row">
 

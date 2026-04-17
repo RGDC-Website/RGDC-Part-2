@@ -22,6 +22,8 @@ namespace RGDC_Web_Application.Models
         public string password { get; set; }
         public string photoLink { get; set; }
         public int role { get; set; }
+        public int permission { get; set; }
+        public int isArchived { get; set; }
         public DateTime lastLogin { get; set; }
         public DateTime accCreatedAt { get; set; }
         public DateTime accUpdatedAt { get; set; }

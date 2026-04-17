@@ -244,27 +244,68 @@
         });
     };
 
-    this.addOwner = function (ownerData) {
+    this.addOwner = function (ownerEmail) {
         return $http({
             method: "post",
             url: "/RGDC/addOwner",
-            data: ownerData
+            data: ownerEmail
         });
     };
 
-    this.addDentist = function (dentistData) {
+    this.addDentist = function (dentistEmail) {
         return $http({
             method: "post",
             url: "/RGDC/addDentist",
+            data: dentistEmail
+        });
+    };
+
+    this.addStaff = function (staffEmail) {
+        return $http({
+            method: "post",
+            url: "/RGDC/addStaff",
+            data: staffEmail
+        });
+    };
+
+    this.signUpStaff = function (staffData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/signUpStaff",
+            data: staffData
+        });
+    };
+
+    this.signUpDentist = function (dentistData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/signUpDentist",
             data: dentistData
         });
     };
 
-    this.addStaff = function (staffData) {
+    this.removeFromQueue = function (emailQueue) {
         return $http({
             method: "post",
-            url: "/RGDC/addStaff",
-            data: staffData
+            url: "/RGDC/removeFromQueue",
+            data: emailQueue
+        });
+    };
+
+    this.signUpOwner = function (ownerData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/signUpOwner",
+            data: ownerData
+        });
+    };
+
+
+    this.checkAddQueue = function (signUpStaffData) {
+        return $http({
+            method: "post",
+            url: "/RGDC/checkAddQueue",
+            data: signUpStaffData
         });
     };
 
@@ -448,6 +489,10 @@
 
     this.getCurrentDentist = function () {
         return $http.get('/RGDC/GetCurrentDentist');
+    };
+
+    this.getCurrentUserPhoto = function () {
+        return $http.get('/RGDC/GetCurrentUserPhoto');
     };
 
     this.createAppointmentRequest = function (appointmentData) {

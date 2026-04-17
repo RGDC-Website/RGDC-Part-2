@@ -1,4 +1,4 @@
-﻿@{
+﻿    @{
     Layout = "~/Views/Shared/_logInSignInLayout.cshtml";
 }
 
@@ -121,15 +121,13 @@
 
                 @*Sign up as staff*@
                 <div class="container" style="margin-top: .5vh; margin-bottom: .5vh; font-size: 0.95rem;">
-                    <span>Joining the team?</span>
-                    <a href="~/RGDC/signUpStaff" class="signup-link" style="display:inline-block">Staff Sign Up</a>
+                    <a href="~/RGDC/signUpStaff" class="signup-link" style="display:inline-block">Joining the team?</a>
                 </div>
 
                 @*Sign up BTN*@
                 <button class="logSignBtn"
                         type="button"
-                        ng-click="signUpInitial()"
-                        ng-disabled="!isFormValid()">
+                        ng-click="signUpInitial()">
                     Sign Up
                 </button>
 
@@ -242,6 +240,9 @@
                         <option value="1">Single</option>
                         <option value="2">Married</option>
                         <option value="3">Widowed</option>
+                        <option value="4">Legally Separated</option>
+                        <option value="5">Annulled/Void</option>
+                        <option value="6">Divorced</option>
                     </select>
                 </div>
                 <div class="col s3">
@@ -281,6 +282,7 @@
                     <input id="occupation"
                            type="text"
                            class="custom-input"
+                            ng-model="signUp_occupation"
                            placeholder="Doctor"
                            maxlength="50"
                            required>
@@ -292,6 +294,7 @@
                     <input id="religion"
                            type="text"
                            class="custom-input"
+                            ng-model="signUp_religion"
                            placeholder="Roman-Catholic"
                            maxlength="50"
                            required>
@@ -302,6 +305,7 @@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                     <input id="contactNumber"
                            type="text"
+                            ng-model="signUp_nationality"
                            class="custom-input"
                            placeholder="Filipino"
                            maxlength="50"
