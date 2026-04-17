@@ -66,12 +66,12 @@
 @*ADD Payment Record*@
 <div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Add New Payment Record</h5>
+        <h5 class="modal-form-title" style="margin-bottom:1.5vh;">Add New Payment Record</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 @*Patient*@
-                <label class="custom-label">Patient</label>
+                <label class="custom-label">Patient <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="selectedPatient"
                         ng-class="{'invalid-input': addSubmitted && !selectedPatient}">
                     <option value="" disabled selected>Select patient...</option>
@@ -79,22 +79,10 @@
                 </select>
                 <span class="validation-msg" ng-show="addSubmitted && !selectedPatient">Patient is required.</span>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s6">
-                @*Dentist*@
-                <label class="custom-label">Dentist</label>
-                <select class="custom-input browser-default" ng-model="selectedDentist"
-                        ng-class="{'invalid-input': addSubmitted && !selectedDentist}">
-                    <option value="" disabled selected>Select dentist...</option>
-                    <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
-                </select>
-                <span class="validation-msg" ng-show="addSubmitted && !selectedDentist">Dentist is required.</span>
-            </div>
             <div class="col s6">
                 @*Date*@
-                <label class="custom-label">Date</label>
+                <label class="custom-label">Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" ng-model="paymentDate" placeholder="MM/DD/YYYY"
                            ng-class="{'invalid-input': addSubmitted && !paymentDate}">
@@ -105,10 +93,43 @@
         </div>
 
         <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">Dentist <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="selectedDentist"
+                        ng-class="{'invalid-input': addSubmitted && !selectedDentist}">
+                    <option value="" disabled selected>Select dentist...</option>
+                    <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
+                </select>
+                <span class="validation-msg" ng-show="addSubmitted && !selectedDentist">Dentist is required.</span>
+            </div>
+
+            <div class="col s6">
+                @*Tooth Number*@
+                <label class="custom-label">Tooth Number</label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedure<span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
+        <div class="row">
             <div class="col s4">
                 @*Mode of Payment*@
                 <label class="custom-label">
                     Mode of Payment
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentMethod" placeholder="Mode of payment..."
                            ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
                 </label>
@@ -118,6 +139,7 @@
                 @*Cost*@
                 <label class="custom-label">
                     Cost
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentCost" placeholder="Cost..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': addSubmitted && !paymentCost}">
@@ -128,6 +150,7 @@
                 @*Discount*@
                 <label class="custom-label">
                     Discount
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentDiscount" placeholder="Discount..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
@@ -139,6 +162,7 @@
                 @*Paid*@
                 <label class="custom-label">
                     Total Amount Paid
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentPaid" placeholder="Total amount paid..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': addSubmitted && !paymentPaid}">
@@ -147,7 +171,8 @@
             </div><div class="col s6">
                 @*Total*@
                 <label class="custom-label">
-                    Total Amount Due
+                    Balance Payment
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentDue" placeholder="Total amount due..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': addSubmitted && !paymentDue}">
@@ -162,6 +187,7 @@
                 @*Description*@
                 <label class="custom-label">
                     Description
+                    <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentDescription"
                               ng-class="{'invalid-input': addSubmitted && !paymentDescription}"></textarea>
