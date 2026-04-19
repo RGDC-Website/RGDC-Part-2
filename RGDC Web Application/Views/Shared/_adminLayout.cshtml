@@ -20,7 +20,6 @@
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </head>
-@*<body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">*@
 <body id="body" ng-app="RGDCWebApplication" ng-controller="RGDCWebApplicationController">
     <div class="row" style="margin: 0;">
         @*sidebar nav*@
@@ -177,7 +176,7 @@
 
             <form>
                 <div class="row">
-                    <div class="col s4">
+                    <div class="col s12 m4 l4">
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
@@ -192,7 +191,7 @@
                         </div>
                     </div>
 
-                    <div class="col s8">
+                    <div class="col s12 m8 l8">
                         <div class="row">
                             @*First name*@
                             <div class="col s6">
@@ -226,7 +225,7 @@
 
                 @*Email*@
                 <div class="row">
-                    <div class="col s12">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Email <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.email"
                                disabled
@@ -238,7 +237,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="owner.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray"
@@ -248,7 +247,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDateOwner" type="text" class="datepicker custom-input" ng-model="owner.birthDate"
@@ -258,7 +257,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="owner.civilStatus"
                                 ng-class="{'invalid-input': editOwnerSubmitted && !owner.civilStatus}">
@@ -270,7 +269,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.contactNumber"
                                placeholder="09XX-XXX-XXXX" maxlength="13"
@@ -281,19 +280,30 @@
 
                 <div class="row">
                     @*Religion*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="owner.religion"
-                               placeholder="Roman-Catholic" maxlength="50"
-                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">
+                        <select class="browser-default custom-input">
+                            <option disabled selected>Select your Religion</option>
+                            <option value="Roman Catholic">Roman Catholic</option>
+                            <option value="Islam">Islam</option>
+                            <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
+                            <option value="Others">Others</option>
+                        </select>
+                        @*<input type="text" class="custom-input" ng-model="owner.religion"
+        placeholder="Roman-Catholic" maxlength="50"
+        ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="owner.nationality"
+                        <select class="browser-default custom-input">
+                            <option disbaled selected>Select your Nationality</option>
+                            <option>Option 1</option>
+                        </select>
+    @*<input type="text" class="custom-input" ng-model="owner.nationality"
                                placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">
+                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -302,9 +312,28 @@
                     @*Address*@
                     <div class="col s12">
                         <p class="custom-label">Address <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="owner.address"
-                               maxlength="250"
-                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.address}">
+                        <div class="row m-0">
+                            <div class="col s12 m2 l2">
+                                <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            </div>
+                        </div>
+                        <div class="row m-0">
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            </div>
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            </div>
+                        </div>
+                        @*<input type="text" class="custom-input" ng-model="owner.address"
+        maxlength="250"
+        ng-class="{'invalid-input': editOwnerSubmitted && !owner.address}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.address">Address is required.</span>
                     </div>
                 </div>
@@ -338,7 +367,7 @@
 
             <form>
                 <div class="row">
-                    <div class="col s4">
+                    <div class="col s12 m4 l4">
                         @*Photo display*@
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
@@ -354,7 +383,7 @@
                         </div>
                     </div>
 
-                    <div class="col s8">
+                    <div class="col s12 m8 l8">
                         <div class="row">
                             @*First name*@
                             <div class="col s6">
@@ -400,7 +429,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray"
@@ -410,7 +439,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDateDentist" type="text" class="datepicker custom-input" ng-model="dentist.birthDate"
@@ -420,7 +449,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.civilStatus"
                                 ng-class="{'invalid-input': editDentistSubmitted && !dentist.civilStatus}">
@@ -432,7 +461,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.contactNumber"
                                placeholder="09XX-XXX-XXXX" maxlength="13"
@@ -443,19 +472,30 @@
 
                 <div class="row">
                     @*Religion*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="dentist.religion"
-                               placeholder="Roman-Catholic" maxlength="50"
-                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">
+                        <select class="browser-default custom-input">
+                            <option disabled selected>Select your Religion</option>
+                            <option value="Roman Catholic">Roman Catholic</option>
+                            <option value="Islam">Islam</option>
+                            <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
+                            <option value="Others">Others</option>
+                        </select>
+                        @*<input type="text" class="custom-input" ng-model="dentist.religion"
+        placeholder="Roman-Catholic" maxlength="50"
+        ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="dentist.nationality"
+                        <select class="browser-default custom-input">
+                            <option disbaled selected>Select your Nationality</option>
+                            <option>Option 1</option>
+                        </select>
+    @*<input type="text" class="custom-input" ng-model="dentist.nationality"
                                placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">
+                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -464,9 +504,28 @@
                     @*Address*@
                     <div class="col s12">
                         <p class="custom-label">Address <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="dentist.address"
-                               maxlength="250"
-                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.address}">
+                        <div class="row m-0">
+                            <div class="col s12 m2 l2">
+                                <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            </div>
+                        </div>
+                        <div class="row m-0">
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            </div>
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            </div>
+                        </div>
+                        @*<input type="text" class="custom-input" ng-model="dentist.address"
+        maxlength="250"
+        ng-class="{'invalid-input': editDentistSubmitted && !dentist.address}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.address">Address is required.</span>
                     </div>
                 </div>
@@ -511,7 +570,7 @@
 
             <form>
                 <div class="row">
-                    <div class="col s4">
+                    <div class="col s12 m4 l4">
                         <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
@@ -526,7 +585,7 @@
                         </div>
                     </div>
 
-                    <div class="col s8">
+                    <div class="col s12 m8 l8">
                         <div class="row">
                             @*First name*@
                             <div class="col s6">
@@ -572,7 +631,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="staff.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray"
@@ -582,7 +641,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDate" type="text" class="datepicker custom-input" ng-model="staff.birthDate"
@@ -592,7 +651,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="staff.civilStatus"
                                 ng-class="{'invalid-input': editStaffSubmitted && !staff.civilStatus}">
@@ -604,7 +663,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s3">
+                    <div class="col s12 m3 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input id="contactNumber" type="text" class="custom-input" ng-model="staff.contactNumber"
                                placeholder="09XX-XXX-XXXX" maxlength="13"
@@ -615,9 +674,9 @@
 
                 <div class="row">
                     @*Religion*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                        <select>
+                        <select class="browser-default custom-input">
                             <option disabled selected>Select your Religion</option>
                             <option value="Roman Catholic">Roman Catholic</option>
                             <option value="Islam">Islam</option>
@@ -625,15 +684,16 @@
                             <option value="Others">Others</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="staff.religion"
-                               placeholder="Roman-Catholic" maxlength="50"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
+        placeholder="Roman-Catholic" maxlength="50"
+        ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
-                    <div class="col s6">
+                    <div class="col s12 m6 l6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                        <select placeholder="Filipino">
-                            <option value="">Option 1</option>
+                        <select class="browser-default custom-input">
+                            <option disbaled selected>Select your Nationality</option>
+                            <option>Option 1</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="staff.nationality"
                                placeholder="Filipino" maxlength="50"
@@ -646,9 +706,29 @@
                     @*Address*@
                     <div class="col s12">
                         <p class="custom-label">Address <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="staff.address"
-                               maxlength="250"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.address}">
+                        <div class="row m-0">
+                            <div class="col s12 m2 l2">
+                                <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            </div>
+                        </div>
+                        <div class="row m-0">
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            </div>
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            </div>
+                        </div>
+
+                        @*<input type="text" class="custom-input" ng-model="staff.address"
+        maxlength="250"
+        ng-class="{'invalid-input': editStaffSubmitted && !staff.address}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.address">Address is required.</span>
                     </div>
                 </div>
