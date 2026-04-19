@@ -46,6 +46,7 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
+                                <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th colspan="2">Status</th>
@@ -66,6 +67,7 @@
                                 <td>{{appt.date}}</td>
                                 <td>{{appt.time}}</td>
                                 <td>{{appt.purpose}}</td>
+                                <td class="notes-cell" title="{{appt.remarks || ''}}" style="white-space: pre-line;">{{appt.remarks}}</td>
                                 <td>{{appt.dentistName}}</td>
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
@@ -83,6 +85,12 @@
                                            data-position="bottom" data-tooltip="Edit Appointment"
                                            aria-label="Edit appointment">
                                             <i class="material-icons brown-text lighten-1">edit</i>
+                                        </a>
+                                        <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped reschedule-btn"
+                                           data-apptid="{{appt.apptID}}"
+                                           data-position="bottom" data-tooltip="Request Reschedule"
+                                           aria-label="Request reschedule">
+                                            <i class="material-icons brown-text lighten-1">autorenew</i>
                                         </a>
                                     </div>
                             </tr>
@@ -115,12 +123,12 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
+                                <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th colspan="2">Status</th>
                             </tr>
                         </thead>
-                        @*table content*@
                         <tbody>
                             <tr ng-if="(!requestedAppointments || requestedAppointments.length === 0)">
                                 <td class="center-align">No requested appointments found.</td>
@@ -135,6 +143,7 @@
                                 <td>{{appt.date}}</td>
                                 <td>{{appt.time}}</td>
                                 <td>{{appt.purpose}}</td>
+                                <td class="notes-cell" title="{{appt.remarks || ''}}" style="white-space: pre-line;">{{appt.remarks}}</td>
                                 <td>{{appt.dentistName}}</td>
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
@@ -178,6 +187,7 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
+                                <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th colspan="2">Status</th>
@@ -189,6 +199,7 @@
                                 <td>{{p.date}}</td>
                                 <td>{{p.time}}</td>
                                 <td>{{p.purpose}}</td>
+                                <td class="notes-cell" title="{{appt.remarks || ''}}" style="white-space: pre-line;">{{appt.remarks}}</td>
                                 <td>{{p.dentistName}}</td>
                                 <td>{{p.patientName}}</td>
                                 <td>{{p.displayStatus || p.status}}</td>
@@ -261,13 +272,16 @@
                 @*Dentist*@
                 <div class="col s12 m6">
                     <label class="custom-label" for="addApptDentist">Dentist <span class="required-mark">*</span></label>
-                    <div ng-if="currentUserAuthorization !== '2'">
-                        <select id="addApptDentist" class="custom-input browser-default" ng-model="newApptRequest.dentistID" required>
+                    <div ng-if="!(currentUserAuthorization === '2' && currentUserPermission === '1')">
+                        <select id="addApptDentist"
+                                class="custom-input browser-default"
+                                ng-model="newApptRequest.dentistID"
+                                ng-options="d.dentistID as d.dentistName for d in dentistArray"
+                                required>
                             <option value="">Select Dentist</option>
-                            <option ng-repeat="dentist in dentistArray" ng-value="dentist.dentistID">{{dentist.dentistName}}</option>
                         </select>
                     </div>
-                    <div ng-if="currentUserAuthorization === '2'">
+                    <div ng-if="(currentUserAuthorization === '2' && currentUserPermission === '1')">
                         <input type="text" class="custom-input" ng-model="currentDentist.dentistName" readonly />
                     </div>
                 </div>
@@ -276,9 +290,12 @@
                 <div class="col s12 m6">
                     <label class="custom-label" for="addApptPatient">Patient <span class="required-mark">*</span></label>
 
-                    <select id="addApptPatient" class="custom-input browser-default" ng-model="newApptRequest.patientID" required>
+                    <select id="addApptPatient"
+                            class="custom-input browser-default"
+                            ng-model="newApptRequest.patientID"
+                            ng-options="p.patientID as p.patientName for p in patientArray"
+                            required>
                         <option value="">Select Patient</option>
-                        <option ng-repeat="patient in patientArray" ng-value="patient.patientID">{{patient.patientName}}</option>
                     </select>
                 </div>
             </div>
@@ -288,6 +305,25 @@
                 <div class="col s12">
                     <label class="custom-label" for="addApptPurpose">Purpose <span class="required-mark">*</span></label>
                     <input id="addApptPurpose" type="text" class="custom-input" ng-model="newApptRequest.reason" placeholder="Purpose" required />
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptContact">Contact Number</label>
+                    <input id="addApptContact" type="text" class="custom-input" ng-model="newApptRequest.contactNumber" placeholder="09#########" />
+                </div>
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptRequester">Requester Name</label>
+                    <input id="addApptRequester" type="text" class="custom-input" ng-model="newApptRequest.requesterName" ng-init="newApptRequest.requesterName = currentUserFullName" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <label class="custom-label" for="addApptNotes">Notes (optional)</label>
+                    <textarea id="addApptNotes" class="materialize-textarea custom-input" ng-model="newApptRequest.notes" placeholder="Additional notes (optional)"></textarea>
                 </div>
             </div>
 
@@ -342,7 +378,7 @@
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" ng-model="editingAppt.dateObj" placeholder="MM/DD/YYYY" min="{{minApptDate}}">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="editingAppt.dateObj" placeholder="MM/DD/YYYY" min="{{minApptDate}}" disabled>
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
 
@@ -357,7 +393,7 @@
                 @*Time Dropdown*@
                 <label class="custom-label">
                     Time
-                    <select class="custom-input" ng-model="editingAppt.timeStr" ng-change="onTimeChange()">
+                    <select class="custom-input" ng-model="editingAppt.timeStr" ng-change="onTimeChange()" disabled>
                         <option value="">Select Time</option>
                         <option value="12:00 AM">12:00 AM</option>
                         <option value="1:00 AM">1:00 AM</option>
@@ -394,11 +430,35 @@
             </div>
 
             <div class="col s12">
+                <label class="custom-label">Status</label>
+                <select class="custom-input browser-default"
+                        ng-model="editingAppt.status"
+                        ng-options="s for s in statusOptions"
+                        ng-disabled="isUserPatient">
+                    <option value="">Select Status</option>
+                </select>
+                <span class="helper-text" ng-if="isUserPatient" style="color: #666; font-size:0.9rem;">
+                    Status can only be changed by dentist/clinic staff.
+                </span>
+            </div>
+
+            <div class="col s12">
                 @*Purpose*@
                 <label class="custom-label">
                     Purpose
                     <input type="text" class="custom-input" ng-model="editingAppt.purpose" placeholder="Purpose">
                 </label>
+            </div>
+
+            <div class="col s12">
+                <label class="custom-label">
+                    Notes
+                    <textarea class="custom-input" ng-model="editingAppt.remarks" placeholder="Enter notes / procedure details"
+                              ng-disabled="isUserPatient"></textarea>
+                </label>
+                <span class="helper-text" ng-if="isUserPatient" style="color: #666; font-size:0.9rem;">
+                    Notes are read-only for patient users.
+                </span>
             </div>
 
         </div>
@@ -423,6 +483,78 @@
     <div class="modal-footer footer-center">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
         <button type="submit" class="edit-btn" ng-click="deleteAppointment()" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0 ">DELETE</button>
+    </div>
+</div>
+
+@*RESCHEDULE appointment*@
+<div id="modalRescheduleAppt" class="modal appt-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Request Reschedule</h5>
+
+        <form novalidate>
+            <input type="hidden" id="rescheduleOriginalApptID" ng-model="rescheduleRequest.originalApptID" />
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <label class="custom-label" for="rescheduleDate">New Date <span class="required-mark">*</span></label>
+                    <div class="datepicker-wrapper">
+                        <input id="rescheduleDate"
+                               type="text"
+                               class="datepicker custom-input"
+                               ng-model="rescheduleRequest.dateTime"
+                               placeholder="MM/DD/YYYY"
+                               min="{{minApptDate}}"
+                               required />
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    </div>
+                </div>
+
+                <div class="col s12 m6">
+                    <label class="custom-label" for="rescheduleTime">New Time <span class="required-mark">*</span></label>
+                    <select id="rescheduleTime"
+                            class="custom-input"
+                            ng-model="rescheduleRequest.time"
+                            ng-options="t for t in timeOptions">
+                        <option value="">Select Time</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <label class="custom-label">Dentist</label>
+                    <input type="text" class="custom-input" ng-model="rescheduleRequest.dentistName" readonly />
+                </div>
+
+                <div class="col s12 m6">
+                    <label class="custom-label">Patient</label>
+                    <input type="text" class="custom-input" ng-model="rescheduleRequest.patientName" readonly />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <label class="custom-label">Reason <span class="required-mark">*</span></label>
+                    <textarea class="custom-input" ng-model="rescheduleRequest.reason" placeholder="Reason for reschedule" required></textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12 m6">
+                    <label class="custom-label">Your Name</label>
+                    <input type="text" class="custom-input" ng-model="rescheduleRequest.requesterName" readonly />
+                </div>
+                <div class="col s12 m6">
+                    <label class="custom-label">Contact Number <span class="required-mark">*</span></label>
+                    <input type="text" class="custom-input" ng-model="rescheduleRequest.contactNumber" placeholder="09XXXXXXXXX" required />
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight:500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="button" class="edit-btn" ng-click="createRescheduleRequest()" style="font-weight:500; margin: -.8vh 2.3vh -1.2vh 0">REQUEST</button>
     </div>
 </div>
 

@@ -418,6 +418,7 @@
                         date: dateStr,
                         time: timeStr,
                         purpose: a.purpose || a.reason || "",
+                        remarks: a.remarks || "",
                         dentistName: a.dentistName || "",
                         patientName: a.patientName || "",
                         status: a.status || "",
@@ -673,17 +674,32 @@
         RGDCWebApplicationService.getAdminScheduledAppointments()
             .then(function (response) {
                 var data = response.data || [];
-                $scope.adminAppointments = (Array.isArray(data) ? data : []).map(function (a) {
-                    // Convert server date format to JS Date and keep raw date object for comparisons
+                var mapped = (Array.isArray(data) ? data : []).map(function (a) {
+                    // parse server date into JS Date
                     var jsDate = parseJsonDateToJsDate(a.dateTime);
+                    // If server previously provided dateTimeObj, prefer that
+                    if ((!jsDate || isNaN(jsDate.getTime())) && a.dateTimeObj && Object.prototype.toString.call(a.dateTimeObj) === '[object Date]') {
+                        jsDate = a.dateTimeObj;
+                    }
+
+                    // Derive display strings from the Date object when possible
                     var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
                     var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
 
+                    // If parsing failed but server returned already-formatted strings (not /Date(...)/), use them
+                    if ((!dateStr || !timeStr) && a.date && typeof a.date === 'string' && !/\/Date\(/.test(a.date)) {
+                        dateStr = dateStr || a.date;
+                    }
+                    if ((!timeStr || !dateStr) && a.time && typeof a.time === 'string' && !/\/Date\(/.test(a.time)) {
+                        timeStr = timeStr || a.time;
+                    }
+
                     return {
                         apptID: a.apptID,
+                        dateTimeObj: jsDate,
+                        // overwrite server raw values with formatted strings (prevents "/Date(...)/" display)
                         date: dateStr,
                         time: timeStr,
-                        dateTimeObj: jsDate,               // raw Date for conflict checks
                         dentistID: (typeof a.dentistID !== 'undefined' && a.dentistID !== null) ? parseInt(a.dentistID, 10) : null,
                         patientID: (typeof a.patientID !== 'undefined' && a.patientID !== null) ? parseInt(a.patientID, 10) : null,
                         purpose: a.purpose || a.reason || "",
@@ -691,41 +707,49 @@
                         patientName: a.patientName || "",
                         status: a.status || "",
                         displayStatus: a.displayStatus || a.status || "",
+                        remarks: a.remarks || null,
+                        procedureID: (a.procedureID !== undefined) ? a.procedureID : null,
                         createdBy: a.createdBy || null
                     };
                 });
 
-                // also expose on root scope so patient/admin views can read it as $root.adminAppointments
-                try {
-                    if ($rootScope) $rootScope.adminAppointments = $scope.adminAppointments;
-                } catch (e) { /* ignore */ }
+                // Helper to finalize assignment and UI work
+                function finalize(filtered) {
+                    $scope.adminAppointments = Array.isArray(filtered) ? filtered : [];
+                    try { if ($rootScope) $rootScope.adminAppointments = $scope.adminAppointments; } catch (e) { }
+                    try { updateDashboardLists(); } catch (e) { console.warn('updateDashboardLists failed', e); }
 
-                try { updateDashboardLists(); } catch (e) { }
-
-                // recompute time options (updateTimeOptions handles missing data safely)
-                try {
-                    $timeout(function () {
-                        try { $scope.updateTimeOptions(); } catch (e) { /* ignore */ }
-                    }, 30);
-                } catch (e) { /* ignore */ }
-
-                // Initialize DataTable after rows render using safe initializer
-                $timeout(function () {
+                    // recompute time options
                     try {
-                        initDataTableSafe('#adminScheduledAppointment', '_adminScheduledDataTableInstance');
-                    } catch (e) {
-                        console.error('Failed to init admin scheduled DataTable:', e);
-                    }
-                }, 60);
+                        $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { } }, 30);
+                    } catch (e) { /* ignore */ }
+
+                    // Initialize DataTable after rows render
+                    $timeout(function () {
+                        try {
+                            // Use the safe initializer that handles destroying/creating and attaches delegated handlers
+                            initDataTableSafe('#adminScheduledAppointment', '_adminScheduledDataTableInstance');
+                        } catch (e) {
+                            console.error('Failed to init admin scheduled DataTable via initDataTableSafe:', e);
+                        }
+                    }, 60);
+                }
+
+                // Role-aware filtering
+                try {
+                    finalize(mapped);
+                } catch (e) {
+                    console.error('role-based filtering failed (fallback to server data)', e);
+                    finalize(mapped);
+                }
             })
             .catch(function (err) {
-                // Retry on aborted requests (-1) up to 2 times
                 if (err && err.status === -1 && _adminLoadRetries < 2) {
                     _adminLoadRetries++;
                     $timeout($scope.loadAdminScheduledAppointments, 500);
                     return;
                 }
-                if (err && err.status && err.status !== -1) console.error("Failed to load admin scheduled appointments", err);
+                console.error("Failed to load admin scheduled appointments", err);
                 $scope.adminAppointments = [];
                 try { if ($rootScope) $rootScope.adminAppointments = []; } catch (e) { }
             });
@@ -1237,13 +1261,44 @@
     }
 
     $scope.getDentists = function () {
-        if ($scope.userAuthorization != 3) {
-            var getDentists = RGDCWebApplicationService.getDentists();
-            getDentists.then(function (dentistList) {
-                $scope.dentistArray = dentistList.data;
+        // Always load dentist list for appointment selection (patients need it too)
+        var getDentists = RGDCWebApplicationService.getDentistList();
+        getDentists.then(function (dentistList) {
+            // ensure mapping to { dentistID, dentistName } consistent with loadDentistList
+            var raw = dentistList.data || [];
+            $scope.dentistArray = (Array.isArray(raw) ? raw : []).map(function (d) {
+                var id = null;
+                if (d && typeof d.dentistID !== 'undefined') id = d.dentistID;
+                else if (d && typeof d.accID !== 'undefined') id = d.accID;
+                else if (d && typeof d.id !== 'undefined') id = d.id;
+                id = (id !== null && id !== '') ? parseInt(id, 10) : null;
+
+                var name = '';
+                if (d) {
+                    if (d.dentistName) name = d.dentistName;
+                    else if (d.fullName) name = d.fullName;
+                    else if (d.firstName || d.lastName) {
+                        name = ((d.firstName || '') + ' ' + (d.lastName || '')).trim();
+                    } else if (d.email) {
+                        name = d.email;
+                    }
+                }
+                return { dentistID: id, dentistName: name };
+            }).filter(function (x) {
+                return x && typeof x.dentistID !== 'undefined' && x.dentistID !== null && !isNaN(x.dentistID);
             });
-        }
-    }
+
+            // If only one dentist, preselect for convenience
+            if (!$scope.newApptRequest) $scope.newApptRequest = {};
+            if (!$scope.newApptRequest.dentistID && $scope.dentistArray.length === 1) {
+                $scope.newApptRequest.dentistID = $scope.dentistArray[0].dentistID;
+                $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { console.error(e); } }, 0);
+            }
+        }).catch(function (err) {
+            console.error('Failed to load dentists', err);
+            $scope.dentistArray = [];
+        });
+    };
 
 
     $scope.getPatientsNDentist = function () {
@@ -1961,7 +2016,7 @@
     $scope.goHome = function () {
         if ($scope.isUserPatient) {
             window.location.href = '/RGDC/patientDashboard';
-        } else if ($scope.currentUserAuthorization === "1") {
+        } else if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
             window.location.href = '/RGDC/dentistDashboard';
         } else {
             window.location.href = '/RGDC/adminDashboard';
@@ -2439,6 +2494,8 @@
         $scope.editingAppt.purpose = appt.purpose;
         $scope.editingAppt.dentistName = appt.dentistName;
         $scope.editingAppt.patientName = appt.patientName;
+        $scope.editingAppt.status = appt.status || 'Scheduled';
+        $scope.editingAppt.remarks = appt.remarks || '';
 
         // Open modal programmatically
         $timeout(function () {
@@ -2545,6 +2602,18 @@
             reason: $scope.editingAppt.purpose
         };
 
+        try {
+            // client-side guard: prevent patient from changing status
+            if (!$scope.isUserPatient && $scope.editingAppt.status) {
+                updateData.status = $scope.editingAppt.status;
+            }
+        } catch (e) {
+            // if scope flags aren't available, still include status conservatively
+            if ($scope.editingAppt.status) updateData.status = $scope.editingAppt.status;
+        }
+
+        updateData.remarks = $scope.editingAppt.remarks || null;
+
         RGDCWebApplicationService.updateAppointment(updateData)
             .then(function (response) {
                 if (response.data && response.data.success) {
@@ -2571,7 +2640,9 @@
                             timeStr: '',
                             purpose: '',
                             dentistName: '',
-                            patientName: ''
+                            patientName: '',
+                            status: 'Scheduled',
+                            remarks: ''
                         };
                         
                         // Reload appointments
@@ -2624,8 +2695,7 @@
             $scope.loadRequestedAppointments();
             $scope.loadPastAppointments();
 
-            if ($scope.currentUserAuthorization === "1") {
-                // dentist user: get dentist record and prefill dentistID
+            if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
                 RGDCWebApplicationService.getCurrentDentist().then(function (resp) {
                     if (resp && resp.data && resp.data.success) {
                         $scope.currentDentist = { dentistID: resp.data.dentistID, dentistName: resp.data.dentistName };
@@ -2640,15 +2710,38 @@
             }
 
             // If patient user, pre-select their patient record so they don't have to choose
-            if ($scope.currentUserAuthorization === "3") {
-                RGDCWebApplicationService.getOwnPatientDetails().then(function (resp) {
-                    if (resp && resp.data && resp.data.patientID) {
-                        $scope.newApptRequest = $scope.newApptRequest || {};
-                        $scope.newApptRequest.patientID = parseInt(resp.data.patientID, 10);
-                        // store for patientArray mapping to use later (in case patient list loads after session)
-                        $scope._ownPatientID = resp.data.patientID;
-                    }
-                }).catch(function () { });
+            if ($scope.isUserPatient) {
+                // Ensure patient and dentist lists are loaded first, then set the model so selects bind correctly.
+                $scope._resolvingOwnPatientID = true;
+                // load both lists in parallel and then resolve own patient id
+                Promise.all([$scope.loadPatientList(), $scope.loadDentistList()])
+                    .then(function () {
+                        return RGDCWebApplicationService.getOwnPatientDetails();
+                    })
+                    .then(function (resp) {
+                        $scope._resolvingOwnPatientID = false;
+                        if (resp && resp.data && typeof resp.data.patientID !== 'undefined') {
+                            $timeout(function () {
+                                $scope.newApptRequest = $scope.newApptRequest || {};
+                                $scope.newApptRequest.patientID = parseInt(resp.data.patientID, 10);
+                                $scope._ownPatientID = resp.data.patientID;
+                                // ensure patient appears in patientArray (loadPatientList already attempts to do this)
+                                if (!($scope.patientArray || []).some(function (p) { return p.patientID === $scope.newApptRequest.patientID; })) {
+                                    var name = resp.data.patientName || ((resp.data.firstName || '') + ' ' + (resp.data.lastName || '')).trim() || resp.data.email || ('Patient ' + resp.data.patientID);
+                                    $scope.patientArray = $scope.patientArray || [];
+                                    $scope.patientArray.push({ patientID: $scope.newApptRequest.patientID, patientName: name });
+                                }
+                            }, 0);
+                        }
+                    })
+                    .catch(function () {
+                        $scope._resolvingOwnPatientID = false;
+                        // fallback: try to set _ownPatientID if available from earlier
+                        if ($scope._ownPatientID) {
+                            $scope.newApptRequest = $scope.newApptRequest || {};
+                            $scope.newApptRequest.patientID = parseInt($scope._ownPatientID, 10);
+                        }
+                    });
             }
 
             // compute minimum selectable date (today + 3 days) for appointment date inputs (global)
@@ -2685,7 +2778,7 @@
             $scope.loadRequestedAppointments();
             $scope.loadAdminScheduledAppointments();
             // If dentist user, get current dentist info so modal can prefill
-            if ($scope.currentUserAuthorization === "1") {
+            if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
                 RGDCWebApplicationService.getCurrentDentist().then(function (resp) {
                     if (resp && resp.data && resp.data.success) {
                         $scope.currentDentist = { dentistID: resp.data.dentistID, dentistName: resp.data.dentistName };
@@ -2714,16 +2807,16 @@
     $scope.deleteAppointment = function () {
         // Try scope first, then fallback to hidden field
         var id = null;
-        if ($scope.deletingAppt && $scope.deletingAppt.apptID) id = parseInt($scope.deletingAppt.apptID, 10);
-        if (!id) {
+        if ($scope.deletingAppt && typeof $scope.deletingAppt.apptID !== 'undefined' && $scope.deletingAppt.apptID !== null) id = parseInt($scope.deletingAppt.apptID, 10);
+        if (id === null || isNaN(id)) {
             try {
                 var hidden = document.getElementById('hiddenDeleteApptID');
-                if (hidden && hidden.value) id = parseInt(hidden.value, 10);
+                if (hidden && hidden.value !== '') id = parseInt(hidden.value, 10);
             } catch (e) {
                 console.error(e);
             }
         }
-        if (!id || isNaN(id) || id <= 0) {
+        if (id === null || isNaN(id) || id < 0) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'No appointment selected.' });
             return;
         }
@@ -2789,7 +2882,8 @@
     $scope.requestedAppointments = [];
 
     $scope.loadDentistList = function () {
-        RGDCWebApplicationService.getDentistList()
+        // Return a promise so callers can wait for dentists to be available
+        return RGDCWebApplicationService.getDentistList()
             .then(function (response) {
                 var raw = response.data || [];
                 $scope.dentistArray = (Array.isArray(raw) ? raw : []).map(function (d) {
@@ -2810,30 +2904,37 @@
                         }
                     }
                     return { dentistID: id, dentistName: name };
+                }).filter(function (x) {
+                    // keep valid numeric ids (including 0)
+                    return x && typeof x.dentistID !== 'undefined' && x.dentistID !== null && !isNaN(x.dentistID);
                 });
 
-                if ($scope.currentUserAuthorization === "1" && $scope.currentDentist && $scope.currentDentist.dentistID) {
-                    $scope.newApptRequest = $scope.newApptRequest || {};
+                // Preselect dentist where appropriate (dentist user / single-dentist clinics)
+                if (!$scope.newApptRequest) $scope.newApptRequest = {};
+                if (($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") && $scope.currentDentist && typeof $scope.currentDentist.dentistID !== 'undefined') {
                     $scope.newApptRequest.dentistID = parseInt($scope.currentDentist.dentistID, 10);
-                    $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { console.error(e); } }, 0);
+                } else if (!$scope.newApptRequest.dentistID && $scope.dentistArray.length === 1) {
+                    $scope.newApptRequest.dentistID = $scope.dentistArray[0].dentistID;
                 }
 
+                // trigger time options recompute
+                $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { } }, 0);
+                return $scope.dentistArray;
             })
             .catch(function (err) {
-                console.error("Failed to load dentist list", err);
+                console.error('Failed to load dentist list', err);
                 $scope.dentistArray = [];
+                return $scope.dentistArray;
             });
     };
 
     $scope.loadPatientList = function () {
-        RGDCWebApplicationService.getPatientListForAppointment()
+        // Return a promise so callers can wait for patients to be available
+        return RGDCWebApplicationService.getPatientListForAppointment()
             .then(function (response) {
                 var raw = response.data || [];
-
                 var arr = Array.isArray(raw) ? raw : [];
 
-                // Keep only true patient records. Server may return objects with patientID
-                // or account objects that include a role property (where role === 3 means Patient).
                 var filtered = arr.filter(function (p) {
                     if (!p) return false;
                     if (typeof p.patientID !== 'undefined' && p.patientID !== null) return true;
@@ -2861,16 +2962,35 @@
                     return { patientID: id, patientName: name };
                 });
 
-                // If current user is a patient, ensure the model is set with correct numeric type
-                if ($scope.currentUserAuthorization === "3" && $scope._ownPatientID) {
-                    $scope.newApptRequest = $scope.newApptRequest || {};
-                    $scope.newApptRequest.patientID = parseInt($scope._ownPatientID, 10);
+                // If current user is a patient, ensure their record is present in the dropdown.
+                if ($scope.isUserPatient) {
+                    var ownId = ($scope._ownPatientID !== undefined && $scope._ownPatientID !== null) ? parseInt($scope._ownPatientID, 10) : null;
+                    if (ownId && $scope.patientArray.every(function (x) { return x.patientID !== ownId; })) {
+                        // fetch own patient details and insert into patientArray
+                        return RGDCWebApplicationService.getOwnPatientDetails()
+                            .then(function (resp) {
+                                var p = resp && resp.data ? resp.data : null;
+                                if (p) {
+                                    var id = (typeof p.patientID !== 'undefined' && p.patientID !== null) ? parseInt(p.patientID, 10) : ((typeof p.accID !== 'undefined') ? parseInt(p.accID, 10) : null);
+                                    var name = p.patientName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || p.email || ('Patient ' + id);
+                                    if (id !== null && !isNaN(id)) {
+                                        $scope.patientArray.push({ patientID: id, patientName: name });
+                                    }
+                                }
+                                return $scope.patientArray;
+                            }).catch(function (err) {
+                                console.warn('Failed to fetch own patient details to ensure presence in patientArray', err);
+                                return $scope.patientArray;
+                            });
+                    }
                 }
 
+                return $scope.patientArray;
             })
             .catch(function (err) {
-                console.error("Failed to load patient list", err);
+                console.error('Failed to load patient list', err);
                 $scope.patientArray = [];
+                return $scope.patientArray;
             });
     };
 
@@ -2878,29 +2998,40 @@
         RGDCWebApplicationService.getRequestedAppointments()
             .then(function (response) {
                 var data = response.data || [];
-
-                if (data && typeof data === 'object' && data.success === false && data.message) {
-                    $scope.requestedAppointments = [];
-                    return;
-                }
                 if (!Array.isArray(data)) {
                     $scope.requestedAppointments = [];
+                    $timeout(function () { initDataTableSafe('#adminRequestedAppointment', '_adminRequestedDataTableInstance'); }, 0);
                     return;
                 }
 
                 var mapped = data.map(function (a) {
                     var jsDate = parseJsonDateToJsDate(a.dateTime);
-                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
-                    var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
+                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : (a.date || "");
+                    var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : (a.time || "");
+
+                    // prefer returned notes field; fallback to building notes from requester/contact
+                    var notes = a.notes || "";
+                    if (!notes || String(notes).trim() === "") {
+                        var parts = [];
+                        if (a.requesterName) parts.push("Requested by: " + a.requesterName + ".");
+                        if (a.contactNumber) parts.push("In case of further questions kindly contact this number: " + a.contactNumber + ".");
+                        notes = parts.join("\n");
+                    }
+
                     return {
                         apptID: a.apptID,
                         date: dateStr,
                         time: timeStr,
                         purpose: a.purpose || a.reason || "",
+                        notes: notes,
+                        remarks: a.remarks || "",
                         dentistName: a.dentistName || "",
                         patientName: a.patientName || "",
+                        contactNumber: a.contactNumber || null,
+                        requesterName: a.requesterName || null,
                         status: a.status || "",
-                        displayStatus: a.displayStatus || a.status || ""
+                        displayStatus: a.displayStatus || a.status || "",
+                        createdBy: a.createdBy || null
                     };
                 });
 
@@ -2917,12 +3048,7 @@
                 }, 0);
             })
             .catch(function (err) {
-                if (err && err.status === -1 && _reqLoadRetries < 2) {
-                    _reqLoadRetries++;
-                    $timeout($scope.loadRequestedAppointments, 500);
-                    return;
-                }
-                if (err && err.status && err.status !== -1) console.error('Failed to load requested appointments', err);
+                console.error('Failed to load requested appointments', err);
                 $scope.requestedAppointments = [];
                 try { if ($rootScope) $rootScope.requestedAppointments = []; } catch (e) { }
                 try { updateDashboardLists(); } catch (e) { }
@@ -2942,23 +3068,43 @@
 
     function updateDashboardLists() {
         try {
-            // requestedAppointments is already role-filtered by server
             $scope.dashboardRequested = Array.isArray($scope.requestedAppointments) ? $scope.requestedAppointments.slice(0) : [];
 
-            // For scheduled, filter adminAppointments to those relevant to current account
             var all = Array.isArray($scope.adminAppointments) ? $scope.adminAppointments : [];
-            if ($scope.currentUserAuthorization === "1") {
-                // dentist: filter by dentistName if available
-                var name = ($scope.currentDentist && $scope.currentDentist.dentistName) ? $scope.currentDentist.dentistName : $scope.currentUserFullName;
-                $scope.dashboardScheduled = all.filter(function (a) { return a.dentistName === name; });
-            } else if ($scope.currentUserAuthorization === "3") {
-                // patient: filter by patientName matching currentUserFullName
-                var pname = $scope.currentUserFullName || "";
-                $scope.dashboardScheduled = all.filter(function (a) { return a.patientName === pname; });
-            } else {
-                // admin/staff/owner: show upcoming scheduled (limit to 10)
+            var auth = String($scope.currentUserAuthorization || "");
+            var perm = String($scope.currentUserPermission || "");
+
+            // Superadmin/Owner: show all upcoming scheduled (limit to 10)
+            if (auth === "0" || auth === "1") {
                 $scope.dashboardScheduled = all.slice(0, 10);
+                return;
             }
+
+            // Dentist: filter by numeric dentistID
+            if (auth === "2" && perm === "1") {
+                var did = ($scope.currentDentist && $scope.currentDentist.dentistID) ? parseInt($scope.currentDentist.dentistID, 10) : null;
+                if (did) {
+                    $scope.dashboardScheduled = all.filter(function (a) { return a.dentistID === did; });
+                } else {
+                    $scope.dashboardScheduled = [];
+                }
+                return;
+            }
+
+            // Patient: filter by numeric patientID (try _ownPatientID or fall back to currentUserFullName)
+            if (auth === "2" && perm === "3") {
+                var pid = ($scope._ownPatientID !== undefined && $scope._ownPatientID !== null) ? parseInt($scope._ownPatientID, 10) : null;
+                if (pid) {
+                    $scope.dashboardScheduled = all.filter(function (a) { return a.patientID === pid; });
+                } else {
+                    var pname = $scope.currentUserFullName || "";
+                    $scope.dashboardScheduled = all.filter(function (a) { return a.patientName === pname; });
+                }
+                return;
+            }
+
+            // other roles (admin/staff): show first 10
+            $scope.dashboardScheduled = all.slice(0, 10);
         } catch (e) {
             console.error('updateDashboardLists error', e);
             $scope.dashboardRequested = $scope.dashboardRequested || [];
@@ -2967,19 +3113,56 @@
     }
 
     $scope.createNewAppointmentRequest = function () {
+        // normalize any id value (number, numeric-string or object) to integer or null
+        function toNumericId(v) {
+            if (v === null || typeof v === 'undefined') return null;
+            if (typeof v === 'object') {
+                v = v.patientID || v.dentistID || v.id || v.accID || v.value || null;
+            }
+            var n = parseInt(v, 10);
+            return isNaN(n) ? null : n;
+        }
+
+        $scope.newApptRequest = $scope.newApptRequest || {};
+        // coerce models to numeric ids (keeps ng-model in sync)
+        var patientId = toNumericId($scope.newApptRequest.patientID);
+        var dentistId = toNumericId($scope.newApptRequest.dentistID);
+        $scope.newApptRequest.patientID = patientId;
+        $scope.newApptRequest.dentistID = dentistId;
+
+        // debug log to help diagnose client-side binding issues
+        console.debug('createNewAppointmentRequest values:', {
+            patientID: $scope.newApptRequest.patientID,
+            dentistID: $scope.newApptRequest.dentistID,
+            dateTime: $scope.newApptRequest.dateTime,
+            time: $scope.newApptRequest.time,
+            reason: $scope.newApptRequest.reason
+        });
+
         // If patient user didn't supply patientID (they are creating for themselves), fetch own patientID
-        if (!$scope.newApptRequest.patientID && $scope.currentUserAuthorization === "3") {
+        if ((!patientId || patientId === null) && $scope.isUserPatient) {
             if ($scope._resolvingOwnPatientID) return;
             $scope._resolvingOwnPatientID = true;
             RGDCWebApplicationService.getOwnPatientDetails().then(function (resp) {
                 $scope._resolvingOwnPatientID = false;
-                if (resp && resp.data && resp.data.patientID) {
-                    $scope.newApptRequest = $scope.newApptRequest || {};
-                    $scope.newApptRequest.patientID = parseInt(resp.data.patientID, 10);
+                var own = resp && resp.data ? (resp.data.patientID || resp.data.accID || null) : null;
+                own = toNumericId(own);
+                if (own) {
+                    $scope.newApptRequest.patientID = own;
+                    $scope._ownPatientID = own;
+                    // ensure patient exists in patientArray for select matching
+                    $timeout(function () {
+                        $scope.patientArray = $scope.patientArray || [];
+                        if (!$scope.patientArray.some(function (p) { return toNumericId(p.patientID) === own; })) {
+                            var name = resp.data.patientName || ((resp.data.firstName || '') + ' ' + (resp.data.lastName || '')).trim() || resp.data.email || ('Patient ' + own);
+                            $scope.patientArray.push({ patientID: own, patientName: name });
+                        }
+                    }, 0);
+                    // continue now that patientID is set
                     $scope.createNewAppointmentRequest();
-                } else {
-                    Swal.fire({ icon: "error", title: "Error", text: "Unable to determine patient record." });
+                    return;
                 }
+                Swal.fire({ icon: "error", title: "Error", text: "Unable to determine patient record." });
             }).catch(function (err) {
                 $scope._resolvingOwnPatientID = false;
                 console.error('Failed to load own patient details', err);
@@ -2988,26 +3171,37 @@
             return;
         }
 
-        if (!$scope.newApptRequest.patientID || !$scope.newApptRequest.dentistID || !$scope.newApptRequest.dateTime || !$scope.newApptRequest.reason || !$scope.newApptRequest.time) {
+        var hasPatient = ($scope.newApptRequest.patientID !== null && typeof $scope.newApptRequest.patientID !== 'undefined');
+        var hasDentist = ($scope.newApptRequest.dentistID !== null && typeof $scope.newApptRequest.dentistID !== 'undefined');
+        var hasDate = !!$scope.newApptRequest.dateTime;
+        var hasReason = !!$scope.newApptRequest.reason;
+        var hasTime = !!$scope.newApptRequest.time;
+
+        if (!hasPatient || !hasDentist || !hasDate || !hasReason || !hasTime) {
+            var missing = [];
+            if (!hasPatient) missing.push('Patient');
+            if (!hasDentist) missing.push('Dentist');
+            if (!hasDate) missing.push('Date');
+            if (!hasTime) missing.push('Time');
+            if (!hasReason) missing.push('Purpose');
+
             Swal.fire({
                 icon: "error",
                 title: "Missing Fields",
-                text: "Please fill in all required fields (Patient, Dentist, Date, Time, Purpose)."
+                text: "Please fill in required fields: " + missing.join(', ') + "."
             });
             return;
         }
 
-        // Parse the date and time into a Date object
+        // Parse date/time into a Date object
         var dateTimeStr = $scope.newApptRequest.dateTime;
         var timeStr = $scope.newApptRequest.time || "12:00 AM";
         var dateObj = (typeof dateTimeStr === 'string') ? new Date(dateTimeStr) : new Date(dateTimeStr);
-
         if (isNaN(dateObj.getTime())) {
             Swal.fire({ icon: "error", title: "Invalid Date", text: "Please select a valid date." });
             return;
         }
 
-        // compute selected slot Date
         var tMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
         if (!tMatch) {
             Swal.fire({ icon: "error", title: "Invalid Time", text: "Please select a valid time." });
@@ -3022,16 +3216,16 @@
         }
         dateObj.setHours(hours, minutes, 0, 0);
 
-        // Re-fetch latest scheduled appointments from server and validate slot is still free
+        // Re-check availability and create request
         RGDCWebApplicationService.getAdminScheduledAppointments()
             .then(function (resp) {
                 var remote = resp && resp.data ? (Array.isArray(resp.data) ? resp.data : []) : [];
+                var dentistNum = toNumericId($scope.newApptRequest.dentistID);
                 var conflict = remote.some(function (a) {
                     var aDate = parseJsonDateToJsDate(a.dateTime);
                     if (!aDate) return false;
-                    // only consider same dentist
-                    var dentistMatch = (typeof a.dentistID !== 'undefined' && a.dentistID !== null) ? (parseInt(a.dentistID, 10) === parseInt($scope.newApptRequest.dentistID, 10)) : true;
-                    if (!dentistMatch) return false;
+                    var aDent = toNumericId(a.dentistID || a.accID || a.id);
+                    if (aDent !== null && !isNaN(aDent) && aDent !== dentistNum) return false;
                     return aDate.getFullYear() === dateObj.getFullYear() &&
                         aDate.getMonth() === dateObj.getMonth() &&
                         aDate.getDate() === dateObj.getDate() &&
@@ -3041,17 +3235,18 @@
 
                 if (conflict) {
                     Swal.fire({ icon: 'error', title: 'Time Taken', text: 'The selected time is no longer available. Please choose another slot.' });
-                    // refresh local list and options
                     $scope.loadAdminScheduledAppointments();
                     return;
                 }
 
-                // no conflict -> create the appointment request
                 var appointmentData = {
-                    patientID: parseInt($scope.newApptRequest.patientID),
-                    dentistID: parseInt($scope.newApptRequest.dentistID),
+                    patientID: parseInt($scope.newApptRequest.patientID, 10),
+                    dentistID: parseInt($scope.newApptRequest.dentistID, 10),
                     dateTime: dateObj,
-                    reason: $scope.newApptRequest.reason
+                    reason: $scope.newApptRequest.reason,
+                    contactNumber: $scope.newApptRequest.contactNumber || null,
+                    requesterName: $scope.newApptRequest.requesterName || $scope.currentUserFullName || null,
+                    notes: $scope.newApptRequest.notes || null
                 };
 
                 RGDCWebApplicationService.createAppointmentRequest(appointmentData)
@@ -3095,91 +3290,130 @@
     };
 
     $scope.acceptRequestedAppointment = function (apptID) {
-        // Accept may be called with either an ID or the full appt object
         console.debug('acceptRequestedAppointment called with:', apptID);
-        var id = 0;
         if (!apptID) {
             Swal.fire({ icon: "error", title: "Error", text: "No appointment selected." });
             return;
         }
+
         function extractId(obj) {
-            if (!obj) return 0;
+            if (!obj && obj !== 0) return null;
             if (typeof obj === 'number') return obj;
-            if (typeof obj === 'string') return parseInt(obj, 10) || 0;
-            if (obj.apptID) return parseInt(obj.apptID, 10) || 0;
-            if (obj.id) return parseInt(obj.id, 10) || 0;
+            if (typeof obj === 'string') {
+                var pv = parseInt(obj, 10);
+                return isNaN(pv) ? null : pv;
+            }
+            if (obj.apptID !== undefined && obj.apptID !== null) {
+                var v = parseInt(obj.apptID, 10);
+                return isNaN(v) ? null : v;
+            }
+            if (obj.id !== undefined && obj.id !== null) {
+                var v2 = parseInt(obj.id, 10);
+                return isNaN(v2) ? null : v2;
+            }
             for (var k in obj) {
                 if (!obj.hasOwnProperty(k)) continue;
                 if (/id$/i.test(k) || /Id$/i.test(k)) {
-                    var v = parseInt(obj[k], 10);
-                    if (!isNaN(v) && v > 0) return v;
+                    var v3 = parseInt(obj[k], 10);
+                    if (!isNaN(v3) && v3 >= 0) return v3;
                 }
             }
             for (var k2 in obj) {
                 if (!obj.hasOwnProperty(k2)) continue;
-                var v2 = parseInt(obj[k2], 10);
-                if (!isNaN(v2) && v2 > 0) return v2;
+                var v4 = parseInt(obj[k2], 10);
+                if (!isNaN(v4) && v4 >= 0) return v4;
             }
-            return 0;
+            return null;
         }
 
-        id = extractId(apptID);
-        try { console.debug('extracted id:', id); } catch (e) {}
+        var id = extractId(apptID);
+        console.debug('extracted id:', id);
 
-        if (id <= 0) {
+        if (id === null || isNaN(id) || id < 0) {
             Swal.fire({ icon: "error", title: "Error", text: "Invalid appointment ID." });
             return;
         }
 
-        // send object payload to ensure model-binding on server
-        RGDCWebApplicationService.acceptAppointment({ apptID: id })
-            .then(function (response) {
-                if (response && response.data && response.data.success) {
-                    // reload both lists so UI updates across views
-                    $scope.loadRequestedAppointments();
-                    $scope.loadAdminScheduledAppointments();
-                } else {
-                    Swal.fire({ icon: "error", title: "Error", text: (response && response.data && response.data.message) || "Failed to accept appointment." });
-                }
-            })
-            .catch(function (err) {
-                console.error("Accept appointment error:", err);
-                Swal.fire({ icon: "error", title: "Error", text: "An error occurred while accepting the appointment." });
-            });
+        // prevent duplicate clicks
+        if ($scope._acceptingAppt) return;
+        $scope._acceptingAppt = true;
+
+        var attempt = 0;
+        function doAccept() {
+            attempt++;
+            console.debug('Accept attempt', attempt, 'for apptID', id);
+
+            RGDCWebApplicationService.acceptAppointment({ apptID: id })
+                .then(function (response) {
+                    $scope._acceptingAppt = false;
+                    if (response && response.data && response.data.success) {
+                        $scope.loadRequestedAppointments();
+                        $scope.loadAdminScheduledAppointments();
+                        return;
+                    }
+                    var msg = (response && response.data && response.data.message) || 'Failed to accept appointment.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                })
+                .catch(function (err) {
+                    console.error("Accept appointment error:", err);
+                    // retry once on client-abort (status === -1)
+                    var isAbort = (err && (err.status === -1 || (err.xhrStatus && err.xhrStatus === 'abort')));
+                    if (isAbort && attempt < 2) {
+                        console.warn('Request aborted, retrying once...');
+                        setTimeout(doAccept, 300);
+                        return;
+                    }
+                    $scope._acceptingAppt = false;
+                    // Try to surface server message if present
+                    var serverMsg = (err && err.data && err.data.message) || (err && err.statusText) || 'An error occurred while accepting the appointment.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: serverMsg });
+                });
+        }
+
+        doAccept();
     };
 
     $scope.denyRequestedAppointment = function (apptID) {
         console.debug('denyRequestedAppointment called with:', apptID);
-        var id = 0;
-        if (!apptID) {
+        if (!apptID && apptID !== 0) {
             Swal.fire({ icon: "error", title: "Error", text: "No appointment selected." });
             return;
         }
+
         function extractId(obj) {
-            if (!obj) return 0;
+            if (!obj && obj !== 0) return null;
             if (typeof obj === 'number') return obj;
-            if (typeof obj === 'string') return parseInt(obj, 10) || 0;
-            if (obj.apptID) return parseInt(obj.apptID, 10) || 0;
-            if (obj.id) return parseInt(obj.id, 10) || 0;
+            if (typeof obj === 'string') {
+                var pv = parseInt(obj, 10);
+                return isNaN(pv) ? null : pv;
+            }
+            if (obj.apptID !== undefined && obj.apptID !== null) {
+                var v = parseInt(obj.apptID, 10);
+                return isNaN(v) ? null : v;
+            }
+            if (obj.id !== undefined && obj.id !== null) {
+                var v2 = parseInt(obj.id, 10);
+                return isNaN(v2) ? null : v2;
+            }
             for (var k in obj) {
                 if (!obj.hasOwnProperty(k)) continue;
                 if (/id$/i.test(k) || /Id$/i.test(k)) {
-                    var v = parseInt(obj[k], 10);
-                    if (!isNaN(v) && v > 0) return v;
+                    var v3 = parseInt(obj[k], 10);
+                    if (!isNaN(v3) && v3 >= 0) return v3;
                 }
             }
             for (var k2 in obj) {
                 if (!obj.hasOwnProperty(k2)) continue;
-                var v2 = parseInt(obj[k2], 10);
-                if (!isNaN(v2) && v2 > 0) return v2;
+                var v4 = parseInt(obj[k2], 10);
+                if (!isNaN(v4) && v4 >= 0) return v4;
             }
-            return 0;
+            return null;
         }
 
-        id = extractId(apptID);
-        try { console.debug('extracted id:', id); } catch (e) {}
+        var id = extractId(apptID);
+        console.debug('extracted id:', id);
 
-        if (id <= 0) {
+        if (id === null || isNaN(id) || id < 0) {
             Swal.fire({ icon: "error", title: "Error", text: "Invalid appointment ID." });
             return;
         }
@@ -3197,6 +3431,8 @@
                 Swal.fire({ icon: "error", title: "Error", text: "An error occurred while denying the appointment." });
             });
     };
+
+
     $scope.addPayment = function () {
         var parts = $scope.selectedPatient.trim().split(' ');
         var idPart = parts[parts.length - 1];
@@ -5990,90 +6226,243 @@
         $scope.timeOptions = $scope.timeOptions || [];
 
         try {
-            // require date and dentist to compute meaningful options
-            if (!$scope.newApptRequest || !$scope.newApptRequest.dateTime || !$scope.newApptRequest.dentistID) {
+            if (!$scope.newApptRequest) {
                 $scope.timeOptions = [];
                 return;
             }
 
-            var selectedDate = (typeof $scope.newApptRequest.dateTime === 'string') ? new Date($scope.newApptRequest.dateTime) : new Date($scope.newApptRequest.dateTime);
-            if (isNaN(selectedDate.getTime())) {
+            // Normalize dentistID: number, string, or object
+            var rawDentist = $scope.newApptRequest.dentistID;
+            var dentistID = null;
+            if (rawDentist === null || typeof rawDentist === 'undefined') {
+                dentistID = null;
+            } else if (typeof rawDentist === 'object') {
+                dentistID = rawDentist.dentistID || rawDentist.id || rawDentist.accID || rawDentist.value || null;
+            } else {
+                dentistID = rawDentist;
+            }
+            dentistID = (dentistID !== null && dentistID !== '') ? parseInt(dentistID, 10) : null;
+
+            // Consider any numeric id (including 0) valid; only null/NaN/negative are invalid
+            function dentistIdIsValid(id) {
+                return !(id === null || typeof id === 'undefined' || isNaN(id) || id < 0);
+            }
+
+            // Helper to try resolve dentistID from currentDentist or dentistArray name match
+            function tryResolveFromContext() {
+                try {
+                    if ($scope.currentDentist) {
+                        var cd = $scope.currentDentist;
+                        var cid = cd.dentistID || cd.id || cd.accID || cd.value || null;
+                        cid = (cid !== null && cid !== '') ? parseInt(cid, 10) : null;
+                        if (dentistIdIsValid(cid)) return cid;
+                    }
+                } catch (e) { /* ignore */ }
+
+                try {
+                    if (Array.isArray($scope.dentistArray) && $scope.dentistArray.length > 0) {
+                        var targetName = ($scope.currentDentist && $scope.currentDentist.dentistName) ? String($scope.currentDentist.dentistName).trim() : null;
+                        if (!targetName && typeof rawDentist === 'string') targetName = rawDentist;
+                        if (targetName) {
+                            var match = $scope.dentistArray.find(function (d) {
+                                return d && d.dentistName && String(d.dentistName).trim() === targetName && dentistIdIsValid(d.dentistID);
+                            });
+                            if (match && dentistIdIsValid(match.dentistID)) return parseInt(match.dentistID, 10);
+                        }
+                        // if only one dentist and its id is valid, use it
+                        if ($scope.dentistArray.length === 1 && dentistIdIsValid($scope.dentistArray[0].dentistID)) {
+                            return parseInt($scope.dentistArray[0].dentistID, 10);
+                        }
+                    }
+                } catch (e) { /* ignore */ }
+
+                return null;
+            }
+
+            // If dentistID invalid, attempt context fallbacks and/or fetch dentist list
+            if (!dentistIdIsValid(dentistID)) {
+                var resolved = tryResolveFromContext();
+                if (resolved !== null) {
+                    dentistID = resolved;
+                    $scope.newApptRequest.dentistID = dentistID;
+                } else {
+                    // fetch dentist list and retry resolution
+                    RGDCWebApplicationService.getDentistList()
+                        .then(function (resp) {
+                            var raw = resp && resp.data ? resp.data : [];
+                            $scope.dentistArray = (Array.isArray(raw) ? raw : []).map(function (d) {
+                                var id = null;
+                                if (d && typeof d.dentistID !== 'undefined') id = d.dentistID;
+                                else if (d && typeof d.accID !== 'undefined') id = d.accID;
+                                else if (d && typeof d.id !== 'undefined') id = d.id;
+                                id = (id !== null && id !== '') ? parseInt(id, 10) : null;
+
+                                var name = '';
+                                if (d) {
+                                    if (d.dentistName) name = d.dentistName;
+                                    else if (d.fullName) name = d.fullName;
+                                    else if (d.firstName || d.lastName) {
+                                        name = ((d.firstName || '') + ' ' + (d.lastName || '')).trim();
+                                    } else if (d.email) {
+                                        name = d.email;
+                                    }
+                                }
+                                return { dentistID: id, dentistName: name };
+                            }).filter(function (x) {
+                                return x && typeof x.dentistID !== 'undefined' && x.dentistID !== null && !isNaN(x.dentistID);
+                            });
+
+                            // if still unresolved, try first valid dentist
+                            if (!dentistIdIsValid(dentistID) && $scope.dentistArray.length > 0) {
+                                dentistID = $scope.dentistArray[0].dentistID;
+                                $scope.newApptRequest = $scope.newApptRequest || {};
+                                $scope.newApptRequest.dentistID = dentistID;
+                            }
+
+                            var r2 = tryResolveFromContext();
+                            if (r2 !== null) {
+                                dentistID = r2;
+                                $scope.newApptRequest.dentistID = dentistID;
+                            }
+
+                            if (!dentistIdIsValid(dentistID)) {
+                                console.warn('updateTimeOptions: invalid dentistID after fetching dentist list', { dentistRaw: rawDentist, dentistArrayLength: $scope.dentistArray.length, currentDentist: $scope.currentDentist });
+                                $scope.timeOptions = [];
+                                if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
+                                return;
+                            }
+
+                            // proceed to compute slots
+                            computeAndSetTimes(dentistID);
+                        })
+                        .catch(function (err) {
+                            console.error('updateTimeOptions: failed to fetch dentist list', err);
+                            $scope.timeOptions = [];
+                            if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
+                        });
+                    return; // async flow continues in then()
+                }
+            }
+
+            // Normalize date: accept Date, ISO string, or friendly string
+            var rawDate = $scope.newApptRequest.dateTime;
+            var selectedDate = null;
+            if (!rawDate) {
                 $scope.timeOptions = [];
+                if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
+                return;
+            }
+            if (Object.prototype.toString.call(rawDate) === '[object Date]') {
+                selectedDate = rawDate;
+            } else if (typeof rawDate === 'string') {
+                var tryIso = new Date(rawDate);
+                if (!isNaN(tryIso.getTime())) selectedDate = tryIso;
+                else selectedDate = parseJsonDateToJsDate(rawDate) || (function () { var m = String(rawDate).match(/\d+/); return m ? new Date(parseInt(m[0], 10)) : null; })();
+            } else {
+                selectedDate = new Date(rawDate);
+            }
+
+            if (!selectedDate || isNaN(selectedDate.getTime())) {
+                $scope.timeOptions = [];
+                if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
                 return;
             }
 
-            var dentistID = (typeof $scope.newApptRequest.dentistID !== 'undefined' && $scope.newApptRequest.dentistID !== null)
-                ? parseInt($scope.newApptRequest.dentistID, 10)
-                : null;
-            if (!dentistID) {
-                $scope.timeOptions = [];
-                return;
-            }
-
-            // normalize date to midnight of selected day
             var year = selectedDate.getFullYear();
             var month = selectedDate.getMonth();
             var day = selectedDate.getDate();
 
-            var durationMs = ($scope._apptDurationMinutes || 120) * 60 * 1000;
-            var slotIntervalMs = ($scope._slotIntervalMinutes || 30) * 60 * 1000;
+            // core slot computation (uses dentistID captured)
+            function computeSlots(existingAppointments) {
+                var durationMs = ($scope._apptDurationMinutes || 120) * 60 * 1000;
+                var slotIntervalMs = ($scope._slotIntervalMinutes || 30) * 60 * 1000;
 
-            // earliest start at business start hour
-            var startDate = new Date(year, month, day, $scope._businessStartHour, 0, 0, 0);
-            // latest start so appointment finishes by business end hour
-            var latestStart = new Date(year, month, day, $scope._businessEndHour, 0, 0, 0);
-            latestStart = new Date(latestStart.getTime() - durationMs);
+                var startDate = new Date(year, month, day, ($scope._businessStartHour || 8), 0, 0, 0);
+                var latestStart = new Date(year, month, day, ($scope._businessEndHour || 18), 0, 0, 0);
+                latestStart = new Date(latestStart.getTime() - durationMs);
 
-            var candidates = [];
-            for (var t = startDate.getTime(); t <= latestStart.getTime(); t += slotIntervalMs) {
-                candidates.push(new Date(t));
+                var candidates = [];
+                for (var t = startDate.getTime(); t <= latestStart.getTime(); t += slotIntervalMs) {
+                    candidates.push(new Date(t));
+                }
+
+                // Filter existing appointments for same dentist & same day
+                var existingForDentist = (Array.isArray(existingAppointments) ? existingAppointments : []).filter(function (a) {
+                    var aDentRaw = a && (typeof a.dentistID !== 'undefined' ? a.dentistID : (a.accID || a.id));
+                    var aDent = (typeof aDentRaw !== 'undefined' && aDentRaw !== null && aDentRaw !== '') ? parseInt(aDentRaw, 10) : null;
+                    if (aDent === null || isNaN(aDent)) return false;
+                    if (aDent !== dentistID) return false;
+                    var aDate = a.dateTimeObj || parseJsonDateToJsDate(a.dateTime) || a.date;
+                    var d = (aDate instanceof Date) ? aDate : new Date(aDate);
+                    if (isNaN(d.getTime())) return false;
+                    return d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+                }).map(function (a) {
+                    var aDate = a.dateTimeObj || parseJsonDateToJsDate(a.dateTime) || a.date;
+                    return (aDate instanceof Date) ? aDate : new Date(aDate);
+                }).filter(Boolean);
+
+                var allowed = candidates.filter(function (slot) {
+                    var sMs = slot.getTime();
+                    var sEnd = sMs + durationMs;
+                    for (var i = 0; i < existingForDentist.length; i++) {
+                        var aMs = existingForDentist[i].getTime();
+                        var aEnd = aMs + durationMs;
+                        if (sMs < aEnd && sEnd > aMs) return false;
+                    }
+                    return true;
+                });
+
+                var formatted = allowed.map(function (d) {
+                    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                });
+
+                formatted = formatted.filter(function (v, i, arr) { return arr.indexOf(v) === i; });
+                formatted.sort(function (a, b) {
+                    var da = new Date('2000-01-01 ' + a);
+                    var db = new Date('2000-01-01 ' + b);
+                    return da - db;
+                });
+
+                return formatted;
             }
 
-            // gather existing appointments for same dentist on selected day
-            var existing = Array.isArray($scope.adminAppointments) ? $scope.adminAppointments : [];
-            var existingForDentist = existing.filter(function (a) {
-                try {
-                    var aDate = a.dateTimeObj || parseJsonDateToJsDate(a.dateTime);
-                    if (!aDate) return false;
-                    return (parseInt(a.dentistID, 10) === dentistID) &&
-                        aDate.getFullYear() === year &&
-                        aDate.getMonth() === month &&
-                        aDate.getDate() === day;
-                } catch (e) {
-                    return false;
-                }
-            }).map(function (a) {
-                return a.dateTimeObj || parseJsonDateToJsDate(a.dateTime);
-            }).filter(Boolean);
-
-            // filter out any candidate that would overlap existing appointment (duration considered)
-            var allowed = candidates.filter(function (slot) {
-                var sMs = slot.getTime();
-                var sEnd = sMs + durationMs;
-
-                for (var i = 0; i < existingForDentist.length; i++) {
-                    var a = existingForDentist[i];
-                    var aMs = (a instanceof Date) ? a.getTime() : (new Date(a)).getTime();
-                    var aEnd = aMs + durationMs;
-
-                    // overlap if slot starts before existing end AND slot end after existing start
-                    if (sMs < aEnd && sEnd > aMs) {
-                        return false; // overlapping -> reject slot
+            function computeAndSetTimes(resolvedDentistID) {
+                if (Array.isArray($scope.adminAppointments) && $scope.adminAppointments.length > 0) {
+                    $scope.timeOptions = computeSlots($scope.adminAppointments);
+                    if ($scope.newApptRequest && $scope.newApptRequest.time && $scope.timeOptions.indexOf($scope.newApptRequest.time) === -1) {
+                        $scope.newApptRequest.time = null;
                     }
+                    return;
                 }
-                return true;
-            });
 
-            // format to strings consistent with other code (e.g., "8:00 AM")
-            $scope.timeOptions = allowed.map(function (d) {
-                return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-            });
+                RGDCWebApplicationService.getAdminScheduledAppointments()
+                    .then(function (resp) {
+                        var remote = resp && resp.data ? (Array.isArray(resp.data) ? resp.data : []) : [];
+                        $scope.adminAppointments = (remote || []).map(function (a) {
+                            var dt = parseJsonDateToJsDate(a.dateTime);
+                            return Object.assign({}, a, { dateTimeObj: dt });
+                        });
+                        $scope.timeOptions = computeSlots($scope.adminAppointments);
+                        if ($scope.newApptRequest && $scope.newApptRequest.time && $scope.timeOptions.indexOf($scope.newApptRequest.time) === -1) {
+                            $scope.newApptRequest.time = null;
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('updateTimeOptions: failed to fetch admin appointments', err);
+                        $scope.timeOptions = [];
+                        if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
+                    });
+            }
+
+            // finally compute times using resolved dentistID
+            computeAndSetTimes(dentistID);
+
         } catch (ex) {
-            console.error('updateTimeOptions error', ex);
+            console.error('updateTimeOptions unexpected error', ex);
             $scope.timeOptions = [];
+            if ($scope.newApptRequest && $scope.newApptRequest.time) $scope.newApptRequest.time = null;
         }
     };
-
 
     $scope.$watch('newApptRequest.dateTime', function (nv, ov) {
         try { $scope.updateTimeOptions(); } catch (e) { console.warn('watch date updateTimeOptions failed', e); }
@@ -6086,72 +6475,167 @@
         // Wait a bit so Angular has rendered rows
         $timeout(function () {
             try {
-                var tbl = document.querySelector(selector);
+                var tbl = document.querySelector('#adminScheduledAppointment');
                 if (!tbl) return;
 
-                // --- Destroy jQuery DataTable if attached to this element ---
-                try {
-                    if (window.jQuery && jQuery.fn && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tbl)) {
-                        try { jQuery(tbl).DataTable().clear().destroy(true); } catch (e) { console.warn('destroy jquery dt failed', e); }
-                    }
-                } catch (e) { /* ignore */ }
+                // Build data rows from Angular model (use simple arrays for DataTables)
+                var dtData = ($scope.adminAppointments || []).map(function (a) {
+                    return [
+                        a.date || '',
+                        a.time || '',
+                        a.purpose || '',
+                        a.remarks || '',
+                        a.dentistName || '',
+                        a.patientName || '',
+                        a.displayStatus || a.status || '',
+                        // placeholder for actions column; DataTable will render HTML from columnDefs below
+                        a.apptID || ''
+                    ];
+                });
 
-                // --- Destroy any previous stored instance (simple or other) ---
-                try {
-                    var prev = window[instanceName];
-                    if (prev && typeof prev.destroy === 'function') {
-                        try { prev.destroy(); } catch (e) { console.warn('destroy previous simple dt failed', e); }
-                        window[instanceName] = null;
-                    }
-                } catch (e) { /* ignore */ }
+                // If a previous instance exists and is a jQuery DataTable, reuse it by clearing and adding rows.
+                var prev = window._adminScheduledDataTableInstance;
+                var isJQueryDt = prev && prev.settings && typeof prev.clear === 'function' && typeof prev.rows === 'function';
 
-                // --- Prefer Simple-DataTables (constructor `DataTable`) ---
-                if (typeof window.DataTable === 'function') {
+                if (isJQueryDt) {
                     try {
-                        // Simple-DataTables options
-                        window[instanceName] = new DataTable(selector, {
-                            searchable: true,
-                            fixedHeight: false,
-                            perPage: 10,
-                            perPageSelect: [5, 10, 25, 50],
-                            labels: {
-                                placeholder: "Search...",
-                                perPage: "{select} entries per page",
-                                noRows: "No rows found",
-                                info: "Showing {start} to {end} of {rows} entries"
-                            }
-                        });
-                        // mark instance type for debug
-                        window[instanceName]._isSimpleDataTable = true;
-                        return;
+                        // clear and repopulate
+                        prev.clear();
+                        if (dtData.length > 0) prev.rows.add(dtData);
+                        prev.draw(false);
                     } catch (e) {
-                        console.warn('Simple DataTable init failed for', selector, e);
-                        // fallthrough to jQuery init
+                        console.warn('Failed to refresh existing jQuery DataTable, destroying and recreating', e);
+                        try { prev.destroy(true); } catch (ex) { /* ignore */ }
+                        window._adminScheduledDataTableInstance = null;
                     }
                 }
 
-                // --- Fallback to jQuery DataTables if available ---
-                if (window.jQuery && jQuery.fn && jQuery.fn.dataTable) {
-                    try {
-                        window[instanceName] = jQuery(tbl).DataTable({
+                // If no instance (or destroyed), create one using jQuery DataTables if available
+                if (!window._adminScheduledDataTableInstance) {
+                    if (window.jQuery && jQuery.fn && jQuery.fn.dataTable) {
+                        // remove any leftover wrappers
+                        try {
+                            if (jQuery.fn.dataTable.isDataTable(tbl)) {
+                                try { jQuery(tbl).DataTable().clear().destroy(true); } catch (e) { /* ignore */ }
+                            }
+                        } catch (e) { /* ignore */ }
+
+                        // Initialize with array data; last column will render action buttons
+                        window._adminScheduledDataTableInstance = jQuery(tbl).DataTable({
                             destroy: true,
-                            searching: true,
-                            paging: true,
-                            info: true,
+                            data: dtData,
+                            columns: [
+                                { title: "Date", data: 0 },
+                                { title: "Time", data: 1 },
+                                { title: "Purpose", data: 2 },
+                                { title: "Notes", data: 3 },
+                                { title: "Dentist", data: 4 },
+                                { title: "Patient", data: 5 },
+                                { title: "Status", data: 6 },
+                                {
+                                    title: "",
+                                    data: 7,
+                                    orderable: false,
+                                    searchable: false,
+                                    render: function (data, type, row, meta) {
+                                        // data == apptID
+                                        var id = data || '';
+                                        var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
+                                            '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" title="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">delete</i></a>' +
+                                            '<a class="btn-edit-appt btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" title="Edit Appointment" role="button" aria-label="Edit appointment"><i class="material-icons brown-text lighten-1">edit</i></a>' +
+                                            '<a class="reschedule-btn btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" title="Request Reschedule" role="button" aria-label="Request reschedule"><i class="material-icons brown-text lighten-1">autorenew</i></a>' +
+                                            '</div>';
+                                        return btns;
+                                    }
+                                }
+                            ],
                             pageLength: 10,
                             lengthMenu: [5, 10, 25, 50],
                             language: { searchPlaceholder: "Search..." }
                         });
-                        window[instanceName]._isSimpleDataTable = false;
-                        return;
-                    } catch (e) {
-                        console.warn('jQuery DataTable init failed for', selector, e);
+                    } else if (typeof window.DataTable === 'function') {
+                        // Fallback to Simple-DataTables if jQuery DataTables not present
+                        try {
+                            window._adminScheduledDataTableInstance = new DataTable('#adminScheduledAppointment', {
+                                searchable: true,
+                                fixedHeight: false,
+                                perPage: 10,
+                                perPageSelect: [5, 10, 25, 50],
+                                labels: {
+                                    placeholder: "Search...",
+                                    perPage: "{select} entries per page",
+                                    noRows: "No rows found",
+                                    info: "Showing {start} to {end} of {rows} entries"
+                                }
+                            });
+                        } catch (e) {
+                            console.warn('Simple DataTable init failed for #adminScheduledAppointment', e);
+                        }
+                    } else {
+                        console.warn('No DataTable lib found; using plain table DOM.');
                     }
                 }
 
-                console.warn('No DataTable library available to init', selector);
-            } catch (ex) {
-                console.error('initDataTableSafe unexpected error for', selector, ex);
+                // Delegated handlers for action buttons (single place to avoid multiple bindings)
+                try {
+                    // Remove previous delegated handlers to avoid duplicates
+                    jQuery(document).off('click', '.btn-delete-appt');
+                    jQuery(document).off('click', '.btn-edit-appt');
+
+                    jQuery(document).on('click', '.btn-delete-appt', function (ev) {
+                        ev.preventDefault();
+                        var apptID = jQuery(this).attr('data-apptid');
+                        var scope = angular.element(document.querySelector('[ng-controller="RGDCWebApplicationController"]')).scope();
+                        if (!scope) return;
+                        scope.$apply(function () {
+                            try {
+                                scope.openDeleteApptModal({ apptID: parseInt(apptID, 10) }, 'scheduled');
+                            } catch (e) { console.error(e); }
+                        });
+                    });
+
+                    jQuery(document).on('click', '.btn-edit-appt', function (ev) {
+                        ev.preventDefault();
+                        var apptID = jQuery(this).attr('data-apptid');
+                        var scope = angular.element(document.querySelector('[ng-controller="RGDCWebApplicationController"]')).scope();
+                        if (!scope) return;
+                        // find appointment object from scope.adminAppointments
+                        scope.$apply(function () {
+                            var id = parseInt(apptID, 10);
+                            var appt = (scope.adminAppointments || []).find(function (x) { return parseInt(x.apptID, 10) === id; });
+                            try {
+                                scope.openEditApptModal(appt, null);
+                            } catch (e) { console.error(e); }
+                        });
+                    });
+
+                    try {
+                        jQuery(document).off('click', '.reschedule-btn');
+                        jQuery(document).on('click', '.reschedule-btn', function (ev) {
+                            ev.preventDefault();
+                            var apptID = parseInt(jQuery(this).attr('data-apptid'), 10);
+                            if (isNaN(apptID)) return;
+                            var scope = angular.element(document.querySelector('[ng-controller="RGDCWebApplicationController"]')).scope();
+                            if (!scope) return;
+                            scope.$apply(function () {
+                                var appt = (scope.adminAppointments || []).find(function (x) { return parseInt(x.apptID, 10) === apptID; });
+                                if (!appt) {
+                                    // try other lists
+                                    appt = (scope.requestedAppointments || []).find(function (x) { return parseInt(x.apptID, 10) === apptID; });
+                                }
+                                if (appt && typeof scope.openRescheduleModal === 'function') {
+                                    scope.openRescheduleModal(appt, null);
+                                }
+                            });
+                        });
+                    } catch (e) {
+                        console.warn('Failed to attach reschedule delegated handler', e);
+                    }
+                } catch (e) {
+                    console.warn('Failed to attach delegated action handlers for scheduled table', e);
+                }
+            } catch (e) {
+                console.error('Failed to init/refresh admin scheduled DataTable:', e);
             }
         }, 60);
     }
@@ -6356,4 +6840,180 @@
     $scope._slotIntervalMinutes = 30;
     $scope._businessStartHour = 8;
     $scope._businessEndHour = 18;
+
+
+    $scope.statusOptions = [
+        "Scheduled",
+        "Checked-in",
+        "Ongoing",
+        "Completed",
+        "No-show",
+        "Cancelled",
+        "Rescheduled"
+    ];
+
+    $scope.editingAppt = {
+        apptID: null,
+        dateObj: '',
+        dateStr: '',
+        timeStr: '',
+        purpose: '',
+        dentistName: '',
+        patientName: '',
+        status: 'Scheduled',
+        remarks: ''
+    };
+
+    //rescheduling
+    $scope.rescheduleRequest = {
+        originalApptID: null,
+        patientID: null,
+        dentistID: null,
+        dateTime: null, // ISO date string from Materialize datepicker
+        time: "12:00 AM",
+        reason: "",
+        contactNumber: "",
+        requesterName: "",
+        dentistName: "",
+        patientName: ""
+    };
+
+    $scope.openRescheduleModal = function (appt, $event) {
+        if ($event && $event.preventDefault) {
+            $event.preventDefault();
+            if ($event.stopPropagation) $event.stopPropagation();
+        }
+        if (!appt || !appt.apptID) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No valid appointment selected.' });
+            return;
+        }
+
+        // populate model
+        $scope.rescheduleRequest = $scope.rescheduleRequest || {};
+        $scope.rescheduleRequest.originalApptID = appt.apptID;
+        $scope.rescheduleRequest.patientID = appt.patientID || null;
+        $scope.rescheduleRequest.dentistID = appt.dentistID || null;
+        $scope.rescheduleRequest.dentistName = appt.dentistName || "";
+        $scope.rescheduleRequest.patientName = appt.patientName || "";
+        $scope.rescheduleRequest.reason = ""; // requester should provide
+        $scope.rescheduleRequest.contactNumber = ""; // requester provides
+        $scope.rescheduleRequest.time = "12:00 AM";
+
+        // Prefill requester name from session full name if available
+        $scope.rescheduleRequest.requesterName = $scope.currentUserFullName || "";
+
+        // open modal
+        $timeout(function () {
+            var modalElem = document.getElementById('modalRescheduleAppt');
+            if (modalElem) {
+                var inst = M.Modal.getInstance(modalElem);
+                if (!inst) inst = M.Modal.init(modalElem, {});
+                inst.open();
+            }
+        }, 60);
+    };
+
+    $scope.createRescheduleRequest = function () {
+        // basic validation
+        if (!$scope.rescheduleRequest || !$scope.rescheduleRequest.originalApptID) {
+            return Swal.fire({ icon: 'error', title: 'Error', text: 'No appointment selected.' });
+        }
+
+        if (!$scope.rescheduleRequest.dateTime) {
+            return Swal.fire({ icon: 'error', title: 'Missing Date', text: 'Select a new date.' });
+        }
+
+        if (!$scope.rescheduleRequest.time) {
+            return Swal.fire({ icon: 'error', title: 'Missing Time', text: 'Select a new time.' });
+        }
+
+        if (!$scope.rescheduleRequest.reason || !$scope.rescheduleRequest.reason.trim()) {
+            return Swal.fire({ icon: 'error', title: 'Missing Reason', text: 'Provide a reason for rescheduling.' });
+        }
+
+        if (!$scope.rescheduleRequest.contactNumber || !$scope.rescheduleRequest.contactNumber.trim()) {
+            return Swal.fire({ icon: 'error', title: 'Missing Contact', text: 'Provide a contact number.' });
+        }
+
+        // parse date and time into JS Date
+        var dateObj = (typeof $scope.rescheduleRequest.dateTime === 'string') ? new Date($scope.rescheduleRequest.dateTime) : new Date($scope.rescheduleRequest.dateTime);
+        if (isNaN(dateObj.getTime())) {
+            return Swal.fire({ icon: 'error', title: 'Invalid Date', text: 'Please select a valid date.' });
+        }
+
+        var tMatch = ($scope.rescheduleRequest.time || "12:00 AM").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+        if (!tMatch) {
+            return Swal.fire({ icon: 'error', title: 'Invalid Time', text: 'Select a valid time.' });
+        }
+        var hours = parseInt(tMatch[1], 10);
+        var minutes = parseInt(tMatch[2], 10);
+        var mer = (tMatch[3] || '').toUpperCase();
+        if (mer) {
+            if (mer === 'PM' && hours !== 12) hours += 12;
+            if (mer === 'AM' && hours === 12) hours = 0;
+        }
+        dateObj.setHours(hours, minutes, 0, 0);
+
+        // re-check availability then submit
+        RGDCWebApplicationService.getAdminScheduledAppointments()
+            .then(function (resp) {
+                var remote = resp && resp.data ? (Array.isArray(resp.data) ? resp.data : []) : [];
+                var dentistNum = $scope.rescheduleRequest.dentistID;
+                var conflict = remote.some(function (a) {
+                    var aDate = parseJsonDateToJsDate(a.dateTime);
+                    if (!aDate) return false;
+                    var aDent = a.dentistID || a.dentistAccID || null;
+                    if (aDent !== null && aDent !== undefined && aDent !== dentistNum) return false;
+                    return aDate.getFullYear() === dateObj.getFullYear() &&
+                        aDate.getMonth() === dateObj.getMonth() &&
+                        aDate.getDate() === dateObj.getDate() &&
+                        aDate.getHours() === dateObj.getHours() &&
+                        aDate.getMinutes() === dateObj.getMinutes();
+                });
+
+                if (conflict) {
+                    Swal.fire({ icon: 'error', title: 'Time Taken', text: 'The selected time is no longer available. Please choose another slot.' });
+                    $scope.loadAdminScheduledAppointments();
+                    return;
+                }
+
+                // build payload using the same AppointmentRequestData shape (includes originalApptID, contactNumber, requesterName)
+                var payload = {
+                    patientID: parseInt($scope.rescheduleRequest.patientID, 10),
+                    dentistID: parseInt($scope.rescheduleRequest.dentistID, 10),
+                    dateTime: dateObj,
+                    reason: $scope.rescheduleRequest.reason,
+                    originalApptID: parseInt($scope.rescheduleRequest.originalApptID, 10),
+                    contactNumber: $scope.rescheduleRequest.contactNumber,
+                    requesterName: $scope.rescheduleRequest.requesterName
+                };
+
+                RGDCWebApplicationService.createAppointmentRequest(payload)
+                    .then(function (response) {
+                        if (response && response.data && response.data.success) {
+                            Swal.fire({ icon: 'success', title: 'Requested', text: 'Reschedule request sent.' }).then(function () {
+                                // close modal
+                                var modalElem = document.getElementById('modalRescheduleAppt');
+                                if (modalElem) {
+                                    var inst = M.Modal.getInstance(modalElem);
+                                    if (inst) inst.close();
+                                }
+                                // refresh lists
+                                $scope.loadRequestedAppointments();
+                                $scope.loadAdminScheduledAppointments();
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: (response && response.data && response.data.message) || 'Failed to send reschedule request.' });
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('createRescheduleRequest error', err);
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while sending the request.' });
+                    });
+            })
+            .catch(function (err) {
+                console.error('availability check error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to check availability. Try again later.' });
+            });
+    };
 });

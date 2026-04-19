@@ -79,7 +79,12 @@
 
         @*appointment req*@
         <div class="col s12 m6 l6 appointment-container">
-            <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT REQUESTS <span class="new badge left" style="margin:0 0.25rem 0 0">(N)</span></span>
+            <span class="bold brown-text lighten-1" style="margin-bottom: 0">
+                APPOINTMENT REQUESTS
+                <span class="new badge left" style="margin:0 0.25rem 0 0" aria-live="polite">
+                    {{ (dashboardRequested && dashboardRequested.length) || 0 }}
+                </span>
+            </span>
             <div class="card grey lighten-2">
                 <div class="card-content containerOverflow">
                     <div ng-if="(!dashboardRequested || dashboardRequested.length === 0)" class="center-align brown-text">No appointment requests.</div>
@@ -91,13 +96,24 @@
                                     <p class="bold">{{r.patientName}} <i class="material-icons tiny green-text" ng-if="r.isNew" style="padding-left:0.25rem" title="New User/Patient">person_add</i></p>
                                     <p>{{r.dentistName}}</p>
                                 </div>
-                                <div class="col hide-on-med-and-down l3"><p>{{r.purpose}}</p></div>
-                                <div class="col hide-on-med-and-down l3"><p>{{r.date}} {{r.time}}</p></div>
+
+                                <div class="col hide-on-med-and-down l4">
+                                    <p class="bold">New date/time</p>
+                                    <p>{{r.date}} {{r.time}}</p>
+                                    <p class="bold" style="margin-top:6px">Reason</p>
+                                    <p>{{r.purpose}}</p>
+                                </div>
+
+                                <div class="col hide-on-med-and-down l3">
+                                    <p class="bold">Contact</p>
+                                    <p style="white-space: pre-line;">{{r.notes || r.remarks}}</p>
+                                </div>
 
                                 @*procedure and dateTime (mobile)*@
                                 <div class="col s6 m6 hide-on-large-only">
                                     <p>{{r.purpose}}</p>
                                     <p>{{r.date}}</p>
+                                    <p style="white-space: pre-line;">{{r.notes || r.remarks}}</p>
                                 </div>
 
                                 @*yes or no btn*@
@@ -117,7 +133,12 @@
         </div>
         @*appointment sched*@
         <div class="col s12 m6 l6 appointment-container">
-            <span class="bold brown-text lighten-1" style="margin-bottom: 0">APPOINTMENT SCHEDULED <span class="badge left p-0" style="margin:0">(N)</span></span>
+            <span class="bold brown-text lighten-1" style="margin-bottom: 0">
+                APPOINTMENT SCHEDULED
+                <span class="badge left p-0" style="margin:0" aria-live="polite">
+                    {{ (dashboardScheduled && dashboardScheduled.length) || 0 }}
+                </span>
+            </span>
             <div class="card grey lighten-2">
                 <div class="card-content containerOverflow">
                     <div ng-if="(!dashboardScheduled || dashboardScheduled.length === 0)" class="center-align brown-text">No scheduled appointments.</div>
