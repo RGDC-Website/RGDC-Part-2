@@ -532,22 +532,7 @@
 
         $scope.editSubmitted = true;
 
-        if (!$scope.paymentInfo.patientID || !$scope.paymentInfo.dentistID || !$scope.paymentInfo.paymentDate ||
-            !$scope.paymentInfo.paymentMethod || !$scope.paymentInfo.cost ||
-            !$scope.paymentInfo.amountPaid || !$scope.paymentInfo.amountDue ||
-            !$scope.paymentInfo.description) {
-            return;
-        }
 
-        if (parseFloat($scope.paymentInfo.amountDue) < 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Amount',
-                text: 'Total amount due should not go below 0.',
-                confirmButtonColor: '#795548'
-            });
-            return;
-        }
         var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
         getPaymentInfo.then(function (payment) {
             $scope.paymentInfo = payment.data;
@@ -3225,7 +3210,7 @@
         var id = parseInt(idPart);
         $scope.selectedDentistID = isNaN(id) ? null : id;
 
-        if (!$scope.selectedPatientID || !$scope.selectedDentistID) {
+        if ($scope.selectedPatientID === null && $scope.selectedDentistID === null) {
             Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
             return;
         }
@@ -3240,28 +3225,30 @@
             return;
         }
  
-        $scope.paymentDue = $scope.paymentCost - ($scope.paymentDiscount || 0) - ($scope.paymentPaid || 0)
-
-        console.log($scope.currentUserID)
+        $scope.paymentDue = $scope.paymentCost - ($scope.paymentDiscount || 0) - ($scope.paymentPaid || 0);
 
         var paymentData = {
             patientID: $scope.selectedPatientID,
             dentistID: $scope.selectedDentistID,
             paymentMethod: $scope.paymentMethod,
+            procedures: $scope.paymentProcedures,
+            toothNumber: $scope.paymentToothNumber,
+            reference: $scope.paymentReference,
             cost: parseFloat($scope.paymentCost) || 0,
             paymentDate: $scope.paymentDate,
             discount: parseFloat($scope.paymentDiscount) || 0,
-            amountPaid: parseFloat($scope.paymentPaid) || 0,
-            amountDue: parseFloat($scope.paymentDue) || 0,
+            paid: parseFloat($scope.paymentPaid) || 0,
+            balance: parseFloat($scope.paymentDue) || 0,
             description: $scope.paymentDescription,
             createdBy: $scope.currentUserID         
         };
 
-        $scope.addSubmitted = true;
 
-        if (!$scope.selectedPatient || !$scope.selectedDentist || !$scope.paymentDate ||
-            !$scope.paymentMethod || !$scope.paymentCost || !$scope.paymentDue ||
-            !$scope.paymentPaid || !$scope.paymentDescription) {
+        $scope.addSubmitted = true;
+        
+        if ($scope.selectedPatient === null || $scope.selectedDentist === null || !$scope.paymentDate ||
+            !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
+            $scope.paymentPaid === null) {
             return; 
         }
         if (parseFloat($scope.paymentDue) < 0) {
@@ -3290,12 +3277,12 @@
     $scope.editPayment = function () {
 
 
-        if (!$scope.paymentInfo.cost || !$scope.paymentInfo.amountPaid) {
-            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
+        if (!$scope.paymentInfo.cost) {
+            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost." });
             return;
         }
 
-        $scope.paymentInfo.amountDue = $scope.paymentInfo.cost - ($scope.paymentInfo.discount || 0) - ($scope.paymentInfo.amountPaid || 0)
+        $scope.paymentInfo.balance = $scope.paymentInfo.cost - ($scope.paymentInfo.discount || 0) - ($scope.paymentInfo.paid || 0)
 
         var data = {
             paymentID: $scope.paymentInfo.paymentID,
@@ -3303,8 +3290,11 @@
             cost: $scope.paymentInfo.cost,
             paymentDate: $scope.paymentInfo.paymentDate,
             discount: $scope.paymentInfo.discount,
-            amountPaid: $scope.paymentInfo.amountPaid,
-            amountDue: $scope.paymentInfo.amountDue,
+            paid: $scope.paymentInfo.paid,
+            balance: $scope.paymentInfo.balance,
+            reference: $scope.paymentInfo.reference,
+            toothNumber: $scope.paymentInfo.toothNumber,
+            procedures: $scope.paymentInfo.procedures,
             description: $scope.paymentInfo.description
         };
 
@@ -5960,6 +5950,7 @@
         var getPaymentInfo = RGDCWebApplicationService.getPaymentInfo(paymentData);
         getPaymentInfo.then(function (payment) {
             $scope.paymentInfo = payment.data;
+            console.log($scope.paymentInfo)
             if ($scope.paymentInfo.paymentDate) {
                 $scope.paymentInfo.paymentDate = formatDateToMDY($scope.paymentInfo.paymentDate)
             }

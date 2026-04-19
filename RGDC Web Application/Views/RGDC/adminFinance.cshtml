@@ -35,7 +35,7 @@
             @*table content*@
             <tbody>
                 <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="payment in paymentsArray">
-                    <td class="valign-wrapper"><img src="https://placehold.co/400" class="circle responsive-img" style="max-width:3rem; margin-right:0.5rem" />{{payment.patientName}}</td>
+                    <td class="valign-wrapper"><img ng-src="{{ payment.photoLink || 'https://placehold.co/400' }}" class="circle responsive-img" style="max-width:3rem; margin-right:0.5rem" />{{payment.patientName}}</td>
                     <td>{{payment.dentistName}}</td>
                     <td>{{payment.paymentDate | date:'MM/dd/yyyy'}}</td>
                     @*view button*@
@@ -106,8 +106,8 @@
 
             <div class="col s6">
                 @*Tooth Number*@
-                <label class="custom-label">Tooth Number</label>
-                <input type="text" class="custom-input browser-default" ng-model=""
+                <label class="custom-label">Tooth Number/s <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentToothNumber"
                        ng-class="" />
             </div>
         </div>
@@ -115,8 +115,8 @@
         <div class="row">
             <div class="col s12">
                 @*Procedure*@
-                <label class="custom-label">Procedure<span class="required-mark">*</span></label>
-                <input type="text" class="custom-input browser-default" ng-model=""
+                <label class="custom-label">Procedures Done <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentProcedures"
                        ng-class="" />
             </div>
         </div>
@@ -125,17 +125,33 @@
         <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
 
         <div class="row">
-            <div class="col s4">
+            <div class="col s6">
                 @*Mode of Payment*@
                 <label class="custom-label">
                     Mode of Payment
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" ng-model="paymentMethod" placeholder="Mode of payment..."
-                           ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
+                    <select class="custom-input"
+                            ng-model="paymentMethod"
+                            ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
+                        <option value="" disabled selected>Select mode of payment...</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Card">Card</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Others">Others</option>
+                    </select>
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentMethod">Mode of payment is required.</span>
             </div>
-            <div class="col s4">
+            <div class="col s6">
+                @*Reference*@
+                <label class="custom-label">
+                    Reference
+                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50"/>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
                 @*Cost*@
                 <label class="custom-label">
                     Cost
@@ -146,7 +162,7 @@
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentCost">Cost is required.</span>
             </div>
-            <div class="col s4">
+            <div class="col s6">
                 @*Discount*@
                 <label class="custom-label">
                     Discount
@@ -156,7 +172,6 @@
                 </label>
             </div>
         </div>
-
         <div class="row">
             <div class="col s6">
                 @*Paid*@
@@ -169,15 +184,17 @@
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentPaid">Total amount paid is required.</span>
             </div><div class="col s6">
-                @*Total*@
+                @*Balance*@
                 <label class="custom-label">
-                    Balance Payment
+                    Balance
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" ng-model="paymentDue" placeholder="Total amount due..."
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                           ng-class="{'invalid-input': addSubmitted && !paymentDue}">
+                    <input type="text" class="custom-input"
+                           ng-value="(paymentCost || 0) - (paymentDiscount || 0) - (paymentPaid || 0)"
+                           placeholder="Balance..."
+                           ng-class="{'invalid-input': addSubmitted && ((paymentCost - paymentDiscount - paymentPaid) < 0)}"
+                           disabled>
                 </label>
-                <span class="validation-msg" ng-show="addSubmitted && !paymentDue">Total amount due is required.</span>
+                <span class="validation-msg" ng-show="addSubmitted && paymentDue === null">Balance is required.</span>
             </div>
 
         </div>
@@ -187,12 +204,10 @@
                 @*Description*@
                 <label class="custom-label">
                     Description
-                    <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentDescription"
-                              ng-class="{'invalid-input': addSubmitted && !paymentDescription}"></textarea>
+                             ></textarea>
                 </label>
-                <span class="validation-msg" ng-show="addSubmitted && !paymentDescription">Description is required.</span>
             </div>
         </div>
     </div>
@@ -221,10 +236,10 @@
                 <label class="custom-label">Patient <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="paymentInfo.patientID"
                         ng-options="patient.patientID as patient.patientName for patient in patientArray"
-                        ng-class="{'invalid-input': editSubmitted && !paymentInfo.patientID}">
+                        ng-class="{'invalid-input': editSubmitted && paymentInfo.patientID  === null}" disabled>
                     <option value="" disabled>Select patient...</option>
                 </select>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.patientID">Patient is required.</span>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.patientID === null">Patient is required.</span>
             </div>
 
             <div class="col s6">
@@ -232,10 +247,10 @@
                 <label class="custom-label">Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" ng-model="paymentInfo.paymentDate" placeholder="MM/DD/YYYY"
-                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.paymentDate}">
+                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paymentDate  === null}">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.paymentDate">Date is required.</span>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paymentDate  === null">Date is required.</span>
             </div>
         </div>
 
@@ -245,16 +260,16 @@
                 <label class="custom-label">Dentist <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="paymentInfo.dentistID"
                         ng-options="dentist.dentistID as dentist.dentistName for dentist in dentistArray"
-                        ng-class="{'invalid-input': editSubmitted && !paymentInfo.dentistID}">
+                        ng-class="{'invalid-input': editSubmitted && paymentInfo.dentistID  === null}" disabled>
                     <option value="" disabled>Select dentist...</option>
                 </select>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.dentistID">Dentist is required.</span>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.dentistID  === null">Dentist is required.</span>
             </div>
 
             <div class="col s6">
                 @*Tooth Number*@
                 <label class="custom-label">Tooth Number</label>
-                <input type="text" class="custom-input browser-default" ng-model=""
+                <input type="text" class="custom-input browser-default" ng-model="paymentInfo.toothNumber"
                        ng-class="" />
             </div>
         </div>
@@ -263,7 +278,7 @@
             <div class="col s12">
                 @*Procedure*@
                 <label class="custom-label">Procedure <span class="required-mark">*</span></label>
-                <input type="text" class="custom-input browser-default" ng-model=""
+                <input type="text" class="custom-input browser-default" ng-model="paymentInfo.procedures"
                        ng-class="" />
             </div>
         </div>
@@ -271,17 +286,37 @@
         <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
 
         <div class="row">
-            <div class="col s4">
+            <div class="col s6">
                 @*Mode of Payment*@
                 <label class="custom-label">
                     Mode of Payment
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Mode of payment..." ng-model="paymentInfo.paymentMethod"
-                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.paymentMethod}">
+                    <select class="custom-input"
+                            ng-model="paymentInfo.paymentMethod"
+                            ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
+                        <option value="" disabled selected>Select mode of payment...</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Card">Card</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Others">Others</option>
+                    </select>
                 </label>
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.paymentMethod">Mode of payment is required.</span>
             </div>
-            <div class="col s4">
+            <div class="col s6">
+                @*Reference*@
+                <label class="custom-label">
+                    Reference
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.reference"
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.cost}">
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
                 @*Cost*@
                 <label class="custom-label">
                     Cost
@@ -292,7 +327,7 @@
                 </label>
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
             </div>
-            <div class="col s4">
+            <div class="col s6">
                 @*Discount*@
                 <label class="custom-label">
                     Discount
@@ -307,24 +342,26 @@
             <div class="col s6">
                 @*Paid*@
                 <label class="custom-label">
-                    Total Amount Paid
+                    Paid
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.amountPaid"
+                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.paid"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.amountPaid}">
+                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paid  === null}">
                 </label>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.amountPaid">Total amount paid is required.</span>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paid  === null">Amount paid is required.</span>
             </div>
             <div class="col s6">
                 @*Total*@
                 <label class="custom-label">
-                    Balance Payment
+                    Balance
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Total amount due..." ng-model="paymentInfo.amountDue"
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.amountDue}">
+                    <input type="text" class="custom-input"
+                           ng-value="(paymentInfo.cost || 0) - (paymentInfo.discount || 0) - (paymentInfo.paid || 0)"
+                           placeholder="Balance..."
+                           ng-class="{'invalid-input': addSubmitted && ((paymentCost - paymentDiscount - paymentPaid) < 0)}"
+                           disabled>
                 </label>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.amountDue">Total amount due is required.</span>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.balance === null">Balance is required.</span>
             </div>
         </div>
 
@@ -336,9 +373,8 @@
                     <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentInfo.description"
-                              ng-class="{'invalid-input': editSubmitted && !paymentInfo.description}"></textarea>
+                        ></textarea>  
                 </label>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.description">Description is required.</span>
             </div>
         </div>
     </div>
@@ -386,8 +422,7 @@
             <div class="col s6">
                 @*Tooth Number*@
                 <label class="custom-label">Tooth Number</label>
-                <input type="text" class="custom-input browser-default" ng-model=""
-                       ng-class="" />
+                <p class="custom-input">{{paymentInfo.toothNumber}}</p>
             </div>
         </div>
 
@@ -395,8 +430,7 @@
             <div class="col s12">
                 @*Procedure*@
                 <label class="custom-label">Procedure</label>
-                <input type="text" class="custom-input browser-default" ng-model=""
-                       ng-class="" />
+                <p class="custom-input">{{paymentInfo.procedures}}</p>
             </div>
         </div>
 

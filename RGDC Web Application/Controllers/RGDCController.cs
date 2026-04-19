@@ -108,74 +108,73 @@ namespace RGDC_Web_Application.Controllers
 
         public ActionResult adminDashboard()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC"); 
+            }
+
             return View();
         }
 
         public ActionResult logIn()
         {
+
             return View();
         }
 
 
         public ActionResult adminPatientsTab()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
-        public ActionResult patientDashboard()
-        {
-            return View();
-        }
 
         public ActionResult adminFinance()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
         public ActionResult adminAppointment()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
         public ActionResult adminClinicStaffTab()
         {
-            return View();
-        }
-
-        public ActionResult staffDashboard()
-        {
-            return View();
-        }
-        public ActionResult dentistDashboard()
-        {
-            return View();
-        }
-
-        public ActionResult staffPatientsTab()
-        {
-            return View();
-        }
-        public ActionResult staffFinance()
-        {
-            return View();
-        }
-        public ActionResult dentistPatientsTab()
-        {
-            return View();
-        }
-
-        public ActionResult dentistFinance()
-        {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
         public ActionResult contactUsPage()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
         public ActionResult faqPage()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
 
@@ -1558,20 +1557,21 @@ RGDC Dental Clinic Team";
                     if (userRoleObj != null && int.TryParse(userRoleObj.ToString(), out int r)) role = r;
 
                     // Base query with joins (keep shape)
-                    var baseQuery = from t in db.tbl_treatmentplan
+                    var baseQuery = from t in db.tbl_payment
                                     join p in db.tbl_patient on t.patientID equals p.patientID
                                     join pa in db.tbl_account on p.accID equals pa.accID
-                                    join da in db.tbl_account on t.accID equals da.accID
+                                    join d in db.tbl_dentist on t.dentistID equals d.dentistID
+                                    join da in db.tbl_account on d.accID equals da.accID
                                     select new
                                     {
-                                        trtPlanID = t.trtPlanID,
-                                        date = t.date,
+                                        trtPlanID = t.paymentID,
+                                        date = t.paymentDate,
                                         procedures = t.procedures,
                                         toothNumber = t.toothNumber,
                                         accID = pa.accID,
                                         patientName = pa.firstName + " " + pa.lastName,
                                         dentist = da.firstName + " " + da.middleName + " " + da.lastName,
-                                        amount = t.amount,
+                                        balance = t.balance,
                                         paid = t.paid,
                                         patientAccID = pa.accID,
                                         dentistAccID = da.accID,
@@ -1596,7 +1596,7 @@ RGDC Dental Clinic Team";
                             accID = x.accID,
                             patientName = x.patientName,
                             dentist = x.dentist,
-                            amount = x.amount,
+                            balance = x.balance,
                             paid = x.paid
                         }).ToList();
 
@@ -1743,18 +1743,7 @@ RGDC Dental Clinic Team";
         public JsonResult getPayments()
         {
             try
-            {
-                var sessionVal = Session["UserID"];
-                var userRole = Session["UserAuthorization"];
-
-                if (sessionVal == null || userRole == null)
-                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                if (!int.TryParse(sessionVal.ToString(), out int userID))
-                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                if (!int.TryParse(userRole.ToString(), out int role))
-                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+            { 
 
                 using (var db = new RGDCContext())
                 {
@@ -1780,7 +1769,7 @@ RGDC Dental Clinic Team";
                                         // Dentist info
                                         dentistID = d.dentistID,
                                         dentistAccID = da.accID,
-                                        dentistName = da.firstName + " " + da.middleName + " " + da.lastName,
+                                        dentistName = da.firstName + " " + da.lastName,
                                         dentistSpecialization = d.specialization,
                                         branchID = d.branchID,
 
@@ -1789,58 +1778,20 @@ RGDC Dental Clinic Team";
                                         description = pay.description,
                                         paymentMethod = pay.paymentMethod,
                                         paymentDate = pay.paymentDate,
+                                        reference = pay.reference,
                                         cost = pay.cost,
                                         discount = pay.discount,
-                                        amountPaid = pay.amountPaid,
-                                        amountDue = pay.amountDue
+                                        toothNumber = pay.toothNumber,
+                                        procedures = pay.procedures,
+                                        paid = pay.paid,
+                                        balance = pay.balance
                                     };
 
-                    // Apply role-based filtering:
-                    // - Owner (role == 0) : see all
-                    // - Dentist (role == 1) : see only payments assigned to them
-                    // - Staff (role == 2) : see payments for dentists in their branch
-                    // - Patient (role == 3) : see only their own payments
-                    IEnumerable<object> resultList;
-
-                    if (role == 0)
-                    {
-                        resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
-                    }
-                    else if (role == 1)
-                    {
-                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.accID == userID);
-                        if (dentist == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                        resultList = baseQuery
-                            .Where(x => x.dentistID == dentist.dentistID)
-                            .OrderBy(x => x.paymentDate)
-                            .ToList();
-                    }
-                    else if (role == 2)
-                    {
-                        var staff = db.tbl_staff.FirstOrDefault(s => s.accID == userID);
-                        if (staff == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                        resultList = baseQuery
-                            .Where(x => x.branchID == staff.branchID)
-                            .OrderBy(x => x.paymentDate)
-                            .ToList();
-                    }
-                    else if (role == 3)
-                    {
-                        var patient = db.tbl_patient.FirstOrDefault(p => p.accID == userID);
-                        if (patient == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                        resultList = baseQuery
-                            .Where(x => x.patientID == patient.patientID)
-                            .OrderBy(x => x.paymentDate)
-                            .ToList();
-                    }
-                    else
-                    {
-                        return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-                    }
-
+      
+                    
+                    var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
+                    
+                  
                     return Json(resultList, JsonRequestBehavior.AllowGet);
                 }
             }
@@ -2189,9 +2140,12 @@ RGDC Dental Clinic Team";
 
                         paymentMethod = pay.paymentMethod,
                         cost = pay.cost,
+                        toothNumber = pay.toothNumber,
+                        procedures = pay.procedures,
                         discount = pay.discount,
-                        amountPaid = pay.amountPaid,
-                        amountDue = pay.amountDue,
+                        balance = pay.balance,
+                        paid = pay.paid,
+                        reference = pay.reference,
                         description = pay.description,
                         paymentDate = pay.paymentDate
                     }
@@ -2613,8 +2567,11 @@ RGDC Dental Clinic Team";
                     payment.paymentMethod = model.paymentMethod;
                     payment.cost = model.cost;
                     payment.discount = model.discount;
-                    payment.amountPaid = model.amountPaid;
-                    payment.amountDue = model.amountDue;
+                    payment.toothNumber= model.toothNumber;
+                    payment.procedures = model.procedures;
+                    payment.reference = model.reference;
+                    payment.paid = model.paid;
+                    payment.balance = model.balance;
                     payment.description = model.description;
                     payment.payUpdatedAt = DateTime.Now;
 
@@ -3576,175 +3533,175 @@ RGDC Dental Clinic Team";
         }
 
         [HttpPost]
-        public JsonResult addProgNotes(tblTreatmentPlanModel model)
-        {
-            var role = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
-            if (role == "1")
-                return Json(new { success = false, message = "Not authorized" }, JsonRequestBehavior.AllowGet);
+        //public JsonResult addProgNotes(tblTreatmentPlanModel model)
+        //{
+        //    var role = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
+        //    if (role == "1")
+        //        return Json(new { success = false, message = "Not authorized" }, JsonRequestBehavior.AllowGet);
 
-            if (model == null)
-                return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
+        //    if (model == null)
+        //        return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
 
-            if (model == null)
-                return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
+        //    if (model == null)
+        //        return Json(new { success = false, message = "Empty payload." }, JsonRequestBehavior.AllowGet);
 
-            if (model.patientID <= 0)
-                return Json(new { success = false, message = "Missing or invalid patientID." }, JsonRequestBehavior.AllowGet);
+        //    if (model.patientID <= 0)
+        //        return Json(new { success = false, message = "Missing or invalid patientID." }, JsonRequestBehavior.AllowGet);
 
-            if (model.accID <= 0)
-                return Json(new { success = false, message = "Missing or invalid accID (dentist)." }, JsonRequestBehavior.AllowGet);
+        //    if (model.accID <= 0)
+        //        return Json(new { success = false, message = "Missing or invalid accID (dentist)." }, JsonRequestBehavior.AllowGet);
 
-            if (string.IsNullOrWhiteSpace(model.procedures))
-                return Json(new { success = false, message = "Procedures is required." }, JsonRequestBehavior.AllowGet);
+        //    if (string.IsNullOrWhiteSpace(model.procedures))
+        //        return Json(new { success = false, message = "Procedures is required." }, JsonRequestBehavior.AllowGet);
 
-            DateTime noteDate;
-            try
-            {
-                noteDate = (model.date == default(DateTime)) ? DateTime.Now : model.date;
-                noteDate = noteDate.Date.Add(DateTime.Now.TimeOfDay);
-            }
-            catch
-            {
-                noteDate = DateTime.Now;
-            }
+        //    DateTime noteDate;
+        //    try
+        //    {
+        //        noteDate = (model.date == default(DateTime)) ? DateTime.Now : model.date;
+        //        noteDate = noteDate.Date.Add(DateTime.Now.TimeOfDay);
+        //    }
+        //    catch
+        //    {
+        //        noteDate = DateTime.Now;
+        //    }
 
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var patientExists = db.tbl_patient.Any(p => p.patientID == model.patientID);
-                    var accExists = db.tbl_account.Any(a => a.accID == model.accID);
+        //    try
+        //    {
+        //        using (var db = new RGDCContext())
+        //        {
+        //            var patientExists = db.tbl_patient.Any(p => p.patientID == model.patientID);
+        //            var accExists = db.tbl_account.Any(a => a.accID == model.accID);
 
-                    if (!patientExists)
-                        return Json(new { success = false, message = $"Patient not found (patientID={model.patientID})." }, JsonRequestBehavior.AllowGet);
+        //            if (!patientExists)
+        //                return Json(new { success = false, message = $"Patient not found (patientID={model.patientID})." }, JsonRequestBehavior.AllowGet);
 
-                    if (!accExists)
-                        return Json(new { success = false, message = $"Account / Dentist not found (accID={model.accID})." }, JsonRequestBehavior.AllowGet);
+        //            if (!accExists)
+        //                return Json(new { success = false, message = $"Account / Dentist not found (accID={model.accID})." }, JsonRequestBehavior.AllowGet);
 
-                    var note = new tblTreatmentPlanModel
-                    {
-                        date = noteDate,
-                        patientID = model.patientID,
-                        accID = model.accID,
-                        amount = model.amount,
-                        paid = model.paid,
-                        procedures = model.procedures,
-                        toothNumber = model.toothNumber
-                    };
+        //            var note = new tblTreatmentPlanModel
+        //            {
+        //                date = noteDate,
+        //                patientID = model.patientID,
+        //                accID = model.accID,
+        //                amount = model.amount,
+        //                paid = model.paid,
+        //                procedures = model.procedures,
+        //                toothNumber = model.toothNumber
+        //            };
 
-                    db.tbl_treatmentplan.Add(note);
-                    var patientLastUpdated = db.tbl_patient.Where(p => p.patientID == model.patientID).Select(p => p.lastUpdated).FirstOrDefault();
-                    if (noteDate > patientLastUpdated)
-                    {
-                        var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
-                        if (patient != null)
-                        {
-                            patient.lastUpdated = noteDate;
-                        }
-                    }
-                    db.SaveChanges();
+        //            db.tbl_treatmentplan.Add(note);
+        //            var patientLastUpdated = db.tbl_patient.Where(p => p.patientID == model.patientID).Select(p => p.lastUpdated).FirstOrDefault();
+        //            if (noteDate > patientLastUpdated)
+        //            {
+        //                var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
+        //                if (patient != null)
+        //                {
+        //                    patient.lastUpdated = noteDate;
+        //                }
+        //            }
+        //            db.SaveChanges();
 
-                    return Json(new { success = true }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Trace.WriteLine("addProgNotes error: " + ex.ToString());
-                return Json(new { success = false, message = "Server error adding progress note." }, JsonRequestBehavior.AllowGet);
-            }
-        }
+        //            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        System.Diagnostics.Trace.WriteLine("addProgNotes error: " + ex.ToString());
+        //        return Json(new { success = false, message = "Server error adding progress note." }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
 
-        public JsonResult selectPlan(tblTreatmentPlanModel plan)
-        {
-            using (var db = new RGDCContext())
-            {
-                var result = (
-                    from t in db.tbl_treatmentplan
-                    join a in db.tbl_account on t.accID equals a.accID
-                    join p in db.tbl_patient on t.patientID equals p.patientID
+        //public JsonResult selectPlan(tblTreatmentPlanModel plan)
+        //{
+        //    using (var db = new RGDCContext())
+        //    {
+        //        var result = (
+        //            from t in db.tbl_treatmentplan
+        //            join a in db.tbl_account on t.accID equals a.accID
+        //            join p in db.tbl_patient on t.patientID equals p.patientID
 
-                    where t.trtPlanID == plan.trtPlanID
+        //            where t.trtPlanID == plan.trtPlanID
 
-                    select new
-                    {
-                        // TREATMENT PLAN
-                        trtPlanID = t.trtPlanID,
-                        date = t.date,
-                        toothNumber = t.toothNumber,
-                        procedures = t.procedures,
-                        amount = t.amount,
-                        paid = t.paid,
+        //            select new
+        //            {
+        //                // TREATMENT PLAN
+        //                trtPlanID = t.trtPlanID,
+        //                date = t.date,
+        //                toothNumber = t.toothNumber,
+        //                procedures = t.procedures,
+        //                amount = t.amount,
+        //                paid = t.paid,
 
-                        // DENTIST
-                        accID = t.accID,
-                        patientID = p.patientID
-                    }
-                ).FirstOrDefault();
+        //                // DENTIST
+        //                accID = t.accID,
+        //                patientID = p.patientID
+        //            }
+        //        ).FirstOrDefault();
 
-                return Json(result, JsonRequestBehavior.AllowGet);
-            }
-        }
-        [HttpPost]
-        public JsonResult editProgressNotes(tblTreatmentPlanModel model)
-        {
-            using (var db = new RGDCContext())
-            {
-                var existing = db.tbl_treatmentplan
-                    .FirstOrDefault(t => t.trtPlanID == model.trtPlanID);
+        //        return Json(result, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+        //[HttpPost]
+        //public JsonResult editProgressNotes(tblTreatmentPlanModel model)
+        //{
+        //    using (var db = new RGDCContext())
+        //    {
+        //        var existing = db.tbl_treatmentplan
+        //            .FirstOrDefault(t => t.trtPlanID == model.trtPlanID);
 
-                if (existing == null)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Progress note not found."
-                    }, JsonRequestBehavior.AllowGet);
-                }
+        //        if (existing == null)
+        //        {
+        //            return Json(new
+        //            {
+        //                success = false,
+        //                message = "Progress note not found."
+        //            }, JsonRequestBehavior.AllowGet);
+        //        }
 
-                // UPDATE FIELDS
-                existing.accID = model.accID;
-                existing.date = model.date;
-                existing.toothNumber = model.toothNumber;
-                existing.procedures = model.procedures;
-                existing.amount = model.amount;
-                existing.paid = model.paid;
-                var patientLastUpdated = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
-                patientLastUpdated.lastUpdated = model.date > patientLastUpdated.lastUpdated ? model.date : patientLastUpdated.lastUpdated;
-                db.SaveChanges();
+        //        // UPDATE FIELDS
+        //        existing.accID = model.accID;
+        //        existing.date = model.date;
+        //        existing.toothNumber = model.toothNumber;
+        //        existing.procedures = model.procedures;
+        //        existing.amount = model.amount;
+        //        existing.paid = model.paid;
+        //        var patientLastUpdated = db.tbl_patient.FirstOrDefault(p => p.patientID == model.patientID);
+        //        patientLastUpdated.lastUpdated = model.date > patientLastUpdated.lastUpdated ? model.date : patientLastUpdated.lastUpdated;
+        //        db.SaveChanges();
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Progress note updated successfully."
-                }, JsonRequestBehavior.AllowGet);
-            }
-        }
-        [HttpPost]
-        public JsonResult deletePlan(tblTreatmentPlanModel trtPlan)
-        {
-            using (var db = new RGDCContext())
-            {
-                var existing = db.tbl_treatmentplan
-                    .FirstOrDefault(t => t.trtPlanID == trtPlan.trtPlanID);
-                if (existing == null)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Progress note not found."
-                    }, JsonRequestBehavior.AllowGet);
-                }
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            message = "Progress note updated successfully."
+        //        }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
+        //[HttpPost]
+        //public JsonResult deletePlan(tblTreatmentPlanModel trtPlan)
+        //{
+        //    using (var db = new RGDCContext())
+        //    {
+        //        var existing = db.tbl_treatmentplan
+        //            .FirstOrDefault(t => t.trtPlanID == trtPlan.trtPlanID);
+        //        if (existing == null)
+        //        {
+        //            return Json(new
+        //            {
+        //                success = false,
+        //                message = "Progress note not found."
+        //            }, JsonRequestBehavior.AllowGet);
+        //        }
 
-                db.tbl_treatmentplan.Remove(existing);
-                db.SaveChanges();
+        //        db.tbl_treatmentplan.Remove(existing);
+        //        db.SaveChanges();
 
-                return Json(new
-                {
-                    success = true,
-                    message = "Progress note deleted successfully."
-                }, JsonRequestBehavior.AllowGet);
-            }
-        }
+        //        return Json(new
+        //        {
+        //            success = true,
+        //            message = "Progress note deleted successfully."
+        //        }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
 
         [HttpGet]
         public JsonResult getOverviewData()
@@ -3762,13 +3719,13 @@ RGDC Dental Clinic Team";
                                             where a.accCreatedAt >= startOfMonth
                                             select p).Count();
 
-                var patientsDoneThisWeek = db.tbl_treatmentplan
-                    .Where(t => t.date >= startOfWeek)
+                var patientsDoneThisWeek = db.tbl_payment
+                    .Where(t => t.paymentDate >= startOfWeek)
                     .Select(t => t.patientID)
                     .Distinct()
                     .Count();
 
-                var unpaidPatients = db.tbl_treatmentplan
+                var unpaidPatients = db.tbl_payment
                     .Where(t => t.paid != 0)
                     .Select(t => t.patientID)
                     .Distinct()
@@ -3794,7 +3751,7 @@ RGDC Dental Clinic Team";
 
                 // Pull raw data into memory first — avoids MySQL GroupBy EF6 bug
                 var allAccounts = (from a in db.tbl_account select a).ToList();
-                var allTreatments = (from t in db.tbl_treatmentplan select t).ToList();
+                var allTreatments = (from t in db.tbl_payment select t).ToList();
 
                 // Patients per month (last 6 months)
                 var patientsPerMonth = (from a in allAccounts
@@ -3809,8 +3766,8 @@ RGDC Dental Clinic Team";
 
                 // Procedures this week
                 var proceduresThisWeek = (from t in allTreatments
-                                          where t.date >= startOfWeek
-                                          group t by t.date.DayOfWeek into g
+                                          where t.paymentDate >= startOfWeek
+                                          group t by t.paymentDate.DayOfWeek into g
                                           select new
                                           {
                                               day = g.Key.ToString(),
@@ -3820,16 +3777,16 @@ RGDC Dental Clinic Team";
                 // Procedures by revenue
                 var proceduresByRevenue = (from t in allTreatments
                                            group t by t.procedures into g
-                                           orderby g.Sum(x => x.amount) descending
+                                           orderby g.Sum(x => x.balance) descending
                                            select new
                                            {
                                                procedure = g.Key,
-                                               total = g.Sum(x => x.amount)
+                                               total = g.Sum(x => x.balance)
                                            }).Take(5).ToList();
 
                 // Paid vs Unpaid
-                var paid = (from t in allTreatments where t.paid >= t.amount select t).Count();
-                var unpaid = (from t in allTreatments where t.paid < t.amount select t).Count();
+                var paid = (from t in allTreatments where t.paid >= t.balance select t).Count();
+                var unpaid = (from t in allTreatments where t.paid < t.balance select t).Count();
 
                 return Json(new
                 {
