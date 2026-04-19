@@ -8,6 +8,9 @@ using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Org.BouncyCastle.Ocsp;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using RGDC_Web_Application.Models;
 using RGDC_Web_Application.Models.Context;
 using RGDC_Web_Application.Models.Map;
@@ -15,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -24,7 +28,9 @@ using System.Net.Http.Headers;
 using System.Net.Mail;
 using System.Reflection.Emit;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,7 +38,10 @@ using System.Web;
 using System.Web.Helpers;
 using System.Web.Management;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Net.WebRequestMethods;
 
 
 namespace RGDC_Web_Application.Controllers
@@ -715,7 +724,76 @@ namespace RGDC_Web_Application.Controllers
                     MailMessage mail = new MailMessage();
                     mail.To.Add(email);
                     mail.Subject = "[RGDC Clinic] Your One-Time Password (OTP) for Password Reset";
-                    mail.Body = $"Hello,\r\n\r\nWe received a request to reset the password for your RGDC account. Use the code below to complete the process.\r\nBOLD{otp}BOLD\r\n\r\nIf you did not request this change, please ignore this email or contact the clinic administrator immediately to secure your account.\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                    string htmlBody = $@"
+                <!DOCTYPE html>
+                <html lang='en'>
+  <head>
+  <meta charset=""UTF-8"" />
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+  <title>Document</title>
+    < !--Compiled and minified CSS-- >
+    < link
+      rel ='stylesheet'
+      href = 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css
+'
+    />
+
+    < !--Compiled and minified JavaScript-- >
+    < script src = 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
+'></script>
+    < style >
+      .bold {{
+                        font - weight: bold!important;
+                    }}
+
+      .m - 0 {{
+                    margin: 0!important;
+                    }}
+
+      .center - flex {{
+                    display: flex;
+                        justify - content: center;
+                    }}
+    </ style >
+  </ head >
+
+  < body >
+    < div class='container'>
+      <div class='row'>
+        <h4>Hi there!</h4>
+      </div>
+      <div class='row'>
+        <div class='col'>
+          <p>
+            This is your one-time password to connect your Google Account to
+            your RGDC account.
+          </p>
+        </div>
+      </div>
+      <div class='row center-flex'>
+        <div class='col'>
+          <div class='card brown darken-1'>
+            <div class='card-content white-text bold center'>
+              <span>
+                <h3 class='bold m-0'>[{otp}]</h3>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='col'>
+          <p class='grey-text'>
+            If you did not request this OTP, or received this email by accident,
+            you may safely ignore this email.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>"; 
+                    mail.IsBodyHtml = true;
+                    mail.Body = htmlBody;
                     mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                     SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
