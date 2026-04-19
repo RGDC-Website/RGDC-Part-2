@@ -43,7 +43,7 @@
                         <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
                             <i class="material-icons brown-text lighten-1">visibility</i>
                         </a>
-                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)">
+                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
                             <i class="material-icons brown-text lighten-1">delete</i>
                         </a>
                         <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
@@ -216,9 +216,9 @@
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Payment Record</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 @*Patient*@
-                <label class="custom-label">Patient</label>
+                <label class="custom-label">Patient <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="paymentInfo.patientID"
                         ng-options="patient.patientID as patient.patientName for patient in patientArray"
                         ng-class="{'invalid-input': editSubmitted && !paymentInfo.patientID}">
@@ -226,22 +226,10 @@
                 </select>
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.patientID">Patient is required.</span>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s6">
-                @*Dentist*@
-                <label class="custom-label">Dentist</label>
-                <select class="custom-input browser-default" ng-model="paymentInfo.dentistID"
-                        ng-options="dentist.dentistID as dentist.dentistName for dentist in dentistArray"
-                        ng-class="{'invalid-input': editSubmitted && !paymentInfo.dentistID}">
-                    <option value="" disabled>Select dentist...</option>
-                </select>
-                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.dentistID">Dentist is required.</span>
-            </div>
             <div class="col s6">
                 @*Date*@
-                <label class="custom-label">Date</label>
+                <label class="custom-label">Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
                     <input id="date" type="text" class="datepicker custom-input" ng-model="paymentInfo.paymentDate" placeholder="MM/DD/YYYY"
                            ng-class="{'invalid-input': editSubmitted && !paymentInfo.paymentDate}">
@@ -252,10 +240,42 @@
         </div>
 
         <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">Dentist <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="paymentInfo.dentistID"
+                        ng-options="dentist.dentistID as dentist.dentistName for dentist in dentistArray"
+                        ng-class="{'invalid-input': editSubmitted && !paymentInfo.dentistID}">
+                    <option value="" disabled>Select dentist...</option>
+                </select>
+                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.dentistID">Dentist is required.</span>
+            </div>
+
+            <div class="col s6">
+                @*Tooth Number*@
+                <label class="custom-label">Tooth Number</label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedure <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
+        <div class="row">
             <div class="col s4">
                 @*Mode of Payment*@
                 <label class="custom-label">
                     Mode of Payment
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Mode of payment..." ng-model="paymentInfo.paymentMethod"
                            ng-class="{'invalid-input': editSubmitted && !paymentInfo.paymentMethod}">
                 </label>
@@ -265,6 +285,7 @@
                 @*Cost*@
                 <label class="custom-label">
                     Cost
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.cost"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': editSubmitted && !paymentInfo.cost}">
@@ -275,6 +296,7 @@
                 @*Discount*@
                 <label class="custom-label">
                     Discount
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
                 </label>
@@ -286,6 +308,7 @@
                 @*Paid*@
                 <label class="custom-label">
                     Total Amount Paid
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.amountPaid"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': editSubmitted && !paymentInfo.amountPaid}">
@@ -295,7 +318,8 @@
             <div class="col s6">
                 @*Total*@
                 <label class="custom-label">
-                    Total Amount Due
+                    Balance Payment
+                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Total amount due..." ng-model="paymentInfo.amountDue"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': editSubmitted && !paymentInfo.amountDue}">
@@ -309,6 +333,7 @@
                 @*Description*@
                 <label class="custom-label">
                     Description
+                    <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentInfo.description"
                               ng-class="{'invalid-input': editSubmitted && !paymentInfo.description}"></textarea>
@@ -317,6 +342,8 @@
             </div>
         </div>
     </div>
+
+
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"
@@ -335,24 +362,46 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Payment Record</h5>
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 @*Patient*@
                 <label class="custom-label">Patient</label>
                 <p class="custom-input">{{paymentInfo.patientName}}</p>
             </div>
-        </div>
-        <div class="row">
-            <div class="col s6">
-                @*Dentist*@
-                <label class="custom-label">Dentist</label>
-                <p class="custom-input">{{paymentInfo.dentistName}}</p>
-            </div>
+
             <div class="col s6">
                 @*Date*@
                 <label class="custom-label">Date</label>
                 <p class="custom-input">{{paymentInfo.paymentDate}}</p>
             </div>
         </div>
+
+
+        <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">Dentist</label>
+                <p class="custom-input">{{paymentInfo.dentistName}}</p>
+            </div>
+
+            <div class="col s6">
+                @*Tooth Number*@
+                <label class="custom-label">Tooth Number</label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedure</label>
+                <input type="text" class="custom-input browser-default" ng-model=""
+                       ng-class="" />
+            </div>
+        </div>
+
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
         <div class="row">
             <div class="col s4">
                 @*Mode of Payment*@
@@ -370,18 +419,22 @@
                 <p class="custom-input">{{paymentInfo.discount}}</p>
             </div>
         </div>
+
+
         <div class="row">
-            <div class="col s6">
-                @*Total*@
-                <label class="custom-label">Total Amount Due</label>
-                <p class="custom-input">{{paymentInfo.amountDue}}</p>
-            </div>
             <div class="col s6">
                 @*Paid*@
                 <label class="custom-label">Total Amount Paid</label>
                 <p class="custom-input">{{paymentInfo.amountPaid}}</p>
             </div>
+
+            <div class="col s6">
+                @*Total*@
+                <label class="custom-label">Balance Payment</label>
+                <p class="custom-input">{{paymentInfo.amountDue}}</p>
+            </div>
         </div>
+
         <div class="row">
             <div class="col s12">
                 @*Description*@
@@ -390,8 +443,13 @@
             </div>
         </div>
     </div>
+
+
     <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">CLOSE</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">
+            CLOSE
+        </button>
+
     </div>
 </div>
 
