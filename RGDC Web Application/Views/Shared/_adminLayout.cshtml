@@ -617,17 +617,25 @@
                     @*Religion*@
                     <div class="col s6">
                         <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="staff.religion"
+                        <select>
+                            <option disabled selected>Select your Religion</option>
+                            <option value="Roman Catholic">Roman Catholic</option>
+                            <option value="Islam">Islam</option>
+                        </select>
+                        @*<input type="text" class="custom-input" ng-model="staff.religion"
                                placeholder="Roman-Catholic" maxlength="50"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
                     <div class="col s6">
                         <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                        <input type="text" class="custom-input" ng-model="staff.nationality"
+                        <select placeholder="Filipino">
+                            <option value="">Option 1</option>
+                        </select>
+                        @*<input type="text" class="custom-input" ng-model="staff.nationality"
                                placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.nationality">Nationality is required.</span>
                     </div>
                 </div>
