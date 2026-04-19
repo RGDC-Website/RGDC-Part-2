@@ -876,6 +876,7 @@
                     accCreatedAt: new Date(),
                     accUpdatedAt: new Date(),
                 };
+                console.log(accountData)
 
                 accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
 
@@ -897,7 +898,7 @@
                             Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
                             return;
                         }
-                        if ($scope.permission == 0) {
+                        if ($scope.signUp_permission == 0) {
                             var ownerData = {
                                 accID: accID,
                                 specialization: $scope.signUp_specialization,
@@ -909,7 +910,7 @@
                                 console.error('signUpPatient failed', err);
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save account information. Contact support.' });
                             });
-                        } else if ($scope.permission == 1) {
+                        } else if ($scope.signUp_permission == 1) {
                             var dentistData = {
                                 accID: accID,
                                 specialization: $scope.signUp_specialization,
@@ -917,13 +918,14 @@
                             }
                             var addDentistAcc = RGDCWebApplicationService.signUpDentist(dentistData);
                             addDentistAcc.then(function (returnedData) {
+                                console.log(returnedData)
 
                             }).catch(function (err) {
                                 Swal.close();
                                 console.error('signUpPatient failed', err);
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save account information. Contact support.' });
                             });
-                        } else if ($scope.permission == 2) {
+                        } else if ($scope.signUp_permission == 2) {
                             var staffData = {
                                 accID: accID,
                                 staffRole: $scope.signUp_staffRole,
@@ -931,7 +933,7 @@
                             }
                             var addStaffAcc = RGDCWebApplicationService.signUpStaff(staffData);
                             addStaffAcc.then(function (returnedData) {
-                               
+                               console.log(returnedData)
                             }).catch(function (err) {
                                 Swal.close();
                                 console.error('signUpPatient failed', err);
@@ -1066,7 +1068,6 @@
                     $scope.currentUserPhoto = returnedData.data.userPhoto;
                     sessionStorage.setItem('currentUserPhoto', returnedData.data.userPhoto);
                 }
-                console.log($scope.currentUserPhoto)
 
                 // Google Calendar flags
                 $scope.googleCalendarEnabled = !!returnedData.data.googleCalendarEnabled;
@@ -3823,6 +3824,7 @@
     $scope.getDentistData = function () {
         RGDCWebApplicationService.getDentistData()
             .then(function (returnedData) {
+                console.log(returnedData.data)
                 $scope.dentist = returnedData.data;
                 $scope.dentist.birthDate = formatDateToMDY($scope.dentist.birthDate);
             });

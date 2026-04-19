@@ -725,73 +725,52 @@ namespace RGDC_Web_Application.Controllers
                     mail.To.Add(email);
                     mail.Subject = "[RGDC Clinic] Your One-Time Password (OTP) for Password Reset";
                     string htmlBody = $@"
-                <!DOCTYPE html>
-                <html lang='en'>
-  <head>
-  <meta charset=""UTF-8"" />
-  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
-  <title>Document</title>
-    < !--Compiled and minified CSS-- >
-    < link
-      rel ='stylesheet'
-      href = 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css
-'
-    />
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>Document</title>
+</head>
 
-    < !--Compiled and minified JavaScript-- >
-    < script src = 'https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js
-'></script>
-    < style >
-      .bold {{
-                        font - weight: bold!important;
-                    }}
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
 
-      .m - 0 {{
-                    margin: 0!important;
-                    }}
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hi there!</h4>
+  </div>
 
-      .center - flex {{
-                    display: flex;
-                        justify - content: center;
-                    }}
-    </ style >
-  </ head >
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      This is your one-time password to connect your Google Account to
+      your RGDC account. Please do not share this to anyone.
+    </p>
+  </div>
 
-  < body >
-    < div class='container'>
-      <div class='row'>
-        <h4>Hi there!</h4>
-      </div>
-      <div class='row'>
-        <div class='col'>
-          <p>
-            This is your one-time password to connect your Google Account to
-            your RGDC account.
-          </p>
-        </div>
-      </div>
-      <div class='row center-flex'>
-        <div class='col'>
-          <div class='card brown darken-1'>
-            <div class='card-content white-text bold center'>
-              <span>
-                <h3 class='bold m-0'>[{otp}]</h3>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class='row'>
-        <div class='col'>
-          <p class='grey-text'>
-            If you did not request this OTP, or received this email by accident,
-            you may safely ignore this email.
-          </p>
-        </div>
-      </div>
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
     </div>
-  </body>
-</html>"; 
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      If you did not request this OTP, or received this email by accident,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
                     mail.IsBodyHtml = true;
                     mail.Body = htmlBody;
                     mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
@@ -3357,8 +3336,8 @@ RGDC Dental Clinic Team";
 
         public JsonResult getOwnerData()
         {
-            // Retrieve ID from Session
             var sessionUserID = Session["userID"];
+
             if (sessionUserID == null)
             {
                 return Json(null, JsonRequestBehavior.AllowGet);
@@ -3395,13 +3374,16 @@ RGDC Dental Clinic Team";
             }
         }
 
-public JsonResult getDentistData()
+        [HttpPost]
+        public JsonResult getDentistData()
         {
-            // Retrieve ID from Session
             var sessionUserID = Session["userID"];
             if (sessionUserID == null)
             {
-                return Json(null, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    message = "not working"
+                }, JsonRequestBehavior.AllowGet);
             }
 
             int accID = Convert.ToInt32(sessionUserID);
