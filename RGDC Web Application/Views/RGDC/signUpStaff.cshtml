@@ -147,7 +147,7 @@
 
         <form>
             <div class="row">
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Photo upload*@
                     <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                         <div class="col s12">
@@ -164,7 +164,7 @@
                     </div>
                 </div>
 
-                <div class="col s8">
+                <div class="col s12 m8 l8">
                     <div class="row">
                         @*First name*@
                         <div class="col s6">
@@ -206,7 +206,7 @@
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3" ng-init="getGender()">
+                <div class="col s12 m3 l3" ng-init="getGender()">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_genderID" required>
                         <option value="" disabled selected>Select Gender</option>
@@ -214,7 +214,7 @@
                     </select>
                 </div>
                 @*Birthdate*@
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
@@ -226,7 +226,7 @@
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_civilStatus" required>
@@ -239,7 +239,7 @@
                         <option value="6">Divorced</option>
                     </select>
                 </div>
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
@@ -255,28 +255,39 @@
             </div>
 
             <div class="row">
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <input id="religion"
+                    <select class="browser-default custom-input">
+                        <option disabled selected>Select your Religion</option>
+                        <option value="Roman Catholic">Roman Catholic</option>
+                        <option value="Islam">Islam</option>
+                        <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
+                        <option value="Others">Others</option>
+                    </select>                
+                     @*<input id="religion"
                            type="text"
                            class="custom-input"
                            ng-model="signUp_religion"
                            placeholder="Roman-Catholic"
                            maxlength="50"
-                           required>
+                           required>*@
                 </div>
 
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <input id="contactNumber"
+                    <select class="browser-default custom-input">
+                        <option disbaled selected>Select your Nationality</option>
+                        <option>Option 1</option>
+                    </select>
+                    @*<input id="contactNumber"
                            type="text"
                            ng-model="signUp_nationality"
                            class="custom-input"
                            placeholder="Filipino"
                            maxlength="50"
-                           required>
+                           required>*@
                 </div>
             </div>
 
@@ -284,14 +295,33 @@
                 <div class="col s12">
                     @*Address*@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="signUp_address"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
-                           required>
+                    <div class="row m-0">
+                        <div class="col s12 m2 l2">
+                            <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                        </div>
+                        <div class="col s12 m5 l5">
+                            <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                        </div>
+                        <div class="col s12 m5 l5">
+                            <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                        </div>
+                    </div>
+                    <div class="row m-0">
+                        <div class="col s12 m6 l6">
+                            <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                        </div>
+                        <div class="col s12 m6 l6">
+                            <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                        </div>
+                    </div>
+                    @*<input id="address"
+        type="text"
+        ng-model="signUp_address"
+        class="custom-input"
+        maxlength="250"
+        oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+        ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
+        required>*@
                 </div>
             </div>
 

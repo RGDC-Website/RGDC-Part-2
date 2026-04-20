@@ -214,10 +214,18 @@ a:hover {
     padding: 0 !important;
 }
 
+
+
+.pr-0{
+    padding-right: 0 !important;
+}
 .pr-05 {
     padding: 0 0.8rem 0 0 !important;
 }
 
+.pl-0{
+    padding-left: 0 !important;
+}
 .pl-05 {
     padding: 0 0 0 0.8rem !important;
 }
