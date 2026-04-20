@@ -206,7 +206,6 @@
     <Compile Include="Models\Context\RGDCContext.cs" />
     <Compile Include="Models\Map\tblAddAccountMap.cs" />
     <Compile Include="Models\Map\tblImagesMap.cs" />
-    <Compile Include="Models\Map\tblTreatmentPlanMap.cs" />
     <Compile Include="Models\Map\tblStaffMap.cs" />
     <Compile Include="Models\Map\tblProcedureMap.cs" />
     <Compile Include="Models\Map\tblPostOpMap.cs" />
@@ -224,7 +223,6 @@
     <Compile Include="Models\MedicalHistoryModel.cs" />
     <Compile Include="Models\tblImagesModel.cs" />
     <Compile Include="Models\tblAddAccountModel.cs" />
-    <Compile Include="Models\tblTreatmentPlanModel.cs" />
     <Compile Include="Models\tblStaffModel.cs" />
     <Compile Include="Models\tblProcedureModel.cs" />
     <Compile Include="Models\tblPostOpModel.cs" />

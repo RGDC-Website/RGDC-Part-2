@@ -29,7 +29,6 @@ namespace RGDC_Web_Application.Models.Context
         public virtual DbSet<tblPostOpModel> tbl_postop { get; set; }
         public virtual DbSet<tblProcedureModel> tbl_procedure { get; set; }
         public virtual DbSet<tblStaffModel> tbl_staff { get; set; }
-        public virtual DbSet<tblTreatmentPlanModel> tbl_treatmentplan { get; set; }
         public virtual DbSet<tblImagesModel> tbl_images { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -49,7 +48,6 @@ namespace RGDC_Web_Application.Models.Context
             modelBuilder.Configurations.Add(new tblPostOpMap());
             modelBuilder.Configurations.Add(new tblProcedureMap());
             modelBuilder.Configurations.Add(new tblStaffMap());
-            modelBuilder.Configurations.Add(new tblTreatmentPlanMap());
             modelBuilder.Configurations.Add(new tblImagesMap());
 
         }
