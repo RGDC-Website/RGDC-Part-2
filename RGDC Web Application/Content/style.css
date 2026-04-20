@@ -1371,6 +1371,16 @@ select.browser-default.custom-input {
     margin: auto !important;
 }
 
+.schedule-modal {
+    background-color: #e0e0e0 !important;
+    border-radius: 15px !important;
+    width: 90% !important;
+    max-width: 75vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+}
+
 
 /*para sa profile pic*/
 .sidebar-profile {
@@ -1502,3 +1512,43 @@ css.validation-msg {
         .password-field .password-toggle:hover {
             color: rgba(0,0,0,0.87);
         }
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+    .schedule-table .time-header {
+        width: 15%;
+        text-align: center;
+        color: #757575;
+        font-weight: 600;
+        color: #795548;
+    }
+
+    .schedule-table .day-header {
+        width: 12%;
+        color: #424242;
+        font-weight: 600;
+        text-align: center;
+        color: #795548;
+    }
+
+    .schedule-table .time-label {
+        text-align: left;
+        font-size: 0.95rem;
+        color: #757575;
+    }
+
+    .schedule-table .checkbox-cell {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+.cb-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}

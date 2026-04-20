@@ -103,7 +103,7 @@
                 <div class="input-field lbl-required">
                     <input id="code"
                            type="text"
-                            ng-model="signUp_code"
+                           ng-model="signUp_code"
                            placeholder="Code*"
                            maxlength="6"
                            oninput="this.value = this.value.replace(/^A-Za-z0-9 ._-/g, '')"
@@ -111,9 +111,15 @@
                 </div>
 
                 @*Already have an account*@
-                <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
+                <!--<div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
                     <span>Already have an account?</span>
                     <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
+                </div>-->
+
+                @*Already have an account*@
+                <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
+                    <span>Already have an account?</span>
+                    <a class="signup-link modal-trigger" data-target="modalInfoForm" style="display:inline-block">Login</a>
                 </div>
 
                 @*Sign up as patient*@
@@ -124,15 +130,11 @@
 
                 @*Sign up BTN*@
                 <button class="logSignBtn"
-                        data-target="modalOwnerInfoForm"
+                        data-target="modalInfoForm"
                         type="button"
                         ng-click="signUpStaffInitial()">
                     Sign Up
                 </button>
-
-                <div class="login-divider">
-                    <span>or sign up with</span>
-                </div>
             </form>
         </div>
     </div>
@@ -302,14 +304,14 @@
                            class="custom-input"
                            maxlength="50">
                 </div>
-            </div>  
+            </div>
 
             <div class="row" ng-show="signUpStaff">
                 @*Clinic Role*@
                 <div class="col s12">
                     <p class="custom-label">Clinic Role <span class="required-mark">*</span></p>
                     <input type="text"
-                            ng-model="signUp_staffRole"
+                           ng-model="signUp_staffRole"
                            class="custom-input"
                            maxlength="50">
                 </div>
@@ -344,9 +346,233 @@
     <div class="modal-footer footer-center" style="margin-top:1.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;" ng-click="pickSignUpPhoto()">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight:500;" ng-click="signUpClinicStaff()">SAVE</button>
+        <button type="submit" class="edit-btn modal-trigger" data-target="modalSchedule" style="font-weight:500;">NEXT</button>
     </div>
 </div>
+
+
+@*schedule modal*@
+<div id="modalSchedule" class="modal schedule-modal containerOverflow-2" style="max-height:95vh">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom: 20px;">Select Availability</h5>
+
+        <div class="schedule-container" style="overflow-x: auto;">
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th class="time-header">Time</th>
+                        <th class="day-header">Mon</th>
+                        <th class="day-header">Tue</th>
+                        <th class="day-header">Wed</th>
+                        <th class="day-header">Thu</th>
+                        <th class="day-header">Fri</th>
+                        <th class="day-header">Sat</th>
+                        <th class="day-header">Sun</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="time-label">08:00 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0800AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0800AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">08:30 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0830AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0830AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">09:00 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0900AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0900AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">09:30 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0930AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0930AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">10:00 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1000AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1000AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">10:30 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1030AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1030AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">11:00 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1100AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1100AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">11:30 AM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1130AM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1130AM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">12:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1200PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">12:30 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_1230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_1230PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">01:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0100PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0100PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">01:30 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0130PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0130PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">02:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0200PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0200PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">02:30 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0230PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0230PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">03:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0300PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0300PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">03:30 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0330PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0330PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">04:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0400PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0400PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">04:30 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0430PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0430PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                    <tr>
+                        <td class="time-label">05:00 PM</td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Mon_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Tue_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Wed_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Thu_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Fri_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sat_0500PM" /><span class="cb-span"></span></label></td>
+                        <td class="checkbox-cell"><label class="cb-label"><input type="checkbox" class="filled-in custom-schedule-cb" name="Sun_0500PM" /><span class="cb-span"></span></label></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center" style="margin-top: 10px;">
+        <button class="modal-close cancel-btn" type="button" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">SAVE</button>
+    </div>
+</div>
+
+
 
 @*Termz and condz*@
 <div id="termsConditions" class="modal">
