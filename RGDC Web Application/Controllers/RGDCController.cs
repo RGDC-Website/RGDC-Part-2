@@ -8,6 +8,7 @@ using Microsoft.Ajax.Utilities;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Asn1.Ocsp;
 using Org.BouncyCastle.Ocsp;
 using Org.BouncyCastle.Pqc.Crypto.Lms;
@@ -296,6 +297,71 @@ namespace RGDC_Web_Application.Controllers
                 throw new ArgumentException($"There is an error {ex.Message}");
             }
         }
+
+        public JsonResult getPostOp()
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var getData = db.tbl_postop.ToList();
+                    return Json(getData, JsonRequestBehavior.AllowGet);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error {ex.Message}");
+            }
+        }
+        public JsonResult savePostOp(tblPostOpModel postOp)
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var sessionVal = Session["SelectedPatientID"];
+                    if (!int.TryParse(sessionVal.ToString(), out int patientID))
+                        return Json(new { success = false, message = "Invalid user ID." });
+
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+
+                    patient.postOpID = postOp.postOpID;
+                    db.SaveChanges();
+
+                    return Json(new { message = "success" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error {ex.Message}");
+            }
+        }
+
+        public JsonResult deletePostOp(tblPostOpModel postOp)
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var sessionVal = Session["SelectedPatientID"];
+                    if (!int.TryParse(sessionVal.ToString(), out int patientID))
+                        return Json(new { success = false, message = "Invalid user ID." });
+
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == patientID);
+
+                    patient.postOpID = 0;
+                    db.SaveChanges();
+
+                    return Json(new { message = "success" }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"There is an error {ex.Message}");
+            }
+        }
+
         [HttpPost]
         public JsonResult signUpAcc(tblAccountModel accDetails)
         {
@@ -679,6 +745,10 @@ namespace RGDC_Web_Application.Controllers
 
         public ActionResult patientProfile()
         {
+            if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
+            {
+                return RedirectToAction("logIn", "RGDC");
+            }
             return View();
         }
         public ActionResult patientFinance()
@@ -1142,12 +1212,13 @@ RGDC Dental Clinic Team";
                 if (sessionVal == null) return Json(null, JsonRequestBehavior.AllowGet);
 
                 if (!int.TryParse(sessionVal.ToString(), out int pid))
-                    return Json(null, JsonRequestBehavior.AllowGet);
+                    return Json(pid, JsonRequestBehavior.AllowGet);
 
                 var result = (
                     from p in db.tbl_patient
                     join a in db.tbl_account on p.accID equals a.accID
                     join g in db.tbl_gender on a.genderID equals g.genderID into gj
+                    join o in db.tbl_postop on p.postOpID equals o.postOpID
                     from g in gj.DefaultIfEmpty()
                     where p.patientID == pid
                     select new
@@ -1164,6 +1235,8 @@ RGDC Dental Clinic Team";
                         referral = p.referral,
                         dentalChartLink = p.dentalChartLink,
                         signatureLink = p.signatureLink,
+                        postOpID = p.postOpID,
+                        postOpInstructions = o.content,
                         patientName = a.firstName + " " + a.lastName,
                         firstName = a.firstName,
                         middleName = a.middleName,
@@ -1890,6 +1963,71 @@ RGDC Dental Clinic Team";
                     var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
                     
                   
+                    return Json(resultList, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult getOwnPayments()
+        {
+            try
+            {
+                var sessionVal = Session["SelectedPatientID"];
+                if (!int.TryParse(sessionVal.ToString(), out int accID))
+                    return Json(new { success = false, message = "Invalid user ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    // Build base query (entities kept so we can apply role filters)
+                    var baseQuery = from pay in db.tbl_payment
+                                    join p in db.tbl_patient on pay.patientID equals p.patientID
+                                    join pa in db.tbl_account on p.accID equals pa.accID
+                                    join d in db.tbl_dentist on pay.dentistID equals d.dentistID
+                                    join da in db.tbl_account on d.accID equals da.accID
+                                    where p.patientID == accID
+                                    select new
+                                    {
+                                        // Patient info
+                                        patientID = p.patientID,
+                                        accID = p.accID,
+                                        patientName = pa.firstName + " " + pa.lastName,
+                                        birthDate = pa.birthDate,
+                                        photoLink = pa.photoLink,
+                                        guardian = p.guardian,
+                                        guardianNumber = p.guardianNumber,
+                                        nextVisit = p.nextVisit,
+                                        lastVisit = p.lastVisit,
+
+                                        // Dentist info
+                                        dentistID = d.dentistID,
+                                        dentistAccID = da.accID,
+                                        dentistName = da.firstName + " " + da.lastName,
+                                        dentistSpecialization = d.specialization,
+                                        branchID = d.branchID,
+
+                                        // Payment info
+                                        paymentID = pay.paymentID,
+                                        description = pay.description,
+                                        paymentMethod = pay.paymentMethod,
+                                        paymentDate = pay.paymentDate,
+                                        reference = pay.reference,
+                                        cost = pay.cost,
+                                        discount = pay.discount,
+                                        toothNumber = pay.toothNumber,
+                                        procedures = pay.procedures,
+                                        paid = pay.paid,
+                                        balance = pay.balance
+                                    };
+
+
+
+                    var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
+
+
                     return Json(resultList, JsonRequestBehavior.AllowGet);
                 }
             }

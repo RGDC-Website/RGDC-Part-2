@@ -35,6 +35,10 @@
         return $http.get("/RGDC/getBranch");
     };
 
+    this.getPostOp = function () {
+        return $http.get("/RGDC/getPostOp");
+    };
+
     //Log In
     this.login = function (loginData) {
         return $http({
@@ -43,6 +47,16 @@
             data: loginData
         })
     }
+
+    this.savePostOp = function (postOp) {
+        return $http({
+            method: "post",
+            url: "/RGDC/savePostOp",
+            data: postOp
+        })
+    }
+
+
 
     //Get Sessions
     this.getSessionVariable = function () {
@@ -93,6 +107,9 @@
     this.getPayments = function () {
         return $http.get("/RGDC/getPayments");
     }
+    this.getOwnPayments = function () {
+        return $http.get("/RGDC/getOwnPayments");
+    }
 
     this.getDentists = function () {
         return $http.get("/RGDC/getDentists");
@@ -127,10 +144,15 @@
         console.log(id)
         return $http.post('/RGDC/deletePayment', id);
     };
-
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
     }
+
+    this.deletePostOp = function () {
+        return $http.post('/RGDC/getPostOp');
+    }
+
+
 
     this.getOwnPatientDetails = function () {
         return $http.get("/RGDC/getOwnPatientDetails");
