@@ -116,7 +116,7 @@ namespace RGDC_Web_Application.Controllers
         {
             if (Session["isLoggedIn"] == null || !(bool)Session["isLoggedIn"])
             {
-                return RedirectToAction("logIn", "RGDC"); 
+                return RedirectToAction("logIn", "RGDC");
             }
 
             return View();
@@ -212,7 +212,7 @@ namespace RGDC_Web_Application.Controllers
 
         [HttpPost]
         public JsonResult checkAddQueue(tblAddAccountModel signUpStaffData)
-           
+
         {
             try
             {
@@ -257,7 +257,7 @@ namespace RGDC_Web_Application.Controllers
                         permission = addAccountRecord.permission
                     }, JsonRequestBehavior.AllowGet);
                 }
-                }
+            }
             catch (Exception ex)
             {
                 return Json(new { exists = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
@@ -659,7 +659,7 @@ namespace RGDC_Web_Application.Controllers
                     Response.Cookies["ASP.NET_SessionId"].Secure = Request.IsSecureConnection;
                 }
 
- 
+
                 using (var db = new RGDCContext())
                 {
                     var user = db.tbl_account.FirstOrDefault(u => u.email == email);
@@ -688,7 +688,7 @@ namespace RGDC_Web_Application.Controllers
         }
         public JsonResult getSessionVariable()
         {
-        
+
             try
             {
                 if (Session["IsLoggedIn"] == null || !(bool)Session["IsLoggedIn"])
@@ -717,10 +717,13 @@ namespace RGDC_Web_Application.Controllers
                     }
                 }
 
+                var userIdStr = Session["UserID"] != null ? Session["UserID"].ToString() : "";
+
                 return Json(new
                 {
                     userName = Session["UserName"].ToString(),
                     fullName = Session["UserFullName"].ToString(),
+                    userID = userIdStr,
                     userAuthorization = Session["UserAuthorization"].ToString(),
                     userPermission = Session["UserPermission"].ToString(),
                     userPhoto = userPhoto,
@@ -793,7 +796,7 @@ namespace RGDC_Web_Application.Controllers
 
                 Session["RESET_OTP"] = otp;
                 Session["RESET_EMAIL"] = email;
-                Session["RESET_OTP_EXPIRY"] = DateTime.Now.AddMinutes(10);  
+                Session["RESET_OTP_EXPIRY"] = DateTime.Now.AddMinutes(10);
 
                 try
                 {
@@ -925,7 +928,8 @@ RGDC Dental Clinic Team";
         {
             using (var db = new RGDCContext())
             {
-                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otp) || string.IsNullOrWhiteSpace(password)) {
+                if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otp) || string.IsNullOrWhiteSpace(password))
+                {
                     return Json(new { success = false, message = "Email, OTP and new password are required" });
                 }
 
@@ -1045,7 +1049,8 @@ RGDC Dental Clinic Team";
                         from dent in dentj.DefaultIfEmpty()
                         join dentAcc in db.tbl_account on (dent != null ? dent.accID : 0) equals dentAcc.accID into dentAccj
                         from dentAcc in dentAccj.DefaultIfEmpty()
-                        where appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled" || appt.status == "Cancelled"
+                        where (appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled" || appt.status == "Cancelled")
+                              && appt.isArchived == 0
                         orderby appt.dateTime descending
                         select new
                         {
@@ -1137,6 +1142,31 @@ RGDC Dental Clinic Team";
             }
         }
 
+        [HttpPost]
+        public JsonResult ArchiveAppointment(int apptID)
+        {
+            try
+            {
+                if (apptID < 0) return Json(new { success = false, message = "Invalid appointment ID." });
+
+                using (var db = new RGDCContext())
+                {
+                    var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
+                    if (appt == null) return Json(new { success = false, message = "Appointment not found." });
+
+                    appt.isArchived = 1;
+                    appt.schedUpdatedAt = DateTime.Now;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, message = "Appointment archived." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
 
         [HttpPost]
         public JsonResult CancelAppointment(int apptID, string reason = null)
@@ -1198,7 +1228,10 @@ RGDC Dental Clinic Team";
         }
         public JsonResult goToPatient(tblPatientModel patient)
         {
-            Session["SelectedPatientID"] = patient.patientID;
+            if (patient != null && patient.patientID > 0)
+            {
+                Session["SelectedPatientID"] = patient.patientID;
+            }
 
             return Json(new
             {
@@ -1214,7 +1247,9 @@ RGDC Dental Clinic Team";
                 if (sessionVal == null) return Json(null, JsonRequestBehavior.AllowGet);
 
                 if (!int.TryParse(sessionVal.ToString(), out int pid))
-                    return Json(pid, JsonRequestBehavior.AllowGet);
+                    return Json(null, JsonRequestBehavior.AllowGet);
+
+                if (pid <= 0) return Json(null, JsonRequestBehavior.AllowGet);
 
                 var result = (
                     from p in db.tbl_patient
@@ -1236,6 +1271,7 @@ RGDC Dental Clinic Team";
                         occupation = p.occupation,
                         referral = p.referral,
                         dentalChartLink = p.dentalChartLink,
+                        dentalChartType = p.dentalChartType,
                         signatureLink = p.signatureLink,
                         postOpID = p.postOpID,
                         postOpInstructions = o.content,
@@ -1262,6 +1298,87 @@ RGDC Dental Clinic Team";
                 ).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public class DentalChartSaveDto
+        {
+            public int patientID { get; set; }
+            public string imagePath { get; set; }
+            public string imageType { get; set; } // "Xray" | "Dental Chart"
+        }
+
+        [HttpPost]
+        public JsonResult SaveDentalChart(DentalChartSaveDto dto)
+        {
+            try
+            {
+                if (dto == null) return Json(new { success = false, message = "Empty payload." });
+                if (dto.patientID <= 0) return Json(new { success = false, message = "Invalid patientID." });
+                if (string.IsNullOrWhiteSpace(dto.imagePath)) return Json(new { success = false, message = "Missing imagePath." });
+                if (string.IsNullOrWhiteSpace(dto.imageType)) return Json(new { success = false, message = "Missing imageType." });
+
+                using (var db = new RGDCContext())
+                {
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == dto.patientID);
+                    if (patient == null) return Json(new { success = false, message = "Patient not found." });
+
+                    // Insert a historical record (do not overwrite previous uploads)
+                    var now = DateTime.Now;
+                    var rec = new tblPatientImageModel
+                    {
+                        patientID = dto.patientID,
+                        imagePath = dto.imagePath,
+                        imageType = dto.imageType.Trim(),
+                        createdAt = now,
+                        updatedAt = now
+                    };
+                    db.tbl_patient_images.Add(rec);
+
+                    // Keep latest pointers on tbl_patient for backward compatibility
+                    patient.dentalChartLink = dto.imagePath;
+                    patient.dentalChartType = dto.imageType.Trim();
+                    patient.lastUpdated = now;
+                    db.SaveChanges();
+
+                    return Json(new { success = true, patientImageID = rec.patientImageID, createdAt = rec.createdAt });
+                }
+            }
+            catch (Exception ex)
+            {
+                var inner = ex.InnerException?.InnerException?.Message;
+                return Json(new { success = false, message = inner ?? ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult GetPatientImages(int patientID)
+        {
+            try
+            {
+                if (patientID <= 0) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
+                using (var db = new RGDCContext())
+                {
+                    var list = db.tbl_patient_images
+                        .Where(x => x.patientID == patientID)
+                        .OrderByDescending(x => x.createdAt)
+                        .Select(x => new
+                        {
+                            x.patientImageID,
+                            x.patientID,
+                            x.imagePath,
+                            x.imageType,
+                            x.createdAt
+                        })
+                        .ToList();
+
+                    return Json(list, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -1785,9 +1902,10 @@ RGDC Dental Clinic Team";
                                     join dentAcc in db.tbl_account on (dent != null ? dent.accID : 0) equals dentAcc.accID into dentAccj
                                     from dentAcc in dentAccj.DefaultIfEmpty()
                                         // Note: DO NOT include "Rescheduled" here
-                                    where appt.status == "Scheduled"
+                                    where appt.isArchived == 0
+                                          && (appt.status == "Scheduled"
                                           || appt.status == "Checked-in"
-                                          || appt.status == "Ongoing"
+                                          || appt.status == "Ongoing")
                                     select new
                                     {
                                         apptID = appt.apptID,
@@ -1824,10 +1942,7 @@ RGDC Dental Clinic Team";
                         }
                         else if (userPerm == 2)
                         {
-                            var staff = db.tbl_staff.FirstOrDefault(s => s.accID == userID);
-                            if (staff == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-                            filtered = baseQuery.Where(x => x.dentBranchID.HasValue && x.dentBranchID.Value == staff.branchID)
-                                                .OrderBy(x => x.dateTime).ToList();
+                            filtered = baseQuery.OrderBy(x => x.dateTime).ToList();
                         }
                         else if (userPerm == 3)
                         {
@@ -1916,7 +2031,7 @@ RGDC Dental Clinic Team";
         public JsonResult getPayments()
         {
             try
-            { 
+            {
 
                 using (var db = new RGDCContext())
                 {
@@ -1960,11 +2075,11 @@ RGDC Dental Clinic Team";
                                         balance = pay.balance
                                     };
 
-      
-                    
+
+
                     var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
-                    
-                  
+
+
                     return Json(resultList, JsonRequestBehavior.AllowGet);
                 }
             }
@@ -1978,9 +2093,31 @@ RGDC Dental Clinic Team";
         {
             try
             {
-                var sessionVal = Session["SelectedPatientID"];
-                if (!int.TryParse(sessionVal.ToString(), out int accID))
-                    return Json(new { success = false, message = "Invalid user ID." });
+                // Prefer SelectedPatientID (admin viewing a specific patient), otherwise fall back to the logged-in user (patient view)
+                int? patientID = null;
+
+                var selectedObj = Session["SelectedPatientID"];
+                if (selectedObj != null && int.TryParse(selectedObj.ToString(), out int selectedPid) && selectedPid > 0)
+                {
+                    patientID = selectedPid;
+                }
+                else
+                {
+                    var userObj = Session["UserID"];
+                    if (userObj != null && int.TryParse(userObj.ToString(), out int accID) && accID > 0)
+                    {
+                        using (var dbResolve = new RGDCContext())
+                        {
+                            patientID = dbResolve.tbl_patient
+                                .Where(p => p.accID == accID)
+                                .Select(p => (int?)p.patientID)
+                                .FirstOrDefault();
+                        }
+                    }
+                }
+
+                if (!patientID.HasValue || patientID.Value <= 0)
+                    return Json(new { success = false, message = "No patient selected." }, JsonRequestBehavior.AllowGet);
 
                 using (var db = new RGDCContext())
                 {
@@ -1990,7 +2127,7 @@ RGDC Dental Clinic Team";
                                     join pa in db.tbl_account on p.accID equals pa.accID
                                     join d in db.tbl_dentist on pay.dentistID equals d.dentistID
                                     join da in db.tbl_account on d.accID equals da.accID
-                                    where p.patientID == accID
+                                    where p.patientID == patientID.Value
                                     select new
                                     {
                                         // Patient info
@@ -2028,7 +2165,6 @@ RGDC Dental Clinic Team";
 
 
                     var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
-
 
                     return Json(resultList, JsonRequestBehavior.AllowGet);
                 }
@@ -2380,6 +2516,7 @@ RGDC Dental Clinic Team";
                 {
                     var isDentist = (role == 1) || (role == 2 && permission == 1);
                     var isPatient = (role == 3) || (role == 2 && permission == 3);
+                    var isStaff = (role == 2 && permission == 2);
 
                     if (isDentist)
                     {
@@ -2456,10 +2593,13 @@ RGDC Dental Clinic Team";
                                 contactNumber = contact,
                                 requesterName = requester,
                                 notes = CleanRemarksForUi(computedNotes),
-                                status = isReschedule ? "Rescheduled" : a.status,
-                                displayStatus = isReschedule ? "Rescheduled" : (a.status == "Requested" ? "Requested" : a.status),
+                                // Keep Requested status; do not surface internal reschedule tokens as a status.
+                                isReschedule = isReschedule,
+                                status = a.status,
+                                displayStatus = (a.status == "Requested" ? "Requested" : a.status),
                                 createdBy = a.createdBy,
-                                remarks = CleanRemarksForUi(a.remarks)
+                                // Clean out internal tokens like "RescheduleOf:" for UI display
+                                remarks = CleanRemarksForUi(computedNotes)
                             };
                         }).ToList();
 
@@ -2538,11 +2678,96 @@ RGDC Dental Clinic Team";
                                 dentistName = a.dentistName,
                                 contactNumber = contact,
                                 requesterName = requester,
-                                notes = notesSb.Length > 0 ? notesSb.ToString() : a.remarks,
-                                status = isReschedule ? "Rescheduled" : a.status,
-                                displayStatus = isReschedule ? "Rescheduled" : (a.status == "Requested" ? "Requested" : a.status),
+                                notes = CleanRemarksForUi(notesSb.Length > 0 ? notesSb.ToString() : a.remarks),
+                                isReschedule = isReschedule,
+                                status = a.status,
+                                displayStatus = (a.status == "Requested" ? "Requested" : a.status),
                                 createdBy = a.createdBy,
-                                remarks = a.remarks
+                                remarks = CleanRemarksForUi(notesSb.Length > 0 ? notesSb.ToString() : a.remarks)
+                            };
+                        }).ToList();
+
+                        return Json(result, JsonRequestBehavior.AllowGet);
+                    }
+                    else if (isStaff)
+                    {
+                        // Front desk: all pending requests for every dentist/patient (same projection as dentist view, with names on both sides)
+                        var raw = (
+                            from appt in db.tbl_appointment
+                            join pat in db.tbl_patient on appt.patientID equals pat.patientID
+                            join patAcc in db.tbl_account on pat.accID equals patAcc.accID
+                            join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
+                            join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
+                            where appt.status == "Requested"
+                            orderby appt.dateTime
+                            select new
+                            {
+                                appt.apptID,
+                                appt.dateTime,
+                                date = appt.dateTime,
+                                time = appt.dateTime,
+                                purpose = appt.reason,
+                                patientID = appt.patientID,
+                                dentistID = appt.dentistID,
+                                patientName = patAcc.firstName + " " + patAcc.lastName,
+                                dentistName = dentAcc.firstName + " " + dentAcc.lastName,
+                                status = appt.status,
+                                createdBy = appt.createdBy,
+                                remarks = appt.remarks
+                            }
+                        ).ToList();
+
+                        var result = raw.Select(a =>
+                        {
+                            string requester = null;
+                            string contact = null;
+                            bool isReschedule = false;
+
+                            if (!string.IsNullOrWhiteSpace(a.remarks) && a.remarks.StartsWith("RescheduleOf:", StringComparison.OrdinalIgnoreCase))
+                            {
+                                isReschedule = true;
+                                var parts = a.remarks.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var p in parts)
+                                {
+                                    var colon = p.IndexOf(':');
+                                    if (colon < 0) continue;
+                                    var key = p.Substring(0, colon).Trim();
+                                    var val = p.Substring(colon + 1).Trim();
+                                    if (string.Equals(key, "Requester", StringComparison.OrdinalIgnoreCase)) requester = val;
+                                    if (string.Equals(key, "Contact", StringComparison.OrdinalIgnoreCase)) contact = val;
+                                }
+                            }
+
+                            var notesSb = new System.Text.StringBuilder();
+                            if (!string.IsNullOrWhiteSpace(requester))
+                            {
+                                notesSb.Append("Requested by: ").Append(requester).Append(".\n");
+                            }
+                            if (!string.IsNullOrWhiteSpace(contact))
+                            {
+                                notesSb.Append("In case of further questions kindly contact this number: ").Append(contact).Append(".");
+                            }
+
+                            var computedNotes = notesSb.Length > 0 ? notesSb.ToString() : a.remarks;
+                            return new
+                            {
+                                apptID = a.apptID,
+                                dateTime = a.dateTime,
+                                date = a.date,
+                                time = a.time,
+                                purpose = a.purpose,
+                                patientID = a.patientID,
+                                dentistID = a.dentistID,
+                                patientName = a.patientName,
+                                dentistName = a.dentistName,
+                                contactNumber = contact,
+                                requesterName = requester,
+                                notes = CleanRemarksForUi(computedNotes),
+                                isReschedule = isReschedule,
+                                status = a.status,
+                                displayStatus = (a.status == "Requested" ? "Requested" : a.status),
+                                createdBy = a.createdBy,
+                                remarks = CleanRemarksForUi(computedNotes)
                             };
                         }).ToList();
 
@@ -2642,14 +2867,18 @@ RGDC Dental Clinic Team";
                     int userAuth = -1;
                     int.TryParse(sessionAuthObj.ToString(), out userAuth);
 
+                    var sessionPermObj = Session["UserPermission"];
+                    int userPerm = -1;
+                    if (sessionPermObj != null) int.TryParse(sessionPermObj.ToString(), out userPerm);
+
                     // If creator (sender), deny
                     if (appt.createdBy == accId)
                     {
                         return Json(new { success = false, message = "Sender cannot accept/deny their own appointment request." });
                     }
 
-                    // Owner/admin can act
-                    if (userAuth == 0 || userAuth == 1)
+                    // Owner/superadmin or front-desk staff can act on behalf of the clinic
+                    if (userAuth == 0 || userAuth == 1 || (userAuth == 2 && userPerm == 2))
                     {
                         // allowed
                     }
@@ -2827,7 +3056,8 @@ RGDC Dental Clinic Team";
                     if (dentist != null)
                     {
                         apptIds.AddRange(db2.tbl_appointment
-                            .Where(a => a.dentistID == dentist.dentistID && a.status == "Scheduled")
+                            .Where(a => a.isArchived == 0 && a.dentistID == dentist.dentistID
+                                && (a.status == "Scheduled" || a.status == "Checked-in" || a.status == "Ongoing"))
                             .Select(a => a.apptID)
                             .ToList());
                     }
@@ -2837,7 +3067,8 @@ RGDC Dental Clinic Team";
                     if (patient != null)
                     {
                         apptIds.AddRange(db2.tbl_appointment
-                            .Where(a => a.patientID == patient.patientID && a.status == "Scheduled")
+                            .Where(a => a.isArchived == 0 && a.patientID == patient.patientID
+                                && (a.status == "Scheduled" || a.status == "Checked-in" || a.status == "Ongoing"))
                             .Select(a => a.apptID)
                             .ToList());
                     }
@@ -2892,6 +3123,8 @@ RGDC Dental Clinic Team";
 
             // Save refresh token for current logged-in account (encrypt in production)
             var sessionVal = Session["UserID"];
+            string refreshForSync = null;
+            int accIdForSync = 0;
             if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int accID))
             {
                 using (var db = new RGDCContext())
@@ -2903,70 +3136,19 @@ RGDC Dental Clinic Team";
                             acc.googleRefreshToken = token.RefreshToken;
                         acc.googleCalendarEnabled = true;
                         db.SaveChanges();
-
-                        // Background sync: create events for existing scheduled appointments that were created before connect
-                        // We only create events where remarks does NOT already contain a googleEventId marker.
-                        var refresh = acc.googleRefreshToken;
-                        var savedAccId = acc.accID;
-                        var savedRole = acc.role;
-
-                        _ = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                using (var db2 = new RGDCContext())
-                                {
-                                    var apptIds = new List<int>();
-
-                                    // get dentist record (if any) for this acc
-                                    var dentist = db2.tbl_dentist.FirstOrDefault(d => d.accID == savedAccId);
-                                    if (dentist != null)
-                                    {
-                                        apptIds.AddRange(db2.tbl_appointment
-                                            .Where(a => a.dentistID == dentist.dentistID && a.status == "Scheduled")
-                                            .Select(a => a.apptID)
-                                            .ToList());
-                                    }
-
-                                    // get patient record (if any)
-                                    var patient = db2.tbl_patient.FirstOrDefault(p => p.accID == savedAccId);
-                                    if (patient != null)
-                                    {
-                                        apptIds.AddRange(db2.tbl_appointment
-                                            .Where(a => a.patientID == patient.patientID && a.status == "Scheduled")
-                                            .Select(a => a.apptID)
-                                            .ToList());
-                                    }
-
-                                    apptIds = apptIds.Distinct().ToList();
-
-                                    foreach (var apptId in apptIds)
-                                    {
-                                        try
-                                        {
-                                            // Create or update event for each scheduled appointment.
-                                            await CreateGoogleEventForAccountAsync(null, apptId, savedAccId, refresh);
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            System.Diagnostics.Trace.WriteLine($"CreateGoogleEvent for apptId={apptId} failed: {ex.Message}");
-                                        }
-
-                                        // small delay to avoid hitting API quotas when many appts exist
-                                        await Task.Delay(150);
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                System.Diagnostics.Trace.WriteLine("Background Google sync failed: " + ex.ToString());
-                            }
-                        });
+                        refreshForSync = acc.googleRefreshToken;
+                        accIdForSync = acc.accID;
                     }
                 }
             }
 
-            return Content("<script>try{window.opener.postMessage({ type: 'google-auth-success' }, '*');}catch(e){} window.close();</script>", "text/html");
+            // Push every active scheduled-tab appointment for this dentist/patient to Google before notifying the opener.
+            if (accIdForSync != 0 && !string.IsNullOrEmpty(refreshForSync))
+            {
+                await SyncExistingAppointmentsForAccountAsync(accIdForSync, 0, refreshForSync);
+            }
+
+            return Content("<script>try{window.opener.postMessage({ type: 'google-auth-success' }, window.location.origin);}catch(e){} window.close();</script>", "text/html");
         }
 
 
@@ -3191,7 +3373,7 @@ RGDC Dental Clinic Team";
                     payment.paymentMethod = model.paymentMethod;
                     payment.cost = model.cost;
                     payment.discount = model.discount;
-                    payment.toothNumber= model.toothNumber;
+                    payment.toothNumber = model.toothNumber;
                     payment.procedures = model.procedures;
                     payment.reference = model.reference;
                     payment.paid = model.paid;
@@ -3236,14 +3418,18 @@ RGDC Dental Clinic Team";
                     int userAuth = -1;
                     int.TryParse(sessionAuthObj.ToString(), out userAuth);
 
+                    var sessionPermObjDeny = Session["UserPermission"];
+                    int userPermDeny = -1;
+                    if (sessionPermObjDeny != null) int.TryParse(sessionPermObjDeny.ToString(), out userPermDeny);
+
                     // Disallow sender from denying their own request
                     if (appt.createdBy == accId)
                     {
                         return Json(new { success = false, message = "Sender cannot accept/deny their own appointment request." });
                     }
 
-                    // Owner/admin allowed; otherwise recipient (dentist or patient) only
-                    if (userAuth != 0 && userAuth != 1)
+                    // Owner/superadmin or front-desk staff; otherwise recipient (dentist or patient) only
+                    if (userAuth != 0 && userAuth != 1 && !(userAuth == 2 && userPermDeny == 2))
                     {
                         bool isRecipient = false;
                         var apptDentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
@@ -3577,7 +3763,7 @@ RGDC Dental Clinic Team";
 
         }
 
-            [HttpPost]
+        [HttpPost]
         public JsonResult signUpOwner(tblOwnerModel ownermod)
         {
             using (var db = new RGDCContext())
@@ -3995,27 +4181,27 @@ RGDC Dental Clinic Team";
                    join s in db.tbl_staff on a.accID equals s.accID
                    where a.accID == accID
                    select new
-                    {
-                        // staff    
-                        staffID = s.staffID,
-                        accID = s.accID,
-                        staffRole = s.staffRole,
-                        branchID = s.branchID,
-                        signature = s.signature,
-                        nationality = a.nationality,
-                        religion = a.religion,
-                        // ACCOUNT (matches your ng-model)
-                        firstName = a.firstName,
-                        middleName = a.middleName,
-                        lastName = a.lastName,
-                        genderID = a.genderID,
-                        birthDate = a.birthDate,
-                        email = a.email,
-                        contactNumber = a.contactNumber,
-                        address = a.address,
-                        civilStatus = a.civilStatus,
-                        photoLink = a.photoLink
-                    }
+                   {
+                       // staff    
+                       staffID = s.staffID,
+                       accID = s.accID,
+                       staffRole = s.staffRole,
+                       branchID = s.branchID,
+                       signature = s.signature,
+                       nationality = a.nationality,
+                       religion = a.religion,
+                       // ACCOUNT (matches your ng-model)
+                       firstName = a.firstName,
+                       middleName = a.middleName,
+                       lastName = a.lastName,
+                       genderID = a.genderID,
+                       birthDate = a.birthDate,
+                       email = a.email,
+                       contactNumber = a.contactNumber,
+                       address = a.address,
+                       civilStatus = a.civilStatus,
+                       photoLink = a.photoLink
+                   }
                 ).FirstOrDefault();
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -4101,7 +4287,7 @@ RGDC Dental Clinic Team";
                                   dentistID = d.dentistID,
                                   specialization = d.specialization,
                                   branchID = d.branchID
-                                    // Example field for professional tax receipt
+                                  // Example field for professional tax receipt
                               }).FirstOrDefault();
 
                 return Json(result, JsonRequestBehavior.AllowGet);
@@ -4262,7 +4448,7 @@ RGDC Dental Clinic Team";
             }
         }
 
-        [HttpPost]
+        // [HttpPost]
         //public JsonResult addProgNotes(tblTreatmentPlanModel model)
         //{
         //    var role = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
@@ -4781,7 +4967,7 @@ RGDC Dental Clinic Team";
         }
 
         [HttpPost]
-        public JsonResult SaveDentistSchedule(List<tblDentistScheduleModel> schedule)
+        public JsonResult SaveDentistSchedule(List<DentistScheduleSaveDto> schedule)
         {
             try
             {
@@ -4789,7 +4975,8 @@ RGDC Dental Clinic Team";
 
                 using (var db = new RGDCContext())
                 {
-                    var dentistID = schedule.First().dentistID;
+                    var dentistID = schedule[0].dentistID;
+                    if (dentistID <= 0) return Json(new { success = false, message = "Invalid dentist ID." });
 
                     // remove existing for dentist (simple approach)
                     var existing = db.tbl_dentist_schedule.Where(s => s.dentistID == dentistID).ToList();
@@ -4801,9 +4988,35 @@ RGDC Dental Clinic Team";
 
                     foreach (var s in schedule)
                     {
-                        // ensure slotMinutes default
-                        if (s.slotMinutes <= 0) s.slotMinutes = 30;
-                        db.tbl_dentist_schedule.Add(s);
+                        if (s.dentistID != dentistID)
+                            return Json(new { success = false, message = "All rows must be for the same dentist." });
+
+                        TimeSpan startTs;
+                        TimeSpan endTs;
+                        try
+                        {
+                            startTs = ParseScheduleTimeSpan(s.startTime);
+                            endTs = ParseScheduleTimeSpan(s.endTime);
+                        }
+                        catch (Exception tex)
+                        {
+                            return Json(new { success = false, message = tex.Message });
+                        }
+
+                        if (endTs <= startTs)
+                            return Json(new { success = false, message = "End time must be after start time for each day." });
+
+                        var slot = s.slotMinutes > 0 ? s.slotMinutes : 30;
+
+                        // New entity (do not reuse DTO / do not set scheduleID — DB generates it)
+                        db.tbl_dentist_schedule.Add(new tblDentistScheduleModel
+                        {
+                            dentistID = dentistID,
+                            dayOfWeek = s.dayOfWeek,
+                            startTime = startTs,
+                            endTime = endTs,
+                            slotMinutes = slot
+                        });
                     }
                     db.SaveChanges();
                     return Json(new { success = true });
@@ -4811,8 +5024,21 @@ RGDC Dental Clinic Team";
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                var msg = ex.GetBaseException() != null ? ex.GetBaseException().Message : ex.Message;
+                return Json(new { success = false, message = msg });
             }
+        }
+
+        private static TimeSpan ParseScheduleTimeSpan(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentException("Start/end time is required.");
+
+            var s = value.Trim();
+            if (TimeSpan.TryParse(s, out var ts))
+                return ts;
+
+            throw new ArgumentException("Invalid time format. Use HH:mm or HH:mm:ss (e.g. 08:00:00).");
         }
     }
 }

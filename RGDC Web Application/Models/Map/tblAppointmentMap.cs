@@ -13,6 +13,8 @@ namespace RGDC_Web_Application.Models.Map
         {
             HasKey(t => t.apptID);
             ToTable("tbl_appointment");
+
+            Property(t => t.isArchived).HasColumnName("isArchived");
         }
     }
 }

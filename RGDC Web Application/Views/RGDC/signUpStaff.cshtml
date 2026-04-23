@@ -258,36 +258,41 @@
                 <div class="col s12 m6 l6">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="signUp_religion" required>
                         <option disabled selected>Select your Religion</option>
                         <option value="Roman Catholic">Roman Catholic</option>
                         <option value="Islam">Islam</option>
                         <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
                         <option value="Others">Others</option>
-                    </select>                
-                     @*<input id="religion"
-                           type="text"
-                           class="custom-input"
-                           ng-model="signUp_religion"
-                           placeholder="Roman-Catholic"
-                           maxlength="50"
-                           required>*@
+                    </select>
+                    @*<input id="religion"
+                type="text"
+                class="custom-input"
+                ng-model="signUp_religion"
+                placeholder="Roman-Catholic"
+                maxlength="50"
+                required>*@
                 </div>
 
                 <div class="col s12 m6 l6">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
-                        <option disbaled selected>Select your Nationality</option>
-                        <option>Option 1</option>
+                    <select class="browser-default custom-input" ng-model="signUp_nationality" required>
+                        <option disabled selected>Select your Nationality</option>
+                        <option value="Filipino">Filipino</option>
+                        <option value="American">American</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Korean">Korean</option>
+                        <option value="Others">Others</option>
                     </select>
                     @*<input id="contactNumber"
-                           type="text"
-                           ng-model="signUp_nationality"
-                           class="custom-input"
-                           placeholder="Filipino"
-                           maxlength="50"
-                           required>*@
+                type="text"
+                ng-model="signUp_nationality"
+                class="custom-input"
+                placeholder="Filipino"
+                maxlength="50"
+                required>*@
                 </div>
             </div>
 
@@ -297,31 +302,33 @@
                     <p class="custom-label">Address <span class="required-mark">*</span></p>
                     <div class="row m-0">
                         <div class="col s12 m2 l2">
-                            <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            <input type="text" maxlength="50" placeholder="House No." class="custom-input" ng-model="address_houseNo" ng-change="syncSignUpAddress()" />
                         </div>
                         <div class="col s12 m5 l5">
-                            <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            <input type="text" maxlength="80" placeholder="Street" class="custom-input" ng-model="address_street" ng-change="syncSignUpAddress()" />
                         </div>
                         <div class="col s12 m5 l5">
-                            <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            <input type="text" maxlength="80" placeholder="Barangay" class="custom-input" ng-model="address_barangay" ng-change="syncSignUpAddress()" />
                         </div>
                     </div>
                     <div class="row m-0">
                         <div class="col s12 m6 l6">
-                            <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            <input type="text" maxlength="80" placeholder="City/Municipality" class="custom-input" ng-model="address_city" ng-change="syncSignUpAddress()" />
                         </div>
                         <div class="col s12 m6 l6">
-                            <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            <input type="text" maxlength="80" placeholder="Province" class="custom-input" ng-model="address_province" ng-change="syncSignUpAddress()" />
                         </div>
                     </div>
+                    <!-- hidden combined field used by submit + DB -->
+                    <input type="hidden" ng-model="signUp_address" />
                     @*<input id="address"
-        type="text"
-        ng-model="signUp_address"
-        class="custom-input"
-        maxlength="250"
-        oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-        ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
-        required>*@
+                type="text"
+                ng-model="signUp_address"
+                class="custom-input"
+                maxlength="250"
+                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
+                required>*@
                 </div>
             </div>
 
@@ -336,12 +343,12 @@
                 </div>
 
                 <div class="row" ng-show="signUpDentist">
-                    <div class="col s12" style="margin-top: .5rem;">
-                        <button type="button" class="btn-small edit-btn"
+                    <div class="col s12 center-align" style="margin-top: .5rem;">
+                        <button type="button" class="btn-small edit-btn schedule-btn"
                                 ng-click="openScheduleModal()">
                             Set Weekly Schedule
                         </button>
-                        <span class="helper-text" style="margin-left:10px;">(Configure your weekly availability for appointments)</span>
+                        <div class="helper-text schedule-helper">(Configure your weekly availability for appointments)</div>
                     </div>
                 </div>
             </div>
@@ -361,8 +368,8 @@
                 @*Branch*@
                 <div class="col s12">
                     <p class="custom-label">Branch <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="signUp_branch" ng-options="b.branchID as b.description for b in branchArray">
-                        <option value="" disabled selected>Select Branch</option>
+                    <select class="browser-default custom-input" ng-model="signUp_branchID" ng-options="b.branchID as b.description for b in branchArray">
+                        <option value="" disabled>Select Branch</option>
                     </select>
                 </div>
             </div>
@@ -386,7 +393,20 @@
     <div class="modal-footer footer-center" style="margin-top:1.5vh">
         <button type="submit" class="edit-btn left" style="font-weight:500;" ng-click="pickSignUpPhoto()">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="button" class="edit-btn" ng-click="openScheduleModal()" style="font-weight:500;">NEXT</button>
+        <button type="button"
+                class="edit-btn"
+                ng-if="signUpDentist"
+                ng-click="openScheduleModal()"
+                style="font-weight:500;">
+            SET SCHEDULE
+        </button>
+
+        <button type="button"
+                class="edit-btn"
+                ng-click="signUpClinicStaff()"
+                style="font-weight:500;">
+            CREATE ACCOUNT
+        </button>
     </div>
 </div>
 
@@ -409,9 +429,10 @@
             <tbody>
                 <tr ng-repeat="d in modalScheduleDays">
                     <td>{{d.dayName}}</td>
-                    <td>
-                        <label>
-                            <input type="checkbox" ng-model="d.enabled" />
+                    <td class="checkbox-cell">
+                        <label class="cb-label">
+                            <input type="checkbox" class="filled-in" ng-model="d.enabled" />
+                            <span></span>
                         </label>
                     </td>
                     <td>
@@ -428,7 +449,7 @@
         </table>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0)" class="modal-close btn-flat">Close</a>
+        <a href="javascript:void(0)" class="btn-flat" ng-click="closeScheduleModal()">Done</a>
     </div>
 </div>
 

@@ -13,6 +13,10 @@ namespace RGDC_Web_Application.Models.Map
         {
             HasKey(t => t.patientID);
             ToTable("tbl_patient");
+
+            Property(t => t.dentalChartLink).HasColumnName("dentalChartLink");
+            Property(t => t.dentalChartType).HasColumnName("dentalChartType");
+
         }
     }
 }

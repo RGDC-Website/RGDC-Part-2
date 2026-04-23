@@ -148,6 +148,18 @@
         return $http.get("/RGDC/getSelectedPatientDetails");
     }
 
+    this.saveDentalChart = function (payload) {
+        return $http({
+            method: "post",
+            url: "/RGDC/SaveDentalChart",
+            data: payload
+        });
+    };
+
+    this.getPatientImages = function (patientID) {
+        return $http.get("/RGDC/GetPatientImages?patientID=" + encodeURIComponent(patientID));
+    };
+
     this.deletePostOp = function () {
         return $http.post('/RGDC/getPostOp');
     }
@@ -448,7 +460,7 @@
             data: staffDet
         });
     };
-    
+
     this.addProgNotes = function (progressNotes) {
         return $http({
             method: "post",
@@ -549,12 +561,28 @@
         return $http.get('/RGDC/GetPastAppointments');
     };
 
+    this.archiveAppointment = function (apptID) {
+        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
+        return $http({
+            method: 'POST',
+            url: '/RGDC/ArchiveAppointment',
+            data: (function (obj) {
+                var str = [];
+                for (var p in obj) if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+                }
+                return str.join('&');
+            })(payload),
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
+        });
+    };
+
     this.cancelAppointment = function (apptID) {
         var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
         return $http({
             method: 'POST',
             url: '/RGDC/CancelAppointment',
-            data: (function(obj){
+            data: (function (obj) {
                 var str = [];
                 for (var p in obj) if (obj.hasOwnProperty(p)) {
                     str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
@@ -571,7 +599,7 @@
         return $http({
             method: 'POST',
             url: '/RGDC/AcceptAppointment',
-            data: (function(obj){
+            data: (function (obj) {
                 var str = [];
                 for (var p in obj) if (obj.hasOwnProperty(p)) {
                     str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
