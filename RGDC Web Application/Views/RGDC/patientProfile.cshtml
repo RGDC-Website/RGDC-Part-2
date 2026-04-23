@@ -127,6 +127,10 @@
                                 <p class="bold brown-text lighten-1">GUARDIAN</p>
                                 <p class="brown-text lighten-1">{{selectedPatient.guar}}</p>
                             </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">GUARDIAN'S CONTACT #</p>
+                                @*<p class="brown-text lighten-1">{{selectedPatient.guar}}</p>*@
+                            </div>
 
                         </div>
 
@@ -668,7 +672,6 @@
                            required>
                 </div>
 
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                 <div class="col s3">
                     @*country*@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
@@ -680,49 +683,6 @@
                            placeholder="country"
                            required>
                 </div>
-=======
-                @*Address*@
-                <label class="custom-label">
-                    Address
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
-                </label>
-
-                @*Nationality*@
-                <label class="custom-label">
-                    Nationality
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
-                </label>
-
-                @*Guardian*@
-                <label class="custom-label">
-                    Guardian
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
-                </label>
-
-                @*Email*@
-                <label class="custom-label">
-                    Email Address
-                    <span class="required-mark">*</span>
-                    <input type="text"
-                           class="custom-input"
-                           placeholder="Email Address"
-                           ng-model="selectedPatient.email"
-                           ng-change="checkEditPatientEmail()" />
-
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
-                        Enter a valid email address
-                    </span>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
-                        Email already taken
-                    </span>
-                    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
-                        Email is valid
-                    </span>
-                </label>
->>>>>>> main
             </div>
 
             <div class="row">
@@ -749,7 +709,6 @@
                     </select>
                 </div>
 
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                 <div class="col s4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
@@ -758,42 +717,6 @@
                         <option>Option 1</option>
                     </select>
                 </div>
-=======
-                @*Occupation*@
-                <label class="custom-label">
-                    Occupation
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
-                </label>
-
-                @*Religion*@
-                <label class="custom-label">
-                    Religion
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
-                </label>
-
-                @*Medical Insurance*@
-                <label class="custom-label">
-                    Medical Insurance
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
-                </label>
-
-                @*Guardian Contact #*@
-                <label class="custom-label">
-                    Guardian's Contact Number
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
-                </label>
-
-                @*Contact #*@
-                <label class="custom-label">
-                    Contact Number
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
-                </label>
->>>>>>> main
             </div>
 
             <div class="row">
@@ -827,17 +750,14 @@
         </form>
     </div>
 
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
         <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
         <button type="button" class="edit-btn modal-close" style="font-weight:500;">EDIT</button>
-=======
     @*New Password*@
     <div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
         <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
->>>>>>> main
     </div>
 </div>
 
@@ -1424,54 +1344,6 @@
                 <span class="validation-msg" ng-show="addSubmitted && !selectedPatient">Patient is required.</span>
             </div>
 
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
-                    @*Dentist*@
-                    <label class="custom-label" ng-init="getDentistOwner()">
-                        Dentist
-                        <span class="required-mark">*</span>
-                        <select name="dentist" ng-model="progNote_accID" class="browser-default custom-input"
-                                ng-options="d.accID as d.fullName for d in dentistArrays track by d.accID" required>
-                            <option value="" disabled selected>Select Dentist</option>
-                        </select>
-                    </label>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.dentist.$invalid && (addProgForm.dentist.$touched || addProgForm.$submitted)">
-                        Dentist is required
-                    </span>
-
-                    @*Amount*@
-                    <label class="custom-label">
-                        Amount
-                        <span class="required-mark">*</span>
-                        <input name="amount" type="number" class="custom-input" placeholder="Amount"
-                               ng-model="progNote_amount" step="0.01" min="0" required
-                               oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
-                    </label>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.amount.$invalid && (addProgForm.amount.$touched || addProgForm.$submitted)">
-                        <span ng-show="addProgForm.amount.$error.required">Amount is required</span>
-                        <span ng-show="addProgForm.amount.$error.number || addProgForm.amount.$error.min">Enter a valid non-negative amount</span>
-                    </span>
-                </div>
-
-                <div class="col s6">
-                    @*Procedures*@
-                    <label class="custom-label">
-                        Procedures
-                        <span class="required-mark">*</span>
-                        <input name="procedures" type="text" class="custom-input" placeholder="Procedures"
-                               ng-model="progNote_procedures" required>
-                    </label>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.procedures.$invalid && (addProgForm.procedures.$touched || addProgForm.$submitted)">
-                        Procedures is required
-                    </span>
-
-                    @*Tooth Number*@
-                    <label class="custom-label">
-                        Tooth Number
-                        <input name="toothNumber" type="number" class="custom-input" placeholder="Tooth Number"
-                               ng-model="progNote_toothNumber" min="1" max="32" step="1" required
-                               oninput="this.value = this.value.replace(/[^0-9]/g,''); if(this.value){ this.value = Math.max(1, Math.min(32, parseInt(this.value)||0)); }">
-                    </label>
-=======
             <div class="col s6">
                 @*Date*@
                 <label class="custom-label">Date <span class="required-mark">*</span></label>
@@ -1588,25 +1460,9 @@
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && paymentDue === null">Balance is required.</span>
             </div>
->>>>>>> main
 
         </div>
 
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
-                    @*Paid*@
-                    <label class="custom-label">
-                        Paid
-                        <span class="required-mark">*</span>
-                        <input name="paid" type="number" class="custom-input" placeholder="Paid"
-                               ng-model="progNote_paid" step="0.01" min="0" required
-                               oninput="this.value = this.value === '' ? '' : this.value.replace(/[^0-9.]/g,'');">
-                    </label>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.paid.$invalid && (addProgForm.paid.$touched || addProgForm.$submitted)">
-                        <span ng-show="addProgForm.paid.$error.required">Paid is required</span>
-                        <span ng-show="addProgForm.paid.$error.number || addProgForm.paid.$error.min">Enter a valid non-negative paid amount</span>
-                    </span>
-                </div>
-=======
         <div class="row">
             <div class="col s12">
                 @*Description*@
@@ -1615,7 +1471,6 @@
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentDescription"></textarea>
                 </label>
->>>>>>> main
             </div>
         </div>
     </div>
@@ -1665,24 +1520,6 @@
         <div class="row">
             <div class="col s6">
                 @*Dentist*@
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
-                <label class="custom-label">
-                    Dentist
-                    <span class="required-mark">*</span>
-                    <select ng-model="progNote.accID"
-                            class="browser-default custom-input"
-                            ng-options="d.accID as d.fullName for d in dentistArrays">
-                        <option value="">Select Dentist</option>
-                    </select>
-                </label>
-
-                @*Amount*@
-                <label class="custom-label">
-                    Amount
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote.amount">
-                </label>
-=======
                 <label class="custom-label">Dentist <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="paymentInfo.dentistID"
                         ng-options="dentist.dentistID as dentist.dentistName for dentist in dentistArray"
@@ -1690,7 +1527,6 @@
                     <option value="" disabled>Select dentist...</option>
                 </select>
                 <span class="validation-msg" ng-show="editSubmitted && paymentInfo.dentistID  === null">Dentist is required.</span>
->>>>>>> main
             </div>
 
             <div class="col s6">
@@ -1884,13 +1720,6 @@
         <div class="row">
             <div class="col s6">
                 @*Paid*@
-<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
-                <label class="custom-label">
-                    Paid
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
-                </label>
-=======
                 <label class="custom-label">Total Amount Paid</label>
                 <p class="custom-input">{{paymentInfo.amountPaid}}</p>
             </div>
@@ -1907,7 +1736,6 @@
                 @*Description*@
                 <label class="custom-label">Description</label>
                 <p style="flex: 1; min-height: 10vh; padding: 1vh; background-color: white;">{{paymentInfo.description}}</p>
->>>>>>> main
             </div>
         </div>
     </div>
@@ -1937,11 +1765,24 @@
 
 
 @*Dental Chart modal*@
-<div id="modalDentalChart" class="modal dentalChart-modal">
+<div id="modalDentalChart" class="modal dentalChart-modal containerOverflow-2">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Upload Dental Chart</h5>
+        <h5 class="modal-form-title">Upload Dental Chart</h5>
 
-        <div class="row">
+        <div class="row" style="margin-top:-1vh;">
+            <div class="col s12">
+                @*Dropdown*@
+                <p class="custom-label">Dropdown <span class="required-mark">*</span></p>
+                <select class="browser-default custom-input" required>
+                    <option value="" disabled selected>Options</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:3.5vh;">
             <div class="row m-0 center">
                 <img id="dentalChartModalImg"
                      img src="https://placehold.co/2550x3300"
@@ -1952,7 +1793,7 @@
     </div>
 
     @*upload, save, cancel buttons*@
-    <div class="modal-footer" style="margin:0 0 0 0 !important">
+    <div class="modal-footer" style="margin:0 0 3.5vh 0 !important">
         <button type="submit" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD DENTAL CHART</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">SAVE</button>
@@ -1966,25 +1807,14 @@
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Add Form</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
-                    Patient<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="[This Patient]" />
+                    Form Type<span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s12">
-                <label class="custom-label">
-                    Dentist<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Dentist..." />
-                </label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
                     Date<span class="required-mark">*</span>
                 </label>
@@ -1997,55 +1827,37 @@
 
         <div class="row">
             <div class="col s12">
+                @*Content*@
                 <label class="custom-label">
-                    Form<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                    Content<span class="required-mark">*</span>
+                    <textarea style="flex: 1; height: 30vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..."></textarea>
                 </label>
             </div>
         </div>
 
-        <div class="row" style="margin-top:1.5vh">
-            <div class="row m-0 center">
-                <img id="dentalChartModalImg"
-                     img src="https://placehold.co/2550x3300"
-                     alt="Dental Chart"
-                     style="max-height: 25rem" />
-            </div>
-        </div>
     </div>
 
     <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+        <button type="button" class="cancel-btn left modal-close" style="font-weight: 500; margin: 0 0 -6vh 2vh">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">ADD</button>
     </div>
 </div>
 
 @*EDIT form *@
-<div id="modalEditForm" class="modal form-modal">
+<div id="modalAddForm" class="modal form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Edit Form</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
-                    Patient<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="[This Patient]" />
+                    Form Type<span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s12">
-                <label class="custom-label">
-                    Dentist<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Dentist..." />
-                </label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
                     Date<span class="required-mark">*</span>
                 </label>
@@ -2058,26 +1870,19 @@
 
         <div class="row">
             <div class="col s12">
+                @*Content*@
                 <label class="custom-label">
-                    Form<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                    Content<span class="required-mark">*</span>
+                    <textarea style="flex: 1; height: 30vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..."></textarea>
                 </label>
             </div>
         </div>
 
-        <div class="row" style="margin-top:1.5vh">
-            <div class="row m-0 center">
-                <img id="dentalChartModalImg"
-                     img src="https://placehold.co/2550x3300"
-                     alt="Dental Chart"
-                     style="max-height: 25rem" />
-            </div>
-        </div>
     </div>
 
-    <div class="modal-footer" style="margin: -2vh 0 3vh 0 !important">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+    <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
+        <button type="button" class="cancel-btn left modal-close" style="font-weight: 500; margin: 0 0 -6vh 2vh">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">SAVE</button>
     </div>
 </div>
