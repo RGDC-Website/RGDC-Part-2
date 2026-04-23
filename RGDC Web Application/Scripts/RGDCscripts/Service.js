@@ -582,9 +582,9 @@
         });
     };
 
-    this.denyAppointment = function (apptID) {
-        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
-        // Send as form urlencoded so MVC will bind primitive apptID parameter reliably
+    this.denyAppointment = function (payload) {
+        // Accept either a primitive apptID or an object { apptID, reason }
+        payload = (typeof payload === 'object') ? payload : { apptID: payload };
         return $http({
             method: 'POST',
             url: '/RGDC/DenyAppointment',
@@ -597,7 +597,9 @@
             })(payload),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
         });
-        }
+    };
+
+
     // create appointment
     this.createAppointment = function (appointment) {
         return $http({
@@ -675,6 +677,19 @@
             method: "POST",
             url: "/RGDC/SaveDentistSignature",
             data: { imagePath: imagePath }
+        });
+    };
+
+    this.getDentistSchedule = function (dentistID) {
+        return $http.get('/RGDC/GetDentistSchedule?dentistID=' + encodeURIComponent(dentistID));
+    };
+
+    this.saveDentistSchedule = function (scheduleArray) {
+        // scheduleArray = [{ dentistID, dayOfWeek, startTime: "HH:mm", endTime: "HH:mm", slotMinutes }]
+        return $http({
+            method: 'POST',
+            url: '/RGDC/SaveDentistSchedule',
+            data: scheduleArray
         });
     };
 });

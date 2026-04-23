@@ -81,8 +81,9 @@ namespace RGDC_Web_Application.Controllers
             }
         }
 
+
         [HttpPost]
-        public JsonResult DeleteAppointment(int apptID)
+        public JsonResult DeleteAppointment(int apptID, string reason = null)
         {
             try
             {
@@ -95,10 +96,14 @@ namespace RGDC_Web_Application.Controllers
                     if (appt == null)
                         return Json(new { success = false, message = "Appointment not found." });
 
-                    db.tbl_appointment.Remove(appt);
+
+                    appt.status = "Cancelled";
+                    var r = (reason ?? "").Trim();
+                    appt.remarks = !string.IsNullOrEmpty(r) ? $"Deleted by admin: {r}" : "Deleted by admin.";
+
                     db.SaveChanges();
 
-                    return Json(new { success = true, message = "Appointment deleted successfully." });
+                    return Json(new { success = true, message = "Appointment marked as deleted and moved to Past Appointments." });
                 }
             }
             catch (Exception ex)
@@ -1040,8 +1045,7 @@ RGDC Dental Clinic Team";
                         from dent in dentj.DefaultIfEmpty()
                         join dentAcc in db.tbl_account on (dent != null ? dent.accID : 0) equals dentAcc.accID into dentAccj
                         from dentAcc in dentAccj.DefaultIfEmpty()
-                            // include Rescheduled as past status
-                        where appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled"
+                        where appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled" || appt.status == "Cancelled"
                         orderby appt.dateTime descending
                         select new
                         {
@@ -1059,7 +1063,7 @@ RGDC Dental Clinic Team";
                     var mapped = result.Select(r =>
                     {
                         string remarks = r.remarks ?? "";
-                        remarks = CleanRemarksForUi(remarks);
+                        remarks = CleanRemarksForUi(r.remarks ?? r.purpose ?? "");
                         try
                         {
                             if (!string.IsNullOrWhiteSpace(remarks))
@@ -1120,7 +1124,7 @@ RGDC Dental Clinic Team";
                             patientName = r.patientName,
                             status = r.status,
                             displayStatus = (r.status == "Rescheduled") ? "Rescheduled" : ((r.status == "Done" || r.status == "Completed") ? "Completed/Done" : r.status),
-                            remarks = CleanRemarksForUi(remarks)
+                            remarks = r.remarks ?? r.purpose ?? ""
                         };
                     }).ToList();
 
@@ -1135,11 +1139,10 @@ RGDC Dental Clinic Team";
 
 
         [HttpPost]
-        public JsonResult CancelAppointment(int apptID)
+        public JsonResult CancelAppointment(int apptID, string reason = null)
         {
             try
             {
-                // Accept 0 as valid; only negative is invalid
                 if (apptID < 0) return Json(new { success = false, message = "Invalid appointment ID." });
 
                 using (var db = new RGDCContext())
@@ -1147,7 +1150,6 @@ RGDC Dental Clinic Team";
                     var appt = db.tbl_appointment.FirstOrDefault(a => a.apptID == apptID);
                     if (appt == null) return Json(new { success = false, message = "Appointment not found." });
 
-                    // Prevent cancellation within 2 days of appointment date (inclusive)
                     var today = DateTime.Today;
                     var cutoff = today.AddDays(2);
                     if (appt.dateTime.Date <= cutoff.Date)
@@ -1155,10 +1157,10 @@ RGDC Dental Clinic Team";
                         return Json(new { success = false, message = "Cannot cancel appointment within 2 days of scheduled date." });
                     }
 
-                    var orig = appt.reason ?? "";
-                    if (!orig.StartsWith("Cancelled - ")) appt.reason = "Cancelled - " + orig;
-
+                    var r = (reason ?? "").Trim();
+                    appt.remarks = !string.IsNullOrEmpty(r) ? $"Cancelled by patient: {r}" : "Cancelled by patient.";
                     appt.status = "Cancelled";
+
                     db.SaveChanges();
 
                     return Json(new { success = true, message = "Appointment cancelled." });
@@ -2388,9 +2390,8 @@ RGDC Dental Clinic Team";
                             from appt in db.tbl_appointment
                             join pat in db.tbl_patient on appt.patientID equals pat.patientID
                             join patAcc in db.tbl_account on pat.accID equals patAcc.accID
-                            where appt.dentistID == dentist.dentistID
-                               && appt.status == "Requested"
-                               && appt.createdBy != userID
+                            where appt.status == "Requested"
+                               && (appt.dentistID == dentist.dentistID || appt.createdBy == userID)
                             orderby appt.dateTime
                             select new
                             {
@@ -2399,6 +2400,8 @@ RGDC Dental Clinic Team";
                                 date = appt.dateTime,
                                 time = appt.dateTime,
                                 purpose = appt.reason,
+                                patientID = appt.patientID,
+                                dentistID = appt.dentistID,
                                 patientName = patAcc.firstName + " " + patAcc.lastName,
                                 dentistName = "",
                                 status = appt.status,
@@ -2446,6 +2449,8 @@ RGDC Dental Clinic Team";
                                 date = a.date,
                                 time = a.time,
                                 purpose = a.purpose,
+                                patientID = a.patientID,
+                                dentistID = a.dentistID,
                                 patientName = a.patientName,
                                 dentistName = a.dentistName,
                                 contactNumber = contact,
@@ -2469,9 +2474,8 @@ RGDC Dental Clinic Team";
                             from appt in db.tbl_appointment
                             join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
                             join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
-                            where appt.patientID == patient.patientID
-                               && appt.status == "Requested"
-                               && appt.createdBy != userID
+                            where appt.status == "Requested"
+                               && (appt.patientID == patient.patientID || appt.createdBy == userID)
                             orderby appt.dateTime
                             select new
                             {
@@ -2480,6 +2484,8 @@ RGDC Dental Clinic Team";
                                 date = appt.dateTime,
                                 time = appt.dateTime,
                                 purpose = appt.reason,
+                                patientID = appt.patientID,
+                                dentistID = appt.dentistID,
                                 patientName = "",
                                 dentistName = dentAcc.firstName + " " + dentAcc.lastName,
                                 status = appt.status,
@@ -2526,6 +2532,8 @@ RGDC Dental Clinic Team";
                                 date = a.date,
                                 time = a.time,
                                 purpose = a.purpose,
+                                patientID = a.patientID,
+                                dentistID = a.dentistID,
                                 patientName = a.patientName,
                                 dentistName = a.dentistName,
                                 contactNumber = contact,
@@ -2623,6 +2631,46 @@ RGDC Dental Clinic Team";
                     if (appt == null)
                         return Json(new { success = false, message = "Appointment not found." });
 
+                    var sessionUserObj = Session["UserID"];
+                    var sessionAuthObj = Session["UserAuthorization"];
+                    if (sessionUserObj == null || sessionAuthObj == null)
+                        return Json(new { success = false, message = "User session expired." });
+
+                    if (!int.TryParse(sessionUserObj.ToString(), out int accId))
+                        return Json(new { success = false, message = "Invalid session user." });
+
+                    int userAuth = -1;
+                    int.TryParse(sessionAuthObj.ToString(), out userAuth);
+
+                    // If creator (sender), deny
+                    if (appt.createdBy == accId)
+                    {
+                        return Json(new { success = false, message = "Sender cannot accept/deny their own appointment request." });
+                    }
+
+                    // Owner/admin can act
+                    if (userAuth == 0 || userAuth == 1)
+                    {
+                        // allowed
+                    }
+                    else
+                    {
+                        // Allow recipient: either the dentist's account OR the patient's account matches current user
+                        bool isRecipient = false;
+
+                        // check dentist
+                        var apptDentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                        if (apptDentist != null && apptDentist.accID == accId) isRecipient = true;
+
+                        // check patient (patient.accID)
+                        var apptPatient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+                        if (apptPatient != null && apptPatient.accID == accId) isRecipient = true;
+
+                        if (!isRecipient)
+                        {
+                            return Json(new { success = false, message = "Not authorized to accept/deny this appointment." });
+                        }
+                    }
                     if (appt.status != "Requested")
                         return Json(new { success = false, message = "Appointment is not in requested status." });
 
@@ -3159,7 +3207,7 @@ RGDC Dental Clinic Team";
         }
 
         [HttpPost]
-        public JsonResult DenyAppointment(int apptID)
+        public JsonResult DenyAppointment(int apptID, string reason = null)
         {
             try
             {
@@ -3176,9 +3224,112 @@ RGDC Dental Clinic Team";
                     if (appt.status != "Requested")
                         return Json(new { success = false, message = "Appointment is not in requested status." });
 
+                    // Session / authorization parsing
+                    var sessionUserObj = Session["UserID"];
+                    var sessionAuthObj = Session["UserAuthorization"];
+                    if (sessionUserObj == null || sessionAuthObj == null)
+                        return Json(new { success = false, message = "User session expired." });
+
+                    if (!int.TryParse(sessionUserObj.ToString(), out int accId))
+                        return Json(new { success = false, message = "Invalid session user." });
+
+                    int userAuth = -1;
+                    int.TryParse(sessionAuthObj.ToString(), out userAuth);
+
+                    // Disallow sender from denying their own request
+                    if (appt.createdBy == accId)
+                    {
+                        return Json(new { success = false, message = "Sender cannot accept/deny their own appointment request." });
+                    }
+
+                    // Owner/admin allowed; otherwise recipient (dentist or patient) only
+                    if (userAuth != 0 && userAuth != 1)
+                    {
+                        bool isRecipient = false;
+                        var apptDentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                        if (apptDentist != null && apptDentist.accID == accId) isRecipient = true;
+
+                        var apptPatient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+                        if (apptPatient != null && apptPatient.accID == accId) isRecipient = true;
+
+                        if (!isRecipient)
+                        {
+                            return Json(new { success = false, message = "Not authorized to accept/deny this appointment." });
+                        }
+                    }
+
+                    // mark as Denied and set updated timestamp
                     appt.status = "Denied";
                     appt.schedUpdatedAt = DateTime.Now;
+
+                    // Build and append denial remarks (preserve existing remarks)
+                    try
+                    {
+                        string deniedByName = null;
+                        var acc = db.tbl_account.FirstOrDefault(a => a.accID == accId);
+                        if (acc != null) deniedByName = (acc.firstName + " " + acc.lastName).Trim();
+
+                        var sb = new System.Text.StringBuilder();
+                        if (!string.IsNullOrWhiteSpace(appt.remarks))
+                        {
+                            sb.Append(appt.remarks.Trim());
+                            if (!appt.remarks.Trim().EndsWith(".")) sb.Append(". ");
+                            else sb.Append(" ");
+                        }
+                        sb.Append("Denied by: ").Append(deniedByName ?? "Clinic").Append(".");
+                        if (!string.IsNullOrWhiteSpace(reason))
+                        {
+                            sb.Append(" Reason: ").Append(reason.Trim());
+                        }
+                        appt.remarks = sb.ToString();
+                    }
+                    catch { /* swallow formatting errors */ }
+
                     db.SaveChanges();
+
+                    // Notify the sender (creator) by email (best-effort)
+                    try
+                    {
+                        if (appt.createdBy > 0)
+                        {
+                            var senderAcc = db.tbl_account.FirstOrDefault(a => a.accID == appt.createdBy);
+                            if (senderAcc != null && !string.IsNullOrWhiteSpace(senderAcc.email))
+                            {
+                                var mail = new MailMessage();
+                                mail.To.Add(senderAcc.email);
+                                mail.Subject = "[RGDC Clinic] Your appointment request was denied";
+                                var bodySb = new StringBuilder();
+                                bodySb.AppendLine("Hello " + (senderAcc.firstName + " " + senderAcc.lastName).Trim() + ",");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("Your appointment request scheduled on " + appt.dateTime.ToString("MMMM d, yyyy h:mm tt") + " has been denied.");
+                                if (!string.IsNullOrWhiteSpace(reason))
+                                {
+                                    bodySb.AppendLine();
+                                    bodySb.AppendLine("Reason provided by recipient:");
+                                    bodySb.AppendLine(reason);
+                                }
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("If you need to reschedule or have questions, please contact the clinic.");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("Regards,");
+                                bodySb.AppendLine("RGDC Dental Clinic");
+
+                                mail.Body = bodySb.ToString();
+                                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                {
+                                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                    smtp.EnableSsl = true;
+                                    smtp.Send(mail);
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // best-effort notify — swallow exceptions so the primary action still succeeds
+                    }
 
                     return Json(new { success = true, message = "Appointment denied successfully." });
                 }
@@ -3188,6 +3339,8 @@ RGDC Dental Clinic Team";
                 return Json(new { success = false, message = $"Error denying appointment: {ex.Message}" });
             }
         }
+
+
         public JsonResult deletePayment(tblPaymentModel model)
         {
             using (var db = new RGDCContext())
@@ -4594,6 +4747,71 @@ RGDC Dental Clinic Team";
             {
                 // fallback: return original if cleaner fails
                 return remarks ?? string.Empty;
+            }
+        }
+
+
+        [HttpGet]
+        public JsonResult GetDentistSchedule(int dentistID)
+        {
+            try
+            {
+                using (var db = new RGDCContext())
+                {
+                    var list = db.tbl_dentist_schedule
+                                 .Where(s => s.dentistID == dentistID)
+                                 .OrderBy(s => s.dayOfWeek).ThenBy(s => s.startTime)
+                                 .Select(s => new
+                                 {
+                                     s.scheduleID,
+                                     s.dentistID,
+                                     s.dayOfWeek,
+                                     startTime = s.startTime, // will be serialized as timespan string
+                                     endTime = s.endTime,
+                                     s.slotMinutes
+                                 }).ToList();
+
+                    return Json(list, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult SaveDentistSchedule(List<tblDentistScheduleModel> schedule)
+        {
+            try
+            {
+                if (schedule == null || schedule.Count == 0) return Json(new { success = false, message = "Empty payload." });
+
+                using (var db = new RGDCContext())
+                {
+                    var dentistID = schedule.First().dentistID;
+
+                    // remove existing for dentist (simple approach)
+                    var existing = db.tbl_dentist_schedule.Where(s => s.dentistID == dentistID).ToList();
+                    if (existing.Any())
+                    {
+                        db.tbl_dentist_schedule.RemoveRange(existing);
+                        db.SaveChanges();
+                    }
+
+                    foreach (var s in schedule)
+                    {
+                        // ensure slotMinutes default
+                        if (s.slotMinutes <= 0) s.slotMinutes = 30;
+                        db.tbl_dentist_schedule.Add(s);
+                    }
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }
