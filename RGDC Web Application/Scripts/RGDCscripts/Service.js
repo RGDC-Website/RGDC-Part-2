@@ -35,6 +35,10 @@
         return $http.get("/RGDC/getBranch");
     };
 
+    this.getPostOp = function () {
+        return $http.get("/RGDC/getPostOp");
+    };
+
     //Log In
     this.login = function (loginData) {
         return $http({
@@ -43,6 +47,16 @@
             data: loginData
         })
     }
+
+    this.savePostOp = function (postOp) {
+        return $http({
+            method: "post",
+            url: "/RGDC/savePostOp",
+            data: postOp
+        })
+    }
+
+
 
     //Get Sessions
     this.getSessionVariable = function () {
@@ -93,6 +107,9 @@
     this.getPayments = function () {
         return $http.get("/RGDC/getPayments");
     }
+    this.getOwnPayments = function () {
+        return $http.get("/RGDC/getOwnPayments");
+    }
 
     this.getDentists = function () {
         return $http.get("/RGDC/getDentists");
@@ -127,10 +144,15 @@
         console.log(id)
         return $http.post('/RGDC/deletePayment', id);
     };
-
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
     }
+
+    this.deletePostOp = function () {
+        return $http.post('/RGDC/getPostOp');
+    }
+
+
 
     this.getOwnPatientDetails = function () {
         return $http.get("/RGDC/getOwnPatientDetails");
@@ -560,9 +582,9 @@
         });
     };
 
-    this.denyAppointment = function (apptID) {
-        var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
-        // Send as form urlencoded so MVC will bind primitive apptID parameter reliably
+    this.denyAppointment = function (payload) {
+        // Accept either a primitive apptID or an object { apptID, reason }
+        payload = (typeof payload === 'object') ? payload : { apptID: payload };
         return $http({
             method: 'POST',
             url: '/RGDC/DenyAppointment',
@@ -575,7 +597,9 @@
             })(payload),
             headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' }
         });
-        }
+    };
+
+
     // create appointment
     this.createAppointment = function (appointment) {
         return $http({
@@ -653,6 +677,19 @@
             method: "POST",
             url: "/RGDC/SaveDentistSignature",
             data: { imagePath: imagePath }
+        });
+    };
+
+    this.getDentistSchedule = function (dentistID) {
+        return $http.get('/RGDC/GetDentistSchedule?dentistID=' + encodeURIComponent(dentistID));
+    };
+
+    this.saveDentistSchedule = function (scheduleArray) {
+        // scheduleArray = [{ dentistID, dayOfWeek, startTime: "HH:mm", endTime: "HH:mm", slotMinutes }]
+        return $http({
+            method: 'POST',
+            url: '/RGDC/SaveDentistSchedule',
+            data: scheduleArray
         });
     };
 });

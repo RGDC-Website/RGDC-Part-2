@@ -30,6 +30,7 @@ namespace RGDC_Web_Application.Models.Context
         public virtual DbSet<tblProcedureModel> tbl_procedure { get; set; }
         public virtual DbSet<tblStaffModel> tbl_staff { get; set; }
         public virtual DbSet<tblImagesModel> tbl_images { get; set; }
+        public virtual DbSet<tblDentistScheduleModel> tbl_dentist_schedule { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -49,6 +50,7 @@ namespace RGDC_Web_Application.Models.Context
             modelBuilder.Configurations.Add(new tblProcedureMap());
             modelBuilder.Configurations.Add(new tblStaffMap());
             modelBuilder.Configurations.Add(new tblImagesMap());
+            modelBuilder.Configurations.Add(new tblDentistScheduleMap());
 
         }
     }

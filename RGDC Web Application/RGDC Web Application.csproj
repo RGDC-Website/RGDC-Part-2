@@ -205,6 +205,7 @@
     <Compile Include="Models\AppointmentUpdateData.cs" />
     <Compile Include="Models\Context\RGDCContext.cs" />
     <Compile Include="Models\Map\tblAddAccountMap.cs" />
+    <Compile Include="Models\Map\tblDentistScheduleMap.cs" />
     <Compile Include="Models\Map\tblImagesMap.cs" />
     <Compile Include="Models\Map\tblStaffMap.cs" />
     <Compile Include="Models\Map\tblProcedureMap.cs" />
@@ -221,6 +222,7 @@
     <Compile Include="Models\Map\tblAccountMap.cs" />
     <Compile Include="Models\PatientUpdateData.cs" />
     <Compile Include="Models\MedicalHistoryModel.cs" />
+    <Compile Include="Models\tblDentistScheduleModel.cs" />
     <Compile Include="Models\tblImagesModel.cs" />
     <Compile Include="Models\tblAddAccountModel.cs" />
     <Compile Include="Models\tblStaffModel.cs" />
