@@ -126,7 +126,6 @@
 
                 @*Sign up BTN*@
                 <button class="logSignBtn modal-trigger"
-                        data-target="modalPatientInformationForm"
                         type="button"
                         ng-click="signUpInitial()">
                     Sign Up
@@ -268,7 +267,7 @@
                     <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
-                           ng-model="signUp_address"
+                           ng-model="signUp_line1"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -283,6 +282,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
+                            ng-model="signUp_line2"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="appartment, suite, unit, building, floor, etc"
@@ -296,6 +296,7 @@
                     <p class="custom-label">City <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                            ng-model="signUp_city"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -309,6 +310,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
+                            ng-model="signUp_state"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="state/province/region"
@@ -321,8 +323,9 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
+                            ng-model="signUp_postal"
                            maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           oninput="this.value = this.value.replace(/[^0-9 ,.-]/g, '')"
                            placeholder="zip/postal code"
                            required>
                 </div>
@@ -332,6 +335,7 @@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                            ng-model="signUp_country"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -356,7 +360,7 @@
                 <div class="col s4">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="signUp_religion"> 
                         <option disabled selected>Select your Religion</option>
                         <option value="Roman Catholic">Roman Catholic</option>
                         <option value="Islam">Islam</option>
@@ -368,9 +372,9 @@
                 <div class="col s4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="signUp_nationality">
                         <option disbaled selected>Select your Nationality</option>
-                        <option>Option 1</option>
+                        <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
                     </select>
                 </div>
             </div>
@@ -431,7 +435,7 @@
     <div class="modal-footer" style="margin-top:2.5vh">
         <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;" ng-click="pickSignUpPhoto()">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-        <button type="button" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">ADD</button>
+        <button type="button" class="edit-btn modal-trigger modal-close" ng-click="signUp()" style="font-weight:500;">SIGN UP</button>
     </div>
 </div>
 

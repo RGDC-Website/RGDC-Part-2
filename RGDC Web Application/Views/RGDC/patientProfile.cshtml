@@ -24,7 +24,7 @@
         </div>
     </div>
     @*DELETE PATIENT Record*@
-    <div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
+    <!--<div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
         <div class="modal-content">
             <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Patient Record</h5>
 
@@ -35,7 +35,7 @@
             <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
             <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePatientThis()">DELETE</button>
         </div>
-    </div>
+    </div>-->
 
     @*content*@
     <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
@@ -63,8 +63,8 @@
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
                         <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit || "---"}}</p>
-                        <button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>
-                        <button class="edit-btn right modal-trigger" data-target="modalEditPatientInfo">EDIT</button>
+                        @*<button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>*@
+                        <button class="edit-btn right modal-trigger" ng-show="!isUserPatient" data-target="modalEditPatientInfo">EDIT</button>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ADDRESS</p>
-                                <p class="brown-text lighten-1">{{selectedPatient.address}}</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.country}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">RELIGION</p>
@@ -149,7 +149,7 @@
                             <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
                             <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
                             <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
-                            <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
+                            @*<li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>*@
                             <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
                         </ul>
                     </div>
@@ -178,7 +178,7 @@
                                 @*update button and last updated*@
                                 <div class="col">
                                     <div class="row">
-                                        <button class="update-btn right modal-trigger" data-target="modalMedHis">UPDATE</button>
+                                        <button class="update-btn right modal-trigger" ng-show="!isUserPatient" data-target="modalMedHis">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
                                         <p class="last-update">Last Update: {{selectedPatient.medHistUpdate || '...'}}</p>
@@ -381,7 +381,7 @@
                                     <td>Xray</td>
                                     <td>
                                         <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" data-position="bottom" data-tooltip="Archive Dental Chart"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteOwner(owner.ownerID, owner.accID)">archive</i></a>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalDentalChart" data-position="bottom" data-tooltip="View Dental Chart" style="margin-right: 0.5rem !important" ng-click="editSelectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalDentalChart" data-position="bottom" data-tooltip="View Dental Chart" style="margin-right: 0.5rem !important" ng-click="editSelectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -471,6 +471,7 @@
                                data-target="modalEditPostOp"
                                data-position="bottom"
                                data-tooltip="Edit Post Op"
+                               ng-show="isUserAdmin"
                                style="margin-right: 0.5rem !important">
                                 <i class="material-icons brown-text lighten-1">edit</i>
                             </a>
@@ -478,6 +479,7 @@
                             <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger"
                                data-target="modalDeletePostOp"
                                data-position="bottom"
+                               ng-show="isUserAdmin"
                                data-tooltip="Delete Post Op">
                                 <i class="material-icons brown-text lighten-1">delete</i>
                             </a>
@@ -522,6 +524,7 @@
                             <input type="text"
                                    class="custom-input"
                                    maxlength="150"
+                                   ng-model="selectedPatient.firstName"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Juan"
                                    required>
@@ -532,6 +535,7 @@
                             <input type="text"
                                    class="custom-input"
                                    maxlength="150"
+                                   ng-model="selectedPatient.middleName"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Mercado"
                                    required>
@@ -543,6 +547,7 @@
                             <p class="custom-label">Last Name <span class="required-mark">*</span></p>
                             <input type="text" class="custom-input"
                                    maxlength="150"
+                                   ng-model="selectedPatient.lastName"
                                    oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                                    placeholder="Dela Cruz"
                                    required>
@@ -557,16 +562,17 @@
                     <p class="custom-label">Email <span class="required-mark">*</span></p>
                     <input type="text" class="custom-input"
                            disabled
+                           ng-model="selectedPatient.email"
                            placeholder="juandlc@gmail.com" maxlength="150">
-                    <span class="validation-msg">Email is required.</span>
+
                 </div>
             </div>
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3" ng-init="getGender()">
+                <div class="col s3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default  custom-input" ng-model="selectedPatient.genderID" required>
                         <option value="" disabled selected>Select Gender</option>
                         <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
                     </select>
@@ -577,16 +583,19 @@
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
                                type="text"
+                               ng-model="selectedPatient.birthDate"
                                class="datepicker custom-input"
                                readonly
-                               required>
+                               max="@DateTime.Now.ToString("yyyy-MM-dd")"
+
+                        required>
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
                 <div class="col s3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" required>
+                    <select class="browser-default custom-input" required ng-model="selectedPatient.civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
@@ -601,6 +610,7 @@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
                            type="text"
+                           ng-model="selectedPatient.contactNumber"
                            class="custom-input"
                            placeholder="09XX-XXX-XXXX"
                            maxlength="11"
@@ -615,6 +625,7 @@
                     <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="selectedPatient.line1"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -627,6 +638,7 @@
                     <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
+                           ng-model="selectedPatient.line2"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -642,6 +654,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
+                           ng-model="selectedPatient.city"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="city"
@@ -654,6 +667,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
+                           ng-model="selectedPatient.state"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="state/province/region"
@@ -667,6 +681,7 @@
                            type="text"
                            class="custom-input"
                            maxlength="250"
+                           ng-model="selectedPatient.postal"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="zip/postal code"
                            required>
@@ -679,6 +694,7 @@
                            type="text"
                            class="custom-input"
                            maxlength="250"
+                           ng-model="selectedPatient.country"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="country"
                            required>
@@ -692,6 +708,7 @@
                     <input id="occupation"
                            type="text"
                            class="custom-input"
+                           ng-model="selectedPatient.occupation"
                            placeholder="Doctor"
                            maxlength="50"
                            required>
@@ -700,7 +717,7 @@
                 <div class="col s4">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="selectedPatient.religion">
                         <option disabled selected>Select your Religion</option>
                         <option value="Roman Catholic">Roman Catholic</option>
                         <option value="Islam">Islam</option>
@@ -712,9 +729,9 @@
                 <div class="col s4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input">
+                    <select class="browser-default custom-input" ng-model="selectedPatient.nationality">
                         <option disbaled selected>Select your Nationality</option>
-                        <option>Option 1</option>
+                        <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
                     </select>
                 </div>
             </div>
@@ -724,6 +741,7 @@
                 <div class="col s4">
                     <p class="custom-label">Guradian <span class="required-mark">*</span></p>
                     <input type="text"
+                           ng-model="selectedPatient.guar"
                            class="custom-input"
                            maxlength="150"
                            oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" />
@@ -734,6 +752,7 @@
                     <p class="custom-label">Guradian's Contact Number' <span class="required-mark">*</span></p>
                     <input type="text"
                            class="custom-input"
+                           ng-model="selectedPatient.guarNum"
                            maxlength="150"
                            oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" />
                 </div>
@@ -742,6 +761,7 @@
                 <div class="col s4">
                     <p class="custom-label">Referral (if any)</p>
                     <input type="text"
+                           ng-model="selectedPatient.referral"
                            class="custom-input"
                            maxlength="50"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
@@ -752,12 +772,13 @@
 
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
-        <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-        <button type="button" class="edit-btn modal-close" style="font-weight:500;">EDIT</button>
-    @*New Password*@
-    <div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
-        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
+        @*New Password*@
+        <!--<div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
+            <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
+        </div>-->
     </div>
 </div>
 
@@ -814,7 +835,6 @@
            type="text"
            class="datepicker custom-input"
            placeholder="Select Birthdate"
-           max="@DateTime.Now.ToString("yyyy-MM-dd")">
     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
 </div>-->
 @*Address*@
