@@ -307,10 +307,10 @@
                     <div id="prog" class="row m-0 containerOverflow-2">
 
                         <div class="row">
-                            <a ng-show="isUserAdmin && !isUserStaff" class="update-btn right modal-trigger" data-target="modalAddProgNotes">ADD NOTE</a>
+                            <a ng-show="isUserAdmin && !isUserStaff" class="update-btn right modal-trigger" data-target="modalAddPayrec">ADD NOTE</a>
                         </div>
 
-                        <table id="progressNotes" class="hover" ng-if="progressNotesReady">
+                        <table id="progressNotes" class="hover" >
                             <thead>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
@@ -323,24 +323,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="patientTreatment in patientTreatments track by patientTreatment.trtPlanID">
-                                    <td>{{patientTreatment.date}}</td>
-                                    <td>{{patientTreatment.procedures}}</td>
-                                    <td>{{patientTreatment.toothNumber}}</td>
-                                    <td>{{patientTreatment.dentist}}</td>
-                                    <td>{{patientTreatment.amount}}</td>
-                                    <td>{{patientTreatment.paid}}</td>
-                                    <td>{{patientTreatment.amount - patientTreatment.paid}}</td>
+                                <tr ng-repeat="payment in paymentsArray track by payment.paymentID">
+                                    <td>{{payment.paymentDate}}</td>
+                                    <td>{{payment.procedures}}</td>
+                                    <td>{{payment.toothNumber}}</td>
+                                    <td>{{payment.dentistName}}</td>
+                                    <td>{{payment.cost}}</td>
+                                    <td>{{payment.paid}}</td>
+                                    <td>{{payment.balance}}</td>
                                     <td>
-                                        <a ng-show="isUserAdmin && !isUserStaff" href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger"
-                                           data-target="modalDeleteProgNote" data-position="bottom" data-tooltip="Delete Progress Note">
-                                            <i class="material-icons brown-text lighten-1" ng-click="selectDeleteProg(patientTreatment.trtPlanID)">delete</i>
+                                        <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
+                                            <i class="material-icons brown-text lighten-1">visibility</i>
                                         </a>
-
-                                        <a ng-show="isUserAdmin" href="#!" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
-                                           data-target="modalEditProgNote" data-position="bottom" data-tooltip="Edit Progress Note" style="margin-right: 0.5rem !important">
-                                            <i class="material-icons brown-text lighten-1" ng-click="selectEditProg(patientTreatment.trtPlanID)">edit</i>
+                                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
+                                            <i class="material-icons brown-text lighten-1">delete</i>
                                         </a>
+                                        <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                     </td>
                                 </tr>
                             </tbody>
@@ -459,7 +457,7 @@
                                     <span class="card-title bold">Post OP</span>
                                     <div class="divider"></div>
                                     @*post op content*@
-                                    <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
+                                <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
                                 </div>
                             </div>
                         </div>
@@ -670,6 +668,7 @@
                            required>
                 </div>
 
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                 <div class="col s3">
                     @*country*@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
@@ -681,6 +680,49 @@
                            placeholder="country"
                            required>
                 </div>
+=======
+                @*Address*@
+                <label class="custom-label">
+                    Address
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
+                </label>
+
+                @*Nationality*@
+                <label class="custom-label">
+                    Nationality
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
+                </label>
+
+                @*Guardian*@
+                <label class="custom-label">
+                    Guardian
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
+                </label>
+
+                @*Email*@
+                <label class="custom-label">
+                    Email Address
+                    <span class="required-mark">*</span>
+                    <input type="text"
+                           class="custom-input"
+                           placeholder="Email Address"
+                           ng-model="selectedPatient.email"
+                           ng-change="checkEditPatientEmail()" />
+
+                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
+                        Enter a valid email address
+                    </span>
+                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
+                        Email already taken
+                    </span>
+                    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
+                        Email is valid
+                    </span>
+                </label>
+>>>>>>> main
             </div>
 
             <div class="row">
@@ -707,6 +749,7 @@
                     </select>
                 </div>
 
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                 <div class="col s4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
@@ -715,6 +758,42 @@
                         <option>Option 1</option>
                     </select>
                 </div>
+=======
+                @*Occupation*@
+                <label class="custom-label">
+                    Occupation
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
+                </label>
+
+                @*Religion*@
+                <label class="custom-label">
+                    Religion
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
+                </label>
+
+                @*Medical Insurance*@
+                <label class="custom-label">
+                    Medical Insurance
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
+                </label>
+
+                @*Guardian Contact #*@
+                <label class="custom-label">
+                    Guardian's Contact Number
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
+                </label>
+
+                @*Contact #*@
+                <label class="custom-label">
+                    Contact Number
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
+                </label>
+>>>>>>> main
             </div>
 
             <div class="row">
@@ -748,11 +827,17 @@
         </form>
     </div>
 
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
     @*Submit , upload, cancel*@
     <div class="modal-footer" style="margin-top:2.5vh">
         <button type="button" class="edit-btn left" style="font-weight:500; margin-right:1vh;">UPLOAD PHOTO</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
         <button type="button" class="edit-btn modal-close" style="font-weight:500;">EDIT</button>
+=======
+    @*New Password*@
+    <div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
+        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
+>>>>>>> main
     </div>
 </div>
 
@@ -1321,26 +1406,25 @@
 </div>
 
 
-@*ADD Progress botes*@
-<div id="modalAddProgNotes" class="modal progNotes-modal">
+
+@*ADD Payment Record*@
+<div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Progress Note</h5>
+        <h5 class="modal-form-title" style="margin-bottom:1.5vh;">Add New Payment Record</h5>
 
+        <div class="row">
+            <div class="col s6">
+                @*Patient*@
+                <label class="custom-label">Patient <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="selectedPatient"
+                        ng-class="{'invalid-input': addSubmitted && !selectedPatient}">
+                    <option value="" disabled selected>Select patient...</option>
+                    <option ng-repeat="patient in patientArray" value="{{patient.patientID}}">{{patient.patientName}}</option>
+                </select>
+                <span class="validation-msg" ng-show="addSubmitted && !selectedPatient">Patient is required.</span>
+            </div>
 
-        <form name="addProgForm" novalidate ng-submit="addProgressNotes()">
-            <div class="row">
-                <div class="col s6">
-                    @*Date*@
-                    <label class="custom-label">Date <span class="required-mark">*</span></label>
-                    <div class="datepicker-wrapper">
-                        <input id="date" name="date" type="text" class="datepicker custom-input" placeholder="Date"
-                               ng-model="progNote_date" required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
-                    </div>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="addProgForm.date.$invalid && (addProgForm.date.$touched || addProgForm.$submitted)">
-                        Date is required
-                    </span>
-
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                     @*Dentist*@
                     <label class="custom-label" ng-init="getDentistOwner()">
                         Dentist
@@ -1387,8 +1471,128 @@
                                ng-model="progNote_toothNumber" min="1" max="32" step="1" required
                                oninput="this.value = this.value.replace(/[^0-9]/g,''); if(this.value){ this.value = Math.max(1, Math.min(32, parseInt(this.value)||0)); }">
                     </label>
+=======
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">Date <span class="required-mark">*</span></label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="paymentDate" placeholder="MM/DD/YYYY"
+                           ng-class="{'invalid-input': addSubmitted && !paymentDate}">
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                </div>
+                <span class="validation-msg" ng-show="addSubmitted && !paymentDate">Date is required.</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">Dentist <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="selectedDentist"
+                        ng-class="{'invalid-input': addSubmitted && !selectedDentist}">
+                    <option value="" disabled selected>Select dentist...</option>
+                    <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
+                </select>
+                <span class="validation-msg" ng-show="addSubmitted && !selectedDentist">Dentist is required.</span>
+            </div>
+
+            <div class="col s6">
+                @*Tooth Number*@
+                <label class="custom-label">Tooth Number/s <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentToothNumber"
+                       ng-class="" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedures Done <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentProcedures"
+                       ng-class="" />
+            </div>
+        </div>
 
 
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Mode of Payment*@
+                <label class="custom-label">
+                    Mode of Payment
+                    <span class="required-mark">*</span>
+                    <select class="custom-input"
+                            ng-model="paymentMethod"
+                            ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
+                        <option value="" disabled selected>Select mode of payment...</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Card">Card</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </label>
+                <span class="validation-msg" ng-show="addSubmitted && !paymentMethod">Mode of payment is required.</span>
+            </div>
+            <div class="col s6">
+                @*Reference*@
+                <label class="custom-label">
+                    Reference
+                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50" />
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
+                @*Cost*@
+                <label class="custom-label">
+                    Cost
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" ng-model="paymentCost" placeholder="Cost..."
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': addSubmitted && !paymentCost}">
+                </label>
+                <span class="validation-msg" ng-show="addSubmitted && !paymentCost">Cost is required.</span>
+            </div>
+            <div class="col s6">
+                @*Discount*@
+                <label class="custom-label">
+                    Discount
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" ng-model="paymentDiscount" placeholder="Discount..."
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
+                @*Paid*@
+                <label class="custom-label">
+                    Total Amount Paid
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" ng-model="paymentPaid" placeholder="Total amount paid..."
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': addSubmitted && !paymentPaid}">
+                </label>
+                <span class="validation-msg" ng-show="addSubmitted && !paymentPaid">Total amount paid is required.</span>
+            </div><div class="col s6">
+                @*Balance*@
+                <label class="custom-label">
+                    Balance
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input"
+                           ng-value="(paymentCost || 0) - (paymentDiscount || 0) - (paymentPaid || 0)"
+                           placeholder="Balance..."
+                           ng-class="{'invalid-input': addSubmitted && ((paymentCost - paymentDiscount - paymentPaid) < 0)}"
+                           disabled>
+                </label>
+                <span class="validation-msg" ng-show="addSubmitted && paymentDue === null">Balance is required.</span>
+            </div>
+>>>>>>> main
+
+        </div>
+
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                     @*Paid*@
                     <label class="custom-label">
                         Paid
@@ -1402,37 +1606,66 @@
                         <span ng-show="addProgForm.paid.$error.number || addProgForm.paid.$error.min">Enter a valid non-negative paid amount</span>
                     </span>
                 </div>
+=======
+        <div class="row">
+            <div class="col s12">
+                @*Description*@
+                <label class="custom-label">
+                    Description
+                    <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..." ng-model="paymentDescription"></textarea>
+                </label>
+>>>>>>> main
             </div>
-        </form>
+        </div>
     </div>
 
     <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-
-
-        <button type="submit" class="edit-btn"
-                style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0"
-                ng-click="addProgressNotes()"
-                ng-disabled="addProgForm.$invalid">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"
+                ng-click="addSubmitted = false">
+            CANCEL
+        </button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0"
+                ng-click="addPayment()">
             ADD
         </button>
     </div>
 </div>
 
-@*EDIT Progress botes*@
-<div id="modalEditProgNote" class="modal progNotes-modal">
+
+@*EDIT Payment Record*@
+<div id="modalEditPayrec" class="modal payrec-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Add Progress Note</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Payment Record</h5>
+
         <div class="row">
+            <div class="col s6">
+                @*Patient*@
+                <label class="custom-label">Patient <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="paymentInfo.patientID"
+                        ng-options="patient.patientID as patient.patientName for patient in patientArray"
+                        ng-class="{'invalid-input': editSubmitted && paymentInfo.patientID  === null}" disabled>
+                    <option value="" disabled>Select patient...</option>
+                </select>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.patientID === null">Patient is required.</span>
+            </div>
+
             <div class="col s6">
                 @*Date*@
                 <label class="custom-label">Date <span class="required-mark">*</span></label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote.date">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="paymentInfo.paymentDate" placeholder="MM/DD/YYYY"
+                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paymentDate  === null}">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paymentDate  === null">Date is required.</span>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col s6">
                 @*Dentist*@
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                 <label class="custom-label">
                     Dentist
                     <span class="required-mark">*</span>
@@ -1449,51 +1682,259 @@
                     <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Amount" ng-model="progNote.amount">
                 </label>
+=======
+                <label class="custom-label">Dentist <span class="required-mark">*</span></label>
+                <select class="custom-input browser-default" ng-model="paymentInfo.dentistID"
+                        ng-options="dentist.dentistID as dentist.dentistName for dentist in dentistArray"
+                        ng-class="{'invalid-input': editSubmitted && paymentInfo.dentistID  === null}" disabled>
+                    <option value="" disabled>Select dentist...</option>
+                </select>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.dentistID  === null">Dentist is required.</span>
+>>>>>>> main
             </div>
 
             <div class="col s6">
-                @*Procedures*@
-                <label class="custom-label">
-                    Procedures
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Procedures" ng-model="progNote.procedures">
-                </label>
-
                 @*Tooth Number*@
-                <label class="custom-label">
-                    Tooth Number
-                    <input type="text" class="custom-input" placeholder="Tooth Number" ng-model="progNote.toothNumber">
-                </label>
+                <label class="custom-label">Tooth Number</label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentInfo.toothNumber"
+                       ng-class="" />
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedure <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-model="paymentInfo.procedures"
+                       ng-class="" />
+            </div>
+        </div>
+
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
+        <div class="row">
+            <div class="col s6">
+                @*Mode of Payment*@
+                <label class="custom-label">
+                    Mode of Payment
+                    <span class="required-mark">*</span>
+                    <select class="custom-input"
+                            ng-model="paymentInfo.paymentMethod"
+                            ng-class="{'invalid-input': addSubmitted && !paymentMethod}">
+                        <option value="" disabled selected>Select mode of payment...</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Card">Card</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.paymentMethod">Mode of payment is required.</span>
+            </div>
+            <div class="col s6">
+                @*Reference*@
+                <label class="custom-label">
+                    Reference
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.reference"
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.cost}">
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
+                @*Cost*@
+                <label class="custom-label">
+                    Cost
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.cost"
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': editSubmitted && !paymentInfo.cost}">
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
+            </div>
+            <div class="col s6">
+                @*Discount*@
+                <label class="custom-label">
+                    Discount
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount"
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s6">
                 @*Paid*@
                 <label class="custom-label">
                     Paid
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
+                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.paid"
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paid  === null}">
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paid  === null">Amount paid is required.</span>
+            </div>
+            <div class="col s6">
+                @*Total*@
+                <label class="custom-label">
+                    Balance
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input"
+                           ng-value="(paymentInfo.cost || 0) - (paymentInfo.discount || 0) - (paymentInfo.paid || 0)"
+                           placeholder="Balance..."
+                           ng-class="{'invalid-input': addSubmitted && ((paymentCost - paymentDiscount - paymentPaid) < 0)}"
+                           disabled>
+                </label>
+                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.balance === null">Balance is required.</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Description*@
+                <label class="custom-label">
+                    Description
+                    <span class="required-mark">*</span>
+                    <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..." ng-model="paymentInfo.description"></textarea>
                 </label>
             </div>
         </div>
     </div>
 
+
+
     <div class="modal-footer">
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="editProgressNotes()">EDIT</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"
+                ng-click="editSubmitted = false">
+            CANCEL
+        </button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0"
+                ng-click="editPayment()">
+            EDIT
+        </button>
     </div>
 </div>
 
-@*DELETE Progress Note*@
-<div id="modalDeleteProgNote" class="modal progNotes-modal" style="width:25% !important; padding:0 !important">
+@*VIEW Payment Record*@
+<div id="modalViewPayrec" class="modal payrec-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Progress Not</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Payment Record</h5>
+        <div class="row">
+            <div class="col s6">
+                @*Patient*@
+                <label class="custom-label">Patient</label>
+                <p class="custom-input">{{paymentInfo.patientName}}</p>
+            </div>
 
-        <p class="custom-label">Are you sure you want to delete this progress note?</p>
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">Date</label>
+                <p class="custom-input">{{paymentInfo.paymentDate}}</p>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col s6">
+                @*Dentist*@
+                <label class="custom-label">Dentist</label>
+                <p class="custom-input">{{paymentInfo.dentistName}}</p>
+            </div>
+
+            <div class="col s6">
+                @*Tooth Number*@
+                <label class="custom-label">Tooth Number</label>
+                <p class="custom-input">{{paymentInfo.toothNumber}}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Procedure*@
+                <label class="custom-label">Procedure</label>
+                <p class="custom-input">{{paymentInfo.procedures}}</p>
+            </div>
+        </div>
+
+        <h5 class="modal-form-title" style="margin: 4vh 0 1.5vh 0;">Payment</h5>
+
+        <div class="row">
+            <div class="col s4">
+                @*Mode of Payment*@
+                <label class="custom-label">Mode of Payment</label>
+                <p class="custom-input">{{paymentInfo.paymentMethod}}</p>
+            </div>
+            <div class="col s4">
+                @*Cost*@
+                <label class="custom-label">Cost</label>
+                <p class="custom-input">{{paymentInfo.cost}}</p>
+            </div>
+            <div class="col s4">
+                @*Discount*@
+                <label class="custom-label">Discount</label>
+                <p class="custom-input">{{paymentInfo.discount}}</p>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col s6">
+                @*Paid*@
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+                <label class="custom-label">
+                    Paid
+                    <span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Paid" ng-model="progNote.paid">
+                </label>
+=======
+                <label class="custom-label">Total Amount Paid</label>
+                <p class="custom-input">{{paymentInfo.amountPaid}}</p>
+            </div>
+
+            <div class="col s6">
+                @*Total*@
+                <label class="custom-label">Balance Payment</label>
+                <p class="custom-input">{{paymentInfo.amountDue}}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                @*Description*@
+                <label class="custom-label">Description</label>
+                <p style="flex: 1; min-height: 10vh; padding: 1vh; background-color: white;">{{paymentInfo.description}}</p>
+>>>>>>> main
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">
+            CLOSE
+        </button>
+
+    </div>
+</div>
+
+@*Archive Peyment Record*@
+<div id="modalDeletePayrec" class="modal payrec-modal" style="width:30% !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Payment Record</h5>
+
+        <p class="custom-label">Are you sure you want to archive this payment record?</p>
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deleteProgressNotes()">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePaymentThis()">DELETE</button>
     </div>
 </div>
+
 
 @*Dental Chart modal*@
 <div id="modalDentalChart" class="modal dentalChart-modal">
@@ -1657,7 +2098,7 @@
 </div>
 
 @*Edit Post Op*@
-<div id="modalEditPostOp" class="modal postOp-modal">
+<div id="modalEditPostOp" class="modal postOp-modal" ng-init="getPostOp()">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Post Operation Instructions</h5>
 
@@ -1665,32 +2106,18 @@
             <div class="col s12">
                 <label class="custom-label">
                     Template<span class="required-mark">*</span>
-                    <select class="browser-default custom-input" ng-model="postOp.selectedTemplate" ng-options="t.key as t.name for t in postOp.templates" ng-change="postOp.applyTemplate()">
-                        <option value="" disabled selected>Select template</option>
-                    </select>
+                            <select class="browser-default custom-input" ng-model="postOp.postOpID" ng-change="setPostOp(postOp.postOpID)">
+                                <option ng-repeat="p in postArray" ng-value="p.postOpID">{{p.title}}</option>
+                            </select>
                 </label>
 
-                <label class="custom-label" style="margin-top:8px;">
-                    Title<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" ng-model="postOp.title" placeholder="Instruction title" />
-                </label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
-                <label class="custom-label">
-                    Instructions<span class="required-mark">*</span>
-                    <textarea ng-model="postOp.instructions" style="flex: 1; height: 45vh; padding-top: 10px; background-color:white; width:100%"></textarea>
-                    <p class="small-muted" style="margin-top:.2vh;">You can paste formatted HTML here if your editor pipeline supports it.</p>
-                </label>
             </div>
         </div>
     </div>
 
     <div class="modal-footer" style="margin-top:-1vh">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">SAVE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="savePostOp()">SAVE</button>
     </div>
 </div>
 
@@ -1700,12 +2127,12 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Delete Post Operation Instructions?</h5>
 
-        <p class="custom-label">Are you sure you want to delete this post operation instructions?</p>
+        <p class="custom-label">Are you sure you want to remove this post operation instructions?</p>
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="removePostOp()">DELETE</button>
     </div>
 </div>
 

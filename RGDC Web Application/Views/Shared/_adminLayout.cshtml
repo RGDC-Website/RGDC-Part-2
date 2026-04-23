@@ -28,9 +28,9 @@
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-        <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
-            <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
-        </div>
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
+                <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
+            </div>
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
                 <img ng-src="{{ dentist.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
             </div>
@@ -151,7 +151,7 @@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
                 <span>Month DD, YYYY | </span>
                 <span>00:00 AM</span>
-            </div>  
+            </div>
             <ul id="contactDropdown" class="dropdown-content brown lighten-1">
                 <li>
                     <a href="#!" class="white-text">one</a>
@@ -290,6 +290,12 @@
                             <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
                             <option value="Others">Others</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="owner.religion"
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -299,11 +305,18 @@
                             <option disbaled selected>Select your Nationality</option>
                             <option>Option 1</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="owner.nationality"
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
                     </div>
                 </div>
 
                 <div class="row">
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                     <div class="col s6">
                         @*Address Line 1*@
                         <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
@@ -378,6 +391,34 @@
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="country"
                                required>
+=======
+                    @*Address*@
+                    <div class="col s12">
+                        <p class="custom-label">Address <span class="required-mark">*</span></p>
+                        <div class="row m-0">
+                            <div class="col s12 m2 l2">
+                                <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            </div>
+                        </div>
+                        <div class="row m-0">
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            </div>
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            </div>
+                        </div>
+                        @*<input type="text" class="custom-input" ng-model="owner.address"
+                            maxlength="250"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.address}">*@
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.address">Address is required.</span>
+>>>>>>> main
                     </div>
                 </div>
 
@@ -524,6 +565,12 @@
                             <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
                             <option value="Others">Others</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="dentist.religion"
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -533,11 +580,18 @@
                             <option disbaled selected>Select your Nationality</option>
                             <option>Option 1</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="dentist.nationality"
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.nationality">Nationality is required.</span>
                     </div>
                 </div>
 
                 <div class="row">
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                     <div class="col s6">
                         @*Address Line 1*@
                         <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
@@ -612,6 +666,34 @@
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="country"
                                required>
+=======
+                    @*Address*@
+                    <div class="col s12">
+                        <p class="custom-label">Address <span class="required-mark">*</span></p>
+                        <div class="row m-0">
+                            <div class="col s12 m2 l2">
+                                <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
+                            </div>
+                            <div class="col s12 m5 l5">
+                                <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
+                            </div>
+                        </div>
+                        <div class="row m-0">
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
+                            </div>
+                            <div class="col s12 m6 l6">
+                                <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
+                            </div>
+                        </div>
+                        @*<input type="text" class="custom-input" ng-model="dentist.address"
+                            maxlength="250"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.address}">*@
+                        <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.address">Address is required.</span>
+>>>>>>> main
                     </div>
                 </div>
 
@@ -768,6 +850,12 @@
                             <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
                             <option value="Others">Others</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="staff.religion"
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -777,6 +865,12 @@
                             <option disbaled selected>Select your Nationality</option>
                             <option>Option 1</option>
                         </select>
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
+=======
+                        @*<input type="text" class="custom-input" ng-model="staff.nationality"
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
+>>>>>>> main
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -846,6 +940,7 @@
                                required>
                     </div>
 
+<<<<<<< added-address-inputs-on-all-sign-ups-and-edit-modals
                     <div class="col s3">
                         @*country*@
                         <p class="custom-label">Country <span class="required-mark">*</span></p>
@@ -856,6 +951,12 @@
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="country"
                                required>
+=======
+                        @*<input type="text" class="custom-input" ng-model="staff.address"
+                            maxlength="250"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.address}">*@
+                        <span class="validation-msg" ng-show="editStaffSubmitted && !staff.address">Address is required.</span>
+>>>>>>> main
                     </div>
                 </div>
 
@@ -938,6 +1039,31 @@
                 <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 0 -3vh 0">CANCEL</button>
                 <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="resetPassword()">CHANGE PASSWORD</button>
             </div>
+        </div>
+    </div>
+
+    <div id="modalNotifications" class="modal">
+        <div class="modal-content">
+            <h5>Notifications</h5>
+            <div ng-if="notifications.length === 0">
+                <p>No notifications.</p>
+            </div>
+            <ul class="collection" ng-if="notifications.length > 0" style="max-height:60vh; overflow:auto;">
+                <li class="collection-item" ng-repeat="n in notifications track by n.notificationID" ng-class="{'grey lighten-4': !n.isRead}">
+                    <div>
+                        <strong>{{n.title}}</strong>
+                        <span class="secondary-content" style="font-size:0.9rem;">{{n.createdAt | date:'short'}}</span>
+                    </div>
+                    <div style="margin-top:.5rem; white-space:pre-line;">{{n.message}}</div>
+                    <div style="margin-top:.75rem;">
+                        <a class="btn-flat" ng-if="!n.isRead" ng-click="markNotificationRead(n)">Mark as read</a>
+                        <a class="btn-flat" ng-if="n.link" ng-href="{{n.link}}">Open</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close btn-flat">Close</a>
         </div>
     </div>
 
