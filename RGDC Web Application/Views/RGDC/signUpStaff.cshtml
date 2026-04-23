@@ -112,10 +112,9 @@
 
                 @*Already have an account*@
                 <!--<div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
-                    <span>Already have an account?</span>
-                    <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
-                </div>-->
-
+        <span>Already have an account?</span>
+        <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
+    </div>-->
                 @*Already have an account*@
                 <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
                     <span>Already have an account?</span>
@@ -264,14 +263,7 @@
                         <option value="Islam">Islam</option>
                         <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
                         <option value="Others">Others</option>
-                    </select>                
-                     @*<input id="religion"
-                           type="text"
-                           class="custom-input"
-                           ng-model="signUp_religion"
-                           placeholder="Roman-Catholic"
-                           maxlength="50"
-                           required>*@
+                    </select>
                 </div>
 
                 <div class="col s12 m6 l6">
@@ -281,47 +273,82 @@
                         <option disbaled selected>Select your Nationality</option>
                         <option>Option 1</option>
                     </select>
-                    @*<input id="contactNumber"
-                           type="text"
-                           ng-model="signUp_nationality"
-                           class="custom-input"
-                           placeholder="Filipino"
-                           maxlength="50"
-                           required>*@
                 </div>
             </div>
 
             <div class="row">
-                <div class="col s12">
-                    @*Address*@
-                    <p class="custom-label">Address <span class="required-mark">*</span></p>
-                    <div class="row m-0">
-                        <div class="col s12 m2 l2">
-                            <input type="text" maxlength="250" placeholder="House No." class="custom-input" />
-                        </div>
-                        <div class="col s12 m5 l5">
-                            <input type="text" maxlength="250" placeholder="Street" class="custom-input" />
-                        </div>
-                        <div class="col s12 m5 l5">
-                            <input type="text" maxlength="250" placeholder="Baranggay" class="custom-input" />
-                        </div>
-                    </div>
-                    <div class="row m-0">
-                        <div class="col s12 m6 l6">
-                            <input type="text" maxlength="250" placeholder="City/Municipality" class="custom-input" />
-                        </div>
-                        <div class="col s12 m6 l6">
-                            <input type="text" maxlength="250" placeholder="Province" class="custom-input" />
-                        </div>
-                    </div>
-                    @*<input id="address"
-        type="text"
-        ng-model="signUp_address"
-        class="custom-input"
-        maxlength="250"
-        oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-        ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
-        required>*@
+                <div class="col s6">
+                    @*Address Line 1*@
+                    <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="street address, p.o. box, company name, c/o"
+                           required>
+                </div>
+
+                <div class="col s6">
+                    @*Address Line 2*@
+                    <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="appartment, suite, unit, building, floor, etc"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s3">
+                    @*City*@
+                    <p class="custom-label">City <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="city"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*state/province/region*@
+                    <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="state/province/region"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*zip/postal code*@
+                    <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="zip/postal code"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*country*@
+                    <p class="custom-label">Country <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="country"
+                           required>
                 </div>
             </div>
 
