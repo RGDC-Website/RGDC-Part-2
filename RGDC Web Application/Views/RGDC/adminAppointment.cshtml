@@ -148,14 +148,15 @@
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
                                 <td style="text-align:center; vertical-align:middle;">
-                                    <div style="display:flex; flex-direction:column; align-items:center;">
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px">
+                                    <div ng-if="canActOnRequest(appt)" style="display:flex; flex-direction:column; align-items:center;">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px" aria-label="Accept requested appointment">
                                             <i class="material-icons tiny">check</i>
                                         </a>
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
                                             <i class="material-icons tiny">close</i>
                                         </a>
                                     </div>
+                                    <!-- Creator (sender) will see no buttons but will still see the row and status -->
                                 </td>
                             </tr>
                         </tbody>
@@ -262,8 +263,15 @@
                     </select>
 
 
-                    <span class="helper-text" style="color:#d32f2f;" ng-if="timeOptions && timeOptions.length === 0">
-                        No available times for selected date and dentist.
+                    <span class="helper-text" style="color:#d32f2f;"
+                          ng-if="(timeOptions && timeOptions.length === 0) && newApptRequest.dentistID && newApptRequest.dateTime">
+                        Dentist is not available on the selected date. Please choose another date or dentist.
+                    </span>
+
+                    <!-- If no dentist or date selected yet, show guidance -->
+                    <span class="helper-text" style="color:#9e9e9e;"
+                          ng-if="!(newApptRequest.dentistID && newApptRequest.dateTime)">
+                        Select a dentist and date to see available time slots.
                     </span>
                 </div>
             </div>
@@ -475,8 +483,15 @@
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Scheduled Appointment</h5>
 
-        <p class="custom-label">Are you sure you want to delete this scheduled appointment? </p>
-        @* Hidden backup field to store apptID so client can fallback if scope is lost *@
+        <p class="custom-label">Are you sure you want to delete this scheduled appointment? Please provide a reason (shown in Past Appointments).</p>
+
+        <div class="row" style="margin-top:10px;">
+            <div class="col s12">
+                <label class="custom-label">Reason <span class="required-mark">*</span></label>
+                <textarea id="deleteApptReason" class="custom-input" ng-model="deleteApptReason" placeholder="Enter reason for deletion/cancellation" required></textarea>
+            </div>
+        </div>
+
         <input type="hidden" id="hiddenDeleteApptID" value="" />
     </div>
 

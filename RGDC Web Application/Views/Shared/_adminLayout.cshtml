@@ -28,9 +28,9 @@
             <h5 style="font-weight:bold;">RGDC</h5>
 
             @*user pfp and name*@
-        <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
-            <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
-        </div>
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
+                <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
+            </div>
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
                 <img ng-src="{{ dentist.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
             </div>
@@ -151,7 +151,7 @@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
                 <span>Month DD, YYYY | </span>
                 <span>00:00 AM</span>
-            </div>  
+            </div>
             <ul id="contactDropdown" class="dropdown-content brown lighten-1">
                 <li>
                     <a href="#!" class="white-text">one</a>
@@ -291,8 +291,8 @@
                             <option value="Others">Others</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="owner.religion"
-        placeholder="Roman-Catholic" maxlength="50"
-        ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">*@
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.religion}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -302,9 +302,9 @@
                             <option disbaled selected>Select your Nationality</option>
                             <option>Option 1</option>
                         </select>
-    @*<input type="text" class="custom-input" ng-model="owner.nationality"
-                               placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">*@
+                        @*<input type="text" class="custom-input" ng-model="owner.nationality"
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.nationality}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -333,8 +333,8 @@
                             </div>
                         </div>
                         @*<input type="text" class="custom-input" ng-model="owner.address"
-        maxlength="250"
-        ng-class="{'invalid-input': editOwnerSubmitted && !owner.address}">*@
+                            maxlength="250"
+                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.address}">*@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.address">Address is required.</span>
                     </div>
                 </div>
@@ -483,8 +483,8 @@
                             <option value="Others">Others</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="dentist.religion"
-        placeholder="Roman-Catholic" maxlength="50"
-        ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">*@
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.religion}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -494,9 +494,9 @@
                             <option disbaled selected>Select your Nationality</option>
                             <option>Option 1</option>
                         </select>
-    @*<input type="text" class="custom-input" ng-model="dentist.nationality"
-                               placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
+                        @*<input type="text" class="custom-input" ng-model="dentist.nationality"
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -525,8 +525,8 @@
                             </div>
                         </div>
                         @*<input type="text" class="custom-input" ng-model="dentist.address"
-        maxlength="250"
-        ng-class="{'invalid-input': editDentistSubmitted && !dentist.address}">*@
+                            maxlength="250"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.address}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.address">Address is required.</span>
                     </div>
                 </div>
@@ -685,8 +685,8 @@
                             <option value="Others">Others</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="staff.religion"
-        placeholder="Roman-Catholic" maxlength="50"
-        ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -697,8 +697,8 @@
                             <option>Option 1</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="staff.nationality"
-                               placeholder="Filipino" maxlength="50"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -728,8 +728,8 @@
                         </div>
 
                         @*<input type="text" class="custom-input" ng-model="staff.address"
-        maxlength="250"
-        ng-class="{'invalid-input': editStaffSubmitted && !staff.address}">*@
+                            maxlength="250"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.address}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.address">Address is required.</span>
                     </div>
                 </div>
@@ -813,6 +813,31 @@
                 <button class="modal-close cancel-btn" style="font-weight: 500; margin: 1vh 0 -3vh 0">CANCEL</button>
                 <button type="submit" class="edit-btn modal-trigger" style="font-weight: 500; margin: 1vh 0 -3vh 0" ng-click="resetPassword()">CHANGE PASSWORD</button>
             </div>
+        </div>
+    </div>
+
+    <div id="modalNotifications" class="modal">
+        <div class="modal-content">
+            <h5>Notifications</h5>
+            <div ng-if="notifications.length === 0">
+                <p>No notifications.</p>
+            </div>
+            <ul class="collection" ng-if="notifications.length > 0" style="max-height:60vh; overflow:auto;">
+                <li class="collection-item" ng-repeat="n in notifications track by n.notificationID" ng-class="{'grey lighten-4': !n.isRead}">
+                    <div>
+                        <strong>{{n.title}}</strong>
+                        <span class="secondary-content" style="font-size:0.9rem;">{{n.createdAt | date:'short'}}</span>
+                    </div>
+                    <div style="margin-top:.5rem; white-space:pre-line;">{{n.message}}</div>
+                    <div style="margin-top:.75rem;">
+                        <a class="btn-flat" ng-if="!n.isRead" ng-click="markNotificationRead(n)">Mark as read</a>
+                        <a class="btn-flat" ng-if="n.link" ng-href="{{n.link}}">Open</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="modal-footer">
+            <a class="modal-close btn-flat">Close</a>
         </div>
     </div>
 
