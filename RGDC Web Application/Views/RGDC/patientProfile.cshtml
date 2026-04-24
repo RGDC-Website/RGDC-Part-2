@@ -416,22 +416,22 @@
                     </div>
 
                     @*Forms*@
-                    <div id="forms" class="row m-0">
+                    <!--<div id="forms" class="row m-0">
                         <div class="row">
                             <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modalAddForm">ADD FORM</a>
                         </div>
 
-                        <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
+                        <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">-->
                             @*table headers*@
-                            <thead>
+                            <!--<thead>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
                                     <th>Form</th>
                                     <th colspan="2">Dentist</th>
                                 </tr>
-                            </thead>
+                            </thead>-->
                             @*table content*@
-                            <tbody>
+                            <!--<tbody>
                                 <tr ng-repeat="f in patientForms track by f.formID">
                                     <td>{{f.date}}</td>
                                     <td>
@@ -449,9 +449,9 @@
                                         </a>
                                     </td>
                                 </tr>
-                            </tbody>
+                            </tbody>-->
                             @*table footer*@
-                            <tfoot>
+                            <!--<tfoot>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
                                     <th>Form</th>
@@ -460,7 +460,7 @@
                                 </tr>
                             </tfoot>
                         </table>
-                    </div>
+                    </div>-->
 
                     @*post op*@
                     <div id="postOp" class="row m-0 ">
@@ -472,7 +472,7 @@
                                     <span class="card-title bold">Post OP</span>
                                     <div class="divider"></div>
                                     @*post op content*@
-                                    <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
+                                    <div ng-bind-html="getPostOpContent()"></div>
                                 </div>
                             </div>
                         </div>
@@ -1811,19 +1811,6 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top:-1vh;">
-            <div class="col s12">
-                @*Dropdown*@
-                <p class="custom-label">Dropdown <span class="required-mark">*</span></p>
-                <select class="browser-default custom-input" required>
-                    <option value="" disabled selected>Options</option>
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                    <option value="3">Option 3</option>
-                </select>
-            </div>
-        </div>
-
         <div class="row" style="margin-top:3.5vh;">
             <div class="row m-0 center">
                 <img id="dentalChartModalImg"
@@ -1836,9 +1823,9 @@
 
     @*upload, save, cancel buttons*@
     <div class="modal-footer" style="margin:0 0 0 0 !important">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh" ng-click="pickDentalChartFile()">UPLOAD</button>
+        <button type="button" ng-show="!isUserPatient" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh" ng-click="pickDentalChartFile()">UPLOAD</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0" ng-click="saveDentalChart()">SAVE</button>
+        <button type="button" ng-show="!isUserPatient" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0" ng-click="saveDentalChart()">SAVE</button>
     </div>
 </div>
 
@@ -1953,7 +1940,7 @@
             <div class="col s12">
                 <label class="custom-label">
                     Template<span class="required-mark">*</span>
-                    <select class="browser-default custom-input" ng-model="postOp.postOpID" ng-change="setPostOp(postOp.postOpID)">
+                    <select class="browser-default custom-input" ng-model="selectedPatient.postOpID" ng-change="setPostOp(selectedPatient.postOpID)">
                         <option ng-repeat="p in postArray" ng-value="p.postOpID">{{p.title}}</option>
                     </select>
                 </label>
@@ -1972,14 +1959,14 @@
 @*DELETE Post Op *@
 <div id="modalDeletePostOp" class="modal postOp-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Delete Post Operation Instructions?</h5>
+        <h5 class="modal-form-title" style="margin-bottom:.5vh;">Remove Post Operation Instructions?</h5>
 
         <p class="custom-label">Are you sure you want to remove this post operation instructions?</p>
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="removePostOp()">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePostOp()">DELETE</button>
     </div>
 </div>
 

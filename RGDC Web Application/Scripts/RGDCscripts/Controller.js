@@ -128,16 +128,6 @@
         return $scope.addPatientContactValid;
     };
 
-    $scope.checkAddPatientAddress = function () {
-        $scope.addPatientAddressValid =
-            $scope.addPatient_address &&
-            $scope.addPatient_address.length >= 5;
-    };
-
-    $scope.isAddPatientAddressValid = function () {
-        return $scope.addPatientAddressValid;
-    };
-
     $scope.hasSpecialChar = function (pwd) {
         if (!pwd) return false;
         return /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?]/.test(pwd);
@@ -148,7 +138,6 @@
             $scope.addPatient_lastName &&
             $scope.isAddPatientEmailValid() &&
             $scope.isAddPatientContactValid() &&
-            $scope.isAddPatientAddressValid() &&
             $scope.addPatient_genderID &&
             $scope.addPatient_birthDate &&
             $scope.addPatient_civilStatus;
@@ -1790,17 +1779,17 @@
                     $scope.editPatientEmailTaken = false;
                     try { $scope.checkEditPatientEmail(); } catch (e) { /* safe */ }
 
-                    try {
-                        $scope.loadPatientForms();
-                    } catch (e) {
-                        console.warn('loadPatientForms failed', e);
-                    }
+                    //try {
+                    //    $scope.loadPatientForms();
+                    //} catch (e) {
+                    //    console.warn('loadPatientForms failed', e);
+                    //}
 
-                    if (!$scope.genderArray || $scope.genderArray.length === 0) {
-                        $scope.getGender();
-                    }
+                    //if (!$scope.genderArray || $scope.genderArray.length === 0) {
+                    //    $scope.getGender();
+                    //}
 
-                    try { $scope.loadPatientForms(); } catch (e) { console.warn('loadPatientForms failed', e); }
+                    //try { $scope.loadPatientForms(); } catch (e) { console.warn('loadPatientForms failed', e); }
 
                     initializeDatepicker();
                 });
@@ -2637,7 +2626,7 @@
     }
     $scope.savePostOp = function () {
         var postOp = {
-            postOpID: $scope.postOp.postOpID
+            postOpID: $scope.selectedPatient.postOpID
         }
         RGDCWebApplicationService.savePostOp(postOp);
         var modal = document.getElementById('modalEditPostOp');
@@ -3074,7 +3063,7 @@
                 $scope._minApptDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
             })();
             // initialize appointment-specific datepickers
-            $timeout(function () { initializeAppointmentDatepickers(); }, 150);z
+            $timeout(function () { initializeAppointmentDatepickers(); }, 150);
         }).catch(function (err) {
             // ignore session errors here
         });
@@ -5166,14 +5155,12 @@
     var _dentistEmailTimer = null;
     $scope.dentistFirstNameValid = true;
     $scope.dentistLastNameValid = true;
-    $scope.dentistAddressValid = true;
     $scope.dentistEmailFormatValid = false;
     $scope.dentistEmailTaken = false;
 
     $scope.validateDentistEditFields = function () {
         $scope.dentistFirstNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.firstName);
         $scope.dentistLastNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.lastName);
-        $scope.dentistAddressValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.address);
     };
 
     $scope.validateDentistEmailEdit = function () {
@@ -5209,7 +5196,7 @@
         $scope.validateDentistEditFields();
         $scope.validateDentistEmailEdit();
 
-        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid || !$scope.dentistAddressValid ||
+        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid || 
             !$scope.dentistContactValid || !$scope.dentistGenderValid || !$scope.dentistBirthDateValid ||
             !$scope.dentistCivilStatusValid || !$scope.dentistReligionValid || !$scope.dentistNationalityValid ||
             !$scope.dentistSpecializationValid || !$scope.dentistBranchValid) {
@@ -5355,14 +5342,12 @@
     var _staffEmailTimer = null;
     $scope.staffFirstNameValid = true;
     $scope.staffLastNameValid = true;
-    $scope.staffAddressValid = true;
     $scope.staffEmailFormatValid = false;
     $scope.staffEmailTaken = false;
 
     $scope.validateStaffEditFields = function () {
         $scope.staffFirstNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.firstName);
         $scope.staffLastNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.lastName);
-        $scope.staffAddressValid = $scope.isNonEmpty($scope.staff && $scope.staff.address);
     };
 
     $scope.validateStaffEmailEdit = function () {
@@ -5559,7 +5544,6 @@
     // Owner edit validation & debounce email check
     $scope.ownerFirstNameValid = false;
     $scope.ownerLastNameValid = false;
-    $scope.ownerAddressValid = false;
     $scope.ownerContactValid = false;
     $scope.ownerEmailFormatValid = false;
     $scope.ownerEmailTaken = false;
@@ -5574,7 +5558,6 @@
     $scope.validateOwnerEditFields = function () {
         $scope.ownerFirstNameValid = $scope.isNonEmpty($scope.owner && $scope.owner.firstName);
         $scope.ownerLastNameValid = $scope.isNonEmpty($scope.owner && $scope.owner.lastName);
-        $scope.ownerAddressValid = $scope.isNonEmpty($scope.owner && $scope.owner.address);
         $scope.ownerContactValid = PHONE_PATTERN.test($scope.owner && $scope.owner.contactNumber || '');
     };
 
@@ -5631,28 +5614,21 @@
         const pattern = /^09\d{9}$/;
         $scope.ownerContactValid = pattern.test($scope.owner_contactNumber || '');
     };
-
-    $scope.checkAddOwnerAddress = function () {
-        $scope.ownerAddressValid = !!$scope.owner_address && $scope.owner_address.trim().length >= 5;
-    };
-
     $scope.isAddOwnerFormValid = function () {
         return $scope.owner_firstName && $scope.owner_lastName &&
             $scope.ownerEmailFormatValid && !$scope.ownerEmailTaken &&
-            $scope.ownerContactValid && $scope.ownerAddressValid &&
+            $scope.ownerContactValid && 
             $scope.owner_genderID && $scope.owner_birthDate && $scope.owner_civilStatus;
     };
 
     // DENTIST add form validation
     $scope.dentistFirstNameValid = false;
     $scope.dentistLastNameValid = false;
-    $scope.dentistAddressValid = false;
     $scope.dentistContactValid = false;
     $scope.dentistEmailFormatValid = false;
     $scope.dentistEmailTaken = false;
     $scope.dentistFirstNameTouched = false;
     $scope.dentistLastNameTouched = false;
-    $scope.dentistAddressTouched = false;
     $scope.dentistContactTouched = false;
     $scope.dentistEmailTouched = false;
     var _dentistEditEmailTimer = null;
@@ -5661,7 +5637,6 @@
     $scope.validateDentistEditFields = function () {
         $scope.dentistFirstNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.firstName);
         $scope.dentistLastNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.lastName);
-        $scope.dentistAddressValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.address);
         $scope.dentistContactValid = PHONE_PATTERN.test($scope.dentist && $scope.dentist.contactNumber || '');
         $scope.dentistGenderValid = !!($scope.dentist && $scope.dentist.genderID);
         $scope.dentistBirthDateValid = !!($scope.dentist && $scope.dentist.birthDate);
@@ -5726,10 +5701,6 @@
         $scope.dentistContactValid = pattern.test($scope.dentist_contactNumber || '');
     };
 
-    $scope.checkAddDentistAddress = function () {
-        $scope.dentistAddressValid = !!$scope.dentist_address && $scope.dentist_address.trim().length >= 5;
-    };
-
     $scope.isAddDentistFormValid = function () {
         return $scope.dentistEmailFormatValid && !$scope.dentistEmailTaken
     };
@@ -5737,7 +5708,6 @@
     // STAFF add form validation
     $scope.staffFirstNameValid = false;
     $scope.staffLastNameValid = false;
-    $scope.staffAddressValid = false;
     $scope.staffContactValid = false;
     $scope.staffEmailFormatValid = false;
     $scope.staffEmailTaken = false;
@@ -5752,7 +5722,6 @@
     $scope.validateStaffEditFields = function () {
         $scope.staffFirstNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.firstName);
         $scope.staffLastNameValid = $scope.isNonEmpty($scope.staff && $scope.staff.lastName);
-        $scope.staffAddressValid = $scope.isNonEmpty($scope.staff && $scope.staff.address);
         $scope.staffContactValid = PHONE_PATTERN.test($scope.staff && $scope.staff.contactNumber || '');
     };
 
@@ -5808,10 +5777,6 @@
     $scope.checkAddStaffContact = function () {
         const pattern = /^09\d{9}$/;
         $scope.staffContactValid = pattern.test($scope.staff_contactNumber || '');
-    };
-
-    $scope.checkAddStaffAddress = function () {
-        $scope.staffAddressValid = !!$scope.staff_address && $scope.staff_address.trim().length >= 5;
     };
 
     $scope.isAddStaffFormValid = function () {
@@ -5943,212 +5908,6 @@
     //    var attempt = 0;
 
     //for displaying of forms
-    $scope.patientForms = [];
-    $scope.patientFormsReady = true;
-
-    $scope.loadPatientForms = function () {
-        try {
-            if (window.patientFormsTable) {
-                try {
-                    if (window.patientFormsTableType === 'jquery' && window.patientFormsTable.destroy) {
-                        window.patientFormsTable.destroy(true);
-                    } else if (window.patientFormsTableType === 'simple' && window.patientFormsTable.destroy) {
-                        window.patientFormsTable.destroy();
-                    }
-                } catch (e) { }
-                window.patientFormsTable = null;
-                window.patientFormsTableType = null;
-            }
-
-            var tblEl = document.querySelector('#patientForms');
-            if (tblEl && window.jQuery && jQuery.fn && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblEl)) {
-                try { jQuery(tblEl).DataTable().clear().destroy(true); } catch (e) { }
-            }
-
-            if (tblEl && tblEl.parentNode) {
-                try {
-                    Array.prototype.slice.call(tblEl.parentNode.children).forEach(function (ch) {
-                        if (ch === tblEl) return;
-                        var cls = ch.className || '';
-                        if (typeof cls === 'string' && (cls.indexOf('dataTable') !== -1 || cls.indexOf('dataTables_wrapper') !== -1)) {
-                            try { ch.parentNode.removeChild(ch); } catch (e) { }
-                        }
-                    });
-                } catch (e) { }
-            }
-        } catch (e) { console.warn('Pre-clean patientForms error', e); }
-
-    //        var hasJQueryDT = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable);
-    //        var hasSimpleDT = typeof window.DataTable !== 'undefined';
-
-    //        if (!hasJQueryDT && !hasSimpleDT) {
-    //            if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
-    //            console.warn('No DataTable library found for #patientForms explicit init.');
-    //            return;
-    //        }
-
-            try {
-                try {
-                    if (window.patientFormsTable) {
-                        if (window.patientFormsTableType === 'jquery') {
-                            try { window.patientFormsTable.destroy(true); } catch (e) { /* ignore */ }
-                        } else if (window.patientFormsTableType === 'simple') {
-                            try { window.patientFormsTable.destroy(); } catch (e) { /* ignore */ }
-                        }
-                        window.patientFormsTable = null;
-                        window.patientFormsTableType = null;
-                    } else if (hasJQueryDT && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblElem)) {
-                        try { jQuery(tblElem).DataTable().destroy(true); } catch (e) { /* ignore */ }
-                    }
-                } catch (e) { }
-
-    //        var tbody = tblElem.querySelector('tbody');
-    //        var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
-    //        if (!hasRows && attempt < maxRetries) return setTimeout(tryInit, retryDelay);
-
-    //        try {
-    //            try {
-    //                if (window.patientFormsTable) {
-    //                    if (window.patientFormsTableType === 'jquery') {
-    //                        try { window.patientFormsTable.destroy(true); } catch (e) { /* ignore */ }
-    //                    } else if (window.patientFormsTableType === 'simple') {
-    //                        try { window.patientFormsTable.destroy(); } catch (e) { /* ignore */ }
-    //                    }
-    //                    window.patientFormsTable = null;
-    //                    window.patientFormsTableType = null;
-    //                } else if (hasJQueryDT && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblElem)) {
-    //                    try { jQuery(tblElem).DataTable().destroy(true); } catch (e) { /* ignore */ }
-    //                }
-    //            } catch (e) {}
-
-    //            if (hasJQueryDT) {
-    //                try {
-    //                    var jq = jQuery(tblElem).DataTable({
-    //                        searching: true,
-    //                        paging: true,
-    //                        info: true,
-    //                        pageLength: 5,
-    //                        lengthMenu: [5, 10, 25, 50],
-    //                        language: { searchPlaceholder: "Search forms, dentist..." },
-    //                        destroy: true
-    //                    });
-    //                    window.patientFormsTable = jq;
-    //                    window.patientFormsTableType = 'jquery';
-    //                    return;
-    //                } catch (e) {
-    //                    console.warn('jQuery DataTables init failed in explicit helper', e);
-    //                }
-    //            }
-
-    //            if (hasSimpleDT) {
-    //                try {
-    //                    var s = new DataTable(tblElem, {
-    //                        searchable: true,
-    //                        fixedHeight: false,
-    //                        perPage: 5,
-    //                        perPageSelect: [5, 10, 25, 50],
-    //                        labels: {
-    //                            placeholder: "Search forms, dentist...",
-    //                            perPage: "{select} entries per page",
-    //                            noRows: "No forms found",
-    //                            info: "Showing {start} to {end} of {rows} entries"
-    //                        }
-    //                    });
-    //                    window.patientFormsTable = s;
-    //                    window.patientFormsTableType = 'simple';
-    //                } catch (e) {
-    //                    console.warn('Simple-DataTables init failed in explicit helper', e);
-    //                }
-    //            }
-    //        } catch (e) {
-    //            console.warn('initPatientFormsDataTable error', e);
-    //        }
-    //    }
-
-    //    tryInit();
-    //}
-
-    //for forms editing
-    $scope.selectEditForm = function (formID) {
-        if (!formID) return;
-        var f = ($scope.patientForms || []).find(function (x) { return x.formID == formID; });
-        if (!f) {
-            console.warn('selectEditForm: form not found in client cache', formID);
-            return;
-        }
-
-        $scope.selectedForm = angular.copy(f) || {};
-        $scope.selectedForm.firstName = $scope.selectedForm.firstName || '';
-        $scope.selectedForm.lastName = $scope.selectedForm.lastName || '';
-        $scope.selectedForm.middleName = $scope.selectedForm.middleName || '';
-        $scope.selectedForm.contactNumber = $scope.selectedForm.contactNumber || '';
-        $scope.selectedForm.address = $scope.selectedForm.address || '';
-        $scope.selectedForm.acceptedTerms = !!$scope.selectedForm.acceptedTerms;
-
-        // clear any picked file state
-        $scope._pickedFormFileEdit = null;
-        if ($scope.selectedForm && $scope.selectedForm.formLink) {
-            $scope.selectedForm.formLinkPreview = $scope.selectedForm.formLink;
-        }
-
-        try { $scope.getDentists(); } catch (e) { }
-
-        $timeout(function () {
-            var modalElem = document.getElementById('modal-edit-form');
-            if (modalElem) {
-                var inst = M.Modal.getInstance(modalElem);
-                if (!inst) inst = M.Modal.init(modalElem);
-                inst.open();
-            }
-        }, 60);
-    };
-
-    //for forms deletion
-    $scope.selectDeleteForm = function (formID) {
-        $scope.deleteFormID = formID;
-        $timeout(function () {
-            var modal = document.getElementById('modal-delete-form');
-            if (modal) {
-                var inst = M.Modal.getInstance(modal);
-                if (!inst) inst = M.Modal.init(modal);
-                inst.open();
-            }
-        }, 40);
-    };
-
-    // perform deletion
-    $scope.deleteFormThis = function () {
-        if ($scope.isUserStaff) {
-            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot delete forms.' });
-            return;
-        }
-
-        if (!$scope.deleteFormID) {
-            Swal.fire({ icon: 'error', title: 'Error', text: 'No form selected.' });
-            return;
-        }
-        RGDCWebApplicationService.deleteForm($scope.deleteFormID)
-            .then(function (resp) {
-                var d = resp && resp.data ? resp.data : resp;
-                if (d && d.success) {
-                    Swal.fire({ icon: 'success', title: 'Deleted', text: d.message || 'Form deleted.' }).then(function () {
-                        var modal = document.getElementById('modal-delete-form');
-                        if (modal && typeof M !== 'undefined' && M.Modal) {
-                            var mi = M.Modal.getInstance(modal);
-                            if (mi) mi.close();
-                        }
-                        $scope.loadPatientForms();
-                    });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: (d && d.message) ? d.message : 'Failed to delete form.' });
-                }
-            })
-            .catch(function (err) {
-                console.error('deleteForm error', err);
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete form.' });
-            });
-    };
-
     $scope._pickedAccountPhotoFile = null;
     $scope.accountPhotoPreview = null;
 

@@ -161,7 +161,7 @@
     };
 
     this.deletePostOp = function () {
-        return $http.post('/RGDC/getPostOp');
+        return $http.post('/RGDC/deletePostOp');
     }
 
 
