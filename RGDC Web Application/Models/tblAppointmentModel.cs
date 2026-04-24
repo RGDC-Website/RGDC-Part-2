@@ -15,6 +15,7 @@ namespace RGDC_Web_Application.Models
         public string reason { get; set; }
         public string remarks { get; set; }
         public string status { get; set; }
+        public int isArchived { get; set; }
         public DateTime schedCreatedAt { get; set; }
         public DateTime schedUpdatedAt { get; set; }
 

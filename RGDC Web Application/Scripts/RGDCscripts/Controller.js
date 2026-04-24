@@ -1,14 +1,14 @@
 ﻿app.controller("RGDCWebApplicationController", function ($scope, $timeout, RGDCWebApplicationService, $http, $rootScope, $sce) {
     //DON'T MERGE ANYTHING MUNA NASISIRA CODE
     $scope.signaturePreview = null;
-    $scope._uploadedSignaturePath = null;   
+    $scope._uploadedSignaturePath = null;
     // retry counters for transient network/abort errors (-1)
     var _adminLoadRetries = 0;
     var _reqLoadRetries = 0;
 
     $scope.currentUserName = "";
     $scope.currentUserID = "";
-    $scope.currentUserPhoto = ""; 
+    $scope.currentUserPhoto = "";
     $scope.currentUserSignature = "";
     const STRENGTH = {
         WEAK: 'Weak',
@@ -29,7 +29,7 @@
         history: {
             women: {},
             other: {}
-},
+        },
         conditions: {}
     };
     $scope.currentUserAuthorization;
@@ -45,6 +45,21 @@
         { dayOfWeek: 5, dayName: 'Friday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
         { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 }
     ];
+
+    // Same shape as signup schedule, but Date objects for <input type="time"> in profile modal.
+    // Must exist on load: ng-repeat in #modalDentistSchedule runs before openDentistScheduleModal().
+    (function initDentistScheduleDaysEarly() {
+        function dsT(h, m) { return new Date(1970, 0, 1, h, m, 0, 0); }
+        $scope.dentistScheduleDays = [
+            { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 4, dayName: 'Thursday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 5, dayName: 'Friday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
+            { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 }
+        ];
+    })();
 
     $scope.nationalities = [
         "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan",
@@ -396,12 +411,12 @@
                                         $scope.whatStaffForm = "Owner"
                                     } else if (data.permission == 1) {
                                         $scope.signUpDentist = true;
-                                        $scope.signUp_role = 2; 
+                                        $scope.signUp_role = 2;
                                         $scope.whatStaffForm = "Dentist"
                                     } else if (data.permission == 2) {
                                         $scope.signUpStaff = true;
                                         $scope.whatStaffForm = "Staff"
-                                        $scope.signUp_role = 2; 
+                                        $scope.signUp_role = 2;
                                     }
                                     $scope.signUp_permission = data.permission;
                                     console.log($scope.signUpStaff)
@@ -429,12 +444,12 @@
                                 text: data.message,
                             });
                         }
-                        });
+                    });
                     //var elem = document.getElementById("modalPatientInformationForm");
                     //if (!elem) {
                     //    elem = document.getElementById("patientInformationForm");
                     //}
-                    
+
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -479,13 +494,15 @@
                     };
                 });
 
-                // Filter past appointments for non-owner users
+                // Filter past appointments for users who are not clinic-wide viewers
                 var filtered = mapped;
                 try {
                     var auth = String($scope.currentUserAuthorization || "");
+                    var perm = String($scope.currentUserPermission || "");
                     var userFull = ($scope.currentUserFullName || "").trim();
                     var userId = String($scope.currentUserID || "");
-                    if (auth !== "0") { // not owner
+                    var seeAllPast = auth === "0" || auth === "1" || (auth === "2" && perm === "2");
+                    if (!seeAllPast) {
                         filtered = mapped.filter(function (m) {
                             var dn = (m.dentistName || "").trim();
                             var pn = (m.patientName || "").trim();
@@ -820,7 +837,7 @@
                 try { if ($rootScope) $rootScope.adminAppointments = []; } catch (e) { }
             });
     };
-    
+
 
     $scope.signUp = function () {
 
@@ -932,10 +949,122 @@
     $scope.signUpClinicStaff = function () {
 
         try {
+            function buildFullAddressFromParts() {
+                // Build signUp_address from separated inputs (skip blanks)
+                var parts = [
+                    $scope.address_houseNo,
+                    $scope.address_street,
+                    $scope.address_barangay,
+                    $scope.address_city,
+                    $scope.address_province
+                ].map(function (p) { return (p || '').toString().trim(); }).filter(Boolean);
+                $scope.signUp_address = parts.join(', ');
+            }
+
+            // Expose a helper so the view can force-sync on keystroke
+            if (typeof $scope.syncSignUpAddress !== 'function') {
+                $scope.syncSignUpAddress = function () {
+                    try {
+                        buildFullAddressFromParts();
+                        // ensure digest picks up hidden field updates
+                        $timeout(function () { }, 0);
+                    } catch (_) { }
+                };
+            }
+
+            // Keep the combined address always in sync (so submit sees latest typing)
+            try {
+                if (!$scope._addressWatchBound) {
+                    $scope._addressWatchBound = true;
+                    $scope.$watchGroup(
+                        ['address_houseNo', 'address_street', 'address_barangay', 'address_city', 'address_province'],
+                        function () { try { buildFullAddressFromParts(); } catch (_) { } }
+                    );
+                }
+            } catch (_) { }
+
+            function normalizeTimeToHHMM(value) {
+                if (value === null || typeof value === 'undefined') return null;
+                // Date -> HH:mm
+                try {
+                    if (value instanceof Date && !isNaN(value.getTime())) {
+                        return String(value.getHours()).padStart(2, '0') + ':' + String(value.getMinutes()).padStart(2, '0');
+                    }
+                } catch (_) { }
+
+                var s = String(value).trim();
+                if (!s) return null;
+
+                // "HH:mm" or "H:mm"
+                var m1 = s.match(/^(\d{1,2}):(\d{2})$/);
+                if (m1) return m1[1].padStart(2, '0') + ':' + m1[2];
+
+                // "HH:mm:ss"
+                var m2 = s.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+                if (m2) return m2[1].padStart(2, '0') + ':' + m2[2];
+
+                // "08:00:00.000 AM" / "8:00:00.000 PM" (what you're seeing in the modal)
+                var m3 = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?\s*(AM|PM)$/i);
+                if (m3) {
+                    var hh = parseInt(m3[1], 10);
+                    var mm = parseInt(m3[2], 10);
+                    var mer = (m3[4] || '').toUpperCase();
+                    if (mer === 'PM' && hh !== 12) hh += 12;
+                    if (mer === 'AM' && hh === 12) hh = 0;
+                    return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+                }
+
+                return null;
+            }
+
+            function hhmmToMinutes(hhmm) {
+                var m = String(hhmm || '').match(/^(\d{2}):(\d{2})$/);
+                if (!m) return null;
+                var hh = parseInt(m[1], 10), mm = parseInt(m[2], 10);
+                if (isNaN(hh) || isNaN(mm)) return null;
+                return hh * 60 + mm;
+            }
+
+            function validateDentistScheduleOrThrow() {
+                // Require at least one enabled day with valid time range for dentist signup
+                var arr = Array.isArray($scope.modalScheduleDays) ? $scope.modalScheduleDays : [];
+                var enabled = arr.filter(function (d) { return d && d.enabled; });
+                if (!enabled.length) {
+                    throw new Error("Please set at least one available day in Weekly Schedule.");
+                }
+                enabled.forEach(function (d) {
+                    var stHHMM = normalizeTimeToHHMM(d.startTime);
+                    var etHHMM = normalizeTimeToHHMM(d.endTime);
+                    var sm = parseInt(d.slotMinutes, 10);
+                    if (!stHHMM || !etHHMM) throw new Error("Please set start/end time for " + (d.dayName || "a day") + ".");
+
+                    // Normalize model values so later persistence uses clean HH:mm
+                    d.startTime = stHHMM;
+                    d.endTime = etHHMM;
+
+                    var sMin = hhmmToMinutes(stHHMM), eMin = hhmmToMinutes(etHHMM);
+                    if (sMin === null || eMin === null) throw new Error("Invalid time format for " + (d.dayName || "a day") + ".");
+                    if (eMin <= sMin) throw new Error((d.dayName || "A day") + ": end time must be after start time.");
+                    if (isNaN(sm) || sm < 5) throw new Error((d.dayName || "A day") + ": slot minutes must be at least 5.");
+                });
+                return true;
+            }
+
             var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password) {
+            // Always sync combined address before validating
+            buildFullAddressFromParts();
+
+            // Coerce branch to number if it came through as a string
+            try {
+                if ($scope.signUp_branchID !== null && typeof $scope.signUp_branchID !== 'undefined' && $scope.signUp_branchID !== '') {
+                    var b = parseInt($scope.signUp_branchID, 10);
+                    $scope.signUp_branchID = isNaN(b) ? null : b;
+                }
+            } catch (_) { }
+
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
                 var accountData = {
                     firstName: $scope.signUp_firstName,
                     middleName: $scope.signUp_middleName,
@@ -966,6 +1095,17 @@
                 accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
 
                 if ($scope.signUp_agreement == true) {
+                    // Dentist must configure weekly schedule before we create the account
+                    if (parseInt($scope.signUp_permission, 10) === 1) {
+                        try {
+                            validateDentistScheduleOrThrow();
+                        } catch (e) {
+                            Swal.fire({ icon: 'error', title: 'Weekly Schedule Required', text: e.message || 'Please set your weekly availability first.' });
+                            try { $scope.openScheduleModal(); } catch (_) { }
+                            return;
+                        }
+                    }
+
                     // show progress modal
                     Swal.fire({
                         title: 'Creating account...',
@@ -983,66 +1123,61 @@
                             Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
                             return;
                         }
+                        // Chain role-specific creation and (for dentists) schedule persistence.
+                        var rolePromise = null;
+
                         if ($scope.signUp_permission == 0) {
                             var ownerData = {
                                 accID: accID,
                                 specialization: $scope.signUp_specialization,
                             }
-                            var addOwnerAcc = RGDCWebApplicationService.signUpOwner(ownerData);
-                            addOwnerAcc.then(function (returnedData) {
-                            }).catch(function (err) {
-                                Swal.close();
-                                console.error('signUpPatient failed', err);
-                                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save account information. Contact support.' });
-                            });
+                            rolePromise = RGDCWebApplicationService.signUpOwner(ownerData);
                         } else if ($scope.signUp_permission == 1) {
                             var dentistData = {
                                 accID: accID,
                                 specialization: $scope.signUp_specialization,
                                 branchID: $scope.signUp_branchID
                             }
-                            var addDentistAcc = RGDCWebApplicationService.signUpDentist(dentistData);
-                            addDentistAcc.then(function (returnedData) {
-                                console.log(returnedData);
-                                // attempt to persist schedule (use accID from outer signUp response)
-                                $scope.persistDentistScheduleAfterSignup(accID)
-                                    .then(function () {
-                                        // no-op or additional UX if you want
-                                    })
-                                    .catch(function (e) {
-                                        console.warn('persistDentistScheduleAfterSignup failed', e);
-                                    });
-                            }).catch(function (err) {
-                                Swal.close();
-                                console.error('signUpPatient failed', err);
-                                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save account information. Contact support.' });
-                            });
+                            rolePromise = RGDCWebApplicationService
+                                .signUpDentist(dentistData)
+                                .then(function (respDent) {
+                                    var dentistID = respDent && respDent.data ? (respDent.data.dentistID || null) : null;
+                                    dentistID = parseInt(dentistID, 10);
+                                    if (!dentistID || isNaN(dentistID)) throw new Error('Failed to resolve dentistID for schedule saving.');
+                                    // required: persist schedule before finishing signup UX
+                                    return $scope.persistDentistScheduleAfterSignup(dentistID);
+                                });
                         } else if ($scope.signUp_permission == 2) {
                             var staffData = {
                                 accID: accID,
                                 staffRole: $scope.signUp_staffRole,
                                 branchID: $scope.signUp_branchID
                             }
-                            var addStaffAcc = RGDCWebApplicationService.signUpStaff(staffData);
-                            addStaffAcc.then(function (returnedData) {
-                               console.log(returnedData)
-                            }).catch(function (err) {
+                            rolePromise = RGDCWebApplicationService.signUpStaff(staffData);
+                        }
+
+                        Promise.resolve(rolePromise)
+                            .then(function () {
+                                // remove from queue (best effort)
+                                try {
+                                    var emailQueue = { email: $scope.signUp_email };
+                                    RGDCWebApplicationService.removeFromQueue(emailQueue);
+                                } catch (_) { }
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Account Created',
+                                    text: 'Your account has been created successfully.',
+                                    confirmButtonText: 'Go to Login'
+                                }).then(function () {
+                                    window.location.href = "/RGDC/logIn";
+                                });
+                            })
+                            .catch(function (err) {
                                 Swal.close();
-                                console.error('signUpPatient failed', err);
-                                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save account information. Contact support.' });
-                            });
-                        }
-                        var emailQueue = {
-                            email: $scope.signUp_email
-                        }
-                        RGDCWebApplicationService.removeFromQueue(emailQueue);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Account Created',
-                                text: 'Your account has been created successfully.',
-                                confirmButtonText: 'Go to Login'
-                            }).then(function () {
-                                window.location.href = "/RGDC/logIn";
+                                console.error('Role creation/schedule persistence failed', err);
+                                var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Failed to save account information. Please try again.';
+                                Swal.fire({ icon: 'error', title: 'Error', text: msg });
                             });
                     }).catch(function (err) {
                         Swal.close();
@@ -1059,10 +1194,27 @@
                 }
             }
             else {
+                // Show which fields are missing to avoid guesswork
+                var missing = [];
+                if (!$scope.signUp_firstName) missing.push('First Name');
+                if (!$scope.signUp_lastName) missing.push('Last Name');
+                if (!$scope.signUp_genderID) missing.push('Gender');
+                if (!$scope.signUp_birthDate) missing.push('Birth Date');
+                if (!$scope.signUp_email) missing.push('Email');
+                if (!$scope.signUp_contactNumber) missing.push('Contact Number');
+                if (!$scope.signUp_address || String($scope.signUp_address).trim().length === 0) missing.push('Address');
+                if (!$scope.signUp_civilStatus) missing.push('Civil Status');
+                if (!$scope.signUp_password) missing.push('Password');
+                // Dentist/staff branch is required for downstream save; show if missing
+                if (($scope.signUpDentist || $scope.signUpStaff) &&
+                    ($scope.signUp_branchID === null || typeof $scope.signUp_branchID === 'undefined' || $scope.signUp_branchID === '')) {
+                    missing.push('Branch');
+                }
+
                 Swal.fire({
                     icon: "error",
                     title: "Incomplete Inputs",
-                    text: "Ensure all fields are filled up with valid information.",
+                    text: missing.length ? ("Missing: " + missing.join(', ')) : "Ensure all fields are filled up with valid information.",
                 });
             }
         } catch (e) {
@@ -1120,8 +1272,8 @@
                 }).then(() => {
                     // Redirect based on user role
                     var auth = String(returnedData.data.authorization || "");
-                        window.location.href = "/RGDC/adminDashboard";
-                    
+                    window.location.href = "/RGDC/adminDashboard";
+
                 });
             } else {
                 $scope.loginError = returnedData.data ? returnedData.data.message : "Invalid email or password";
@@ -1269,7 +1421,7 @@
         });
     }
 
-  
+
     $scope.resetPassword = function () {
 
         if ($scope.forgot_newPassword !== $scope.forgot_confirmPassword) {
@@ -1308,7 +1460,7 @@
                     title: "Password Not Changed",
                     text: returnedData.data.message,
                 });
-            }   
+            }
         });
     };
 
@@ -1390,9 +1542,15 @@
     }
 
     $scope.goToPatientInfo = function (patient) {
-        var patientID = {
-            patientID: patient.patientID.toString()
+        // Normalize patientID to a valid integer before posting to session
+        var pid = null;
+        try { pid = parseInt(patient && patient.patientID, 10); } catch (_) { pid = null; }
+        if (!pid || isNaN(pid) || pid <= 0) {
+            console.warn('goToPatientInfo: invalid patientID', patient && patient.patientID);
+            Swal.fire({ icon: 'error', title: 'Error', text: 'Invalid patient selected.' });
+            return;
         }
+        var patientID = { patientID: String(pid) };
 
         if ($scope.currentUserAuthorization != "2") {
             RGDCWebApplicationService.goToPatient(patientID)
@@ -1413,7 +1571,13 @@
                 var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
                     console.log(patientInfo)
-                    if (!patientInfo || !patientInfo.data) return;
+                    // Server can return null/empty when no patient is selected.
+                    // Normalize to "no patient" instead of breaking downstream code.
+                    if (!patientInfo || !patientInfo.data || typeof patientInfo.data !== 'object') {
+                        $scope.selectedPatient = null;
+                        $scope.paymentsArray = [];
+                        return;
+                    }
 
                     var p = patientInfo.data;
 
@@ -1488,6 +1652,21 @@
                     }
 
                     $scope.selectedPatient = p;
+
+                    // load dental chart/xray history table
+                    try {
+                        if ($scope.selectedPatient && $scope.selectedPatient.patientID && typeof $scope.loadPatientImages === 'function') {
+                            $scope.loadPatientImages($scope.selectedPatient.patientID);
+                        }
+                    } catch (e) { }
+
+                    // load dental chart/xray history table
+                    try {
+                        if ($scope.selectedPatient && $scope.selectedPatient.patientID && typeof $scope.loadPatientImages === 'function') {
+                            $scope.loadPatientImages($scope.selectedPatient.patientID);
+                        }
+                    } catch (e) { }
+
                     $scope.editPatientEmailValid = $scope.hasValidEmail(($scope.selectedPatient && $scope.selectedPatient.email) ? $scope.selectedPatient.email.trim() : '');
                     $scope.editPatientEmailTaken = false;
                     try { $scope.checkEditPatientEmail(); } catch (e) { /* safe */ }
@@ -1504,24 +1683,27 @@
 
                     initializeDatepicker();
                 });
-                    var getPayments = RGDCWebApplicationService.getOwnPayments();
-                    getPayments.then(function (paymentList) {
-                        $scope.paymentsArray = paymentList.data;
-                        $scope.paymentsArray.forEach(function (payment) {
-                            console.log($scope.paymentsArray)
-                            if (payment.paymentDate) {
-                                payment.paymentDate = formatDateToMDY(payment.paymentDate)
-                            }
-                        })
-
-
-                        $timeout(function () {
-                            initProgressNotesDataTable({ maxRetries: 30, retryDelay: 120 });
-                        }, 80);
-                    }).catch(function (err) {
-                        console.error('getPatientTreatment error', err);
+                console.log("here")
+                var getPayments = RGDCWebApplicationService.getOwnPayments();
+                getPayments.then(function (paymentList) {
+                    var data = paymentList ? paymentList.data : null;
+                    // API can return { success:false, message:"..." } when no patient is selected
+                    $scope.paymentsArray = Array.isArray(data) ? data : [];
+                    $scope.paymentsArray.forEach(function (payment) {
+                        if (payment && payment.paymentDate) {
+                            payment.paymentDate = formatDateToMDY(payment.paymentDate);
+                        }
                     });
-                
+
+
+                    $timeout(function () {
+                        initProgressNotesDataTable({ maxRetries: 30, retryDelay: 120 });
+                    }, 80);
+                }).catch(function (err) {
+                    console.error('getPatientTreatment error', err);
+                    $scope.paymentsArray = [];
+                });
+
             } else {
                 var getPatientInfo = RGDCWebApplicationService.getOwnPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
@@ -1753,25 +1935,25 @@
     $scope.updatePatientProfile = function () {
         if (!$scope.selectedPatient) return;
 
-            if ($scope.selectedPatient.email) {
-        // ensure format checked at least once
-        if (!$scope.editPatientEmailValid) {
-            Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
-            return;
+        if ($scope.selectedPatient.email) {
+            // ensure format checked at least once
+            if (!$scope.editPatientEmailValid) {
+                Swal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email address.' });
+                return;
+            }
+            if ($scope.editPatientEmailTaken) {
+                Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is already in use by another account.' });
+                return;
+            }
         }
-        if ($scope.editPatientEmailTaken) {
-            Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is already in use by another account.' });
-            return;
-        }
-    }
 
         var profInfo = {
-             patientID: $scope.selectedPatient.patientID,
-             accID: $scope.selectedPatient.accID,
-             firstName: $scope.selectedPatient.firstName,
-             middleName: $scope.selectedPatient.middleName,
-             lastName: $scope.selectedPatient.lastName,
-             genderID: (typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null)
+            patientID: $scope.selectedPatient.patientID,
+            accID: $scope.selectedPatient.accID,
+            firstName: $scope.selectedPatient.firstName,
+            middleName: $scope.selectedPatient.middleName,
+            lastName: $scope.selectedPatient.lastName,
+            genderID: (typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null)
                 ? parseInt($scope.selectedPatient.genderID)
                 : null,
              birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
@@ -1784,16 +1966,16 @@
             city: $scope.selectedPatient.city,
             postal: $scope.selectedPatient.postal,
             civilStatus: $scope.selectedPatient.civilStatus,
-             occupation: $scope.selectedPatient.occupation,
-             religion: $scope.selectedPatient.religion,
-             nationality: $scope.selectedPatient.nationality,
-             currentPhysician: $scope.selectedPatient.currPhy || $scope.selectedPatient.currentPhysician,
-             previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
-             guardian: $scope.selectedPatient.guar,
-             guardianNumber: $scope.selectedPatient.guarNum,
-             referral: $scope.selectedPatient.referral
-         };
-         console.log(profInfo)
+            occupation: $scope.selectedPatient.occupation,
+            religion: $scope.selectedPatient.religion,
+            nationality: $scope.selectedPatient.nationality,
+            currentPhysician: $scope.selectedPatient.currPhy || $scope.selectedPatient.currentPhysician,
+            previousPhysician: $scope.selectedPatient.prevPhy || $scope.selectedPatient.previousPhysician,
+            guardian: $scope.selectedPatient.guar,
+            guardianNumber: $scope.selectedPatient.guarNum,
+            referral: $scope.selectedPatient.referral
+        };
+        console.log(profInfo)
         var updateData = RGDCWebApplicationService.updatePatient(profInfo);
         updateData.then(function (response) {
             if (response.data.success) {
@@ -1938,6 +2120,162 @@
         };
 
         input.click();
+    };
+
+    // Dental chart / Xray (stored in tbl_patient.dentalChartLink + dentalChartType)
+    $scope.dentalUploadType = $scope.dentalUploadType || "";
+    $scope._pickedDentalChartFile = null;
+
+    $scope.openDentalChartModalView = function () {
+        try {
+            if (!$scope.selectedPatient) return;
+            $scope.dentalUploadType = $scope.selectedPatient.dentalChartType || $scope.dentalUploadType || "";
+            var modalImg = document.getElementById('dentalChartModalImg');
+            if (modalImg && $scope.selectedPatient.dentalChartLink) {
+                modalImg.src = $scope.selectedPatient.dentalChartLink + '?t=' + new Date().getTime();
+            }
+        } catch (_) { }
+    };
+
+    $scope.patientImages = $scope.patientImages || [];
+    $scope.loadPatientImages = function (patientID) {
+        return RGDCWebApplicationService.getPatientImages(patientID)
+            .then(function (resp) {
+                var data = resp && resp.data ? resp.data : [];
+                var arr = Array.isArray(data) ? data : [];
+                // Normalize createdAt from MVC "/Date(…)/" into real JS Date for Angular date filter
+                $scope.patientImages = arr.map(function (x) {
+                    try {
+                        var y = Object.assign({}, x);
+                        if (y && y.createdAt) {
+                            var js = parseJsonDateToJsDate(y.createdAt);
+                            if (js) y.createdAt = js;
+                        }
+                        return y;
+                    } catch (_) {
+                        return x;
+                    }
+                });
+                $timeout(function () { }, 0);
+            })
+            .catch(function (err) {
+                console.error('getPatientImages error', err);
+                $scope.patientImages = [];
+            });
+    };
+
+    $scope.viewPatientImage = function (img) {
+        try {
+            if (!img) return;
+            $scope.dentalUploadType = img.imageType || $scope.dentalUploadType || "";
+            var modalImg = document.getElementById('dentalChartModalImg');
+            if (modalImg && img.imagePath) {
+                modalImg.src = img.imagePath + '?t=' + new Date().getTime();
+            }
+        } catch (_) { }
+    };
+
+    $scope.pickDentalChartFile = function () {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+
+        input.onchange = function (e) {
+            var file = e.target.files && e.target.files[0];
+            if (!file) {
+                document.body.removeChild(input);
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({ icon: 'error', title: 'Invalid File', text: 'Please select an image file.' });
+                document.body.removeChild(input);
+                return;
+            }
+
+            $scope._pickedDentalChartFile = file;
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                $timeout(function () {
+                    var modalImg = document.getElementById('dentalChartModalImg');
+                    if (modalImg) modalImg.src = evt.target.result;
+                }, 0);
+            };
+            reader.readAsDataURL(file);
+            document.body.removeChild(input);
+        };
+        input.click();
+    };
+
+    $scope.saveDentalChart = function () {
+        try {
+            function ensureSelectedPatient() {
+                if ($scope.selectedPatient && $scope.selectedPatient.patientID) return Promise.resolve($scope.selectedPatient);
+                // fallback: load from session-selected patient
+                return RGDCWebApplicationService.getSelectedPatientDetails().then(function (resp) {
+                    if (resp && resp.data) {
+                        $scope.selectedPatient = resp.data;
+                        return $scope.selectedPatient;
+                    }
+                    return null;
+                });
+            }
+            if (!$scope.dentalUploadType) {
+                return Swal.fire({ icon: 'error', title: 'Missing Type', text: 'Please select Xray or Dental Chart.' });
+            }
+            if (!$scope._pickedDentalChartFile) {
+                return Swal.fire({ icon: 'error', title: 'No File', text: 'Please upload/select an image first.' });
+            }
+
+            Swal.fire({ title: 'Uploading...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+
+            ensureSelectedPatient().then(function (p) {
+                if (!p || !p.patientID) {
+                    throw new Error('No patient selected.');
+                }
+                return RGDCWebApplicationService.uploadFile($scope._pickedDentalChartFile)
+                    .then(function (resp) {
+                        var json = resp && resp.data ? resp.data : {};
+                        if (!(json.success === true && json.filePath)) throw new Error(json.message || 'Upload failed.');
+                        return RGDCWebApplicationService.saveDentalChart({
+                            patientID: parseInt(p.patientID, 10),
+                            imagePath: json.filePath,
+                            imageType: $scope.dentalUploadType
+                        });
+                    })
+                    .then(function (resp2) {
+                        var d = resp2 && resp2.data ? resp2.data : {};
+                        if (!d.success) throw new Error(d.message || 'Failed to save dental chart.');
+                        $scope._pickedDentalChartFile = null;
+                        // Refresh patient details so table shows the new type/path
+                        return RGDCWebApplicationService.getSelectedPatientDetails();
+                    })
+                    .then(function (patientInfo) {
+                        if (patientInfo && patientInfo.data) {
+                            $scope.selectedPatient = patientInfo.data;
+                        }
+                        // refresh list
+                        try {
+                            if ($scope.selectedPatient && $scope.selectedPatient.patientID) {
+                                $scope.loadPatientImages($scope.selectedPatient.patientID);
+                            }
+                        } catch (_) { }
+
+                        Swal.fire({ icon: 'success', title: 'Saved', text: 'Image uploaded.' });
+                    })
+                    .catch(function (err) {
+                        console.error('saveDentalChart error', err);
+                        Swal.fire({ icon: 'error', title: 'Error', text: (err && err.message) ? err.message : 'Failed to upload.' });
+                    });
+            }).catch(function (e) {
+                console.error('saveDentalChart ensureSelectedPatient error', e);
+                Swal.fire({ icon: 'error', title: 'No patient', text: e.message || 'No patient selected.' });
+            });
+        } catch (e) {
+            console.error('saveDentalChart error', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message || 'Failed to upload.' });
+        }
     };
 
     $scope.getImages = function () {
@@ -2114,7 +2452,7 @@
     $scope.goHome = function () {
         if ($scope.isUserPatient) {
             window.location.href = '/RGDC/patientDashboard';
-        } else if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
+        } else if (String($scope.currentUserAuthorization || "") === "2" && String($scope.currentUserPermission || "") === "1") {
             window.location.href = '/RGDC/dentistDashboard';
         } else {
             window.location.href = '/RGDC/adminDashboard';
@@ -2293,7 +2631,7 @@
         );
     };
 
-    $scope.deletePostOp = function (){
+    $scope.deletePostOp = function () {
         RGDCWebApplicationService.deletePostOp();
         window.location.href = "/RGDC/patientProfile"
     }
@@ -2307,8 +2645,8 @@
             var inst = M.Modal.getInstance(modal);
             if (inst) inst.close();
         }
-       window.location.href = "/RGDC/patientProfile"
-    }   
+        window.location.href = "/RGDC/patientProfile"
+    }
 
     app.controller('YourController', function ($scope, $sce) {
 
@@ -2362,7 +2700,7 @@
     // --- Edit appointment functionality ---
     // Store appointment ID independently to prevent scope loss
     var currentEditingApptID = null;
-    
+
     $scope.editingAppt = {
         apptID: null,
         dateObj: '',
@@ -2423,7 +2761,7 @@
                 if (hiddenField) {
                     hiddenField.value = appt.apptID;
                 }
-                
+
                 // store apptID on modal element as backup
                 modalElem.setAttribute('data-edit-appt-id', appt.apptID);
                 var modalInst = M.Modal.getInstance(modalElem);
@@ -2451,7 +2789,7 @@
         var hiddenField = document.getElementById('hiddenApptID');
         var hiddenApptID = hiddenField ? parseInt(hiddenField.value) : null;
         var apptIDToUse = $scope.editingAppt.apptID || hiddenApptID || currentEditingApptID;
-        
+
         if (!apptIDToUse) {
             Swal.fire({
                 icon: 'error',
@@ -2473,7 +2811,7 @@
         // Parse ISO date format (YYYY-MM-DD) from HTML5 date input
         var isoDateStr = $scope.editingAppt.dateObj;
         var dateTime = new Date(isoDateStr);
-        
+
         if (isNaN(dateTime.getTime())) {
             Swal.fire({
                 icon: 'error',
@@ -2486,7 +2824,7 @@
         // Extract time from the time string (format: "h:mm AM/PM" or "HH:mm")
         var timeStr = $scope.editingAppt.timeStr;
         var timeParts = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-        
+
         if (!timeParts) {
             Swal.fire({
                 icon: 'error',
@@ -2538,17 +2876,17 @@
                         icon: 'success',
                         title: 'Success!',
                         text: 'Appointment updated successfully.'
-                    }).then(function() {
+                    }).then(function () {
                         // Close modal
                         var modal = findModalElement(['modalEditSchedAppt', 'modalEditSched', 'modal-edit-sched']);
                         if (modal && typeof M !== 'undefined' && M.Modal) {
                             var inst = M.Modal.getInstance(modal);
                             if (inst) inst.close();
                         }
-                        
+
                         // Reset closure variable
                         currentEditingApptID = null;
-                        
+
                         // Reset the editingAppt object
                         $scope.editingAppt = {
                             apptID: null,
@@ -2561,7 +2899,7 @@
                             status: 'Scheduled',
                             remarks: ''
                         };
-                        
+
                         // Reload appointments
                         $scope.loadAdminScheduledAppointments();
                     });
@@ -2605,6 +2943,21 @@
         }
     };
 
+    function selectAdminAppointmentTab(tabId) {
+        try {
+            var tabsEl = document.querySelector('.tabs');
+            if (tabsEl && typeof M !== 'undefined' && M && M.Tabs) {
+                var inst = M.Tabs.getInstance(tabsEl);
+                if (!inst) inst = M.Tabs.init(tabsEl, {});
+                if (inst && typeof inst.select === 'function') inst.select(tabId);
+            } else {
+                // fallback: trigger click on anchor
+                var a = document.querySelector('a[href="#' + tabId + '"]');
+                if (a) a.click();
+            }
+        } catch (_) { }
+    }
+
     // Initialize admin appointments on controller load
     $timeout(function () {
         // Ensure session variables loaded to know current role
@@ -2615,7 +2968,7 @@
             $scope.loadRequestedAppointments();
             $scope.loadPastAppointments();
 
-            if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
+            if (String($scope.currentUserAuthorization || "") === "2" && String($scope.currentUserPermission || "") === "1") {
                 RGDCWebApplicationService.getCurrentDentist().then(function (resp) {
                     if (resp && resp.data && resp.data.success) {
                         $scope.currentDentist = { dentistID: resp.data.dentistID, dentistName: resp.data.dentistName };
@@ -2625,6 +2978,8 @@
 
                         // ensure time options recompute immediately (in case date already chosen)
                         $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { console.error(e); } }, 0);
+                        // Re-bind requested-appointments actions (canActOnRequest uses currentDentist + appt.dentistID)
+                        $timeout(function () { try { $scope.loadRequestedAppointments(); } catch (e2) { } }, 0);
                     }
                 }).catch(function () { });
             }
@@ -2665,7 +3020,7 @@
             }
 
             // compute minimum selectable date (today + 3 days) for appointment date inputs (global)
-            (function computeMinDate(){
+            (function computeMinDate() {
                 var d = new Date();
                 d.setDate(d.getDate() + 3);
                 var yyyy = d.getFullYear();
@@ -2698,18 +3053,19 @@
             $scope.loadRequestedAppointments();
             $scope.loadAdminScheduledAppointments();
             // If dentist user, get current dentist info so modal can prefill
-            if ($scope.currentUserAuthorization === "2" && $scope.currentUserPermission === "1") {
+            if (String($scope.currentUserAuthorization || "") === "2" && String($scope.currentUserPermission || "") === "1") {
                 RGDCWebApplicationService.getCurrentDentist().then(function (resp) {
                     if (resp && resp.data && resp.data.success) {
                         $scope.currentDentist = { dentistID: resp.data.dentistID, dentistName: resp.data.dentistName };
                         $scope.newApptRequest = $scope.newApptRequest || {};
                         $scope.newApptRequest.dentistID = parseInt(resp.data.dentistID, 10);
                         $timeout(function () { try { $scope.updateTimeOptions(); } catch (e) { console.error(e); } }, 0);
+                        $timeout(function () { try { $scope.loadRequestedAppointments(); } catch (e2) { } }, 0);
                     }
                 }).catch(function () { });
             }
             // compute minimum selectable date (today + 3 days) for appointment date inputs
-            (function computeMinDate(){
+            (function computeMinDate() {
                 var d = new Date();
                 d.setDate(d.getDate() + 3);
                 var yyyy = d.getFullYear();
@@ -2747,6 +3103,8 @@
                         Swal.fire({ icon: 'success', title: 'Deleted', text: resp.data.message }).then(function () {
                             $scope.loadAdminScheduledAppointments();
                             $scope.loadPastAppointments();
+                            // jump user to Past Appointments tab
+                            selectAdminAppointmentTab('past');
                         });
                     } else {
                         Swal.fire({ icon: 'error', title: 'Error', text: (resp && resp.data && resp.data.message) || 'Failed to delete appointment.' });
@@ -2755,6 +3113,54 @@
                 .catch(function (err) {
                     console.error('deleteAppointment error', err);
                     Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while deleting appointment.' });
+                });
+        });
+    };
+
+    $scope.openArchivePastApptModal = function (appt) {
+        try {
+            $scope.apptToArchive = appt || null;
+            var modalElem = document.getElementById('modalDeletePastAppt');
+            if (!modalElem) return;
+            if (typeof M !== 'undefined' && M && M.Modal) {
+                var instance = M.Modal.getInstance(modalElem);
+                if (!instance) instance = M.Modal.init(modalElem, {});
+                instance.open();
+            } else {
+                modalElem.style.display = 'block';
+            }
+        } catch (e) {
+            console.error('openArchivePastApptModal failed', e);
+        }
+    };
+
+    $scope.archivePastAppointment = function () {
+        var apptID = $scope.apptToArchive && $scope.apptToArchive.apptID ? $scope.apptToArchive.apptID : null;
+        if (!apptID) return Swal.fire({ icon: 'error', title: 'Error', text: 'No appointment selected.' });
+
+        Swal.fire({
+            title: 'Archive Appointment',
+            text: 'This will archive the appointment and remove it from Past Appointments. Continue?',
+            icon: 'warning',
+            showCancelButton: true
+        }).then(function (res) {
+            if (!res.isConfirmed) return;
+
+            RGDCWebApplicationService.archiveAppointment({ apptID: apptID })
+                .then(function (resp) {
+                    if (resp && resp.data && resp.data.success) {
+                        var modalElem = document.getElementById('modalDeletePastAppt');
+                        try { M.Modal.getInstance(modalElem).close(); } catch (e) { modalElem.style.display = 'none'; }
+                        Swal.fire({ icon: 'success', title: 'Archived', text: resp.data.message }).then(function () {
+                            $scope.loadPastAppointments();
+                        });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Error', text: (resp && resp.data && resp.data.message) || 'Failed to archive appointment.' });
+                    }
+                })
+                .catch(function (err) {
+                    console.error('archivePastAppointment error', err);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while archiving appointment.' });
                 });
         });
     };
@@ -2907,14 +3313,17 @@
                         time: timeStr,
                         purpose: a.purpose || a.reason || "",
                         notes: notes,
-                        remarks: a.remarks || "",
+                        // show cleaned notes in the table (hide internal tokens like "RescheduleOf:")
+                        remarks: notes,
+                        dentistID: (typeof a.dentistID !== 'undefined' && a.dentistID !== null) ? parseInt(a.dentistID, 10) : null,
+                        patientID: (typeof a.patientID !== 'undefined' && a.patientID !== null) ? parseInt(a.patientID, 10) : null,
                         dentistName: a.dentistName || "",
                         patientName: a.patientName || "",
                         contactNumber: a.contactNumber || null,
                         requesterName: a.requesterName || null,
                         status: a.status || "",
                         displayStatus: a.displayStatus || a.status || "",
-                        createdBy: a.createdBy || null
+                        createdBy: a.createdBy != null && a.createdBy !== undefined ? a.createdBy : null
                     };
                 });
 
@@ -2943,6 +3352,35 @@
         dentistID: null,
         dateTime: null,
         reason: ""
+    };
+
+    $scope.newApptSubmitted = false;
+    $scope.newApptValid = {
+        patientID: true,
+        dentistID: true,
+        dateTime: true,
+        time: true,
+        reason: true,
+        contactNumber: true
+    };
+
+    $scope.validateNewApptRequest = function () {
+        try {
+            $scope.newApptRequest = $scope.newApptRequest || {};
+            var r = ($scope.newApptRequest.reason || '').toString().trim();
+            var contact = ($scope.newApptRequest.contactNumber || '').toString().trim();
+            $scope.newApptValid.patientID = !!$scope.newApptRequest.patientID;
+            $scope.newApptValid.dentistID = !!$scope.newApptRequest.dentistID;
+            $scope.newApptValid.dateTime = !!$scope.newApptRequest.dateTime;
+            $scope.newApptValid.time = !!$scope.newApptRequest.time;
+            $scope.newApptValid.reason = r.length >= 3;
+            // optional contact: if provided, must match PH mobile pattern
+            $scope.newApptValid.contactNumber = !contact || /^09\d{9}$/.test(contact);
+            return $scope.newApptValid.patientID && $scope.newApptValid.dentistID && $scope.newApptValid.dateTime &&
+                $scope.newApptValid.time && $scope.newApptValid.reason && $scope.newApptValid.contactNumber;
+        } catch (_) {
+            return false;
+        }
     };
 
     // Dashboard lists (per-account view)
@@ -2996,6 +3434,10 @@
     }
 
     $scope.createNewAppointmentRequest = function () {
+        $scope.newApptSubmitted = true;
+        if (!$scope.validateNewApptRequest()) {
+            // keep existing Swal missing-fields UX, but now users also see inline hints
+        }
         // normalize any id value (number, numeric-string or object) to integer or null
         function toNumericId(v) {
             if (v === null || typeof v === 'undefined') return null;
@@ -3275,7 +3717,7 @@
             Swal.fire({ icon: "error", title: "Error", text: "Select Proper Date." });
             return;
         }
- 
+
         $scope.paymentDue = $scope.paymentCost - ($scope.paymentDiscount || 0) - ($scope.paymentPaid || 0);
 
         var paymentData = {
@@ -3291,16 +3733,16 @@
             paid: parseFloat($scope.paymentPaid) || 0,
             balance: parseFloat($scope.paymentDue) || 0,
             description: $scope.paymentDescription,
-            createdBy: $scope.currentUserID         
+            createdBy: $scope.currentUserID
         };
 
 
         $scope.addSubmitted = true;
-        
+
         if ($scope.selectedPatient === null || $scope.selectedDentist === null || !$scope.paymentDate ||
             !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
             $scope.paymentPaid === null) {
-            return; 
+            return;
         }
         if (parseFloat($scope.paymentDue) < 0) {
             Swal.fire({
@@ -3349,17 +3791,17 @@
             description: $scope.paymentInfo.description
         };
 
-       RGDCWebApplicationService.updatePayment(data)
-           .then(function (response) {
-               Swal.fire({ icon: 'success', title: 'Updated', text: 'Successfully updated payment record.' }).then((result) => {
-                   if (result.isConfirmed) {
-                       window.location.href = "/RGDC/adminFinance";
-                       afterUpdate();
-                   }
+        RGDCWebApplicationService.updatePayment(data)
+            .then(function (response) {
+                Swal.fire({ icon: 'success', title: 'Updated', text: 'Successfully updated payment record.' }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC/adminFinance";
+                        afterUpdate();
+                    }
 
-               });
+                });
             })
-    }; 
+    };
 
     $scope.addPatient = function () {
         //for staff restriction in adding patients
@@ -3440,7 +3882,7 @@
                 });
 
             })
-        }    
+        }
     }
 
     // Helper to find modal element by multiple possible ids (handles camelCase vs kebab-case in markup)
@@ -3505,44 +3947,106 @@
             return;
         }
 
+        var pollTimer = null;
         var messageHandler = function (e) {
             if (!e.data || e.data.type !== 'google-auth-success') return;
+            if (e.origin && window.location.origin && e.origin !== window.location.origin) return;
 
-            // optionally verify e.origin in production
+            if (pollTimer) {
+                try { clearInterval(pollTimer); } catch (ePoll) { }
+                pollTimer = null;
+            }
             window.removeEventListener('message', messageHandler);
 
-            // refresh UI state from server
+            // refresh UI state from server ($http already runs inside a digest — do not call $scope.$apply here)
             RGDCWebApplicationService.getSessionVariable()
                 .then(function (resp) {
-                    $scope.$apply(function () {
-                        $scope.googleConnected = !!resp.data.googleRefreshTokenPresent;
-                        $scope.googleCalendarEnabled = !!resp.data.googleCalendarEnabled;
-                    });
+                    var d = resp && resp.data ? resp.data : {};
+                    $timeout(function () {
+                        $scope.googleConnected = !!d.googleRefreshTokenPresent;
+                        $scope.googleCalendarEnabled = !!d.googleCalendarEnabled;
+                        if ($scope.googleConnected && !$scope.googleCalendarEnabled) {
+                            $scope.googleCalendarEnabled = true;
+                        }
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Google Calendar connected',
+                            text: 'Your active scheduled appointments have been synced to Google Calendar.',
+                            timer: 3200,
+                            showConfirmButton: true
+                        });
+                    }, 0);
                 })
                 .catch(function () {
-                    $scope.$apply(function () {
+                    $timeout(function () {
                         $scope.googleConnected = true;
                         $scope.googleCalendarEnabled = true;
-                    });
+                    }, 0);
                 });
 
-            try { popup.close(); } catch (e) { }
+            try { popup.close(); } catch (err) { }
         };
 
         window.addEventListener('message', messageHandler);
+
+        // If the user closes the popup without finishing OAuth, drop the listener
+        pollTimer = setInterval(function () {
+            try {
+                if (popup.closed) {
+                    if (pollTimer) clearInterval(pollTimer);
+                    pollTimer = null;
+                    window.removeEventListener('message', messageHandler);
+                }
+            } catch (e) {
+                if (pollTimer) clearInterval(pollTimer);
+                pollTimer = null;
+            }
+        }, 800);
+    };
+
+    /** Checkbox: enable sync only when Google is connected; disable asks for confirmation (disconnect). */
+    $scope.onGoogleCalendarCheckboxClick = function ($event) {
+        if ($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+        }
+        if ($scope.googleCalendarEnabled) {
+            Swal.fire({
+                title: 'Disconnect Google Calendar?',
+                html: 'Turning this off will stop saving appointments to Google and will remove the stored Google connection for this account.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, disconnect',
+                cancelButtonText: 'Cancel'
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+                $scope.toggleGoogleCalendar(false);
+            });
+            return;
+        }
+        if (!$scope.googleConnected) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Connect Google first',
+                text: 'Use the Connect Google button to sign in, then you can turn on calendar sync.'
+            });
+            return;
+        }
+        $scope.toggleGoogleCalendar(true);
     };
 
     $scope.toggleGoogleCalendar = function (enabled) {
         RGDCWebApplicationService.toggleGoogleCalendar(enabled)
             .then(function (resp) {
                 if (resp.data && resp.data.success) {
-                    $scope.googleCalendarEnabled = enabled;
-                    if (!enabled) {
-                        $scope.googleConnected = false;
-                    }
+                    $timeout(function () {
+                        $scope.googleCalendarEnabled = enabled;
+                        if (!enabled) {
+                            $scope.googleConnected = false;
+                        }
+                    }, 0);
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: (resp.data && resp.data.message) ? resp.data.message : 'Failed to toggled Google calendar sync.' });
-                    // revert toggle UI
                     $timeout(function () { $scope.googleCalendarEnabled = !enabled; }, 0);
                 }
             })
@@ -3575,7 +4079,7 @@
             $scope.clinicOwners = returnedData.data.owners;
             $scope.clinicDentists = returnedData.data.dentists;
             $scope.clinicStaff = returnedData.data.staff;
-        }); 
+        });
     }
     $scope.addOwner = function () {
         var ownerEmail = {
@@ -3766,7 +4270,7 @@
     //    });
     //}
 
-    $scope.selectArchiveOwner = function(accID){
+    $scope.selectArchiveOwner = function (accID) {
         $scope.accArchived = accID;
     }
 
@@ -3791,7 +4295,7 @@
     $scope.selectArchiveStaff = function (accID) {
         $scope.accArchived = accID;
     }
-    
+
     $scope.archiveStaff = function () {
         var staffAcc = {
             accID: $scope.accArchived
@@ -3872,8 +4376,170 @@
             .then(function (returnedData) {
                 $scope.dentist = returnedData.data;
                 $scope.dentist.birthDate = formatDateToMDY($scope.dentist.birthDate);
+
+                // Split address into parts for the profile modal (best-effort)
+                try {
+                    var addr = ($scope.dentist && $scope.dentist.address) ? String($scope.dentist.address) : '';
+                    var parts = addr.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+                    $scope.dentistAddress_houseNo = parts[0] || '';
+                    $scope.dentistAddress_street = parts[1] || '';
+                    $scope.dentistAddress_barangay = parts[2] || '';
+                    $scope.dentistAddress_city = parts[3] || '';
+                    $scope.dentistAddress_province = parts[4] || '';
+                } catch (_) { }
             });
     }
+
+    $scope.syncDentistAddress = function () {
+        try {
+            var parts = [
+                $scope.dentistAddress_houseNo,
+                $scope.dentistAddress_street,
+                $scope.dentistAddress_barangay,
+                $scope.dentistAddress_city,
+                $scope.dentistAddress_province
+            ].map(function (p) { return (p || '').toString().trim(); }).filter(Boolean);
+            $scope.dentist = $scope.dentist || {};
+            $scope.dentist.address = parts.join(', ');
+        } catch (_) { }
+    };
+
+    function dentistScheduleDefaultTime(h, m) {
+        return new Date(1970, 0, 1, h, m, 0, 0);
+    }
+
+    function dentistScheduleApiTimeToDate(v) {
+        if (v instanceof Date && !isNaN(v.getTime())) return v;
+        if (typeof v === 'string') {
+            var hhmm = formatTimeToHHMM(v);
+            if (!hhmm) return null;
+            var p = hhmm.split(':');
+            return dentistScheduleDefaultTime(parseInt(p[0], 10), parseInt(p[1], 10));
+        }
+        if (v && typeof v === 'object') {
+            if (typeof v.TotalMilliseconds !== 'undefined') {
+                var totalMin = Math.floor(v.TotalMilliseconds / 60000);
+                var hh = Math.floor(totalMin / 60) % 24;
+                var mm = totalMin % 60;
+                return dentistScheduleDefaultTime(hh, mm);
+            }
+            if (typeof v.Hours !== 'undefined' && typeof v.Minutes !== 'undefined') {
+                return dentistScheduleDefaultTime(parseInt(v.Hours, 10) || 0, parseInt(v.Minutes, 10) || 0);
+            }
+        }
+        return null;
+    }
+
+    $scope._initDentistScheduleDays = function () {
+        if (!$scope.dentistScheduleDays || !Array.isArray($scope.dentistScheduleDays)) {
+            $scope.dentistScheduleDays = [
+                { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 4, dayName: 'Thursday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 5, dayName: 'Friday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 },
+                { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: dentistScheduleDefaultTime(8, 0), endTime: dentistScheduleDefaultTime(12, 0), slotMinutes: 30 }
+            ];
+        }
+    };
+
+    $scope.openDentistScheduleModal = function () {
+        try {
+            $scope._initDentistScheduleDays();
+            var did = $scope.dentist && $scope.dentist.dentistID ? parseInt($scope.dentist.dentistID, 10) : null;
+            if (!did) {
+                return Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to determine dentist ID.' });
+            }
+
+            // load existing schedule and map into dentistScheduleDays
+            RGDCWebApplicationService.getDentistSchedule(did)
+                .then(function (resp) {
+                    var list = resp && resp.data ? (Array.isArray(resp.data) ? resp.data : []) : [];
+                    $scope.dentistScheduleDays.forEach(function (d) {
+                        d.enabled = false;
+                        d.startTime = dentistScheduleDefaultTime(8, 0);
+                        d.endTime = dentistScheduleDefaultTime(12, 0);
+                        d.slotMinutes = 30;
+                    });
+                    list.forEach(function (s) {
+                        var dow = parseInt(s.dayOfWeek, 10);
+                        var row = $scope.dentistScheduleDays.find(function (d) { return parseInt(d.dayOfWeek, 10) === dow; });
+                        if (!row) return;
+                        row.enabled = true;
+                        var stD = dentistScheduleApiTimeToDate(s.startTime);
+                        var etD = dentistScheduleApiTimeToDate(s.endTime);
+                        if (stD) row.startTime = stD;
+                        if (etD) row.endTime = etD;
+                        row.slotMinutes = parseInt(s.slotMinutes, 10) || row.slotMinutes || 30;
+                    });
+
+                    $timeout(function () {
+                        var el = document.getElementById('modalDentistSchedule');
+                        if (el && typeof M !== 'undefined' && M && M.Modal) {
+                            var inst = M.Modal.getInstance(el);
+                            if (!inst) inst = M.Modal.init(el, { dismissible: false });
+                            inst.open();
+                        }
+                    }, 0);
+                })
+                .catch(function (err) {
+                    console.error('getDentistSchedule error', err);
+                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to load schedule.' });
+                });
+        } catch (e) {
+            console.error('openDentistScheduleModal error', e);
+        }
+    };
+
+    $scope.saveDentistScheduleFromProfile = function () {
+        try {
+            var did = $scope.dentist && $scope.dentist.dentistID ? parseInt($scope.dentist.dentistID, 10) : null;
+            if (!did) return;
+
+            // reuse signup validator style: normalize and validate enabled rows
+            var enabled = ($scope.dentistScheduleDays || []).filter(function (d) { return d && d.enabled; });
+            if (!enabled.length) {
+                return Swal.fire({ icon: 'error', title: 'Weekly Schedule Required', text: 'Please enable at least one day.' });
+            }
+            var payload = enabled.map(function (d) {
+                var st = formatTimeToHHMM(d.startTime);
+                var et = formatTimeToHHMM(d.endTime);
+                if (!st || !et) throw new Error('Please set start/end time for ' + (d.dayName || 'a day') + '.');
+                return {
+                    dentistID: did,
+                    dayOfWeek: parseInt(d.dayOfWeek, 10),
+                    // Send HH:mm:ss so MVC can bind cleanly into TimeSpan
+                    startTime: st + ':00',
+                    endTime: et + ':00',
+                    slotMinutes: parseInt(d.slotMinutes, 10) || 30
+                };
+            });
+
+            RGDCWebApplicationService.saveDentistSchedule(payload)
+                .then(function (resp) {
+                    var ok = resp && resp.data && resp.data.success === true;
+                    if (!ok) throw new Error((resp && resp.data && resp.data.message) || 'Failed to save schedule.');
+                    Swal.fire({ icon: 'success', title: 'Saved', text: 'Weekly schedule updated.' }).then(function () {
+                        // If Add Appointment modal is open, refresh available time slots immediately
+                        try { $scope.updateTimeOptions(); } catch (_) { }
+                    });
+                    // close modal
+                    var el = document.getElementById('modalDentistSchedule');
+                    if (el && typeof M !== 'undefined' && M && M.Modal) {
+                        var inst = M.Modal.getInstance(el);
+                        if (inst) inst.close();
+                    }
+                })
+                .catch(function (err) {
+                    console.error('saveDentistScheduleFromProfile error', err);
+                    Swal.fire({ icon: 'error', title: 'Error', text: (err && err.message) ? err.message : 'Failed to save schedule.' });
+                });
+        } catch (e) {
+            console.error('saveDentistScheduleFromProfile error', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message || 'Failed to save schedule.' });
+        }
+    };
 
 
     $scope.selectDentist = function (dentistID) {
@@ -4068,13 +4734,13 @@
 
     $scope.overview = {};
     $scope.getOverviewData = function () {
-            RGDCWebApplicationService.getOverviewData()
-        .then(function (response) {
-            $scope.overview = response.data;
-        })
-        .catch(function (err) {
-            console.error('Failed to load overview data', err);
-        });
+        RGDCWebApplicationService.getOverviewData()
+            .then(function (response) {
+                $scope.overview = response.data;
+            })
+            .catch(function (err) {
+                console.error('Failed to load overview data', err);
+            });
     }
 
     $scope.getAnalyticsData = function () {
@@ -4537,10 +5203,16 @@
     $scope.editDentist = function () {
         $scope.editDentistSubmitted = true;
 
+        // Ensure dentist.address is up-to-date from split inputs
+        try { $scope.syncDentistAddress && $scope.syncDentistAddress(); } catch (_) { }
+
         $scope.validateDentistEditFields();
         $scope.validateDentistEmailEdit();
 
-        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid) {
+        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid || !$scope.dentistAddressValid ||
+            !$scope.dentistContactValid || !$scope.dentistGenderValid || !$scope.dentistBirthDateValid ||
+            !$scope.dentistCivilStatusValid || !$scope.dentistReligionValid || !$scope.dentistNationalityValid ||
+            !$scope.dentistSpecializationValid || !$scope.dentistBranchValid) {
             Swal.fire({
                 icon: 'error',
                 title: 'Missing required fields',
@@ -4802,7 +5474,7 @@
 
             if (photoPath) {
                 accDet.photoLink = photoPath;
-                $scope.staff.photoLink = photoPath; 
+                $scope.staff.photoLink = photoPath;
             }
 
             return RGDCWebApplicationService.editAccount(accDet);
@@ -4991,6 +5663,13 @@
         $scope.dentistLastNameValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.lastName);
         $scope.dentistAddressValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.address);
         $scope.dentistContactValid = PHONE_PATTERN.test($scope.dentist && $scope.dentist.contactNumber || '');
+        $scope.dentistGenderValid = !!($scope.dentist && $scope.dentist.genderID);
+        $scope.dentistBirthDateValid = !!($scope.dentist && $scope.dentist.birthDate);
+        $scope.dentistCivilStatusValid = !!($scope.dentist && $scope.dentist.civilStatus);
+        $scope.dentistReligionValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.religion);
+        $scope.dentistNationalityValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.nationality);
+        $scope.dentistSpecializationValid = $scope.isNonEmpty($scope.dentist && $scope.dentist.specialization);
+        $scope.dentistBranchValid = ($scope.dentist && ($scope.dentist.branchID !== null && typeof $scope.dentist.branchID !== 'undefined' && $scope.dentist.branchID !== ''));
     };
 
     $scope.validateDentistEmailEdit = function () {
@@ -5175,7 +5854,7 @@
 
             var tblElem = tables[0];
             for (var i = 1; i < tables.length; i++) {
-                try { tables[i].parentNode.removeChild(tables[i]); } catch (e) {}
+                try { tables[i].parentNode.removeChild(tables[i]); } catch (e) { }
             }
 
             var tbody = tblElem.querySelector('tbody');
@@ -5201,7 +5880,7 @@
                             if (typeof cls === 'string' && cls.indexOf('dataTable') !== -1) {
                                 try { parent.removeChild(ch); } catch (_) { }
                             }
-                        } catch (e) {}
+                        } catch (e) { }
                     });
                 }
 
@@ -5263,8 +5942,41 @@
     //    var retryDelay = opts.retryDelay || 120;
     //    var attempt = 0;
 
-    //    function tryInit() {
-    //        attempt++;
+    //for displaying of forms
+    $scope.patientForms = [];
+    $scope.patientFormsReady = true;
+
+    $scope.loadPatientForms = function () {
+        try {
+            if (window.patientFormsTable) {
+                try {
+                    if (window.patientFormsTableType === 'jquery' && window.patientFormsTable.destroy) {
+                        window.patientFormsTable.destroy(true);
+                    } else if (window.patientFormsTableType === 'simple' && window.patientFormsTable.destroy) {
+                        window.patientFormsTable.destroy();
+                    }
+                } catch (e) { }
+                window.patientFormsTable = null;
+                window.patientFormsTableType = null;
+            }
+
+            var tblEl = document.querySelector('#patientForms');
+            if (tblEl && window.jQuery && jQuery.fn && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblEl)) {
+                try { jQuery(tblEl).DataTable().clear().destroy(true); } catch (e) { }
+            }
+
+            if (tblEl && tblEl.parentNode) {
+                try {
+                    Array.prototype.slice.call(tblEl.parentNode.children).forEach(function (ch) {
+                        if (ch === tblEl) return;
+                        var cls = ch.className || '';
+                        if (typeof cls === 'string' && (cls.indexOf('dataTable') !== -1 || cls.indexOf('dataTables_wrapper') !== -1)) {
+                            try { ch.parentNode.removeChild(ch); } catch (e) { }
+                        }
+                    });
+                } catch (e) { }
+            }
+        } catch (e) { console.warn('Pre-clean patientForms error', e); }
 
     //        var hasJQueryDT = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable);
     //        var hasSimpleDT = typeof window.DataTable !== 'undefined';
@@ -5275,12 +5987,20 @@
     //            return;
     //        }
 
-    //        var tblElem = document.querySelector('#patientForms');
-    //        if (!tblElem) {
-    //            if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
-    //            console.warn('#patientForms element not found for explicit init.');
-    //            return;
-    //        }
+            try {
+                try {
+                    if (window.patientFormsTable) {
+                        if (window.patientFormsTableType === 'jquery') {
+                            try { window.patientFormsTable.destroy(true); } catch (e) { /* ignore */ }
+                        } else if (window.patientFormsTableType === 'simple') {
+                            try { window.patientFormsTable.destroy(); } catch (e) { /* ignore */ }
+                        }
+                        window.patientFormsTable = null;
+                        window.patientFormsTableType = null;
+                    } else if (hasJQueryDT && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblElem)) {
+                        try { jQuery(tblElem).DataTable().destroy(true); } catch (e) { /* ignore */ }
+                    }
+                } catch (e) { }
 
     //        var tbody = tblElem.querySelector('tbody');
     //        var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
@@ -5349,6 +6069,86 @@
     //}
 
     //for forms editing
+    $scope.selectEditForm = function (formID) {
+        if (!formID) return;
+        var f = ($scope.patientForms || []).find(function (x) { return x.formID == formID; });
+        if (!f) {
+            console.warn('selectEditForm: form not found in client cache', formID);
+            return;
+        }
+
+        $scope.selectedForm = angular.copy(f) || {};
+        $scope.selectedForm.firstName = $scope.selectedForm.firstName || '';
+        $scope.selectedForm.lastName = $scope.selectedForm.lastName || '';
+        $scope.selectedForm.middleName = $scope.selectedForm.middleName || '';
+        $scope.selectedForm.contactNumber = $scope.selectedForm.contactNumber || '';
+        $scope.selectedForm.address = $scope.selectedForm.address || '';
+        $scope.selectedForm.acceptedTerms = !!$scope.selectedForm.acceptedTerms;
+
+        // clear any picked file state
+        $scope._pickedFormFileEdit = null;
+        if ($scope.selectedForm && $scope.selectedForm.formLink) {
+            $scope.selectedForm.formLinkPreview = $scope.selectedForm.formLink;
+        }
+
+        try { $scope.getDentists(); } catch (e) { }
+
+        $timeout(function () {
+            var modalElem = document.getElementById('modal-edit-form');
+            if (modalElem) {
+                var inst = M.Modal.getInstance(modalElem);
+                if (!inst) inst = M.Modal.init(modalElem);
+                inst.open();
+            }
+        }, 60);
+    };
+
+    //for forms deletion
+    $scope.selectDeleteForm = function (formID) {
+        $scope.deleteFormID = formID;
+        $timeout(function () {
+            var modal = document.getElementById('modal-delete-form');
+            if (modal) {
+                var inst = M.Modal.getInstance(modal);
+                if (!inst) inst = M.Modal.init(modal);
+                inst.open();
+            }
+        }, 40);
+    };
+
+    // perform deletion
+    $scope.deleteFormThis = function () {
+        if ($scope.isUserStaff) {
+            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot delete forms.' });
+            return;
+        }
+
+        if (!$scope.deleteFormID) {
+            Swal.fire({ icon: 'error', title: 'Error', text: 'No form selected.' });
+            return;
+        }
+        RGDCWebApplicationService.deleteForm($scope.deleteFormID)
+            .then(function (resp) {
+                var d = resp && resp.data ? resp.data : resp;
+                if (d && d.success) {
+                    Swal.fire({ icon: 'success', title: 'Deleted', text: d.message || 'Form deleted.' }).then(function () {
+                        var modal = document.getElementById('modal-delete-form');
+                        if (modal && typeof M !== 'undefined' && M.Modal) {
+                            var mi = M.Modal.getInstance(modal);
+                            if (mi) mi.close();
+                        }
+                        $scope.loadPatientForms();
+                    });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: (d && d.message) ? d.message : 'Failed to delete form.' });
+                }
+            })
+            .catch(function (err) {
+                console.error('deleteForm error', err);
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete form.' });
+            });
+    };
+
     $scope._pickedAccountPhotoFile = null;
     $scope.accountPhotoPreview = null;
 
@@ -5972,6 +6772,11 @@
     });
 
     function initDataTableSafe(selector, instanceName) {
+        // Only the scheduled grid uses jQuery DataTables + static HTML action cells.
+        // Requested / past tables must stay Angular-rendered so ng-if / ng-click (accept/deny) keep working.
+        if (selector && selector !== '#adminScheduledAppointment') {
+            return;
+        }
         // Wait a bit so Angular has rendered rows
         $timeout(function () {
             try {
@@ -6298,6 +7103,187 @@
         patientName: ""
     };
 
+    $scope.rescheduleTimeOptions = [];
+
+    function sanitizeContactNumber(raw) {
+        var s = String(raw || '');
+        // digits only
+        s = s.replace(/\D/g, '');
+        // keep max 11 digits
+        if (s.length > 11) s = s.slice(0, 11);
+        return s;
+    }
+
+    $scope.filterRescheduleContactNumber = function () {
+        try {
+            if (!$scope.rescheduleRequest) $scope.rescheduleRequest = {};
+            $scope.rescheduleRequest.contactNumber = sanitizeContactNumber($scope.rescheduleRequest.contactNumber);
+        } catch (_) { }
+    };
+
+    function isValidMobile09(s) {
+        return /^09\d{9}$/.test(String(s || ''));
+    }
+
+    function refreshMaterializeSelect(selectId) {
+        try {
+            var el = document.getElementById(selectId);
+            if (!el) return;
+            if (typeof M !== 'undefined' && M && M.FormSelect) {
+
+                try {
+                    var existingInst = M.FormSelect.getInstance(el);
+                    if (existingInst) existingInst.destroy();
+                } catch (_) { }
+
+                try {
+                    // If select is already wrapped, unwrap it (remove the old wrapper)
+                    var wrapper = el.closest ? el.closest('.select-wrapper') : null;
+                    if (wrapper && wrapper.parentNode) {
+                        var parent = wrapper.parentNode;
+                        parent.insertBefore(el, wrapper);
+                        parent.removeChild(wrapper);
+                    }
+                } catch (_) { }
+
+                // Remove any leftover dropdown content siblings (defensive cleanup)
+                try {
+                    var parent2 = el.parentNode;
+                    if (parent2) {
+                        var leftovers = parent2.querySelectorAll ? parent2.querySelectorAll('.select-wrapper') : [];
+                        // If any wrappers still exist alongside the select, remove them
+                        for (var i = 0; i < leftovers.length; i++) {
+                            if (leftovers[i] && leftovers[i].parentNode) leftovers[i].parentNode.removeChild(leftovers[i]);
+                        }
+                    }
+                } catch (_) { }
+
+                M.FormSelect.init(el);
+            }
+        } catch (_) { }
+    }
+
+    $scope.updateRescheduleTimeOptions = function () {
+        try {
+            $scope.rescheduleTimeOptions = [];
+            if (!$scope.rescheduleRequest) return;
+
+            var did = $scope.rescheduleRequest.dentistID;
+            var dateStr = $scope.rescheduleRequest.dateTime;
+            if (did === null || typeof did === 'undefined' || did === '' || !dateStr) {
+                $scope.rescheduleTimeOptions = [];
+                $scope.rescheduleRequest.time = null;
+                return;
+            }
+
+            did = parseInt(did, 10);
+            if (isNaN(did) || did < 0) {
+                $scope.rescheduleTimeOptions = [];
+                $scope.rescheduleRequest.time = null;
+                return;
+            }
+
+            var dateObj = (typeof dateStr === 'string') ? new Date(dateStr) : new Date(dateStr);
+            if (!dateObj || isNaN(dateObj.getTime())) {
+                $scope.rescheduleTimeOptions = [];
+                $scope.rescheduleRequest.time = null;
+                return;
+            }
+
+            // Temporarily compute using the same schedule + taken slots logic as updateTimeOptions,
+            // but write to rescheduleTimeOptions instead of timeOptions.
+            var dow = dateObj.getDay();
+
+            RGDCWebApplicationService.getDentistSchedule(did)
+                .then(function (resp) {
+                    var schedule = resp && resp.data ? resp.data : [];
+                    var dayEntries = (Array.isArray(schedule) ? schedule : []).filter(function (s) {
+                        return parseInt(s.dayOfWeek, 10) === parseInt(dow, 10);
+                    });
+
+                    var slots = [];
+                    dayEntries.forEach(function (entry) {
+                        var startMin = null, endMin = null, slotMins = 30;
+                        if (typeof entry.startTime === 'string') startMin = parseTimeToMinutes(entry.startTime);
+                        else if (entry.startTime && typeof entry.startTime === 'object' && entry.startTime.TotalMinutes) startMin = Math.floor(entry.startTime.TotalMinutes);
+                        if (typeof entry.endTime === 'string') endMin = parseTimeToMinutes(entry.endTime);
+                        else if (entry.endTime && typeof entry.endTime === 'object' && entry.endTime.TotalMinutes) endMin = Math.floor(entry.endTime.TotalMinutes);
+                        if (entry.slotMinutes) slotMins = parseInt(entry.slotMinutes, 10) || 30;
+                        if (startMin == null || endMin == null || endMin <= startMin) return;
+                        var cur = startMin;
+                        while (cur + 0 <= endMin - slotMins) {
+                            slots.push(minutesToDisplay(cur));
+                            cur += slotMins;
+                        }
+                    });
+
+                    var unique = Array.from(new Set(slots));
+
+                    // Exclude already-taken times for this dentist + date
+                    return RGDCWebApplicationService.getAdminScheduledAppointments()
+                        .then(function (resp2) {
+                            var remote = resp2 && resp2.data ? (Array.isArray(resp2.data) ? resp2.data : []) : [];
+                            var dayY = dateObj.getFullYear(), dayM = dateObj.getMonth(), dayD = dateObj.getDate();
+                            var takenMinutes = new Set();
+
+                            remote.forEach(function (a) {
+                                try {
+                                    var aDent = parseInt(a.dentistID || a.dentistAccID || a.accID || a.id, 10);
+                                    if (isNaN(aDent) || aDent !== did) return;
+                                    var aDate = parseJsonDateToJsDate(a.dateTime);
+                                    if (!aDate) return;
+                                    if (aDate.getFullYear() !== dayY || aDate.getMonth() !== dayM || aDate.getDate() !== dayD) return;
+                                    // allow the original appointment slot to remain selectable
+                                    if ($scope.rescheduleRequest && $scope.rescheduleRequest.originalApptID && a.apptID && String(a.apptID) === String($scope.rescheduleRequest.originalApptID)) {
+                                        return;
+                                    }
+                                    takenMinutes.add(aDate.getHours() * 60 + aDate.getMinutes());
+                                } catch (_) { }
+                            });
+
+                            function displayToMinutes(s) {
+                                var m = String(s || '').match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                                if (!m) return null;
+                                var hh = parseInt(m[1], 10);
+                                var mm = parseInt(m[2], 10);
+                                var mer = (m[3] || 'AM').toUpperCase();
+                                if (mer === 'PM' && hh !== 12) hh += 12;
+                                if (mer === 'AM' && hh === 12) hh = 0;
+                                return hh * 60 + mm;
+                            }
+
+                            $scope.rescheduleTimeOptions = unique.filter(function (t) {
+                                var mins = displayToMinutes(t);
+                                if (mins === null) return true;
+                                return !takenMinutes.has(mins);
+                            });
+
+                            if ($scope.rescheduleRequest && $scope.rescheduleRequest.time && Array.isArray($scope.rescheduleTimeOptions)) {
+                                if ($scope.rescheduleTimeOptions.indexOf($scope.rescheduleRequest.time) === -1) {
+                                    $scope.rescheduleRequest.time = null;
+                                }
+                            }
+                            $timeout(function () { }, 0);
+                        })
+                        .catch(function () {
+                            $scope.rescheduleTimeOptions = unique;
+                            $timeout(function () { }, 0);
+                        });
+                })
+                .catch(function (err) {
+                    console.error('updateRescheduleTimeOptions failed', err);
+                    $scope.rescheduleTimeOptions = [];
+                    $scope.rescheduleRequest.time = null;
+                    $timeout(function () { }, 0);
+                });
+        } catch (ex) {
+            console.error('updateRescheduleTimeOptions error', ex);
+            $scope.rescheduleTimeOptions = [];
+            try { $scope.rescheduleRequest.time = null; } catch (_) { }
+            $timeout(function () { }, 0);
+        }
+    };
+
     $scope.openRescheduleModal = function (appt, $event) {
         if ($event && $event.preventDefault) {
             $event.preventDefault();
@@ -6326,10 +7312,51 @@
         $timeout(function () {
             var modalElem = document.getElementById('modalRescheduleAppt');
             if (modalElem) {
+                // If this modal was previously initialized with Materialize select,
+                // it may have left behind a .select-wrapper overlay that blocks inputs.
+                try {
+                    var sel = document.getElementById('rescheduleTime');
+                    if (sel) {
+                        var wrap = sel.closest ? sel.closest('.select-wrapper') : null;
+                        if (wrap && wrap.parentNode) {
+                            var parent = wrap.parentNode;
+                            parent.insertBefore(sel, wrap);
+                            parent.removeChild(wrap);
+                        }
+                    }
+                    // Also remove any other leftover wrappers inside the modal (defensive)
+                    var leftovers = modalElem.querySelectorAll ? modalElem.querySelectorAll('.select-wrapper') : [];
+                    for (var i = 0; i < leftovers.length; i++) {
+                        if (leftovers[i] && leftovers[i].parentNode) leftovers[i].parentNode.removeChild(leftovers[i]);
+                    }
+
+                    // Materialize also inserts an input.select-dropdown + ul.dropdown-content which can overlay fields.
+                    var fakeInputs = modalElem.querySelectorAll ? modalElem.querySelectorAll('input.select-dropdown') : [];
+                    for (var j = 0; j < fakeInputs.length; j++) {
+                        if (fakeInputs[j] && fakeInputs[j].parentNode) fakeInputs[j].parentNode.removeChild(fakeInputs[j]);
+                    }
+                    var dropdowns = modalElem.querySelectorAll ? modalElem.querySelectorAll('ul.dropdown-content') : [];
+                    for (var k = 0; k < dropdowns.length; k++) {
+                        if (dropdowns[k] && dropdowns[k].parentNode) dropdowns[k].parentNode.removeChild(dropdowns[k]);
+                    }
+
+                    // Ensure contact number input is not blocked/disabled
+                    var contact = modalElem.querySelector ? modalElem.querySelector('input[ng-model="rescheduleRequest.contactNumber"]') : null;
+                    if (contact) {
+                        contact.disabled = false;
+                        contact.readOnly = false;
+                        contact.style.pointerEvents = 'auto';
+                        contact.style.position = 'relative';
+                        contact.style.zIndex = '2';
+                    }
+                } catch (_) { }
+
                 var inst = M.Modal.getInstance(modalElem);
                 if (!inst) inst = M.Modal.init(modalElem, {});
                 inst.open();
             }
+            // compute time options for this dentist/date selection
+            try { $scope.updateRescheduleTimeOptions(); } catch (_) { }
         }, 60);
     };
 
@@ -6351,8 +7378,25 @@
             return Swal.fire({ icon: 'error', title: 'Missing Reason', text: 'Provide a reason for rescheduling.' });
         }
 
+        // Some modal/overlay situations can prevent ng-model from updating reliably.
+        // Pull the value directly from the input as a fallback before validating.
+        try {
+            if (!$scope.rescheduleRequest.contactNumber || !String($scope.rescheduleRequest.contactNumber).trim()) {
+                var el = document.getElementById('rescheduleContactNumber');
+                if (el && typeof el.value !== 'undefined') {
+                    $scope.rescheduleRequest.contactNumber = el.value;
+                }
+            }
+        } catch (_) { }
+
         if (!$scope.rescheduleRequest.contactNumber || !$scope.rescheduleRequest.contactNumber.trim()) {
             return Swal.fire({ icon: 'error', title: 'Missing Contact', text: 'Provide a contact number.' });
+        }
+
+        // normalize + validate contact number: digits only, 11 digits, starts with 09
+        $scope.rescheduleRequest.contactNumber = sanitizeContactNumber($scope.rescheduleRequest.contactNumber);
+        if (!isValidMobile09($scope.rescheduleRequest.contactNumber)) {
+            return Swal.fire({ icon: 'error', title: 'Invalid Contact', text: 'Contact number must be 11 digits and start with 09 (e.g., 09XXXXXXXXX).' });
         }
 
         // parse date and time into JS Date
@@ -6437,6 +7481,14 @@
             });
     };
 
+    // keep reschedule time options synced
+    $scope.$watch('rescheduleRequest.dentistID', function () {
+        try { $scope.updateRescheduleTimeOptions(); } catch (_) { }
+    });
+    $scope.$watch('rescheduleRequest.dateTime', function () {
+        try { $scope.updateRescheduleTimeOptions(); } catch (_) { }
+    });
+
     $scope.canActOnRequest = function (appt) {
         if (!appt) return false;
 
@@ -6445,22 +7497,26 @@
             var curAcc = $scope.currentUserID ? String($scope.currentUserID) : null;
 
             // If current user is the creator/sender -> cannot act
-            if (curAcc && appt.createdBy && String(appt.createdBy) === curAcc) return false;
+            if (curAcc && appt.createdBy != null && appt.createdBy !== undefined && String(appt.createdBy) === curAcc) return false;
+
+            // Front desk: handle requests for any dentist/patient (server enforces the same)
+            if ($scope.isUserStaff === true) return true;
 
             // Owner/admin allow (UI can still call server; server double-checks)
-            if ($scope.currentUserAuthorization === "0" || $scope.currentUserAuthorization === "1") return true;
+            var auth = String($scope.currentUserAuthorization || "");
+            if (auth === "0" || auth === "1") return true;
 
             // If appointment has dentistID and currentDentist is loaded, allow if match
             try {
-                if ($scope.currentDentist && typeof $scope.currentDentist.dentistID !== 'undefined' && typeof appt.dentistID !== 'undefined') {
-                    if (String($scope.currentDentist.dentistID) === String(appt.dentistID)) return true;
+                if ($scope.currentDentist && $scope.currentDentist.dentistID != null && appt.dentistID != null && !isNaN(parseInt(appt.dentistID, 10))) {
+                    if (parseInt($scope.currentDentist.dentistID, 10) === parseInt(appt.dentistID, 10)) return true;
                 }
             } catch (e) { /* ignore */ }
 
             // If current user is patient and we resolved their patientID (_ownPatientID), allow if matches appt.patientID
             try {
-                if ($scope._ownPatientID && typeof appt.patientID !== 'undefined') {
-                    if (String($scope._ownPatientID) === String(appt.patientID)) return true;
+                if ($scope._ownPatientID != null && appt.patientID != null && !isNaN(parseInt(appt.patientID, 10))) {
+                    if (parseInt($scope._ownPatientID, 10) === parseInt(appt.patientID, 10)) return true;
                 }
             } catch (e) { /* ignore */ }
 
@@ -6568,9 +7624,61 @@
                         return toMinFromDisplay(a) - toMinFromDisplay(b);
                     });
 
-                    $scope.timeOptions = unique;
-                    // trigger UI update (if within async)
-                    $timeout(function () { }, 0);
+                    // Exclude already-taken times (scheduled appointments) for this dentist + date.
+                    RGDCWebApplicationService.getAdminScheduledAppointments()
+                        .then(function (resp2) {
+                            // Prefer the already-mapped $scope.adminAppointments (has dateTimeObj + normalized dentistID)
+                            // to avoid timezone/parsing mismatches from raw /Date(...)/ strings.
+                            var remote = (Array.isArray($scope.adminAppointments) && $scope.adminAppointments.length > 0)
+                                ? $scope.adminAppointments
+                                : (resp2 && resp2.data ? (Array.isArray(resp2.data) ? resp2.data : []) : []);
+                            var dayY = dateObj.getFullYear(), dayM = dateObj.getMonth(), dayD = dateObj.getDate();
+                            var takenMinutes = new Set();
+
+                            remote.forEach(function (a) {
+                                try {
+                                    var aDent = parseInt(a.dentistID || a.dentistAccID || a.accID || a.id, 10);
+                                    if (isNaN(aDent) || aDent !== parseInt(did, 10)) return;
+                                    var aDate = a.dateTimeObj || parseJsonDateToJsDate(a.dateTime) || parseJsonDateToJsDate(a.date) || null;
+                                    if (!aDate) return;
+                                    if (aDate.getFullYear() !== dayY || aDate.getMonth() !== dayM || aDate.getDate() !== dayD) return;
+                                    takenMinutes.add(aDate.getHours() * 60 + aDate.getMinutes());
+                                } catch (_) { }
+                            });
+
+                            function displayToMinutes(s) {
+                                var m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+                                if (!m) return null;
+                                var hh = parseInt(m[1], 10);
+                                var mm = parseInt(m[2], 10);
+                                var mer = (m[3] || 'AM').toUpperCase();
+                                if (mer === 'PM' && hh !== 12) hh += 12;
+                                if (mer === 'AM' && hh === 12) hh = 0;
+                                return hh * 60 + mm;
+                            }
+
+                            $scope.timeOptions = unique.filter(function (t) {
+                                var mins = displayToMinutes(t);
+                                if (mins === null) return true;
+                                return !takenMinutes.has(mins);
+                            });
+
+                            // If previously selected time is now invalid, clear it
+                            try {
+                                if ($scope.newApptRequest && $scope.newApptRequest.time && Array.isArray($scope.timeOptions)) {
+                                    if ($scope.timeOptions.indexOf($scope.newApptRequest.time) === -1) {
+                                        $scope.newApptRequest.time = null;
+                                    }
+                                }
+                            } catch (_) { }
+
+                            $timeout(function () { }, 0);
+                        })
+                        .catch(function () {
+                            // fallback: show schedule-derived slots only
+                            $scope.timeOptions = unique;
+                            $timeout(function () { }, 0);
+                        });
                 })
                 .catch(function (err) {
                     console.error('Failed to load dentist schedule', err);
@@ -6591,27 +7699,19 @@
     });
 
     $scope.initModalScheduleDays = function () {
+        // Keep schedule times as "HH:mm" strings.
+        // Converting to Date objects causes some browsers to render them as "08:00:00.000 AM" and breaks validation.
         if (!$scope.modalScheduleDays || !Array.isArray($scope.modalScheduleDays)) return;
         $scope.modalScheduleDays.forEach(function (d) {
-            function convertToDate(t) {
-                if (!t && t !== 0) return null;
-                if (t instanceof Date) return t;
-                // accept "HH:mm" or "H:mm"
-                var m = String(t).match(/^(\d{1,2}):(\d{2})$/);
-                if (!m) return null;
-                var hh = parseInt(m[1], 10);
-                var mm = parseInt(m[2], 10);
-                // Use a consistent date (epoch) - only time portion is relevant for input[type=time]
-                return new Date(1970, 0, 1, hh, mm, 0);
-            }
-
             try {
-                d.startTime = convertToDate(d.startTime) || null;
-                d.endTime = convertToDate(d.endTime) || null;
-                // slotMinutes already numeric; ensure numeric
+                // normalize common string formats to HH:mm
+                var st = formatTimeToHHMM(d.startTime);
+                var et = formatTimeToHHMM(d.endTime);
+                d.startTime = st || '08:00';
+                d.endTime = et || '12:00';
                 d.slotMinutes = (typeof d.slotMinutes === 'number') ? d.slotMinutes : parseInt(d.slotMinutes, 10) || 30;
             } catch (e) {
-                console.warn('initModalScheduleDays convert failed for', d, e);
+                console.warn('initModalScheduleDays normalize failed for', d, e);
             }
         });
     };
@@ -6645,11 +7745,14 @@
                 if (!dentistAccID) return resolve(); // nothing to persist
                 var arr = Array.isArray($scope.modalScheduleDays) ? $scope.modalScheduleDays : [];
                 var payload = arr.filter(function (d) { return !!d && !!d.enabled; }).map(function (d) {
+                    var st = formatTimeToHHMM(d.startTime) || '';
+                    var et = formatTimeToHHMM(d.endTime) || '';
                     return {
                         dentistID: dentistAccID,
                         dayOfWeek: parseInt(d.dayOfWeek, 10),
-                        startTime: formatTimeToHHMM(d.startTime) || '', // "HH:mm"
-                        endTime: formatTimeToHHMM(d.endTime) || '',
+                        // Send HH:mm:ss for MVC TimeSpan binding reliability
+                        startTime: st ? (st + ':00') : '',
+                        endTime: et ? (et + ':00') : '',
                         slotMinutes: parseInt(d.slotMinutes, 10) || 30
                     };
                 });
@@ -6671,9 +7774,22 @@
             $scope.initModalScheduleDays();
             var modalElem = document.getElementById('modalSchedule');
             if (!modalElem) return;
+
+            // Materialize does not support true nested modals well.
+            // If the signup info form modal is open, close it first so the schedule modal can receive clicks.
+            try {
+                var parent = document.getElementById('modalInfoForm');
+                if (parent && typeof M !== 'undefined' && M && M.Modal) {
+                    var parentInst = M.Modal.getInstance(parent);
+                    if (parentInst && parent.classList.contains('open')) {
+                        parentInst.close();
+                    }
+                }
+            } catch (_) { }
+
             if (typeof M !== 'undefined' && M && M.Modal) {
                 var inst = M.Modal.getInstance(modalElem);
-                if (!inst) inst = M.Modal.init(modalElem, {});
+                if (!inst) inst = M.Modal.init(modalElem, { dismissible: false });
                 inst.open();
             } else {
                 modalElem.style.display = "block";
@@ -6692,11 +7808,45 @@
         }
         // If string already "HH:mm", return as-is (validate)
         if (typeof dt === 'string') {
-            var m = dt.match(/^(\d{1,2}):(\d{2})$/);
-            if (m) {
-                return m[1].padStart(2, '0') + ':' + m[2];
+            var s = dt.trim();
+            var m = s.match(/^(\d{1,2}):(\d{2})$/);
+            if (m) return m[1].padStart(2, '0') + ':' + m[2];
+
+            // "HH:mm:ss"
+            var m2 = s.match(/^(\d{1,2}):(\d{2}):(\d{2})$/);
+            if (m2) return m2[1].padStart(2, '0') + ':' + m2[2];
+
+            // "08:00:00.000 AM"
+            var m3 = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?\s*(AM|PM)$/i);
+            if (m3) {
+                var hh3 = parseInt(m3[1], 10);
+                var mm3 = parseInt(m3[2], 10);
+                var mer = (m3[4] || '').toUpperCase();
+                if (mer === 'PM' && hh3 !== 12) hh3 += 12;
+                if (mer === 'AM' && hh3 === 12) hh3 = 0;
+                return String(hh3).padStart(2, '0') + ':' + String(mm3).padStart(2, '0');
             }
         }
         return null;
     }
+
+    $scope.closeScheduleModal = function () {
+        try {
+            var modalElem = document.getElementById('modalSchedule');
+            if (modalElem && typeof M !== 'undefined' && M && M.Modal) {
+                var inst = M.Modal.getInstance(modalElem);
+                if (inst) inst.close();
+            }
+
+            // Re-open the parent info modal so user can continue signup
+            var parent = document.getElementById('modalInfoForm');
+            if (parent && typeof M !== 'undefined' && M && M.Modal) {
+                var parentInst = M.Modal.getInstance(parent);
+                if (!parentInst) parentInst = M.Modal.init(parent, {});
+                parentInst.open();
+            }
+        } catch (e) {
+            console.error('closeScheduleModal error', e);
+        }
+    };
 });

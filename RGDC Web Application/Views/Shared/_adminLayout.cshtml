@@ -52,7 +52,7 @@
             <div class="row center" style="margin-top: 0.5rem;">
                 <div class="google-sync" style="display: inline-flex; align-items: center; justify-content: center; flex-wrap: wrap; margin-left: 0;">
                     <label style="vertical-align: middle;">
-                        <input type="checkbox" ng-model="googleCalendarEnabled" ng-change="toggleGoogleCalendar(googleCalendarEnabled)" />
+                        <input type="checkbox" ng-checked="googleCalendarEnabled" ng-click="onGoogleCalendarCheckboxClick($event)" />
                         <span style="vertical-align: middle; margin-left: 0.5rem; font-size: .95rem; color: lightgray">Save appointments to Google Calendar</span>
                     </label>
 
@@ -410,7 +410,7 @@
 
 
     @*Edit Profile Dentist*@
-    <div id="modalEditProfileDentist" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getDentistData()">
+    <div id="modalEditProfileDentist" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getDentistData(); getGender(); getBranch()">
         <div>
             <h5 class="modal-form-title">Edit Profile</h5>
 
@@ -483,7 +483,7 @@
                         <select class="browser-default custom-input" ng-model="dentist.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray" disabled
                                 ng-class="{'invalid-input': editDentistSubmitted && !dentist.genderID}">
-                            <option value="" disabled selected>Select Gender</option>
+                            <option value="" disabled>Select Gender</option>
                         </select>
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.genderID">Gender is required.</span>
                     </div>
@@ -502,7 +502,7 @@
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.civilStatus"
                                 ng-class="{'invalid-input': editDentistSubmitted && !dentist.civilStatus}">
-                            <option value="" disabled selected>Select Status</option>
+                            <option value="" disabled>Select Status</option>
                             <option value="1">Single</option>
                             <option value="2">Married</option>
                             <option value="3">Widowed</option>
@@ -513,9 +513,13 @@
                     <div class="col s12 m3 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.contactNumber"
-                               placeholder="09XX-XXX-XXXX" maxlength="13"
-                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.contactNumber}">
+                               placeholder="09#########"
+                               maxlength="11"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,11)"
+                               ng-change="validateDentistEditFields()"
+                               ng-class="{'invalid-input': editDentistSubmitted && (!dentist.contactNumber || !dentistContactValid)}">
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.contactNumber">Contact number is required.</span>
+                        <span class="validation-msg" ng-show="editDentistSubmitted && dentist.contactNumber && !dentistContactValid">Contact must be 11 digits starting with 09.</span>
                     </div>
                 </div>
 
@@ -632,7 +636,18 @@
                     @*Specialization*@
                     <div class="col s12">
                         <p class="custom-label">Specialization <span class="required-mark">*</span></p>
-                        <input type="text" ng-model="dentist.specialization" class="custom-input" maxlength="50" placeholder="Orthodontics">
+                        <input type="text" ng-model="dentist.specialization" class="custom-input" maxlength="50" placeholder="Orthodontics"
+                               ng-class="{'invalid-input': editDentistSubmitted && !dentist.specialization}">
+                        <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.specialization">Specialization is required.</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col s12">
+                        <button type="button" class="btn-small edit-btn schedule-btn" ng-click="openDentistScheduleModal()">
+                            Edit Weekly Schedule
+                        </button>
+                        <span class="helper-text schedule-helper">(Update your weekly availability used for appointment slots)</span>
                     </div>
                 </div>
                 <div class="row">
@@ -641,7 +656,7 @@
                         <p class="custom-label">Branch <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.branchID"
                                 ng-options="b.branchID as b.description for b in branchArray">
-                            <option value="" disabled selected>Select Branch</option>
+                            <option value="" disabled>Select Branch</option>
                         </select>
                     </div>
                 </div>
@@ -657,6 +672,47 @@
             <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editDentistSubmitted = false">CANCEL</button>
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">SAVE</button>
+        </div>
+    </div>
+
+    @*Dentist weekly schedule modal (profile edit)*@
+    <div id="modalDentistSchedule" class="modal modal-dentist-schedule">
+        <div class="modal-content">
+            <h5>Weekly Schedule (Availability)</h5>
+            <p class="small">Select days and time ranges when you are available. These determine appointment slots.</p>
+            <table class="striped schedule-table">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th style="width:120px">Available</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th style="width:100px">Slot (min)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="d in dentistScheduleDays track by d.dayOfWeek">
+                        <td>{{d.dayName}}</td>
+                        <td class="checkbox-cell">
+                            <label class="cb-label">
+                                <input type="checkbox" class="filled-in" ng-model="d.enabled" />
+                                <span></span>
+                            </label>
+                        </td>
+                        <td>
+                            <input type="time" class="custom-input" ng-model="d.startTime" ng-disabled="!d.enabled" />
+                        </td>
+                        <td>
+                            <input type="time" class="custom-input" ng-model="d.endTime" ng-disabled="!d.enabled" />
+                        </td>
+                        <td><input type="number" min="5" step="5" class="custom-input" ng-model="d.slotMinutes" ng-disabled="!d.enabled" /></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a href="javascript:void(0)" class="modal-close btn-flat">Cancel</a>
+            <a href="javascript:void(0)" class="btn-flat" ng-click="saveDentistScheduleFromProfile()">Save</a>
         </div>
     </div>
 
@@ -1058,9 +1114,19 @@
         document.addEventListener('DOMContentLoaded', function () {
             var today = new Date();
 
-            // General date pickers (not the patient birthdate one)
-            var dateElems = document.querySelectorAll('.datepicker:not(#birthDate)');
-            M.Datepicker.init(dateElems, {
+            // Appointment date pickers: future dates only
+            var apptElems = document.querySelectorAll('.datepicker.appt-datepicker');
+            M.Datepicker.init(apptElems, {
+                format: 'mm/dd/yyyy',
+                minDate: today,
+                yearRange: [today.getFullYear(), today.getFullYear() + 3],
+                autoClose: true,
+                showClearBtn: true
+            });
+
+            // Other date pickers (e.g. payments/filters) default to past dates up to today
+            var otherElems = document.querySelectorAll('.datepicker:not(#birthDate):not(.appt-datepicker)');
+            M.Datepicker.init(otherElems, {
                 format: 'mm/dd/yyyy',
                 maxDate: today,
                 yearRange: [1920, today.getFullYear()],
@@ -1140,19 +1206,7 @@
             var instances = M.Sidenav.init(elems);
         });
 
-       document.addEventListener('DOMContentLoaded', function () {
-           var today = new Date();
-
-           // Date picker
-           var dateElems = document.querySelectorAll('.datepicker');
-           M.Datepicker.init(dateElems, {
-               format: 'mm/dd/yyyy',
-               maxDate: today,
-               yearRange: [1920, today.getFullYear()],
-               autoClose: true,
-               showClearBtn: true
-           });
-       });
+       // (Removed duplicate datepicker initializer to avoid conflicting configs)
 
     //collapsible
     document.addEventListener('DOMContentLoaded', function () {

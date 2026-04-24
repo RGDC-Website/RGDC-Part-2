@@ -624,11 +624,16 @@ html, body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    z-index: 2000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none !important;
+    z-index: 900;
 }
+
+    .datepicker-overlay[style*="display: block"] {
+        display: flex !important;
+    }
 
 
 /*Para sa uplaadaadigng ng aimgaaess*/
@@ -1254,7 +1259,6 @@ select.browser-default.custom-input {
 
 .modal-overlay {
     background-color: rgba(0,0,0,0.5) !important;
-    display: block !important;
     opacity: 1 !important;
 }
 
@@ -1561,3 +1565,45 @@ css.validation-msg {
     margin: 0;
 }
 
+/* Signup info modal footer: align buttons and spacing evenly */
+#modalInfoForm .modal-footer.footer-center {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center !important;
+    gap: 12px;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+}
+
+    #modalInfoForm .modal-footer.footer-center .edit-btn,
+    #modalInfoForm .modal-footer.footer-center .cancel-btn {
+        margin: 0 !important;
+    }
+
+/* Dentist schedule row alignment (button + helper text inline) */
+.schedule-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.schedule-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.schedule-helper {
+    margin: 0;
+    text-align: left;
+}
+
+/* Footer actions: keep Cancel/SetSchedule/CreateAccount grouped on right */
+#modalInfoForm .footer-right-actions {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}

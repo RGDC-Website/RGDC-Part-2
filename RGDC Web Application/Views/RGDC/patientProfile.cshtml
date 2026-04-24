@@ -314,7 +314,7 @@
                             <a ng-show="isUserAdmin && !isUserStaff" class="update-btn right modal-trigger" data-target="modalAddPayrec">ADD NOTE</a>
                         </div>
 
-                        <table id="progressNotes" class="hover" >
+                        <table id="progressNotes" class="hover">
                             <thead>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
@@ -367,28 +367,39 @@
                             <a ng-show="isUserAdmin" class="update-btn right modal-trigger white-text" data-target="modalDentalChart">UPLOAD CHART</a>
                         </div>
 
-                        <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
+                        <table id="patientDentalChartTable" class="hover tableClk">
                             <thead>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
-                                    <th colspan="2">Type</th>
+                                    <th>Type</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             @*table content*@
                             <tbody>
-                                <tr data-href="#">
-                                    <td>XX/XX/XXXX</td>
-                                    <td>Xray</td>
+                                <tr ng-if="!patientImages || patientImages.length === 0">
+                                    <td colspan="3" class="center-align">No image uploaded yet.</td>
+                                </tr>
+                                <tr ng-repeat="img in patientImages track by img.patientImageID">
+                                    <td>{{img.createdAt | date:'MM/dd/yyyy'}}</td>
+                                    <td>{{img.imageType}}</td>
                                     <td>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" data-position="bottom" data-tooltip="Archive Dental Chart"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteOwner(owner.ownerID, owner.accID)">archive</i></a>
-                                        <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalDentalChart" data-position="bottom" data-tooltip="View Dental Chart" style="margin-right: 0.5rem !important" ng-click="editSelectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
+                                           data-target="modalDentalChart"
+                                           data-position="bottom"
+                                           data-tooltip="View"
+                                           style="margin-right: 0.5rem !important"
+                                           ng-click="viewPatientImage(img)">
+                                            <i class="material-icons brown-text lighten-1">visibility</i>
+                                        </a>
                                     </td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr class="brown-text lighten-1">
                                     <th>Date</th>
-                                    <th colspan="2">Type</th>
+                                    <th>Type</th>
+                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -461,7 +472,7 @@
                                     <span class="card-title bold">Post OP</span>
                                     <div class="divider"></div>
                                     @*post op content*@
-                                <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
+                                    <div ng-bind-html="selectedPatient.postOpInstructions || postOp.instructions"></div>
                                 </div>
                             </div>
                         </div>
@@ -1787,7 +1798,18 @@
 @*Dental Chart modal*@
 <div id="modalDentalChart" class="modal dentalChart-modal containerOverflow-2">
     <div class="modal-content">
-        <h5 class="modal-form-title">Upload Dental Chart</h5>
+        <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Upload Image</h5>
+
+        <div class="row">
+            <div class="col s12 m6">
+                <label class="custom-label">Type <span class="required-mark">*</span></label>
+                <select class="browser-default custom-input" ng-model="dentalUploadType">
+                    <option value="" disabled>Select Type</option>
+                    <option value="Xray">Xray</option>
+                    <option value="Dental Chart">Dental Chart</option>
+                </select>
+            </div>
+        </div>
 
         <div class="row" style="margin-top:-1vh;">
             <div class="col s12">
@@ -1813,10 +1835,10 @@
     </div>
 
     @*upload, save, cancel buttons*@
-    <div class="modal-footer" style="margin:0 0 3.5vh 0 !important">
-        <button type="submit" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD DENTAL CHART</button>
+    <div class="modal-footer" style="margin:0 0 0 0 !important">
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh" ng-click="pickDentalChartFile()">UPLOAD</button>
         <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">SAVE</button>
+        <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0" ng-click="saveDentalChart()">SAVE</button>
     </div>
 </div>
 
@@ -1931,9 +1953,9 @@
             <div class="col s12">
                 <label class="custom-label">
                     Template<span class="required-mark">*</span>
-                            <select class="browser-default custom-input" ng-model="postOp.postOpID" ng-change="setPostOp(postOp.postOpID)">
-                                <option ng-repeat="p in postArray" ng-value="p.postOpID">{{p.title}}</option>
-                            </select>
+                    <select class="browser-default custom-input" ng-model="postOp.postOpID" ng-change="setPostOp(postOp.postOpID)">
+                        <option ng-repeat="p in postArray" ng-value="p.postOpID">{{p.title}}</option>
+                    </select>
                 </label>
 
             </div>
