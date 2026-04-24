@@ -24,7 +24,7 @@
         </div>
     </div>
     @*DELETE PATIENT Record*@
-    <div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
+    <!--<div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
         <div class="modal-content">
             <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Patient Record</h5>
 
@@ -35,7 +35,7 @@
             <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
             <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePatientThis()">DELETE</button>
         </div>
-    </div>
+    </div>-->
 
     @*content*@
     <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
@@ -63,8 +63,8 @@
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
                         <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit || "---"}}</p>
-                        <button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>
-                        <button class="edit-btn right modal-trigger" data-target="modalEditPatientInfo">EDIT</button>
+                        @*<button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>*@
+                        <button class="edit-btn right modal-trigger" ng-show="!isUserPatient" data-target="modalEditPatientInfo">EDIT</button>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ADDRESS</p>
-                                <p class="brown-text lighten-1">{{selectedPatient.address}}</p>
+                                <p class="brown-text lighten-1">{{selectedPatient.country}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">RELIGION</p>
@@ -127,6 +127,10 @@
                                 <p class="bold brown-text lighten-1">GUARDIAN</p>
                                 <p class="brown-text lighten-1">{{selectedPatient.guar}}</p>
                             </div>
+                            <div class="mb-1">
+                                <p class="bold brown-text lighten-1">GUARDIAN'S CONTACT #</p>
+                                @*<p class="brown-text lighten-1">{{selectedPatient.guar}}</p>*@
+                            </div>
 
                         </div>
 
@@ -145,7 +149,7 @@
                             <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
                             <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
                             <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
-                            <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
+                            @*<li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>*@
                             <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
                         </ul>
                     </div>
@@ -174,7 +178,7 @@
                                 @*update button and last updated*@
                                 <div class="col">
                                     <div class="row">
-                                        <button class="update-btn right modal-trigger" data-target="modalMedHis">UPDATE</button>
+                                        <button class="update-btn right modal-trigger" ng-show="!isUserPatient" data-target="modalMedHis">UPDATE</button>
                                     </div>
                                     <div class="row" style="margin-top:-15px">
                                         <p class="last-update">Last Update: {{selectedPatient.medHistUpdate || '...'}}</p>
@@ -478,6 +482,7 @@
                                data-target="modalEditPostOp"
                                data-position="bottom"
                                data-tooltip="Edit Post Op"
+                               ng-show="isUserAdmin"
                                style="margin-right: 0.5rem !important">
                                 <i class="material-icons brown-text lighten-1">edit</i>
                             </a>
@@ -485,6 +490,7 @@
                             <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger"
                                data-target="modalDeletePostOp"
                                data-position="bottom"
+                               ng-show="isUserAdmin"
                                data-tooltip="Delete Post Op">
                                 <i class="material-icons brown-text lighten-1">delete</i>
                             </a>
@@ -497,178 +503,449 @@
 </div>
 
 
-@*Patient info*@
-<div id="modalEditPatientInfo" class="modal patientInfo-modal">
-    <div class="modal-content">
+@*Patient information form*@
+<div id="modalEditPatientInfo" class="modal patientInformationForm-modal containerOverflow-2">
+    <div>
         <h5 class="modal-form-title">Edit Patient Information</h5>
 
-        <div class="row">
-            @*Firstname*@
-            <div class="col s4">
-                <label class="custom-label">
-                    First Name
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedPatient.firstName">
-                </label>
-            </div>
-
-            @*Middlename*@
-            <div class="col s4">
-                <label class="custom-label">
-                    Middle Name
-                    <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedPatient.middleName">
-                </label>
-            </div>
-
-            @*Lastname*@
-            <div class="col s4">
-                <label class="custom-label">
-                    Last Name
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedPatient.lastName">
-                </label>
-            </div>
-        </div>
-
-
-        <div class="row">
-            <div class="col s6">
-                @*Gender*@
-                <label class="custom-label">
-                    Gender
-                    <span class="required-mark">*</span>
-                    <select class="browser-default custom-input"
-                            ng-model="selectedPatient.genderID"
-                            ng-options="g.genderID as g.description for g in genderArray"
-                            style="margin-bottom:15px;">
-                        <option value="" disabled>Select Gender</option>
-                    </select>
-                </label>
-
-
-                @*Birthdate*@
-                <label class="custom-label">Birth Date <span class="required-mark">*</span></label>
-                <div class="datepicker-wrapper">
-                    <input id="birthDate"
-                           ng-model="selectedPatient.birthDateRaw"
-                           type="text"
-                           class="datepicker custom-input"
-                           placeholder="Select Birthdate"
-                           max="@DateTime.Now.ToString("yyyy-MM-dd")">
-                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+        <form>
+            <div class="row">
+                <div class="col s4">
+                    @*Photo upload*@
+                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                        <div class="col s12">
+                            <div class="photo-box">
+                                <img ng-if="signupPhotoPreview || _uploadedSignUpPhotoPath" ng-src="{{ signupPhotoPreview || _uploadedSignUpPhotoPath }}" alt="Profile" />
+                                <i class="material-icons photo-placeholder-icon" ng-if="!signupPhotoPreview && !_uploadedSignUpPhotoPath">image</i>
+                            </div>
+                            <input type="file"
+                                   id="signUpPhotoInput"
+                                   accept="image/*"
+                                   style="display:none"
+                                   onchange="angular.element(this).scope().onSignUpPhotoSelected(this.files)" />
+                        </div>
+                    </div>
                 </div>
 
-
-                @*Address*@
-                <label class="custom-label">
-                    Address
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
-                </label>
-
-                @*Nationality*@
-                <label class="custom-label">
-                    Nationality
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
-                </label>
-
-                @*Guardian*@
-                <label class="custom-label">
-                    Guardian
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
-                </label>
-
-                @*Email*@
-                <label class="custom-label">
-                    Email Address
-                    <span class="required-mark">*</span>
-                    <input type="text"
-                           class="custom-input"
-                           placeholder="Email Address"
-                           ng-model="selectedPatient.email"
-                           ng-change="checkEditPatientEmail()" />
-
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
-                        Enter a valid email address
-                    </span>
-                    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
-                        Email already taken
-                    </span>
-                    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
-                        Email is valid
-                    </span>
-                </label>
+                <div class="col s8">
+                    <div class="row">
+                        @*First name*@
+                        <div class="col s6">
+                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
+                            <input type="text"
+                                   class="custom-input"
+                                   maxlength="150"
+                                   ng-model="selectedPatient.firstName"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Juan"
+                                   required>
+                        </div>
+                        @*MIddle name*@
+                        <div class="col s6">
+                            <p class="custom-label">Middle Name</p>
+                            <input type="text"
+                                   class="custom-input"
+                                   maxlength="150"
+                                   ng-model="selectedPatient.middleName"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Mercado"
+                                   required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        @*Last name*@
+                        <div class="col s12">
+                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
+                            <input type="text" class="custom-input"
+                                   maxlength="150"
+                                   ng-model="selectedPatient.lastName"
+                                   oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                                   placeholder="Dela Cruz"
+                                   required>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="col s6">
-                @*Civil status*@
-                <label class="custom-label">
-                    Civil Status
-                    <span class="required-mark">*</span>
-                    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
+            @*Email*@
+            <div class="row">
+                <div class="col s12">
+                    <p class="custom-label">Email <span class="required-mark">*</span></p>
+                    <input type="text" class="custom-input"
+                           disabled
+                           ng-model="selectedPatient.email"
+                           placeholder="juandlc@gmail.com" maxlength="150">
+
+                </div>
+            </div>
+
+            <div class="row">
+                @*Gender*@
+                <div class="col s3">
+                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
+                    <select class="browser-default  custom-input" ng-model="selectedPatient.genderID" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option ng-repeat="gender in genderArray" value="{{gender.genderID}}">{{gender.description}}</option>
+                    </select>
+                </div>
+                @*Birthdate*@
+                <div class="col s3">
+                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
+                    <div class="datepicker-wrapper">
+                        <input id="birthDate"
+                               type="text"
+                               ng-model="selectedPatient.birthDate"
+                               class="datepicker custom-input"
+                               readonly
+                               max="@DateTime.Now.ToString("yyyy-MM-dd")"
+
+                        required>
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    </div>
+                </div>
+                <div class="col s3">
+                    @*Civil status*@
+                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
+                    <select class="browser-default custom-input" required ng-model="selectedPatient.civilStatus">
                         <option value="" disabled selected>Select Status</option>
                         <option value="1">Single</option>
                         <option value="2">Married</option>
                         <option value="3">Widowed</option>
+                        <option value="4">Legally Separated</option>
+                        <option value="5">Annulled/Void</option>
+                        <option value="6">Divorced</option>
                     </select>
-                </label>
-
-                @*Occupation*@
-                <label class="custom-label">
-                    Occupation
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
-                </label>
-
-                @*Religion*@
-                <label class="custom-label">
-                    Religion
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
-                </label>
-
-                @*Medical Insurance*@
-                <label class="custom-label">
-                    Medical Insurance
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
-                </label>
-
-                @*Guardian Contact #*@
-                <label class="custom-label">
-                    Guardian's Contact Number
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
-                </label>
-
-                @*Contact #*@
-                <label class="custom-label">
-                    Contact Number
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
-                </label>
+                </div>
+                <div class="col s3">
+                    @*Contact number*@
+                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
+                    <input id="contactNumber"
+                           type="text"
+                           ng-model="selectedPatient.contactNumber"
+                           class="custom-input"
+                           placeholder="09XX-XXX-XXXX"
+                           maxlength="11"
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           required>
+                </div>
             </div>
+
+            <div class="row">
+                <div class="col s6">
+                    @*Address Line 1*@
+                    <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           ng-model="selectedPatient.line1"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="street address, p.o. box, company name, c/o"
+                           required>
+                </div>
+
+                <div class="col s6">
+                    @*Address Line 2*@
+                    <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           ng-model="selectedPatient.line2"
+                           class="custom-input"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="appartment, suite, unit, building, floor, etc"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s3">
+                    @*City*@
+                    <p class="custom-label">City <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           ng-model="selectedPatient.city"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="city"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*state/province/region*@
+                    <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           ng-model="selectedPatient.state"
+                           maxlength="250"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="state/province/region"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*zip/postal code*@
+                    <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           ng-model="selectedPatient.postal"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="zip/postal code"
+                           required>
+                </div>
+
+                <div class="col s3">
+                    @*country*@
+                    <p class="custom-label">Country <span class="required-mark">*</span></p>
+                    <input id="address"
+                           type="text"
+                           class="custom-input"
+                           maxlength="250"
+                           ng-model="selectedPatient.country"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                           placeholder="country"
+                           required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s4">
+                    @*Occupation*@
+                    <p class="custom-label">Occupation <span class="required-mark">*</span></p>
+                    <input id="occupation"
+                           type="text"
+                           class="custom-input"
+                           ng-model="selectedPatient.occupation"
+                           placeholder="Doctor"
+                           maxlength="50"
+                           required>
+                </div>
+
+                <div class="col s4">
+                    @*Religion*@
+                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                    <select class="browser-default custom-input" ng-model="selectedPatient.religion">
+                        <option disabled selected>Select your Religion</option>
+                        <option value="Roman Catholic">Roman Catholic</option>
+                        <option value="Islam">Islam</option>
+                        <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <div class="col s4">
+                    @*Nationality*@
+                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                    <select class="browser-default custom-input" ng-model="selectedPatient.nationality">
+                        <option disbaled selected>Select your Nationality</option>
+                        <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                @*Guradian*@
+                <div class="col s4">
+                    <p class="custom-label">Guradian <span class="required-mark">*</span></p>
+                    <input type="text"
+                           ng-model="selectedPatient.guar"
+                           class="custom-input"
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" />
+                </div>
+
+                @*Guradian Number*@
+                <div class="col s4">
+                    <p class="custom-label">Guradian's Contact Number' <span class="required-mark">*</span></p>
+                    <input type="text"
+                           class="custom-input"
+                           ng-model="selectedPatient.guarNum"
+                           maxlength="150"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" />
+                </div>
+
+                @*Refferal*@
+                <div class="col s4">
+                    <p class="custom-label">Referral (if any)</p>
+                    <input type="text"
+                           ng-model="selectedPatient.referral"
+                           class="custom-input"
+                           maxlength="50"
+                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @*Submit , upload, cancel*@
+    <div class="modal-footer" style="margin-top:2.5vh">
+        <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD</button>
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
+        @*New Password*@
+        <!--<div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
+            <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
+        </div>-->
+    </div>
+</div>
+
+@*Patient info*@
+<!--<div id="modalEditPatientInfo" class="modal patientInfo-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title">Edit Patient Information</h5>
+
+        <div class="row">-->
+@*Firstname*@
+<!--<div class="col s4">
+    <label class="custom-label">
+        First Name
+        <span class="required-mark">*</span>
+        <input type="text" class="custom-input" placeholder="First Name" ng-model="selectedPatient.firstName">
+    </label>
+</div>-->
+@*Middlename*@
+<!--<div class="col s4">
+    <label class="custom-label">
+        Middle Name
+        <input type="text" class="custom-input" placeholder="Middle Name" ng-model="selectedPatient.middleName">
+    </label>
+</div>-->
+@*Lastname*@
+<!--<div class="col s4">
+        <label class="custom-label">
+            Last Name
+            <span class="required-mark">*</span>
+            <input type="text" class="custom-input" placeholder="Last Name" ng-model="selectedPatient.lastName">
+        </label>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col s6">-->
+@*Gender*@
+<!--<label class="custom-label">
+    Gender
+    <span class="required-mark">*</span>
+    <select class="browser-default custom-input"
+            ng-model="selectedPatient.genderID"
+            ng-options="g.genderID as g.description for g in genderArray"
+            style="margin-bottom:15px;">
+        <option value="" disabled>Select Gender</option>
+    </select>
+</label>-->
+@*Birthdate*@
+<!--<label class="custom-label">Birth Date <span class="required-mark">*</span></label>
+<div class="datepicker-wrapper">
+    <input id="birthDate"
+           ng-model="selectedPatient.birthDateRaw"
+           type="text"
+           class="datepicker custom-input"
+           placeholder="Select Birthdate"
+    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+</div>-->
+@*Address*@
+<!--<label class="custom-label">
+    Address
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Address" ng-model="selectedPatient.address">
+</label>-->
+@*Nationality*@
+<!--<label class="custom-label">
+    Nationality
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Nationality" ng-model="selectedPatient.nationality">
+</label>-->
+@*Guardian*@
+<!--<label class="custom-label">
+    Guardian
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Guardian" ng-model="selectedPatient.guar">
+</label>-->
+@*Email*@
+<!--<label class="custom-label">
+    Email Address
+    <span class="required-mark">*</span>
+    <input type="text"
+           class="custom-input"
+           placeholder="Email Address"
+           ng-model="selectedPatient.email"
+           ng-change="checkEditPatientEmail()" />
+
+    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && !editPatientEmailValid">
+        Enter a valid email address
+    </span>
+    <span class="helper-text" style="color:#d32f2f" ng-show="selectedPatient.email && editPatientEmailValid && editPatientEmailTaken">
+        Email already taken
+    </span>
+    <span class="helper-text" style="color:#388e3c" ng-show="selectedPatient.email && editPatientEmailValid && !editPatientEmailTaken">
+        Email is valid
+    </span>
+</label>
+</div>
+
+<div class="col s6">-->
+@*Civil status*@
+<!--<label class="custom-label">
+    Civil Status
+    <span class="required-mark">*</span>
+    <select class="browser-default custom-input" style="margin-bottom:15px;" ng-model="selectedPatient.civilStatus" required>
+        <option value="" disabled selected>Select Status</option>
+        <option value="1">Single</option>
+        <option value="2">Married</option>
+        <option value="3">Widowed</option>
+    </select>
+</label>-->
+@*Occupation*@
+<!--<label class="custom-label">
+    Occupation
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Occupation" ng-model="selectedPatient.occupation">
+</label>-->
+@*Religion*@
+<!--<label class="custom-label">
+    Religion
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Religion" ng-model="selectedPatient.religion">
+</label>-->
+@*Medical Insurance*@
+<!--<label class="custom-label">
+    Medical Insurance
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Medical Insurance" ng-model="selectedPatient.insurance">
+</label>-->
+@*Guardian Contact #*@
+<!--<label class="custom-label">
+    Guardian's Contact Number
+    <span class="required-mark">*</span>
+    <input type="text" class="custom-input" placeholder="Guardian's Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.guarNum" maxlength="11">
+</label>-->
+@*Contact #*@
+<!--<label class="custom-label">
+            Contact Number
+            <span class="required-mark">*</span>
+            <input type="text" class="custom-input" placeholder="Contact Number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" ng-model="selectedPatient.contactNumber" maxlength="11">
+        </label>
         </div>
     </div>
-
-    @*New Password*@
-    <div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
-        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
-    </div>
-    <input id="patient_photo_input" type="file" accept="image/*" style="display:none"
-           onchange="angular.element(this).scope().onPatientPhotoSelected(this.files)" />
-
-
-    @*upload, save, cancel buttons*@
-    <div class="modal-footer">
+</div>-->
+@*New Password*@
+<!--<div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;"">
+    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
+</div>
+<input id="patient_photo_input" type="file" accept="image/*" style="display:none"
+       onchange="angular.element(this).scope().onPatientPhotoSelected(this.files)" />-->
+@*upload, save, cancel buttons*@
+<!--<div class="modal-footer">
         <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD NEW ACCOUNT PICTURE</button>
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
     </div>
-</div>
-
+</div>-->
 
 @*medical history modal*@
 <div id="modalMedHis" class="modal medhis-modal">
@@ -1519,7 +1796,7 @@
 
 
 @*Dental Chart modal*@
-<div id="modalDentalChart" class="modal dentalChart-modal">
+<div id="modalDentalChart" class="modal dentalChart-modal containerOverflow-2">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Upload Image</h5>
 
@@ -1534,7 +1811,20 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row" style="margin-top:-1vh;">
+            <div class="col s12">
+                @*Dropdown*@
+                <p class="custom-label">Dropdown <span class="required-mark">*</span></p>
+                <select class="browser-default custom-input" required>
+                    <option value="" disabled selected>Options</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:3.5vh;">
             <div class="row m-0 center">
                 <img id="dentalChartModalImg"
                      img src="https://placehold.co/2550x3300"
@@ -1559,25 +1849,14 @@
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Add Form</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
-                    Patient<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="[This Patient]" />
+                    Form Type<span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s12">
-                <label class="custom-label">
-                    Dentist<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Dentist..." />
-                </label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
                     Date<span class="required-mark">*</span>
                 </label>
@@ -1590,55 +1869,37 @@
 
         <div class="row">
             <div class="col s12">
+                @*Content*@
                 <label class="custom-label">
-                    Form<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                    Content<span class="required-mark">*</span>
+                    <textarea style="flex: 1; height: 30vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..."></textarea>
                 </label>
             </div>
         </div>
 
-        <div class="row" style="margin-top:1.5vh">
-            <div class="row m-0 center">
-                <img id="dentalChartModalImg"
-                     img src="https://placehold.co/2550x3300"
-                     alt="Dental Chart"
-                     style="max-height: 25rem" />
-            </div>
-        </div>
     </div>
 
     <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+        <button type="button" class="cancel-btn left modal-close" style="font-weight: 500; margin: 0 0 -6vh 2vh">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">ADD</button>
     </div>
 </div>
 
 @*EDIT form *@
-<div id="modalEditForm" class="modal form-modal">
+<div id="modalAddForm" class="modal form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Edit Form</h5>
 
         <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
-                    Patient<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="[This Patient]" />
+                    Form Type<span class="required-mark">*</span>
+                    <input type="text" class="custom-input" placeholder="Type of Form" />
                 </label>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col s12">
-                <label class="custom-label">
-                    Dentist<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Dentist..." />
-                </label>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col s12">
+            <div class="col s6">
                 <label class="custom-label">
                     Date<span class="required-mark">*</span>
                 </label>
@@ -1651,26 +1912,19 @@
 
         <div class="row">
             <div class="col s12">
+                @*Content*@
                 <label class="custom-label">
-                    Form<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                    Content<span class="required-mark">*</span>
+                    <textarea style="flex: 1; height: 30vh; padding: 1vh; background-color:white; border:none;"
+                              placeholder="Description..."></textarea>
                 </label>
             </div>
         </div>
 
-        <div class="row" style="margin-top:1.5vh">
-            <div class="row m-0 center">
-                <img id="dentalChartModalImg"
-                     img src="https://placehold.co/2550x3300"
-                     alt="Dental Chart"
-                     style="max-height: 25rem" />
-            </div>
-        </div>
     </div>
 
-    <div class="modal-footer" style="margin: -2vh 0 3vh 0 !important">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: 0 0 -6vh 2vh">UPLOAD FILE</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">CANCEL</button>
+    <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
+        <button type="button" class="cancel-btn left modal-close" style="font-weight: 500; margin: 0 0 -6vh 2vh">CANCEL</button>
         <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">SAVE</button>
     </div>
 </div>
@@ -1729,3 +1983,4 @@
     </div>
 </div>
 
+</div>

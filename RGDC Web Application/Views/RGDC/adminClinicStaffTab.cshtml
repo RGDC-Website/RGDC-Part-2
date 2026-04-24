@@ -23,7 +23,7 @@
                     <li class="tab px-1"><a class="brown-text p-0" href="#Owner">Owner</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Dentist">Dentist</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Staff">Staff</a></li>
-                    <li class="tab px-1"><a class="brown-text p-0" href="#Pending">Pending</a></li>
+                    @*<li class="tab px-1"><a class="brown-text p-0" href="#Pending">Pending</a></li>*@
                 </ul>
             </div>
         </nav>
@@ -34,9 +34,10 @@
                 <div class="row m-0">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
-                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="text" selected>text</option>
-                        </select>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="ownerInformationFormAdd">
@@ -76,9 +77,10 @@
                 <div class="row m-0">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
-                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="text" selected>text</option>
-                        </select>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="dentistInformationFormAdd">
@@ -121,9 +123,10 @@
                 <div class="row m-0">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
-                        <select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="text" selected>text</option>
-                        </select>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="staffInformationFormAdd">
@@ -163,20 +166,20 @@
             </div>
             
             @*pending*@
-            <div id="Pending" class="containerOverflow-2 row m-0">
+            <!--<div id="Pending" class="containerOverflow-2 row m-0">
                 <div class="row m-0">
                     <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Pending</p>
-                </div>
+                </div>-->
                 @*pending Table*@
-                <table id="adminClinicStaffTabTablePending" class="hover tableClk">
+                <!--<table id="adminClinicStaffTabTablePending" class="hover tableClk">
                     <thead>
                         <tr class="brown-text lighten-1">
                             <th>Email</th>
                             <th colspan="2">Role</th>
                         </tr>
-                    </thead>
+                    </thead>-->
                     @*table content*@
-                    <tbody>
+                    <!--<tbody>
                         <tr data-href="#">
                             <td>email@gmail.com</td>
                             <td>Role</td>
@@ -192,7 +195,7 @@
                         </tr>
                     </tfoot>
                 </table>
-            </div>
+            </div>-->
 
 
         </div>

@@ -61,6 +61,51 @@
         ];
     })();
 
+    $scope.nationalities = [
+        "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan",
+        "Antiguan", "Argentine", "Armenian", "Australian", "Austrian",
+        "Azerbaijani", "Bahamian", "Bahraini", "Bangladeshi", "Barbadian",
+        "Belarusian", "Belgian", "Belizean", "Beninese", "Bhutanese",
+        "Bolivian", "Bosnian", "Botswanan", "Brazilian", "British",
+        "Bruneian", "Bulgarian", "Burkinabe", "Burmese", "Burundian",
+        "Cambodian", "Cameroonian", "Canadian", "Cape Verdean",
+        "Central African", "Chadian", "Chilean", "Chinese", "Colombian",
+        "Comorian", "Congolese", "Costa Rican", "Croatian", "Cuban",
+        "Cypriot", "Czech", "Danish", "Djiboutian", "Dominican",
+        "Dutch", "East Timorese", "Ecuadorean", "Egyptian",
+        "Emirati", "Equatorial Guinean", "Eritrean", "Estonian",
+        "Ethiopian", "Fijian", "Finnish", "French", "Gabonese",
+        "Gambian", "Georgian", "German", "Ghanaian", "Greek",
+        "Grenadian", "Guatemalan", "Guinean", "Guyanese",
+        "Haitian", "Honduran", "Hungarian", "Icelandic", "Indian",
+        "Indonesian", "Iranian", "Iraqi", "Irish", "Israeli",
+        "Italian", "Ivorian", "Jamaican", "Japanese", "Jordanian",
+        "Kazakh", "Kenyan", "Kuwaiti", "Kyrgyz", "Laotian",
+        "Latvian", "Lebanese", "Liberian", "Libyan", "Liechtensteiner",
+        "Lithuanian", "Luxembourger", "Malagasy", "Malawian",
+        "Malaysian", "Maldivian", "Malian", "Maltese", "Marshallese",
+        "Mauritanian", "Mauritian", "Mexican", "Micronesian",
+        "Moldovan", "Monacan", "Mongolian", "Montenegrin",
+        "Moroccan", "Mozambican", "Namibian", "Nauruan",
+        "Nepalese", "New Zealander", "Nicaraguan", "Nigerien",
+        "Nigerian", "North Korean", "North Macedonian", "Norwegian",
+        "Omani", "Pakistani", "Palauan", "Panamanian",
+        "Papua New Guinean", "Paraguayan", "Peruvian",
+        "Filipino", "Polish", "Portuguese", "Qatari",
+        "Romanian", "Russian", "Rwandan", "Saint Lucian",
+        "Salvadoran", "Samoan", "San Marinese", "Saudi",
+        "Senegalese", "Serbian", "Seychellois", "Sierra Leonean",
+        "Singaporean", "Slovak", "Slovenian", "Solomon Islander",
+        "Somali", "South African", "South Korean", "Spanish",
+        "Sri Lankan", "Sudanese", "Surinamese", "Swazi",
+        "Swedish", "Swiss", "Syrian", "Taiwanese", "Tajik",
+        "Tanzanian", "Thai", "Togolese", "Tongan",
+        "Trinidadian", "Tunisian", "Turkish", "Turkmen",
+        "Tuvaluan", "Ugandan", "Ukrainian", "Uruguayan",
+        "Uzbek", "Vanuatuan", "Venezuelan", "Vietnamese",
+        "Yemeni", "Zambian", "Zimbabwean"
+    ];
+   
     // Ensure root-scoped appointment arrays exist so views referencing $root won't break
     try {
         if (!$rootScope.requestedAppointments) $rootScope.requestedAppointments = [];
@@ -112,7 +157,7 @@
     $scope.passwordStrength = '';
     $scope.strengthColor = '';
     $scope.passwordsMatch = true;
-    $scope.signUp_emailLocked = false;
+    $scope._emailLocked = false;
 
     $scope.checkPasswordStrength = function () {
         const pwd = $scope.signUp_password || '';
@@ -258,9 +303,6 @@
         return num.length >= 10;
     };
 
-    $scope.isAddressFieldValid = function () {
-        return !!$scope.signUp_address && $scope.signUp_address.trim().length > 0;
-    };
 
     $scope.isCurrentPhysicianValid = function () {
         // optional field: valid if empty or has characters
@@ -582,7 +624,6 @@
             if ($scope.paymentInfo.paymentDate) {
                 $scope.paymentInfo.paymentDate = formatDateToMDY($scope.paymentInfo.paymentDate)
             }
-            console.log($scope.paymentInfo.patientID)
         });
     }
 
@@ -804,7 +845,7 @@
             var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password) {
                 var accountData = {
                     firstName: $scope.signUp_firstName,
                     middleName: $scope.signUp_middleName,
@@ -818,7 +859,12 @@
                     nationality: $scope.signUp_nationality,
                     religion: $scope.signUp_religion,
                     occupation: $scope.signUp_occupation,
-                    address: $scope.signUp_address,
+                    line1: $scope.signUp_line1,
+                    line2: $scope.signUp_line2,
+                    state: $scope.signUp_state,
+                    country: $scope.signUp_country,
+                    city: $scope.signUp_city,
+                    postal: $scope.signUp_postal,
                     civilStatus: $scope.signUp_civilStatus,
                     password: $scope.signUp_password,
                     lastLogin: new Date(),
@@ -1032,7 +1078,12 @@
                     nationality: $scope.signUp_nationality,
                     religion: $scope.signUp_religion,
                     occupation: $scope.signUp_occupation,
-                    address: $scope.signUp_address,
+                    line1: $scope.signUp_line1,
+                    line2: $scope.signUp_line2,
+                    state: $scope.signUp_state,
+                    country: $scope.signUp_country,
+                    city: $scope.signUp_city,
+                    postal: $scope.signUp_postal,
                     civilStatus: $scope.signUp_civilStatus,
                     password: $scope.signUp_password,
                     lastLogin: new Date(),
@@ -1562,6 +1613,8 @@
                         p.genderID = null;
                     }
 
+                   
+
                     if (p.birthDate) {
                         var birthJs = parseJsonDateToJsDate(p.birthDate);
                         if (birthJs) {
@@ -1618,11 +1671,11 @@
                     $scope.editPatientEmailTaken = false;
                     try { $scope.checkEditPatientEmail(); } catch (e) { /* safe */ }
 
-                    try {
-                        $scope.loadPatientForms();
-                    } catch (e) {
-                        console.warn('loadPatientForms failed', e);
-                    }
+                    //try {
+                    //    $scope.loadPatientForms();
+                    //} catch (e) {
+                    //    console.warn('loadPatientForms failed', e);
+                    //}
 
                     if (!$scope.genderArray || $scope.genderArray.length === 0) {
                         $scope.getGender();
@@ -1903,10 +1956,15 @@
             genderID: (typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null)
                 ? parseInt($scope.selectedPatient.genderID)
                 : null,
-            birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
-            email: $scope.selectedPatient.email,
-            contactNumber: $scope.selectedPatient.contactNumber,
-            address: $scope.selectedPatient.address,
+             birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
+             email: $scope.selectedPatient.email,
+             contactNumber: $scope.selectedPatient.contactNumber,
+            line1: $scope.selectedPatient.line1,
+            line2: $scope.selectedPatient.line2,
+            state: $scope.selectedPatient.state,
+            country: $scope.selectedPatient.country,
+            city: $scope.selectedPatient.city,
+            postal: $scope.selectedPatient.postal,
             civilStatus: $scope.selectedPatient.civilStatus,
             occupation: $scope.selectedPatient.occupation,
             religion: $scope.selectedPatient.religion,
@@ -2549,163 +2607,7 @@
         input.click();
     };
 
-    $scope.addForm = function (form) {
-        if ($scope.isUserStaff) {
-            Swal.fire({ icon: 'error', title: 'Not authorized', text: 'Staff accounts cannot add forms.' });
-            return;
-        }
-
-        if (!form) form = $scope.newForm || {};
-
-        var formCtrl = $scope.addFormForm;
-
-        if (formCtrl) {
-            formCtrl.$setSubmitted();
-        }
-
-        var missing = [];
-        if (!form.firstName || String(form.firstName).trim() === '') missing.push('First Name');
-        if (!form.lastName || String(form.lastName).trim() === '') missing.push('Last Name');
-        if (!form.address || String(form.address).trim().length < 5) missing.push('Address (min 5 chars)');
-        if (!form.contactNumber || !$scope.isValidAddFormContact(form.contactNumber)) missing.push('Contact Number (09#########)');
-        if (!form.acceptedTerms) missing.push('Terms & Conditions');
-
-        if (missing.length > 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Missing or invalid fields',
-                html: 'Please correct the following: <br><strong>' + missing.join(', ') + '</strong>'
-            });
-            return;
-        }
-
-
-        var proceed = function (filePath) {
-            var payload = {
-                patientID: $scope.selectedPatient ? ($scope.selectedPatient.patientID || null) : null,
-                dentistID: (form.dentistID || null),
-                createdBy: $scope.currentUserID || null,
-                formatID: form.formatID || 1,
-                formLink: filePath || null
-            };
-            $http({
-                method: 'POST',
-                url: '/RGDC/AddForm',
-                data: payload
-            }).then(function (resp) {
-                var data = resp.data || resp;
-                if (data && data.success) {
-                    Swal.fire({ icon: 'success', title: 'Added', text: data.message || 'Form added.' });
-                    $scope.getSelectedPatientDetails();
-                    $scope.loadPatientForms();
-                    var modal = document.getElementById('modal-add-form');
-                    if (modal && typeof M !== 'undefined' && M.Modal) {
-                        var inst = M.Modal.getInstance(modal);
-                        if (inst) inst.close();
-                    }
-                    $scope.newForm = {};
-                    if (formCtrl) {
-                        formCtrl.$setPristine();
-                        formCtrl.$setUntouched();
-                    }
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to add form.' });
-                }
-            }).catch(function (err) {
-                console.error('AddForm error', err);
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to add form.' });
-            });
-        };
-
-        var file = (form._file || $scope._pickedFormFile);
-        if (file) {
-            Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            RGDCWebApplicationService.uploadFile(file).then(function (resp) {
-                Swal.close();
-                var d = resp.data || resp;
-                if (d && d.success && d.filePath) {
-                    proceed(d.filePath);
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (d && d.message) ? d.message : 'File upload failed.' });
-                }
-            }).catch(function (err) {
-                Swal.close();
-                console.error('uploadFile error', err);
-                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload file.' });
-            });
-        } else {
-            proceed(null);
-        }
-    };
-
-    $scope.saveForm = function (form) {
-        if (!form) form = $scope.selectedForm || {};
-        var formCtrl = $scope.editFormForm;
-        if (formCtrl) formCtrl.$setSubmitted();
-
-        var missing = [];
-        if (!form.firstName || String(form.firstName).trim() === '') missing.push('First Name');
-        if (!form.lastName || String(form.lastName).trim() === '') missing.push('Last Name');
-        if (!form.address || String(form.address).trim().length < 5) missing.push('Address (min 5 chars)');
-        if (!form.contactNumber || !$scope.isValidAddFormContact(form.contactNumber)) missing.push('Contact Number (09#########)');
-        if (!form.acceptedTerms) missing.push('Accept Terms');
-
-        if (missing.length > 0) {
-            Swal.fire({ icon: 'error', title: 'Missing or invalid fields', html: 'Please correct: <br><strong>' + missing.join(', ') + '</strong>' });
-            return;
-        }
-
-        function proceed(filePath) {
-            var payload = {
-                formID: form.formID || null,
-                dentistID: form.dentistID || null,
-                formatID: form.formatID || 1,
-                formLink: filePath || form.formLink || null
-            };
-
-            $http({
-                method: 'POST',
-                url: '/RGDC/SaveForm',
-                data: payload
-            }).then(function (resp) {
-                var data = resp.data || resp;
-                if (data && data.success) {
-                    Swal.fire({ icon: 'success', title: 'Saved', text: data.message || 'Form saved.' });
-                    var modal = document.getElementById('modal-edit-form');
-                    if (modal && typeof M !== 'undefined' && M.Modal) {
-                        var inst = M.Modal.getInstance(modal);
-                        if (inst) inst.close();
-                    }
-                    $scope.loadPatientForms();
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Error', text: (data && data.message) ? data.message : 'Failed to save form.' });
-                }
-            }).catch(function (err) {
-                console.error('SaveForm error', err);
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save form.' });
-            });
-        }
-
-        var file = (form._file || $scope._pickedFormFileEdit);
-        if (file) {
-            Swal.fire({ title: 'Uploading file...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            RGDCWebApplicationService.uploadFile(file).then(function (resp) {
-                Swal.close();
-                var d = resp.data || resp;
-                if (d && d.success && d.filePath) {
-                    proceed(d.filePath);
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Upload failed', text: (d && d.message) ? d.message : 'File upload failed.' });
-                }
-            }).catch(function (err) {
-                Swal.close();
-                console.error('uploadFile error', err);
-                Swal.fire({ icon: 'error', title: 'Upload Error', text: 'Failed to upload file.' });
-            });
-        } else {
-            proceed(null);
-        }
-    };
+ 
 
     $scope.postArray = [];
 
@@ -3172,7 +3074,7 @@
                 $scope._minApptDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
             })();
             // initialize appointment-specific datepickers
-            $timeout(function () { initializeAppointmentDatepickers(); }, 150);
+            $timeout(function () { initializeAppointmentDatepickers(); }, 150);z
         }).catch(function (err) {
             // ignore session errors here
         });
@@ -3911,8 +3813,8 @@
         //Add email duplication check
         var birthDate = new Date($scope.addPatient_birthDate);
         birthDate.setHours(0, 0, 0, 0); // 00:00:00
-        console.log($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_address && $scope.addPatient_civilStatus)
-        if ($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_address && $scope.addPatient_civilStatus) {
+        console.log($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_civilStatus)
+        if ($scope.addPatient_firstName && $scope.addPatient_lastName && $scope.addPatient_genderID && $scope.addPatient_birthDate && $scope.addPatient_email && $scope.addPatient_contactNumber && $scope.addPatient_civilStatus) {
             var accountData = {
                 firstName: $scope.addPatient_firstName,
                 middleName: $scope.addPatient_middleName,
@@ -3921,7 +3823,12 @@
                 birthDate: birthDate,
                 email: $scope.addPatient_email,
                 contactNumber: $scope.addPatient_contactNumber,
-                address: $scope.addPatient_address,
+                line1: $scope.addPatient_line1,
+                line2: $scope.addPatient_line2,
+                state: $scope.addPatient_state,
+                country: $scope.addPatient_country,
+                city: $scope.addPatient_city,
+                postal: $scope.addPatient_postal,
                 civilStatus: $scope.addPatient_civilStatus,
                 password: "Default123",
                 lastLogin: new Date(),
@@ -4677,7 +4584,7 @@
         $scope.validateOwnerEditFields();
         $scope.validateOwnerEmailEdit();
 
-        if (!$scope.ownerFirstNameValid || !$scope.ownerLastNameValid || !$scope.ownerAddressValid) {
+        if (!$scope.ownerFirstNameValid || !$scope.ownerLastNameValid) {
             Swal.fire({
                 icon: 'error',
                 title: 'Missing required fields',
@@ -4743,7 +4650,12 @@
                 birthDate: $scope.owner.birthDate,
                 email: $scope.owner.email,
                 contactNumber: $scope.owner.contactNumber,
-                address: $scope.owner.address,
+                line1: $scope.owner.line1,
+                line2: $scope.owner.line2,
+                state: $scope.owner.state,
+                country: $scope.owner.country,
+                city: $scope.owner.city,
+                postal: $scope.owner.postal,
                 nationality: $scope.owner.nationality,
                 religion: $scope.owner.religion,
                 civilStatus: $scope.owner.civilStatus
@@ -5368,7 +5280,12 @@
                 contactNumber: $scope.dentist.contactNumber,
                 nationality: $scope.dentist.nationality,
                 religion: $scope.dentist.religion,
-                address: $scope.dentist.address,
+                line1: $scope.dentist.line1,
+                line2: $scope.dentist.line2,
+                state: $scope.dentist.state,
+                country: $scope.dentist.country,
+                city: $scope.dentist.city,
+                postal: $scope.dentist.postal,
                 civilStatus: $scope.dentist.civilStatus
             };
 
@@ -5478,7 +5395,7 @@
         $scope.validateStaffEditFields();
         $scope.validateStaffEmailEdit();
 
-        if (!$scope.staffFirstNameValid || !$scope.staffLastNameValid || !$scope.staffAddressValid) {
+        if (!$scope.staffFirstNameValid || !$scope.staffLastNameValid ) {
             Swal.fire({
                 icon: 'error',
                 title: 'Missing required fields',
@@ -5544,7 +5461,12 @@
                 birthDate: $scope.staff.birthDate,
                 email: $scope.staff.email,
                 contactNumber: $scope.staff.contactNumber,
-                address: $scope.staff.address,
+                line1: $scope.staff.line1,
+                line2: $scope.staff.line2,
+                state: $scope.staff.state,
+                country: $scope.staff.country,
+                city: $scope.staff.city,
+                postal: $scope.staff.postal,
                 civilStatus: $scope.staff.civilStatus,
                 nationality: $scope.staff.nationality,
                 religion: $scope.staff.religion
@@ -6014,6 +5936,11 @@
         if (!num) return false;
         return /^09\d{9}$/.test(String(num));
     };
+    //function initPatientFormsDataTable(opts) {
+    //    opts = opts || {};
+    //    var maxRetries = opts.maxRetries || 30;
+    //    var retryDelay = opts.retryDelay || 120;
+    //    var attempt = 0;
 
     //for displaying of forms
     $scope.patientForms = [];
@@ -6051,83 +5978,14 @@
             }
         } catch (e) { console.warn('Pre-clean patientForms error', e); }
 
-        $scope.patientFormsReady = false;
+    //        var hasJQueryDT = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable);
+    //        var hasSimpleDT = typeof window.DataTable !== 'undefined';
 
-        RGDCWebApplicationService.getPatientForms()
-            .then(function (resp) {
-                var data = resp.data || [];
-                if (!Array.isArray(data)) {
-                    $scope.patientForms = [];
-                    $timeout(function () { $scope.patientFormsReady = true; }, 0);
-                    return;
-                }
-
-                var mapped = data.map(function (f) {
-                    var jsDate = parseJsonDateToJsDate(f.date);
-                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
-                    return {
-                        formID: f.formID,
-                        formLink: f.formLink,
-                        date: dateStr,
-                        dentistName: f.dentistName || "",
-                        createdBy: f.createdBy || null,
-                        formatID: f.formatID || null,
-                        firstName: f.firstName || '',
-                        lastName: f.lastName || '',
-                        contactNumber: f.contactNumber || '',
-                        address: f.address || ''
-                    };
-                });
-
-                $timeout(function () {
-                    $scope.patientForms = mapped;
-                    $scope.patientFormsReady = true;
-
-                    $timeout(function () {
-                        try {
-                            initPatientFormsDataTable({ maxRetries: 30, retryDelay: 120 });
-                        } catch (e) {
-                            console.warn('initPatientFormsDataTable call failed', e);
-                        }
-                    }, 60);
-                }, 0);
-            })
-            .catch(function (err) {
-                console.error('Failed to load patient forms', err);
-                $scope.patientForms = [];
-                $timeout(function () { $scope.patientFormsReady = true; }, 0);
-            });
-    };
-
-
-    function initPatientFormsDataTable(opts) {
-        opts = opts || {};
-        var maxRetries = opts.maxRetries || 30;
-        var retryDelay = opts.retryDelay || 120;
-        var attempt = 0;
-
-        function tryInit() {
-            attempt++;
-
-            var hasJQueryDT = !!(window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable);
-            var hasSimpleDT = typeof window.DataTable !== 'undefined';
-
-            if (!hasJQueryDT && !hasSimpleDT) {
-                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
-                console.warn('No DataTable library found for #patientForms explicit init.');
-                return;
-            }
-
-            var tblElem = document.querySelector('#patientForms');
-            if (!tblElem) {
-                if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
-                console.warn('#patientForms element not found for explicit init.');
-                return;
-            }
-
-            var tbody = tblElem.querySelector('tbody');
-            var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
-            if (!hasRows && attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+    //        if (!hasJQueryDT && !hasSimpleDT) {
+    //            if (attempt < maxRetries) return setTimeout(tryInit, retryDelay);
+    //            console.warn('No DataTable library found for #patientForms explicit init.');
+    //            return;
+    //        }
 
             try {
                 try {
@@ -6144,52 +6002,71 @@
                     }
                 } catch (e) { }
 
-                if (hasJQueryDT) {
-                    try {
-                        var jq = jQuery(tblElem).DataTable({
-                            searching: true,
-                            paging: true,
-                            info: true,
-                            pageLength: 5,
-                            lengthMenu: [5, 10, 25, 50],
-                            language: { searchPlaceholder: "Search forms, dentist..." },
-                            destroy: true
-                        });
-                        window.patientFormsTable = jq;
-                        window.patientFormsTableType = 'jquery';
-                        return;
-                    } catch (e) {
-                        console.warn('jQuery DataTables init failed in explicit helper', e);
-                    }
-                }
+    //        var tbody = tblElem.querySelector('tbody');
+    //        var hasRows = tbody && tbody.querySelectorAll('tr').length > 0;
+    //        if (!hasRows && attempt < maxRetries) return setTimeout(tryInit, retryDelay);
 
-                if (hasSimpleDT) {
-                    try {
-                        var s = new DataTable(tblElem, {
-                            searchable: true,
-                            fixedHeight: false,
-                            perPage: 5,
-                            perPageSelect: [5, 10, 25, 50],
-                            labels: {
-                                placeholder: "Search forms, dentist...",
-                                perPage: "{select} entries per page",
-                                noRows: "No forms found",
-                                info: "Showing {start} to {end} of {rows} entries"
-                            }
-                        });
-                        window.patientFormsTable = s;
-                        window.patientFormsTableType = 'simple';
-                    } catch (e) {
-                        console.warn('Simple-DataTables init failed in explicit helper', e);
-                    }
-                }
-            } catch (e) {
-                console.warn('initPatientFormsDataTable error', e);
-            }
-        }
+    //        try {
+    //            try {
+    //                if (window.patientFormsTable) {
+    //                    if (window.patientFormsTableType === 'jquery') {
+    //                        try { window.patientFormsTable.destroy(true); } catch (e) { /* ignore */ }
+    //                    } else if (window.patientFormsTableType === 'simple') {
+    //                        try { window.patientFormsTable.destroy(); } catch (e) { /* ignore */ }
+    //                    }
+    //                    window.patientFormsTable = null;
+    //                    window.patientFormsTableType = null;
+    //                } else if (hasJQueryDT && jQuery.fn.dataTable && jQuery.fn.dataTable.isDataTable(tblElem)) {
+    //                    try { jQuery(tblElem).DataTable().destroy(true); } catch (e) { /* ignore */ }
+    //                }
+    //            } catch (e) {}
 
-        tryInit();
-    }
+    //            if (hasJQueryDT) {
+    //                try {
+    //                    var jq = jQuery(tblElem).DataTable({
+    //                        searching: true,
+    //                        paging: true,
+    //                        info: true,
+    //                        pageLength: 5,
+    //                        lengthMenu: [5, 10, 25, 50],
+    //                        language: { searchPlaceholder: "Search forms, dentist..." },
+    //                        destroy: true
+    //                    });
+    //                    window.patientFormsTable = jq;
+    //                    window.patientFormsTableType = 'jquery';
+    //                    return;
+    //                } catch (e) {
+    //                    console.warn('jQuery DataTables init failed in explicit helper', e);
+    //                }
+    //            }
+
+    //            if (hasSimpleDT) {
+    //                try {
+    //                    var s = new DataTable(tblElem, {
+    //                        searchable: true,
+    //                        fixedHeight: false,
+    //                        perPage: 5,
+    //                        perPageSelect: [5, 10, 25, 50],
+    //                        labels: {
+    //                            placeholder: "Search forms, dentist...",
+    //                            perPage: "{select} entries per page",
+    //                            noRows: "No forms found",
+    //                            info: "Showing {start} to {end} of {rows} entries"
+    //                        }
+    //                    });
+    //                    window.patientFormsTable = s;
+    //                    window.patientFormsTableType = 'simple';
+    //                } catch (e) {
+    //                    console.warn('Simple-DataTables init failed in explicit helper', e);
+    //                }
+    //            }
+    //        } catch (e) {
+    //            console.warn('initPatientFormsDataTable error', e);
+    //        }
+    //    }
+
+    //    tryInit();
+    //}
 
     //for forms editing
     $scope.selectEditForm = function (formID) {

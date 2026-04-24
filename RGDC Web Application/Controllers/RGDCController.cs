@@ -389,7 +389,12 @@ namespace RGDC_Web_Application.Controllers
                         contactNumber = accDetails.contactNumber,
                         religion = accDetails.religion,
                         nationality = accDetails.nationality,
-                        address = accDetails.address,
+                        state = accDetails.state,
+                        city = accDetails.city,
+                        line1 = accDetails.line1,
+                        line2 = accDetails.line2,
+                        country = accDetails.country,
+                        postal = accDetails.postal,
                         civilStatus = accDetails.civilStatus,
                         password = passwordHash(accDetails.password),
                         lastLogin = DateTime.Now,
@@ -536,7 +541,11 @@ namespace RGDC_Web_Application.Controllers
                         Session["UserPermission"] = user.permission;
                         Session["IsLoggedIn"] = true;
                         Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
-
+                        if (user.permission == 3)
+                        {
+                            var patient = db.tbl_patient.FirstOrDefault(u => u.accID == user.accID);
+                            Session["SelectedPatientID"] = patient.patientID;
+                        }
                         return Json(new
                         {
                             success = true,
@@ -1284,7 +1293,12 @@ RGDC Dental Clinic Team";
                         gender = g != null ? g.description : null,
                         email = a.email,
                         contactNumber = a.contactNumber,
-                        address = a.address,
+                        state = a.state,
+                        city = a.city,
+                        line1 = a.line1,
+                        line2 = a.line2,
+                        country = a.country,
+                        postal = a.postal,
                         civilStatus = a.civilStatus,
                         religion = a.religion,
                         nationality = a.nationality,
@@ -1421,7 +1435,12 @@ RGDC Dental Clinic Team";
                                 gender = g != null ? g.description : null,
                                 email = a.email,
                                 contactNumber = a.contactNumber,
-                                address = a.address,
+                                state = a.state,
+                                city = a.city,
+                                line1 = a.line1,
+                                line2 = a.line2,
+                                country = a.country,
+                                postal = a.postal,
                                 civilStatus = a.civilStatus,
                                 religion = a.religion,
                                 nationality = a.nationality,
@@ -1571,7 +1590,12 @@ RGDC Dental Clinic Team";
                     if (profInfo.birthDate.HasValue) acc.birthDate = profInfo.birthDate.Value;
                     acc.email = string.IsNullOrWhiteSpace(profInfo.email) ? acc.email : profInfo.email;
                     acc.contactNumber = string.IsNullOrWhiteSpace(profInfo.contactNumber) ? acc.contactNumber : profInfo.contactNumber;
-                    acc.address = string.IsNullOrWhiteSpace(profInfo.address) ? acc.address : profInfo.address;
+                    acc.line1 = string.IsNullOrWhiteSpace(profInfo.line1) ? acc.line1 : profInfo.line1;
+                    acc.line2 = string.IsNullOrWhiteSpace(profInfo.line2) ? acc.line2 : profInfo.line2;
+                    acc.city = string.IsNullOrWhiteSpace(profInfo.city) ? acc.city : profInfo.city;
+                    acc.state = string.IsNullOrWhiteSpace(profInfo.state) ? acc.state : profInfo.state;
+                    acc.postal = string.IsNullOrWhiteSpace(profInfo.postal) ? acc.postal : profInfo.postal;
+                    acc.country = string.IsNullOrWhiteSpace(profInfo.country) ? acc.country : profInfo.country;
                     acc.civilStatus = string.IsNullOrWhiteSpace(profInfo.civilStatus) ? acc.civilStatus : profInfo.civilStatus;
                     acc.religion = string.IsNullOrWhiteSpace(profInfo.religion) ? acc.religion : profInfo.religion;
                     acc.nationality = string.IsNullOrWhiteSpace(profInfo.nationality) ? acc.nationality : profInfo.nationality;
@@ -3694,7 +3718,12 @@ RGDC Dental Clinic Team";
                     birthDate = accmod.birthDate,
                     email = accmod.email,
                     contactNumber = accmod.contactNumber,
-                    address = accmod.address,
+                    line1 = accmod.line1,
+                    line2 = accmod.line2,
+                    city = accmod.city,
+                    state = accmod.state,
+                    postal = accmod.postal,
+                    country = accmod.country,
                     civilStatus = accmod.civilStatus,
                     password = passwordHash("Default123"),
                     photoLink = string.IsNullOrWhiteSpace(accmod.photoLink) ? null : accmod.photoLink,
@@ -4075,7 +4104,12 @@ RGDC Dental Clinic Team";
                         birthDate = a.birthDate,
                         email = a.email,
                         contactNumber = a.contactNumber,
-                        address = a.address,
+                        line1 = a.line1,
+                        line2 = a.line2,
+                        city = a.city,
+                        state = a.state,
+                        postal = a.postal,
+                        country = a.country,
                         nationality = a.nationality,
                         religion = a.religion,
                         civilStatus = a.civilStatus,
@@ -4112,7 +4146,12 @@ RGDC Dental Clinic Team";
                         birthDate = a.birthDate,
                         email = a.email,
                         contactNumber = a.contactNumber,
-                        address = a.address,
+                        line1 = a.line1,
+                        line2 = a.line2,
+                        city = a.city,
+                        state = a.state,
+                        postal = a.postal,
+                        country = a.country,
                         civilStatus = a.civilStatus,
                         photoLink = a.photoLink,
                         nationality = a.nationality,
@@ -4151,7 +4190,12 @@ RGDC Dental Clinic Team";
                         contactNumber = a.contactNumber,
                         nationality = a.nationality,
                         religion = a.religion,
-                        address = a.address,
+                        line1 = a.line1,
+                        line2 = a.line2,
+                        city = a.city,
+                        state = a.state,
+                        postal = a.postal,
+                        country = a.country,
                         civilStatus = a.civilStatus,
                         photoLink = a.photoLink
                     }
@@ -4181,27 +4225,32 @@ RGDC Dental Clinic Team";
                    join s in db.tbl_staff on a.accID equals s.accID
                    where a.accID == accID
                    select new
-                   {
-                       // staff    
-                       staffID = s.staffID,
-                       accID = s.accID,
-                       staffRole = s.staffRole,
-                       branchID = s.branchID,
-                       signature = s.signature,
-                       nationality = a.nationality,
-                       religion = a.religion,
-                       // ACCOUNT (matches your ng-model)
-                       firstName = a.firstName,
-                       middleName = a.middleName,
-                       lastName = a.lastName,
-                       genderID = a.genderID,
-                       birthDate = a.birthDate,
-                       email = a.email,
-                       contactNumber = a.contactNumber,
-                       address = a.address,
-                       civilStatus = a.civilStatus,
-                       photoLink = a.photoLink
-                   }
+                    {
+                        // staff    
+                        staffID = s.staffID,
+                        accID = s.accID,
+                        staffRole = s.staffRole,
+                        branchID = s.branchID,
+                        signature = s.signature,
+                        nationality = a.nationality,
+                        religion = a.religion,
+                        // ACCOUNT (matches your ng-model)
+                        firstName = a.firstName,
+                        middleName = a.middleName,
+                        lastName = a.lastName,
+                        genderID = a.genderID,
+                        birthDate = a.birthDate,
+                        email = a.email,
+                        contactNumber = a.contactNumber,
+                        line1 = a.line1,
+                        line2 = a.line2,
+                        city = a.city,
+                        state = a.state,
+                        postal = a.postal,
+                        country = a.country,
+                        civilStatus = a.civilStatus,
+                        photoLink = a.photoLink
+                    }
                 ).FirstOrDefault();
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -4233,7 +4282,12 @@ RGDC Dental Clinic Team";
                                   genderID = a.genderID,
                                   birthDate = a.birthDate,
                                   contactNumber = a.contactNumber,
-                                  address = a.address,
+                                  line1 = a.line1,
+                                  line2 = a.line2,
+                                  city = a.city,
+                                  state = a.state,
+                                  postal = a.postal,
+                                  country = a.country,
                                   civilStatus = a.civilStatus,
                                   photoLink = a.photoLink,
                                   religion = a.religion,
@@ -4277,7 +4331,12 @@ RGDC Dental Clinic Team";
                                   genderID = a.genderID,
                                   birthDate = a.birthDate,
                                   contactNumber = a.contactNumber,
-                                  address = a.address,
+                                  line1 = a.line1,
+                                  line2 = a.line2,
+                                  city = a.city,
+                                  state = a.state,
+                                  postal = a.postal,
+                                  country = a.country,
                                   civilStatus = a.civilStatus,
                                   photoLink = a.photoLink,
                                   religion = a.religion,
@@ -4316,9 +4375,14 @@ RGDC Dental Clinic Team";
                 existing.birthDate = accmod.birthDate;
                 existing.email = accmod.email;
                 existing.contactNumber = accmod.contactNumber;
-                existing.address = accmod.address;
+                existing.line1 = accmod.line1;
+                existing.line2 = accmod.line2;
+                existing.city = accmod.city;
+                existing.state = accmod.state;
+                existing.postal = accmod.postal;
+                existing.country = accmod.country;
                 existing.nationality = accmod.nationality;
-                existing.religion = accmod.nationality;
+                existing.religion = accmod.religion;
                 existing.photoLink = accmod.photoLink;
                 existing.civilStatus = accmod.civilStatus;
                 existing.accUpdatedAt = DateTime.Now;
