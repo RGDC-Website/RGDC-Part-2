@@ -209,7 +209,7 @@ a:hover {
 .bold {
     font-weight: bold;
 }
-.section p, li{
+.section p, li, span{
     text-align:justify !important;
 }
 .centered-text{
