@@ -938,17 +938,17 @@
     $scope.signUpClinicStaff = function () {
 
         try {
-            function buildFullAddressFromParts() {
-                // Build signUp_address from separated inputs (skip blanks)
-                var parts = [
-                    $scope.address_houseNo,
-                    $scope.address_street,
-                    $scope.address_barangay,
-                    $scope.address_city,
-                    $scope.address_province
-                ].map(function (p) { return (p || '').toString().trim(); }).filter(Boolean);
-                $scope.signUp_address = parts.join(', ');
-            }
+            //function buildFullAddressFromParts() {
+            //    // Build signUp_address from separated inputs (skip blanks)
+            //    var parts = [
+            //        $scope.address_houseNo,
+            //        $scope.address_street,
+            //        $scope.address_barangay,
+            //        $scope.address_city,
+            //        $scope.address_province
+            //    ].map(function (p) { return (p || '').toString().trim(); }).filter(Boolean);
+            //    $scope.signUp_address = parts.join(', ');
+            //}
 
             // Expose a helper so the view can force-sync on keystroke
             if (typeof $scope.syncSignUpAddress !== 'function') {
@@ -963,13 +963,13 @@
 
             // Keep the combined address always in sync (so submit sees latest typing)
             try {
-                if (!$scope._addressWatchBound) {
-                    $scope._addressWatchBound = true;
-                    $scope.$watchGroup(
-                        ['address_houseNo', 'address_street', 'address_barangay', 'address_city', 'address_province'],
-                        function () { try { buildFullAddressFromParts(); } catch (_) { } }
-                    );
-                }
+                //if (!$scope._addressWatchBound) {
+                //    $scope._addressWatchBound = true;
+                //    $scope.$watchGroup(
+                //        ['address_houseNo', 'address_street', 'address_barangay', 'address_city', 'address_province'],
+                //        function () { try { buildFullAddressFromParts(); } catch (_) { } }
+                //    );
+                //}
             } catch (_) { }
 
             function normalizeTimeToHHMM(value) {
@@ -1043,7 +1043,7 @@
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
             // Always sync combined address before validating
-            buildFullAddressFromParts();
+            //buildFullAddressFromParts();
 
             // Coerce branch to number if it came through as a string
             try {
@@ -1053,7 +1053,7 @@
                 }
             } catch (_) { }
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_address && $scope.signUp_civilStatus && $scope.signUp_password) {
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password) {
                 var accountData = {
                     firstName: $scope.signUp_firstName,
                     middleName: $scope.signUp_middleName,
@@ -1191,7 +1191,6 @@
                 if (!$scope.signUp_birthDate) missing.push('Birth Date');
                 if (!$scope.signUp_email) missing.push('Email');
                 if (!$scope.signUp_contactNumber) missing.push('Contact Number');
-                if (!$scope.signUp_address || String($scope.signUp_address).trim().length === 0) missing.push('Address');
                 if (!$scope.signUp_civilStatus) missing.push('Civil Status');
                 if (!$scope.signUp_password) missing.push('Password');
                 // Dentist/staff branch is required for downstream save; show if missing
