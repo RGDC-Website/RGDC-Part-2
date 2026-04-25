@@ -1607,3 +1607,7 @@ css.validation-msg {
     align-items: center;
     gap: 12px;
 }
+
+.required-mark {
+    color: red;
+}
