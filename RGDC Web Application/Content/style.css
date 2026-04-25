@@ -209,6 +209,12 @@ a:hover {
 .bold {
     font-weight: bold;
 }
+.section p, li{
+    text-align:justify !important;
+}
+.centered-text{
+    text-align:center !important;
+}
 
 .p-0 {
     padding: 0 !important;
@@ -276,6 +282,10 @@ mb-3 {
 }
 .x-1{
     margin:0 2rem 0 2rem !important;
+}
+
+.required-mark{
+    color: red !important;
 }
 
 .clkPointer {
