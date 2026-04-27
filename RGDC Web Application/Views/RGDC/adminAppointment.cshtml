@@ -659,6 +659,108 @@
     </div>
 </div>
 
+@*VIEW scheduled Appointment*@
+<div id="modalViewSchedAppt" class="modal appt-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Scheduled Appointment</h5>
+
+        <!-- Hidden field to store apptID separately -->
+        <input type="hidden" id="hiddenApptID" value="">
+
+        <div class="row">
+            <div class="col s6">
+                @*Date*@
+                <label class="custom-label">Date</label>
+                <div class="datepicker-wrapper">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="editingAppt.dateObj" placeholder="MM/DD/YYYY" min="{{minApptDate}}" disabled>
+                    <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                </div>
+
+                @*Dentist*@
+                <label class="custom-label">
+                    Dentist
+                    <input type="text" class="custom-input" ng-bind="editingAppt.dentistName" placeholder="Dentist" readonly>
+                </label>
+            </div>
+
+            <div class="col s6">
+                @*Time Dropdown*@
+                <label class="custom-label">
+                    Time
+                    <select class="custom-input" ng-model="editingAppt.timeStr" ng-change="onTimeChange()" disabled>
+                        <option value="">Select Time</option>
+                        <option value="12:00 AM">12:00 AM</option>
+                        <option value="1:00 AM">1:00 AM</option>
+                        <option value="2:00 AM">2:00 AM</option>
+                        <option value="3:00 AM">3:00 AM</option>
+                        <option value="4:00 AM">4:00 AM</option>
+                        <option value="5:00 AM">5:00 AM</option>
+                        <option value="6:00 AM">6:00 AM</option>
+                        <option value="7:00 AM">7:00 AM</option>
+                        <option value="8:00 AM">8:00 AM</option>
+                        <option value="9:00 AM">9:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="1:00 PM">1:00 PM</option>
+                        <option value="2:00 PM">2:00 PM</option>
+                        <option value="3:00 PM">3:00 PM</option>
+                        <option value="4:00 PM">4:00 PM</option>
+                        <option value="5:00 PM">5:00 PM</option>
+                        <option value="6:00 PM">6:00 PM</option>
+                        <option value="7:00 PM">7:00 PM</option>
+                        <option value="8:00 PM">8:00 PM</option>
+                        <option value="9:00 PM">9:00 PM</option>
+                        <option value="10:00 PM">10:00 PM</option>
+                        <option value="11:00 PM">11:00 PM</option>
+                    </select>
+                </label>
+
+                @*Patient*@
+                <label class="custom-label">
+                    Patient
+                    <input type="text" class="custom-input" ng-bind="editingAppt.patientName" placeholder="Patient" readonly>
+                </label>
+            </div>
+
+            <div class="col s12">
+                <label class="custom-label">Status</label>
+                <select class="custom-input browser-default" disabled
+                        ng-model="editingAppt.status"
+                        ng-options="s for s in statusOptions">
+                    <option value="">Select Status</option>
+                </select>
+                <span class="helper-text" ng-if="isUserPatient" style="color: #666; font-size:0.9rem;">
+                    Status can only be changed by dentist/clinic staff.
+                </span>
+            </div>
+
+            <div class="col s12">
+                @*Purpose*@
+                <label class="custom-label">
+                    Purpose
+                    <input disabled type="text" class="custom-input" ng-model="editingAppt.purpose" placeholder="Purpose">
+                </label>
+            </div>
+
+            <div class="col s12">
+                <label class="custom-label">
+                    Notes
+                    <textarea class="custom-input" ng-model="editingAppt.remarks" placeholder="Enter notes / procedure details"
+                              disabled></textarea>
+                </label>
+                <span class="helper-text" ng-if="isUserPatient" style="color: #666; font-size:0.9rem;">
+                    Notes are read-only for patient users.
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-footer footer-center">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+    </div>
+</div>
 
 @*<script>
         (function () {

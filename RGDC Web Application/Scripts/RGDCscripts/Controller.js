@@ -2754,6 +2754,66 @@
         }, 100);
     };
 
+    $scope.openViewApptModal = function (appt, $event) {
+        if ($event && $event.preventDefault) {
+            $event.preventDefault();
+            if ($event.stopPropagation) $event.stopPropagation();
+        }
+        if (!appt || !appt.apptID) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'No valid appointment selected.'
+            });
+            return;
+        }
+
+        // Store apptID in a closure variable to preserve it
+        currentEditingApptID = appt.apptID;
+
+        // Parse the date string into ISO format for HTML5 date input
+        var isoDateStr = '';
+        if (appt.date) {
+            var dateObj = new Date(appt.date);
+            if (!isNaN(dateObj.getTime())) {
+                // Convert to ISO format (YYYY-MM-DD)
+                var year = dateObj.getFullYear();
+                var month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                var day = String(dateObj.getDate()).padStart(2, '0');
+                isoDateStr = year + '-' + month + '-' + day;
+            }
+        }
+
+        // Update the scope object directly with all properties
+        $scope.editingAppt.apptID = appt.apptID;
+        $scope.editingAppt.dateObj = isoDateStr;
+        $scope.editingAppt.dateStr = appt.date;
+        $scope.editingAppt.timeStr = appt.time;
+        $scope.editingAppt.purpose = appt.purpose;
+        $scope.editingAppt.dentistName = appt.dentistName;
+        $scope.editingAppt.patientName = appt.patientName;
+        $scope.editingAppt.status = appt.status || 'Scheduled';
+        $scope.editingAppt.remarks = appt.remarks || '';
+
+        // Open modal programmatically
+        $timeout(function () {
+            var modalElem = findModalElement(['modalViewSchedAppt']);
+            if (modalElem) {
+                // Store apptID on the hidden input field
+                var hiddenField = document.getElementById('hiddenApptID');
+                if (hiddenField) {
+                    hiddenField.value = appt.apptID;
+                }
+
+                // store apptID on modal element as backup
+                modalElem.setAttribute('data-edit-appt-id', appt.apptID);
+                var modalInst = M.Modal.getInstance(modalElem);
+                if (!modalInst) modalInst = M.Modal.init(modalElem);
+                modalInst.open();
+            }
+        }, 100);
+    };
+
     $scope.onTimeChange = function () {
         // no-op to avoid re-initializing Materialize select which duplicates elements
     };
@@ -6598,8 +6658,10 @@
                                     render: function (data, type, row, meta) {
                                         // data == apptID
                                         var id = data || '';
-                                        if (isUserDentist) {
-                                            var btns = "";
+                                        if ($scope.isUserDentist) {
+                                            var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
+                                                '<a class="btn-view-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="View Appointment" role="button" aria-label="View appointment"><i class="material-icons brown-text lighten-1">visibility</i></a>' +
+                                                '</div>';
                                         } else {
                                         var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
                                             '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">archive</i></a>' +
@@ -6667,6 +6729,21 @@
                             var appt = (scope.adminAppointments || []).find(function (x) { return parseInt(x.apptID, 10) === id; });
                             try {
                                 scope.openEditApptModal(appt, null);
+                            } catch (e) { console.error(e); }
+                        });
+                    });
+
+                    jQuery(document).on('click', '.btn-view-appt', function (ev) {
+                        ev.preventDefault();
+                        var apptID = jQuery(this).attr('data-apptid');
+                        var scope = angular.element(document.querySelector('[ng-controller="RGDCWebApplicationController"]')).scope();
+                        if (!scope) return;
+                        // find appointment object from scope.adminAppointments
+                        scope.$apply(function () {
+                            var id = parseInt(apptID, 10);
+                            var appt = (scope.adminAppointments || []).find(function (x) { return parseInt(x.apptID, 10) === id; });
+                            try {
+                                scope.openViewApptModal(appt, null);
                             } catch (e) { console.error(e); }
                         });
                     });
