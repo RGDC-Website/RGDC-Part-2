@@ -1,33 +1,23 @@
 ﻿
-/*large*/
-@media only screen and (min-width: 993px) {
-    .main-content {
-        margin-left: 25% !important;
-        padding: 0 !important;
-    }
+/*body {
+    margin-left: 25% !important;
+}*/
 
-    .center-tabs {
-        display: flex !important;
-        justify-content: center !important;
+.navTabs {
+    margin-top: 2rem;
+    padding: 0 3%;
+}
+
+/*medium and up*/
+@media only screen and (min-width: 601px) {
+    .responsive-btn-roundedSquare {
+        margin-left: 0.25rem;
+    }
+    .clinicStaff-HeaderBtn{
+        display: none;
     }
 }
 
-/*medium*/
-@media only screen and (min-width: 601px) and (max-width: 992px) {
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-
-    .appointment-container {
-        padding: 0 0.7rem;
-    }
-
-    .center-tabs {
-        display: flex !important;
-        justify-content: center !important;
-    }
-}
 
 /*small*/
 @media only screen and (max-width: 600px) {
@@ -53,6 +43,66 @@
     .tabs.tabs-transparent {
         overflow-x: auto !important;
     }
+
+    .responsive-btn-roundedSquare{
+        margin-left: 0;
+    }
+}
+
+/*medium*/
+@media only screen and (min-width: 601px) and (max-width: 992px) {
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    .appointment-container {
+        padding: 0 0.7rem;
+    }
+
+    .center-tabs {
+        display: flex !important;
+        justify-content: center !important;
+    }
+    
+
+}
+
+/*large*/
+@media only screen and (min-width: 993px) {
+    .main-content {
+        margin-left: 25% !important;
+        padding: 0 !important;
+    }
+
+    .center-tabs {
+        display: flex !important;
+        justify-content: center !important;
+    }
+    .navTabs {
+        margin-top: 2rem;
+        padding: 0 3rem;
+    }
+    
+}
+
+/*phone landscape, tablet portrait*/
+@media only screen and (max-height: 500px) and (orientation:landscape), 
+    only screen and (min-width: 601px) and (max-width: 992px) and (orientation: portrait)
+{
+    .main-content {
+        margin-left: 25%;
+    }
+
+    .desktop-sidenav {
+        display: none;
+    }
+}
+
+.mobileRes-headerBtn{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
 }
 
 .responsive-data-table-div {
@@ -1437,9 +1487,7 @@ select.browser-default.custom-input {
     padding: 2rem 1.5rem;
     box-sizing: border-box;
 }
-body .main-content {
-    margin-left: 25% !important;
-}
+
 
 .sidebar-fixed .row {
     margin-left: 0;
