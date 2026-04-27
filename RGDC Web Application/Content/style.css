@@ -1,4 +1,8 @@
 ﻿
+/*body {
+    margin-left: 25% !important;
+}*/
+
 /*large*/
 @media only screen and (min-width: 993px) {
     .main-content {
@@ -1437,9 +1441,7 @@ select.browser-default.custom-input {
     padding: 2rem 1.5rem;
     box-sizing: border-box;
 }
-body .main-content {
-    margin-left: 25% !important;
-}
+
 
 .sidebar-fixed .row {
     margin-left: 0;
