@@ -30,8 +30,8 @@
 
         <div class="card-content">
 
-            <div id="Owner" class="containerOverflow-2 row m-0" n>
-                <div class="row m-0">
+            <div id="Owner" class="containerOverflow-2 row m-0">
+                <div class="row m-0 hide-on-small-only">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
                         @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
@@ -41,6 +41,19 @@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="ownerInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Owner
+                        </a>
+                    </div>
+                </div>
+                @*mobile responsive header and button*@
+                <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
+                    <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>*@
+                        <a class="edit-btn modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="ownerInformationFormAdd">
                             <i class="material-icons left white-text">group_add</i>Add Owner
                         </a>
                     </div>
@@ -60,7 +73,7 @@
                             <td>{{owner.specialization}}</td>
                             <td>
                                 <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveOwner(owner.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="ownerInformationFormEdit" title="View Account Details" style="margin-right: 0.5rem !important" ng-click="selectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="ownerInformationFormEdit" title="View Account Details" ng-click="selectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -74,18 +87,31 @@
             </div>
 
             <div id="Dentist" class="containerOverflow-2 row m-0">
-                <div class="row m-0">
+                <div class="row m-0 hide-on-small-only">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
                         @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="Active" selected>Active</option>
-                            <option value="Inactive" selected>Inactive</option>
-                        </select>*@
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive" selected>Inactive</option>
+                </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="dentistInformationFormAdd">
                             <i class="material-icons left white-text">group_add</i>Add Dentist
                         </a>
+                    </div>
+                </div>
+                @*mobile responsive header and button*@
+                <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
+                    <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive" selected>Inactive</option>
+                </select>*@
+                    <a class="edit-btn modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="dentistInformationFormAdd">
+                        <i class="material-icons left white-text">group_add</i>Add Dentist
+                    </a>
                     </div>
                 </div>
                 @*Dentist Table*@
@@ -105,7 +131,7 @@
                             <td>{{dentist.description}}</td>
                             <td>
                                 <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="dentistInformationFormEdit" title="View Account Details" style="margin-right: 0.5rem !important" ><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
                             </td>
                         </tr>
                     </tbody>
@@ -120,7 +146,7 @@
             </div>
 
             <div id="Staff" class="containerOverflow-2 row m-0">
-                <div class="row m-0">
+                <div class="row m-0 hide-on-small-only">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
                         @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
@@ -130,6 +156,19 @@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="edit-btn modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="staffInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Staff
+                        </a>
+                    </div>
+                </div>
+                @*mobile responsive header and button*@
+                <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
+                    <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
+                        <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
+                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive" selected>Inactive</option>
+                        </select>*@
+                        <a class="edit-btn modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="staffInformationFormAdd">
                             <i class="material-icons left white-text">group_add</i>Add Staff
                         </a>
                     </div>
@@ -151,7 +190,7 @@
                             <td>{{staff.description}}</td>
                             <td>
                                 <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="staffInformationFormEdit" title="View Account Details" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
                             </td>
                         </tr>
                     </tbody>
