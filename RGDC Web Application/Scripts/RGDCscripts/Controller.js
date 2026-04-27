@@ -747,18 +747,14 @@
             .then(function (response) {
                 var data = response.data || [];
                 var mapped = (Array.isArray(data) ? data : []).map(function (a) {
-                    // parse server date into JS Date
                     var jsDate = parseJsonDateToJsDate(a.dateTime);
-                    // If server previously provided dateTimeObj, prefer that
                     if ((!jsDate || isNaN(jsDate.getTime())) && a.dateTimeObj && Object.prototype.toString.call(a.dateTimeObj) === '[object Date]') {
                         jsDate = a.dateTimeObj;
                     }
 
-                    // Derive display strings from the Date object when possible
                     var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
                     var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : "";
 
-                    // If parsing failed but server returned already-formatted strings (not /Date(...)/), use them
                     if ((!dateStr || !timeStr) && a.date && typeof a.date === 'string' && !/\/Date\(/.test(a.date)) {
                         dateStr = dateStr || a.date;
                     }
@@ -769,7 +765,6 @@
                     return {
                         apptID: a.apptID,
                         dateTimeObj: jsDate,
-                        // overwrite server raw values with formatted strings (prevents "/Date(...)/" display)
                         date: dateStr,
                         time: timeStr,
                         dentistID: (typeof a.dentistID !== 'undefined' && a.dentistID !== null) ? parseInt(a.dentistID, 10) : null,
@@ -6603,11 +6598,15 @@
                                     render: function (data, type, row, meta) {
                                         // data == apptID
                                         var id = data || '';
+                                        if (isUserDentist) {
+                                            var btns = "";
+                                        } else {
                                         var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
                                             '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" title="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">delete</i></a>' +
                                             '<a class="btn-edit-appt btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" title="Edit Appointment" role="button" aria-label="Edit appointment"><i class="material-icons brown-text lighten-1">edit</i></a>' +
                                             '<a class="reschedule-btn btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" title="Request Reschedule" role="button" aria-label="Request reschedule"><i class="material-icons brown-text lighten-1">autorenew</i></a>' +
                                             '</div>';
+                                    }
                                         return btns;
                                     }
                                 }

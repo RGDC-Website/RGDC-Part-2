@@ -7,7 +7,7 @@
     @*top part (title, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*user name*@
-        <div class="col m8 l8"><h4 class="bold">Appointments</h4></div>
+        <div class="col m8 l8"><h4 class="bold">{{isUserDentist ? "Schedules" : "Appointments"}}</h4></div>
         @*refresh and logout buttons*@
         <div class="col hide-on-med-and-down l4">
             <span class="right">
@@ -19,16 +19,16 @@
 
     @*create new appointment button*@
     <div class="row m-0">
-        <a class="edit-btn modal-trigger left white-text" data-target="modalAddAppt"><i class="material-icons left">add</i>Schedule Appointment</a>
+        <a ng-show="!isUserDentist" class="edit-btn modal-trigger left white-text" data-target="modalAddAppt"><i class="material-icons left">add</i>Schedule Appointment</a>
     </div>
 
     <div class="card grey lighten-2" style="margin-top:5vh;">
         <nav class="nav-extended grey lighten-2 z-depth-0">
             <div class="nav-content p-1">
                 <ul class="tabs tabs-transparent center-tabs">
-                    <li class="tab px-1"><a class="brown-text p-0" href="#sched">Scheduled Appointments</a></li>
-                    <li class="tab px-1"><a class="brown-text p-0" href="#req">Requested Appointments</a></li>
-                    <li class="tab px-1"><a class="brown-text p-0" href="#past">Past Appointments</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#sched">Scheduled</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#req">Requested</a></li>
+                    <li class="tab px-1"><a class="brown-text p-0" href="#past">Past</a></li>
                 </ul>
             </div>
         </nav>
@@ -71,7 +71,7 @@
                                 <td>{{appt.dentistName}}</td>
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
-                                <td class="actions-cell">
+                                <td class="actions-cell" ng-show="!isUserDentist">
                                     <div class="appt-action-buttons" role="group" aria-label="Appointment actions">
                                         <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped redBtn"
                                            ng-click="openDeleteApptModal(appt, 'scheduled')"
@@ -144,10 +144,10 @@
                                 <td>{{appt.displayStatus || appt.status}}</td>
                                 <td style="text-align:center; vertical-align:middle;">
                                     <div ng-if="canActOnRequest(appt)" style="display:flex; flex-direction:column; align-items:center;">
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px" aria-label="Accept requested appointment">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px" aria-label="Accept requested appointment">
                                             <i class="material-icons tiny">check</i>
                                         </a>
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
                                             <i class="material-icons tiny">close</i>
                                         </a>
                                     </div>
@@ -202,7 +202,7 @@
                                 <td>{{p.patientName}}</td>
                                 <td>{{p.displayStatus || p.status}}</td>
                                 <td>
-                                    <a class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn btn-archive-appt" ng-click="openArchivePastApptModal(p)" data-position="bottom" data-tooltip="Archive Appointment">
+                                    <a ng-show="!isUserDentist" class="btn-floating btn-small waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn btn-archive-appt" ng-click="openArchivePastApptModal(p)" data-position="bottom" data-tooltip="Archive Appointment">
                                         <i class="material-icons brown-text lighten-1">archive</i>
                                     </a>
                                 </td>
