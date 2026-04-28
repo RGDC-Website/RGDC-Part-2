@@ -20,6 +20,7 @@
 
                 @*Email*@
                 <div class="input-field lbl-required">
+                    <p class="custom-label " style="text-align:left">Email <span class="required-mark">*</span></p>
                     <input id="email"
                            ng-focus="active='email'"
                            ng-blur="active = ''"
@@ -58,7 +59,7 @@
 
                 @* Password Field *@
                 <div class="input-field password-field">
-
+                    <p class="custom-label" style="text-align:left">Password <span class="required-mark">*</span></p>
                     <div class="password-wrapper">
                         <input id="password"
                                ng-focus="active='password'"
@@ -94,6 +95,7 @@
 
                 @* Confirm Password Field *@
                 <div class="input-field password-field">
+                    <p class="custom-label" style="text-align:left">Confirm Password <span class="required-mark">*</span></p>
                     <div class="password-wrapper">
                         <input id="confPassword"
                                ng-focus="active='confPassword'"
@@ -118,8 +120,15 @@
                     </span>
                 </div>
 
+                @*Sign up BTN*@
+                <button class="logSignBtn modal-trigger"
+                        type="button"
+                        ng-click="signUpInitial()">
+                    Sign Up
+                </button>
+
                 @*Already have an account*@
-                <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
+                <div class="container" style="margin-top: 1.3vh; font-size: 0.95rem;">
                     <span>Already have an account?</span>
                     <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
                 </div>
@@ -128,14 +137,6 @@
                 <div class="container" style="margin-top: .5vh; margin-bottom: .5vh; font-size: 0.95rem;">
                     <a href="~/RGDC/signUpStaff" class="signup-link" style="display:inline-block">Joining the team?</a>
                 </div>
-
-                @*Sign up BTN*@
-                <button class="logSignBtn modal-trigger"
-                        type="button"
-                        ng-click="signUpInitial()">
-                    Sign Up
-                </button>
-
 
                 <div class="login-divider">
                     <span>or sign up with</span>
