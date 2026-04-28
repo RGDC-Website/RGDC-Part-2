@@ -813,7 +813,7 @@ namespace RGDC_Web_Application.Controllers
                     // SEND EMAIL
                     MailMessage mail = new MailMessage();
                     mail.To.Add(email);
-                    mail.Subject = "[RGDC Clinic] Your One-Time Password (OTP) for Password Reset";
+                    mail.Subject = "[RGDC Website] Your One-Time Password (OTP) for Password Reset";
                     string htmlBody = $@"
 <!DOCTYPE html>
 <html lang='en'>
@@ -3519,7 +3519,7 @@ RGDC Dental Clinic Team";
                             {
                                 var mail = new MailMessage();
                                 mail.To.Add(senderAcc.email);
-                                mail.Subject = "[RGDC Clinic] Your appointment request was denied";
+                                mail.Subject = "[RGDC Website] Your appointment request was denied";
                                 var bodySb = new StringBuilder();
                                 bodySb.AppendLine("Hello " + (senderAcc.firstName + " " + senderAcc.lastName).Trim() + ",");
                                 bodySb.AppendLine();
@@ -3787,7 +3787,7 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(ownerEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+                mail.Subject = "[RGDC Website] Your Code (OTP) for Account Signup";
 
                 string htmlBody = $@"
 <!DOCTYPE html>
@@ -3808,7 +3808,7 @@ RGDC Dental Clinic Team";
 
   <div style='margin-bottom: 1rem;'>
     <p>
-      You may now sign up as an <strong>Owner</strong> for RGDC Clinic.
+      You may now sign up as an <strong>Owner</strong> for RGDC Website.
       Please use the one-time password (OTP) below to proceed with your registration.
     </p>
   </div>
@@ -3915,7 +3915,7 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(dentistEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+                mail.Subject = "[RGDC Website] Your Code (OTP) for Account Signup";
 
                 string htmlBody = $@"
 <!DOCTYPE html>
@@ -3936,7 +3936,7 @@ RGDC Dental Clinic Team";
 
   <div style='margin-bottom: 1rem;'>
     <p>
-      You may now sign up as an <strong>Dentist</strong> for RGDC Clinic.
+      You may now sign up as an <strong>Dentist</strong> for RGDC Website.
       Please use the one-time password (OTP) below to proceed with your registration.
     </p>
   </div>
@@ -4061,7 +4061,7 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(staffEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+                mail.Subject = "[RGDC Website] Your Code (OTP) for Account Signup";
 
                 string htmlBody = $@"
 <!DOCTYPE html>
@@ -4082,7 +4082,7 @@ RGDC Dental Clinic Team";
 
   <div style='margin-bottom: 1rem;'>
     <p>
-      You may now sign up as an <strong>Staff</strong> for RGDC Clinic.
+      You may now sign up as an <strong>Staff</strong> for RGDC Website.
       Please use the one-time password (OTP) below to proceed with your registration.
     </p>
   </div>

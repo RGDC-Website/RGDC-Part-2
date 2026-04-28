@@ -39,7 +39,7 @@
             </div>
 
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" />
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img" ng-click="goToProfile()"/>
             </div>
 
             @*user name and role*@

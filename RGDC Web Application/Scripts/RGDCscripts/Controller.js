@@ -61,6 +61,10 @@
         ];
     })();
 
+    $scope.goToProfile = function () {
+        window.location.href = '/RGDC/patientProfile'; 
+    };
+
     $scope.nationalities = [
         "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan",
         "Antiguan", "Argentine", "Armenian", "Australian", "Austrian",
