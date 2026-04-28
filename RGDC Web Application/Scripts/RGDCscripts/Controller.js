@@ -105,7 +105,7 @@
         "Uzbek", "Vanuatuan", "Venezuelan", "Vietnamese",
         "Yemeni", "Zambian", "Zimbabwean"
     ];
-   
+
     // Ensure root-scoped appointment arrays exist so views referencing $root won't break
     try {
         if (!$rootScope.requestedAppointments) $rootScope.requestedAppointments = [];
@@ -1596,7 +1596,7 @@
                         p.genderID = null;
                     }
 
-                   
+
 
                     if (p.birthDate) {
                         var birthJs = parseJsonDateToJsDate(p.birthDate);
@@ -1939,9 +1939,9 @@
             genderID: (typeof $scope.selectedPatient.genderID !== 'undefined' && $scope.selectedPatient.genderID !== null)
                 ? parseInt($scope.selectedPatient.genderID)
                 : null,
-             birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
-             email: $scope.selectedPatient.email,
-             contactNumber: $scope.selectedPatient.contactNumber,
+            birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
+            email: $scope.selectedPatient.email,
+            contactNumber: $scope.selectedPatient.contactNumber,
             line1: $scope.selectedPatient.line1,
             line2: $scope.selectedPatient.line2,
             state: $scope.selectedPatient.state,
@@ -2590,7 +2590,7 @@
         input.click();
     };
 
- 
+
 
     $scope.postArray = [];
 
@@ -3341,13 +3341,20 @@
                     var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : (a.date || "");
                     var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : (a.time || "");
 
-                    // prefer returned notes field; fallback to building notes from requester/contact
-                    var notes = a.notes || "";
-                    if (!notes || String(notes).trim() === "") {
-                        var parts = [];
-                        if (a.requesterName) parts.push("Requested by: " + a.requesterName + ".");
-                        if (a.contactNumber) parts.push("In case of further questions kindly contact this number: " + a.contactNumber + ".");
-                        notes = parts.join("\n");
+                    var status = (a.status || "");
+                    // Prefer server-provided notes/remarks. For denied requests, always show denial remarks (includes reason).
+                    var notes = "";
+                    if (String(status).toLowerCase() === "denied") {
+                        notes = a.remarks || a.notes || "";
+                    } else {
+                        // prefer returned notes field; fallback to building notes from requester/contact
+                        notes = a.notes || a.remarks || "";
+                        if (!notes || String(notes).trim() === "") {
+                            var parts = [];
+                            if (a.requesterName) parts.push("Requested by: " + a.requesterName + ".");
+                            if (a.contactNumber) parts.push("In case of further questions kindly contact this number: " + a.contactNumber + ".");
+                            notes = parts.join("\n");
+                        }
                     }
 
                     return {
@@ -3364,8 +3371,8 @@
                         patientName: a.patientName || "",
                         contactNumber: a.contactNumber || null,
                         requesterName: a.requesterName || null,
-                        status: a.status || "",
-                        displayStatus: a.displayStatus || a.status || "",
+                        status: status,
+                        displayStatus: a.displayStatus || status || "",
                         createdBy: a.createdBy != null && a.createdBy !== undefined ? a.createdBy : null
                     };
                 });
@@ -3395,6 +3402,75 @@
         dentistID: null,
         dateTime: null,
         reason: ""
+    };
+
+    // Ensure patient users create appointments for themselves (auto-select own patientID).
+    // Called when opening the "Add New Appointment" modal and after successful creation resets.
+    $scope.prepareNewAppointmentRequest = function () {
+        try {
+            $scope.newApptRequest = $scope.newApptRequest || {};
+            $scope.currentPatient = $scope.currentPatient || { patientID: null, patientName: "" };
+
+            // Ensure dropdown data exists (don't block UI on this)
+            if (!Array.isArray($scope.dentistArray) || $scope.dentistArray.length === 0) {
+                try { $scope.loadDentistList(); } catch (_) { }
+            }
+            if (!Array.isArray($scope.patientArray) || $scope.patientArray.length === 0) {
+                try { $scope.loadPatientList(); } catch (_) { }
+            }
+
+            if ($scope.isUserPatient) {
+                // If we already resolved it, use cached ID immediately
+                if ($scope._ownPatientID != null && !isNaN(parseInt($scope._ownPatientID, 10))) {
+                    var oid = parseInt($scope._ownPatientID, 10);
+                    $scope.newApptRequest.patientID = oid;
+                    $scope.currentPatient.patientID = oid;
+                    // Best-effort display name from already-loaded patientArray
+                    try {
+                        var match = ($scope.patientArray || []).find(function (p) { return parseInt(p.patientID, 10) === oid; });
+                        if (match && match.patientName) $scope.currentPatient.patientName = match.patientName;
+                    } catch (_) { }
+                    $timeout(function () { try { $scope.updateTimeOptions(); } catch (_) { } }, 0);
+                    return;
+                }
+
+                // Otherwise resolve from server (safe even if called multiple times)
+                RGDCWebApplicationService.getOwnPatientDetails()
+                    .then(function (resp) {
+                        var p = resp && resp.data ? resp.data : null;
+                        var own = p ? (p.patientID || p.accID || null) : null;
+                        own = own != null ? parseInt(own, 10) : null;
+                        if (own != null && !isNaN(own)) {
+                            $scope._ownPatientID = own;
+                            $timeout(function () {
+                                $scope.newApptRequest = $scope.newApptRequest || {};
+                                $scope.newApptRequest.patientID = own;
+                                $scope.currentPatient = $scope.currentPatient || { patientID: null, patientName: "" };
+                                $scope.currentPatient.patientID = own;
+                                // ensure patient exists in patientArray so ng-options can match
+                                $scope.patientArray = $scope.patientArray || [];
+                                if (!$scope.patientArray.some(function (x) { return parseInt(x.patientID, 10) === own; })) {
+                                    var name = (p && (p.patientName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || p.email)) || ('Patient ' + own);
+                                    $scope.patientArray.push({ patientID: own, patientName: name });
+                                }
+                                // Update display name (prefer server-provided)
+                                try {
+                                    var display = (p && (p.patientName || ((p.firstName || '') + ' ' + (p.lastName || '')).trim() || p.email)) || "";
+                                    if (!display) {
+                                        var m2 = ($scope.patientArray || []).find(function (x) { return parseInt(x.patientID, 10) === own; });
+                                        display = m2 ? (m2.patientName || "") : "";
+                                    }
+                                    $scope.currentPatient.patientName = display || ('Patient ' + own);
+                                } catch (_) { }
+                                try { $scope.updateTimeOptions(); } catch (_) { }
+                            }, 0);
+                        }
+                    })
+                    .catch(function (_) { /* best-effort */ });
+            } else {
+                $timeout(function () { try { $scope.updateTimeOptions(); } catch (_) { } }, 0);
+            }
+        } catch (_) { }
     };
 
     $scope.newApptSubmitted = false;
@@ -3613,7 +3689,7 @@
                     dateTime: dateObj,
                     reason: $scope.newApptRequest.reason,
                     contactNumber: $scope.newApptRequest.contactNumber || null,
-                    requesterName: $scope.newApptRequest.requesterName || $scope.currentUserFullName || null,
+                    requesterName: $scope.currentUserFullName || null,
                     notes: $scope.newApptRequest.notes || null
                 };
 
@@ -3625,8 +3701,12 @@
                                 title: "Success!",
                                 text: "Appointment request created successfully and sent to the recipient."
                             }).then(function () {
-                                $scope.newApptRequest = { patientID: null, dentistID: null, dateTime: null, reason: "" };
-                                $scope.newApptRequest.time = "12:00 AM";
+                                // Reset fields, but keep patient auto-selected for patient users
+                                var keepPatientId = ($scope.isUserPatient && $scope._ownPatientID != null && !isNaN(parseInt($scope._ownPatientID, 10)))
+                                    ? parseInt($scope._ownPatientID, 10)
+                                    : null;
+                                $scope.newApptRequest = { patientID: keepPatientId, dentistID: null, dateTime: null, reason: "" };
+                                $scope.newApptRequest.time = null;
                                 var modal = findModalElement(['modalAddAppt', 'modal-add-appt', 'modalAddAppt']);
                                 if (modal && typeof M !== 'undefined' && M.Modal) {
                                     var inst = M.Modal.getInstance(modal);
@@ -5250,7 +5330,7 @@
         $scope.validateDentistEditFields();
         $scope.validateDentistEmailEdit();
 
-        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid || 
+        if (!$scope.dentistFirstNameValid || !$scope.dentistLastNameValid ||
             !$scope.dentistContactValid || !$scope.dentistGenderValid || !$scope.dentistBirthDateValid ||
             !$scope.dentistCivilStatusValid || !$scope.dentistReligionValid || !$scope.dentistNationalityValid ||
             !$scope.dentistSpecializationValid || !$scope.dentistBranchValid) {
@@ -5434,7 +5514,7 @@
         $scope.validateStaffEditFields();
         $scope.validateStaffEmailEdit();
 
-        if (!$scope.staffFirstNameValid || !$scope.staffLastNameValid ) {
+        if (!$scope.staffFirstNameValid || !$scope.staffLastNameValid) {
             Swal.fire({
                 icon: 'error',
                 title: 'Missing required fields',
@@ -5671,7 +5751,7 @@
     $scope.isAddOwnerFormValid = function () {
         return $scope.owner_firstName && $scope.owner_lastName &&
             $scope.ownerEmailFormatValid && !$scope.ownerEmailTaken &&
-            $scope.ownerContactValid && 
+            $scope.ownerContactValid &&
             $scope.owner_genderID && $scope.owner_birthDate && $scope.owner_civilStatus;
     };
 
@@ -6663,12 +6743,12 @@
                                                 '<a class="btn-view-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="View Appointment" role="button" aria-label="View appointment"><i class="material-icons brown-text lighten-1">visibility</i></a>' +
                                                 '</div>';
                                         } else {
-                                        var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
-                                            '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">archive</i></a>' +
-                                            '<a class="btn-edit-appt btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Edit Appointment" role="button" aria-label="Edit appointment"><i class="material-icons brown-text lighten-1">edit</i></a>' +
-                                            '<a class="reschedule-btn btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Request Reschedule" role="button" aria-label="Request reschedule"><i class="material-icons brown-text lighten-1">autorenew</i></a>' +
-                                            '</div>';
-                                    }
+                                            var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
+                                                '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">archive</i></a>' +
+                                                '<a class="btn-edit-appt btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Edit Appointment" role="button" aria-label="Edit appointment"><i class="material-icons brown-text lighten-1">edit</i></a>' +
+                                                '<a class="reschedule-btn btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Request Reschedule" role="button" aria-label="Request reschedule"><i class="material-icons brown-text lighten-1">autorenew</i></a>' +
+                                                '</div>';
+                                        }
                                         return btns;
                                     }
                                 }
@@ -7327,6 +7407,9 @@
         if (!appt) return false;
 
         try {
+            // Only pending requests can be accepted/denied.
+            if (String(appt.status || '').toLowerCase() !== 'requested') return false;
+
             // current logged-in acc id (session)
             var curAcc = $scope.currentUserID ? String($scope.currentUserID) : null;
 
@@ -7364,6 +7447,85 @@
         }
 
         return false;
+    };
+
+    // For pending requested rows: creator can cancel their own request.
+    $scope.isRequestCreator = function (appt) {
+        try {
+            if (!appt) return false;
+            var curAcc = $scope.currentUserID ? String($scope.currentUserID) : null;
+            if (!curAcc) return false;
+            if (appt.createdBy == null || appt.createdBy === undefined) return false;
+            return String(appt.createdBy) === curAcc;
+        } catch (_) {
+            return false;
+        }
+    };
+
+    $scope.isRequestedStatus = function (appt) {
+        try {
+            return String((appt && appt.status) || '').toLowerCase() === 'requested';
+        } catch (_) {
+            return false;
+        }
+    };
+
+    $scope.isDeniedStatus = function (appt) {
+        try {
+            return String((appt && appt.status) || '').toLowerCase() === 'denied';
+        } catch (_) {
+            return false;
+        }
+    };
+
+    $scope.cancelRequestedAppointment = function (appt) {
+        if (!$scope.isRequestedStatus(appt)) {
+            return Swal.fire({ icon: 'info', title: 'Not Pending', text: 'Only pending requests can be cancelled.' });
+        }
+        // Reuse existing cancel flow (includes server-side enforcement)
+        return $scope.cancelAppointment(appt);
+    };
+
+    // For denied requests: creator can "delete" which archives it into Past Appointments.
+    $scope.deleteDeniedRequest = function (appt) {
+        try {
+            if (!appt || !appt.apptID) return Swal.fire({ icon: 'error', title: 'Error', text: 'No appointment selected.' });
+            if (!$scope.isRequestCreator(appt)) return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'Only the creator can delete this request.' });
+            if (!$scope.isDeniedStatus(appt)) {
+                return Swal.fire({ icon: 'info', title: 'Not Denied', text: 'Only denied requests can be deleted from this list.' });
+            }
+
+            Swal.fire({
+                title: 'Delete Denied Request?',
+                text: 'This will remove it from Requested and move it to Past Appointments.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Delete'
+            }).then(function (res) {
+                if (!res.isConfirmed) return;
+                Swal.fire({ title: 'Processing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                RGDCWebApplicationService.archiveAppointment({ apptID: appt.apptID })
+                    .then(function (resp) {
+                        Swal.close();
+                        if (resp && resp.data && resp.data.success) {
+                            Swal.fire({ icon: 'success', title: 'Deleted', text: resp.data.message || 'Moved to Past Appointments.' }).then(function () {
+                                $scope.loadRequestedAppointments();
+                                $scope.loadPastAppointments();
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: (resp && resp.data && resp.data.message) || 'Failed to delete denied request.' });
+                        }
+                    })
+                    .catch(function (err) {
+                        Swal.close();
+                        console.error('deleteDeniedRequest error', err);
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while deleting the denied request.' });
+                    });
+            });
+        } catch (e) {
+            console.error('deleteDeniedRequest failed', e);
+        }
     };
 
     function parseTimeToMinutes(t) {
