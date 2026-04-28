@@ -3787,8 +3787,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(ownerEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Owner for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Owner</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -3858,8 +3915,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(dentistEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as a Dentist for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Dentist</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -3947,8 +4061,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(staffEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Dental Staff for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Owner</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
