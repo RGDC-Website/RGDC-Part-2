@@ -460,6 +460,7 @@ namespace RGDC_Web_Application.Controllers
                         accID = accDetails.accID,
                         currentPhysician = accDetails.currentPhysician,
                         referral = accDetails.referral,
+                        occupation = accDetails.occupation,
                         lastVisit = accDetails.lastVisit,
                         medicalHistory = accDetails.medicalHistory,
                         medHistUpdate = DateTime.Now,
@@ -1012,33 +1013,28 @@ RGDC Dental Clinic Team";
         [HttpPost]
         public JsonResult verifyOTP(string otpCode)
         {
-            // 1. Check if session exists
             if (Session["RESET_OTP"] == null || Session["RESET_OTP_EXPIRY"] == null)
             {
                 return Json(new { success = false, message = "No active reset request found. Please resend OTP." });
             }
 
-            // 2. Check Expiry
             DateTime expiry = (DateTime)Session["RESET_OTP_EXPIRY"];
             if (DateTime.Now > expiry)
             {
-                // Clear session if expired
                 Session["RESET_OTP"] = null;
                 return Json(new { success = false, message = "OTP has expired. Please request a new one." });
             }
 
-            // 3. Compare OTP
             string storedOtp = Session["RESET_OTP"].ToString();
             if (storedOtp == otpCode)
             {
-                // Optional: Set a flag that the user is verified to proceed to the actual reset
                 Session["IS_OTP_VERIFIED"] = true;
 
                 return Json(new { success = true, message = "OTP verified successfully." });
             }
             else
             {
-                return Json(new { success = false, message = "Invalid OTP code. Please try again." });
+                return Json(new { success = false, message = storedOtp });
             }
         }
 
@@ -2507,6 +2503,101 @@ RGDC Dental Clinic Team";
                     try { db.SaveChanges(); }
                     catch (Exception exSave) { return Json(new { success = false, message = "Database error: " + exSave.GetBaseException().Message }); }
 
+                    if (request.originalApptID.HasValue)
+                    {
+                        try
+                        {
+                            var origAppt = db.tbl_appointment.FirstOrDefault(a => a.apptID == request.originalApptID.Value);
+                            if (origAppt != null)
+                            {
+                                var dentistAcc = db.tbl_account.FirstOrDefault(a => a.accID == dentist.accID);
+                                var patientAcc = db.tbl_account.FirstOrDefault(a => a.accID == patient.accID);
+
+                                string dentistName = dentistAcc != null ? ((dentistAcc.firstName + " " + dentistAcc.lastName).Trim()) : "your dentist";
+                                string patientName = patientAcc != null ? ((patientAcc.firstName + " " + patientAcc.lastName).Trim()) : "your patient";
+
+                                string origTime = origAppt.dateTime.ToString("h:mm tt");
+                                string origDate = origAppt.dateTime.ToString("MMMM d, yyyy");
+                                string newTime = newAppointment.dateTime.ToString("h:mm tt");
+                                string newDate = newAppointment.dateTime.ToString("MMMM d, yyyy");
+
+                                string purpose = string.IsNullOrWhiteSpace(origAppt.reason) ? "N/A" : origAppt.reason.Trim();
+                                string reschedReason = string.IsNullOrWhiteSpace(newAppointment.reason) ? "N/A" : newAppointment.reason.Trim();
+
+                                string subject = "[RGDC Clinic] Reschedule request pending approval";
+
+                                // Send to dentist
+                                try
+                                {
+                                    if (dentistAcc != null && !string.IsNullOrWhiteSpace(dentistAcc.email))
+                                    {
+                                        var bodySb = new StringBuilder();
+                                        bodySb.AppendLine("Hello there, " + dentistName + "!");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("Your appointment with " + patientName + " on " + origTime + ", " + origDate + " with the purpose of " + purpose + " has been requested to be rescheduled to " + newTime + ", " + newDate + ".");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("This was requested due to the following reason/s: " + reschedReason);
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("Please check your appointment dashboard for more details.");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                        var mail = new MailMessage();
+                                        mail.To.Add(dentistAcc.email);
+                                        mail.Subject = subject;
+                                        mail.Body = bodySb.ToString();
+                                        mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                        using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                        {
+                                            smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                            smtp.EnableSsl = true;
+                                            smtp.Send(mail);
+                                        }
+                                    }
+                                }
+                                catch { /* best-effort */ }
+
+                                // Send to patient
+                                try
+                                {
+                                    if (patientAcc != null && !string.IsNullOrWhiteSpace(patientAcc.email))
+                                    {
+                                        var bodySb = new StringBuilder();
+                                        bodySb.AppendLine("Hello there, " + patientName + "!");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("Your appointment with " + dentistName + " on " + origTime + ", " + origDate + " with the purpose of " + purpose + " has been requested to be rescheduled to " + newTime + ", " + newDate + ".");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("This was requested due to the following reason/s: " + reschedReason);
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("Please check your appointment dashboard for more details.");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                        bodySb.AppendLine();
+                                        bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                        var mail = new MailMessage();
+                                        mail.To.Add(patientAcc.email);
+                                        mail.Subject = subject;
+                                        mail.Body = bodySb.ToString();
+                                        mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                        using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                        {
+                                            smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                            smtp.EnableSsl = true;
+                                            smtp.Send(mail);
+                                        }
+                                    }
+                                }
+                                catch { /* best-effort */ }
+                            }
+                        }
+                        catch { /* best-effort */ }
+                    }
+
                     return Json(new { success = true, message = "Appointment request created successfully.", apptID = newAppointment.apptID });
                 }
             }
@@ -2983,10 +3074,99 @@ RGDC Dental Clinic Team";
                                 var origAppt = db.tbl_appointment.FirstOrDefault(a => a.apptID == origId);
                                 if (origAppt != null)
                                 {
-                                    // mark original as Rescheduled so it will appear in Past
+                                    try
+                                    {
+                                        var dentistRec = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                                        var patientRec = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+
+                                        var dentistAccRec = (dentistRec != null) ? db.tbl_account.FirstOrDefault(a => a.accID == dentistRec.accID) : null;
+                                        var patientAccRec = (patientRec != null) ? db.tbl_account.FirstOrDefault(a => a.accID == patientRec.accID) : null;
+
+                                        string dentistFullName = (dentistAccRec != null) ? ((dentistAccRec.firstName + " " + dentistAccRec.lastName).Trim()) : "your dentist";
+                                        string patientFullName = (patientAccRec != null) ? ((patientAccRec.firstName + " " + patientAccRec.lastName).Trim()) : "your patient";
+
+                                        string procedure = string.IsNullOrWhiteSpace(origAppt.reason) ? "Dental" : origAppt.reason.Trim();
+                                        string reschedReason = string.IsNullOrWhiteSpace(appt.reason) ? "N/A" : appt.reason.Trim();
+
+                                        string origTime = origAppt.dateTime.ToString("h:mm tt");
+                                        string origDate = origAppt.dateTime.ToString("MMMM d, yyyy");
+                                        string newTime = appt.dateTime.ToString("h:mm tt");
+                                        string newDate = appt.dateTime.ToString("MMMM d, yyyy");
+
+                                        string subject = "[RGDC Clinic] Appointment rescheduled";
+
+                                        // Dentist email
+                                        try
+                                        {
+                                            if (dentistAccRec != null && !string.IsNullOrWhiteSpace(dentistAccRec.email))
+                                            {
+                                                var bodySb = new StringBuilder();
+                                                bodySb.AppendLine("Hello there, " + dentistFullName + "!");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("Your " + procedure + " appointment with " + patientFullName + " on " + origTime + ", " + origDate + " has been successfully rescheduled on " + newTime + ", " + newDate + ".");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("This was requested due to the following reason/s: " + reschedReason);
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("Please check your appointment dashboard for more details.");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                                var mail = new MailMessage();
+                                                mail.To.Add(dentistAccRec.email);
+                                                mail.Subject = subject;
+                                                mail.Body = bodySb.ToString();
+                                                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                                using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                                {
+                                                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                                    smtp.EnableSsl = true;
+                                                    smtp.Send(mail);
+                                                }
+                                            }
+                                        }
+                                        catch { }
+
+                                        // Patient email
+                                        try
+                                        {
+                                            if (patientAccRec != null && !string.IsNullOrWhiteSpace(patientAccRec.email))
+                                            {
+                                                var bodySb = new StringBuilder();
+                                                bodySb.AppendLine("Hello there, " + patientFullName + "!");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("Your " + procedure + " appointment with " + dentistFullName + " on " + origTime + ", " + origDate + " has been successfully rescheduled on " + newTime + ", " + newDate + ".");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("This was requested due to the following reason/s: " + reschedReason);
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("Please check your appointment dashboard for more details.");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                                bodySb.AppendLine();
+                                                bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                                var mail = new MailMessage();
+                                                mail.To.Add(patientAccRec.email);
+                                                mail.Subject = subject;
+                                                mail.Body = bodySb.ToString();
+                                                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                                using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                                {
+                                                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                                    smtp.EnableSsl = true;
+                                                    smtp.Send(mail);
+                                                }
+                                            }
+                                        }
+                                        catch { }
+                                    }
+                                    catch { }
+
                                     origAppt.status = "Rescheduled";
 
-                                    // build friendly remarks for the original appointment: requester + rescheduled date
                                     var origSb = new System.Text.StringBuilder();
                                     if (!string.IsNullOrWhiteSpace(requester))
                                     {
@@ -3000,7 +3180,6 @@ RGDC Dental Clinic Team";
                                 }
                             }
 
-                            // For the newly accepted appointment, replace raw tokens with friendly notes
                             try
                             {
                                 var sb = new System.Text.StringBuilder();
@@ -3019,10 +3198,114 @@ RGDC Dental Clinic Team";
                                     db.SaveChanges();
                                 }
                             }
-                            catch { /* swallow formatting errors */ }
+                            catch { }
                         }
                     }
-                    catch { /* swallow */ }
+                    catch { }
+
+                    try
+                    {
+                        var dentist = db.tbl_dentist.FirstOrDefault(d => d.dentistID == appt.dentistID);
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == appt.patientID);
+
+                        var dentistAcc = (dentist != null) ? db.tbl_account.FirstOrDefault(a => a.accID == dentist.accID) : null;
+                        var patientAcc = (patient != null) ? db.tbl_account.FirstOrDefault(a => a.accID == patient.accID) : null;
+
+                        string dentistName = (dentistAcc != null) ? ((dentistAcc.firstName + " " + dentistAcc.lastName).Trim()) : "your dentist";
+                        string patientName = (patientAcc != null) ? ((patientAcc.firstName + " " + patientAcc.lastName).Trim()) : "your patient";
+
+                        string apptTime = appt.dateTime.ToString("h:mm tt");
+                        string apptDate = appt.dateTime.ToString("MMMM d, yyyy");
+                        string purpose = string.IsNullOrWhiteSpace(appt.reason) ? "N/A" : appt.reason.Trim();
+
+                        string subject = "[RGDC Clinic] Appointment notification";
+
+                        // Determine who requested it (relative roles for each recipient)
+                        string requesterName = "RGDC Clinic";
+                        string requesterRoleForDentist = "clinic staff";
+                        string requesterRoleForPatient = "clinic staff";
+                        try
+                        {
+                            if (patientAcc != null && appt.createdBy == patientAcc.accID)
+                            {
+                                requesterName = patientName;
+                                requesterRoleForDentist = "patient";
+                                requesterRoleForPatient = "patient";
+                            }
+                            else if (dentistAcc != null && appt.createdBy == dentistAcc.accID)
+                            {
+                                requesterName = dentistName;
+                                requesterRoleForDentist = "dentist";
+                                requesterRoleForPatient = "dentist";
+                            }
+                        }
+                        catch { }
+
+                        // Send to dentist
+                        try
+                        {
+                            if (dentistAcc != null && !string.IsNullOrWhiteSpace(dentistAcc.email))
+                            {
+                                var bodySb = new StringBuilder();
+                                bodySb.AppendLine("Hello there, " + dentistName + "!");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("An appointment has been requested by your " + requesterRoleForDentist + ", " + requesterName + ", on " + apptDate + " at " + apptTime + " with the purpose of " + purpose + ".");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("Please check your account dashboard for more details.");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                var mail = new MailMessage();
+                                mail.To.Add(dentistAcc.email);
+                                mail.Subject = subject;
+                                mail.Body = bodySb.ToString();
+                                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                {
+                                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                    smtp.EnableSsl = true;
+                                    smtp.Send(mail);
+                                }
+                            }
+                        }
+                        catch { }
+
+                        // Send to patient
+                        try
+                        {
+                            if (patientAcc != null && !string.IsNullOrWhiteSpace(patientAcc.email))
+                            {
+                                var bodySb = new StringBuilder();
+                                bodySb.AppendLine("Hello there, " + patientName + "!");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("An appointment has been requested by your " + requesterRoleForPatient + ", " + requesterName + ", on " + apptDate + " at " + apptTime + " with the purpose of " + purpose + ".");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("Please check your account dashboard for more details.");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("If you did not request this message, or received this email by accident, you may safely ignore this email.");
+                                bodySb.AppendLine();
+                                bodySb.AppendLine("This is a system-generated message. Please do not reply to this email.");
+
+                                var mail = new MailMessage();
+                                mail.To.Add(patientAcc.email);
+                                mail.Subject = subject;
+                                mail.Body = bodySb.ToString();
+                                mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
+
+                                using (var smtp = new SmtpClient("smtp.gmail.com", 587))
+                                {
+                                    smtp.Credentials = new NetworkCredential("reyesguansingdc.noreply@gmail.com", "nniircdehqoxkkqa");
+                                    smtp.EnableSsl = true;
+                                    smtp.Send(mail);
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                    catch { }
 
                     // Preserve your existing Google Calendar logic if any (keep below if present in original method)
                     try
@@ -3061,7 +3344,7 @@ RGDC Dental Clinic Team";
                             }
                         }
                     }
-                    catch { /* swallow */ }
+                    catch { }
 
                     return Json(new { success = true, message = "Appointment accepted successfully." });
                 }
@@ -3791,8 +4074,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(ownerEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Owner for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Owner</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -3862,8 +4202,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(dentistEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as a Dentist for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Dentist</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -3899,6 +4296,7 @@ RGDC Dental Clinic Team";
                 {
                     success = true,
                     message = "Dentist inserted successfully.",
+                    dentistID = newDentist.dentistID
                 }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -3950,8 +4348,65 @@ RGDC Dental Clinic Team";
                 // SEND EMAIL
                 MailMessage mail = new MailMessage();
                 mail.To.Add(staffEmail.email);
-                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup!";
-                mail.Body = $"Hello,\r\n\r\nYou may now signup as an Dental Staff for RGDC Clinic. Use the code below to access the signup.\r\n{otp}\r\n\r\n\r\n\r\nThank you,\r\nRGDC Dental Clinic Team";
+                mail.Subject = "[RGDC Clinic] Your Code (OTP) for Account Signup";
+
+                string htmlBody = $@"
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<title>RGDC Signup OTP</title>
+</head>
+
+<body style='font-family: Roboto, sans-serif; margin:0; padding:0;'>
+
+<div style='margin: 0 15%;'>
+  
+  <div style='margin-bottom: 1rem;'>
+    <h4 style='margin:0;'>Hello!</h4>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      You may now sign up as an <strong>Staff</strong> for RGDC Clinic.
+      Please use the one-time password (OTP) below to proceed with your registration.
+    </p>
+  </div>
+
+  <div style='text-align: center; margin-bottom: 1rem;'>
+    <div style='background-color:#6d4c41; color:white; padding:20px; border-radius:5px; display:inline-block;'>
+      <h3 style='margin:0; font-size:2.5rem;'>{otp}</h3>
+    </div>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Do not share this code with anyone. If you did not request this signup,
+      you may safely ignore this email.
+    </p>
+  </div>
+
+  <div style='margin-bottom: 1rem;'>
+    <p>
+      Thank you,<br/>
+      RGDC Dental Clinic Team
+    </p>
+  </div>
+
+</div>
+
+<div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
+  <p style='color:#9e9e9e;'>
+    This is a system-generated message. Please do not reply to this email.
+  </p>
+</div>
+
+</body>
+</html>";
+
+                mail.IsBodyHtml = true;
+                mail.Body = htmlBody;
                 mail.From = new MailAddress("reyesguansingdc.noreply@gmail.com");
 
                 SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
@@ -5122,4 +5577,3 @@ RGDC Dental Clinic Team";
         }
     }
 }
-
