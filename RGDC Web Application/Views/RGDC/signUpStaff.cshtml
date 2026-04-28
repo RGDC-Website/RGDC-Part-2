@@ -51,7 +51,8 @@
                 </div>
 
                 @* Password Field *@
-                <div class="input-field">
+            <div class="input-field password-field">
+                <div class="password-wrapper">
                     <input id="password"
                            ng-focus="active='password'"
                            ng-blur="active = ''"
@@ -62,25 +63,30 @@
                            ng-change="checkPasswordStrength()"
                            ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
                            required>
-
-                    <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
-                        Strength: <strong>{{ passwordStrength }}</strong>
-                    </span>
-
-                    <div class="password-requirements" ng-show="(active=='password') && signUp_password">
-                        <small>Password must include:</small>
-                        <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
-                            <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
-                            <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
-                        </ul>
-                    </div>
+                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                        {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
+                    </i>
                 </div>
 
+                <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
+                    Strength: <strong>{{ passwordStrength }}</strong>
+                </span>
+
+                <div class="password-requirements" ng-show="(active=='password') && signUp_password">
+                    <small>Password must include:</small>
+                    <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
+                        <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
+                        <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
+                    </ul>
+                </div>
+            </div>
+
                 @* Confirm Password Field *@
-                <div class="input-field">
+            <div class="input-field password-field">
+                <div class="password-wrapper">
                     <input id="confPassword"
                            ng-focus="active='confPassword'"
                            ng-blur="active = ''"
@@ -90,14 +96,18 @@
                            maxlength="50"
                            ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
                            required>
-
-                    <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
-                        Passwords do not match
-                    </span>
-                    <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
-                        Passwords matched
-                    </span>
+                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                        {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
+                    </i>
                 </div>
+
+                <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
+                    Passwords do not match
+                </span>
+                <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
+                    Passwords matched
+                </span>
+            </div>
 
                 @*Code*@
                 <div class="input-field lbl-required">
