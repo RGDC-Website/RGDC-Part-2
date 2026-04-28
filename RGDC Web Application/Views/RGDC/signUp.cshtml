@@ -58,20 +58,23 @@
 
                 @* Password Field *@
                 <div class="input-field password-field">
-                    <input id="password"
-                           ng-focus="active='password'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_password"
-                           ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
-                           placeholder="Password*"
-                           maxlength="50"
-                           ng-change="checkPasswordStrength()"
-                           ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
-                           required>
 
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
-                        {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
+                    <div class="password-wrapper">
+                        <input id="password"
+                               ng-focus="active='password'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_password"
+                               ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
+                               placeholder="Password*"
+                               maxlength="50"
+                               ng-change="checkPasswordStrength()"
+                               ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
+                               required>
+
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
+                            {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
                     <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
                         Strength: <strong>{{ passwordStrength }}</strong>
@@ -91,19 +94,21 @@
 
                 @* Confirm Password Field *@
                 <div class="input-field password-field">
-                    <input id="confPassword"
-                           ng-focus="active='confPassword'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_confPassword"
-                           ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
-                           placeholder="Confirm password*"
-                           maxlength="50"
-                           ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
-                           required>
+                    <div class="password-wrapper">
+                        <input id="confPassword"
+                               ng-focus="active='confPassword'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_confPassword"
+                               ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
+                               placeholder="Confirm password*"
+                               maxlength="50"
+                               ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
+                               required>
 
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
-                        {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                            {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
                     <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
                         Passwords do not match
