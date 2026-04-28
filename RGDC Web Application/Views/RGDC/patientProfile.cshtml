@@ -18,7 +18,6 @@
         @*refresh and logout buttons*@
         <div class="col hide-on-med-and-down l4">
             <span class="right" style="margin-top:7px;">
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Tab"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
                 <div ng-click="logOut()" class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
@@ -37,7 +36,7 @@
         </div>
     </div>-->
     @*content*@
-    <div class="row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
+    <div class="row content-patient-row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
 
         @*left column*@
         <div class="col m4 l4" style="padding-left:0">
@@ -140,7 +139,8 @@
         </div>
 
         @*right column------------------------------------------------------------------------------------------------------------------------------------*@
-        <div class="col m8 l8" style="padding-right: 0">
+    <div class="patient-tabs-container">
+        <div class="col m8 l8 p-0 patient-right" style="padding-right: 0">
             <div class="card grey lighten-2">
                 <nav class="nav-extended grey lighten-2 z-depth-0">
                     <div class="nav-content p-1">
@@ -497,6 +497,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    
     </div>
 </div>
 
