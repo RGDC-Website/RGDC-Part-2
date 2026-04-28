@@ -111,13 +111,13 @@
 
                                 @*procedure and dateTime (mobile)*@
                                 <div class="col s6 m6 hide-on-large-only">
-                                    <p>{{r.purpose}}</p>
+                                    <p>{{r.purpose}}</p>YYY
                                     <p>{{r.date}}</p>
                                     <p style="white-space: pre-line;">{{r.notes || r.remarks}}</p>
                                 </div>
 
                                 @*yes or no btn*@
-                                <div class="col s6 m6 l1">
+                                <div class="col s6 m6 l1" ng-show="isUserStaff">
                                     <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem">
                                         <i class="material-icons tiny">check</i>
                                     </a>
@@ -167,7 +167,7 @@
     </div>
 
     @*analytics*@
-    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="!isUserPatient" ng-init="getAnalyticsData()"  >
+    <div class="row" style="padding: 0 1rem 0 1rem" ng-show="!isUserPatient" ng-init="getAnalyticsData()">
         <p class="bold brown-text lighten-1" style="margin-bottom: 0">ANALYTICS</p>
         <div class="row">
 

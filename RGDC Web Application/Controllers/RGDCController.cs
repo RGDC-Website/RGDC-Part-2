@@ -1058,8 +1058,11 @@ RGDC Dental Clinic Team";
                         from dent in dentj.DefaultIfEmpty()
                         join dentAcc in db.tbl_account on (dent != null ? dent.accID : 0) equals dentAcc.accID into dentAccj
                         from dentAcc in dentAccj.DefaultIfEmpty()
-                        where (appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled" || appt.status == "Cancelled")
-                              && appt.isArchived == 0
+                        where (
+                                ((appt.status == "Done" || appt.status == "Completed" || appt.status == "Rescheduled" || appt.status == "Cancelled")
+                                 && appt.isArchived == 0)
+                                || (appt.status == "Denied" && appt.isArchived == 1)
+                              )
                         orderby appt.dateTime descending
                         select new
                         {
@@ -1069,7 +1072,8 @@ RGDC Dental Clinic Team";
                             dentistName = dentAcc != null ? (dentAcc.firstName + " " + dentAcc.lastName) : null,
                             patientName = patAcc != null ? (patAcc.firstName + " " + patAcc.lastName) : null,
                             status = appt.status,
-                            remarks = appt.remarks
+                            remarks = appt.remarks,
+                            createdBy = appt.createdBy
                         }
                     ).ToList();
 
@@ -1138,7 +1142,8 @@ RGDC Dental Clinic Team";
                             patientName = r.patientName,
                             status = r.status,
                             displayStatus = (r.status == "Rescheduled") ? "Rescheduled" : ((r.status == "Done" || r.status == "Completed") ? "Completed/Done" : r.status),
-                            remarks = r.remarks ?? r.purpose ?? ""
+                            remarks = r.remarks ?? r.purpose ?? "",
+                            createdBy = r.createdBy
                         };
                     }).ToList();
 
@@ -2551,8 +2556,13 @@ RGDC Dental Clinic Team";
                             from appt in db.tbl_appointment
                             join pat in db.tbl_patient on appt.patientID equals pat.patientID
                             join patAcc in db.tbl_account on pat.accID equals patAcc.accID
-                            where appt.status == "Requested"
-                               && (appt.dentistID == dentist.dentistID || appt.createdBy == userID)
+                            where appt.isArchived == 0
+                               && (
+                                    // Recipient view: dentist sees pending requests for them
+                                    (appt.status == "Requested" && appt.dentistID == dentist.dentistID)
+                                    // Creator view: creator sees their own requests, including denied ones
+                                    || (appt.createdBy == userID && (appt.status == "Requested" || appt.status == "Denied"))
+                                  )
                             orderby appt.dateTime
                             select new
                             {
@@ -2638,8 +2648,13 @@ RGDC Dental Clinic Team";
                             from appt in db.tbl_appointment
                             join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
                             join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
-                            where appt.status == "Requested"
-                               && (appt.patientID == patient.patientID || appt.createdBy == userID)
+                            where appt.isArchived == 0
+                               && (
+                                    // Recipient view: patient sees pending requests for them (rare, but keep parity)
+                                    (appt.status == "Requested" && appt.patientID == patient.patientID)
+                                    // Creator view: creator sees their own requests, including denied ones
+                                    || (appt.createdBy == userID && (appt.status == "Requested" || appt.status == "Denied"))
+                                  )
                             orderby appt.dateTime
                             select new
                             {
@@ -2715,14 +2730,15 @@ RGDC Dental Clinic Team";
                     }
                     else if (isStaff)
                     {
-                        // Front desk: all pending requests for every dentist/patient (same projection as dentist view, with names on both sides)
+                        // Front desk: all pending + denied requests for every dentist/patient
                         var raw = (
                             from appt in db.tbl_appointment
                             join pat in db.tbl_patient on appt.patientID equals pat.patientID
                             join patAcc in db.tbl_account on pat.accID equals patAcc.accID
                             join dent in db.tbl_dentist on appt.dentistID equals dent.dentistID
                             join dentAcc in db.tbl_account on dent.accID equals dentAcc.accID
-                            where appt.status == "Requested"
+                            where appt.isArchived == 0
+                               && (appt.status == "Requested" || appt.status == "Denied")
                             orderby appt.dateTime
                             select new
                             {
@@ -3519,7 +3535,7 @@ RGDC Dental Clinic Team";
                                     bodySb.AppendLine(reason);
                                 }
                                 bodySb.AppendLine();
-                                bodySb.AppendLine("If you need to reschedule or have questions, please contact the clinic.");
+                                bodySb.AppendLine("If you need to reschedule, submit another request in the website. If you have questions please contact the clinic.");
                                 bodySb.AppendLine();
                                 bodySb.AppendLine("Regards,");
                                 bodySb.AppendLine("RGDC Dental Clinic");
@@ -4225,32 +4241,32 @@ RGDC Dental Clinic Team";
                    join s in db.tbl_staff on a.accID equals s.accID
                    where a.accID == accID
                    select new
-                    {
-                        // staff    
-                        staffID = s.staffID,
-                        accID = s.accID,
-                        staffRole = s.staffRole,
-                        branchID = s.branchID,
-                        signature = s.signature,
-                        nationality = a.nationality,
-                        religion = a.religion,
-                        // ACCOUNT (matches your ng-model)
-                        firstName = a.firstName,
-                        middleName = a.middleName,
-                        lastName = a.lastName,
-                        genderID = a.genderID,
-                        birthDate = a.birthDate,
-                        email = a.email,
-                        contactNumber = a.contactNumber,
-                        line1 = a.line1,
-                        line2 = a.line2,
-                        city = a.city,
-                        state = a.state,
-                        postal = a.postal,
-                        country = a.country,
-                        civilStatus = a.civilStatus,
-                        photoLink = a.photoLink
-                    }
+                   {
+                       // staff    
+                       staffID = s.staffID,
+                       accID = s.accID,
+                       staffRole = s.staffRole,
+                       branchID = s.branchID,
+                       signature = s.signature,
+                       nationality = a.nationality,
+                       religion = a.religion,
+                       // ACCOUNT (matches your ng-model)
+                       firstName = a.firstName,
+                       middleName = a.middleName,
+                       lastName = a.lastName,
+                       genderID = a.genderID,
+                       birthDate = a.birthDate,
+                       email = a.email,
+                       contactNumber = a.contactNumber,
+                       line1 = a.line1,
+                       line2 = a.line2,
+                       city = a.city,
+                       state = a.state,
+                       postal = a.postal,
+                       country = a.country,
+                       civilStatus = a.civilStatus,
+                       photoLink = a.photoLink
+                   }
                 ).FirstOrDefault();
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
