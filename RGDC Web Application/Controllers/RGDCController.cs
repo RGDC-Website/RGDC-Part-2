@@ -4942,7 +4942,10 @@ RGDC Dental Clinic Team";
                 existing.country = accmod.country;
                 existing.nationality = accmod.nationality;
                 existing.religion = accmod.religion;
-                existing.photoLink = accmod.photoLink;
+                if (!string.IsNullOrWhiteSpace(accmod.photoLink))
+                {
+                    existing.photoLink = accmod.photoLink;
+                }
                 existing.civilStatus = accmod.civilStatus;
                 existing.accUpdatedAt = DateTime.Now;
 
