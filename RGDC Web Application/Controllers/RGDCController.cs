@@ -4082,7 +4082,7 @@ RGDC Dental Clinic Team";
 
   <div style='margin-bottom: 1rem;'>
     <p>
-      You may now sign up as an <strong>Owner</strong> for RGDC Clinic.
+      You may now sign up as an <strong>Staff</strong> for RGDC Clinic.
       Please use the one-time password (OTP) below to proceed with your registration.
     </p>
   </div>
