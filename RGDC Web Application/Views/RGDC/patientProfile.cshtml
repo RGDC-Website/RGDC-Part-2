@@ -62,7 +62,6 @@
 
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
-                        <p class="brown-text lighten-1">Next Visit: {{selectedPatient.nextVisit || "---"}}</p>
                         @*<button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" style="margin-right: 16.5vw;" data-target="modalDeletePatient">DELETE</button>*@
                         <button class="edit-btn right modal-trigger" ng-show="isUserPatient" data-target="modalEditPatientInfo">EDIT</button>
                     </div>

@@ -18,10 +18,10 @@ namespace RGDC_Web_Application.Models
         public string paymentMethod { get; set; }
         public DateTime paymentDate { get; set; }
         public float cost { get; set; }
-        public float discount { get; set; }
         public float paid { get; set; }
         public float balance { get; set; }
         public DateTime payCreatedAt { get; set; }
         public DateTime payUpdatedAt { get; set; }
+        public int isArchived { get; set; }
     }
 }

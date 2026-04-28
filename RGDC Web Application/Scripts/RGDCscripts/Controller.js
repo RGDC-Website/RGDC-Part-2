@@ -35,7 +35,9 @@
     };
     $scope.currentUserAuthorization;
     $scope.paymentsArray = [];
+    $scope.allPayments = [];
     $scope.paymentID;
+    $scope.showFinanceArchived = false;
 
     $scope.modalScheduleDays = [
         { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
@@ -621,17 +623,42 @@
         });
     }
 
+    $scope.toggleFinanceArchive = function () {
+        $scope.showFinanceArchived = true;
+    };
+
+    $scope.toggleFinanceArchiveF = function () {
+        $scope.showFinanceArchived = false;
+    };
+
     $scope.deletePayRec = function (paymentID) {
         $scope.deletePayment = paymentID
     }
-
+    $scope.undeletePayRec = function (paymentID) {
+        $scope.undeletePayment = paymentID
+    }
+    
     $scope.deletePaymentThis = function () {
         var paymentData = {
             paymentID: $scope.deletePayment
         }
         RGDCWebApplicationService.deletePayment(paymentData)
             .then(function (response) {
-                Swal.fire({ icon: 'success', title: 'Deleted', text: 'Successfully deleted payment record.' }).then((result) => {
+                Swal.fire({ icon: 'success', title: 'Archived', text: 'Successfully archived payment record.' }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC/adminFinance";
+                        afterUpdate();
+                    }
+                });
+            });
+    }
+    $scope.undeletePaymentThis = function () {
+        var paymentData = {
+            paymentID: $scope.undeletePayment
+        }
+        RGDCWebApplicationService.undeletePayment(paymentData)
+            .then(function (response) {
+                Swal.fire({ icon: 'success', title: 'Unrchived', text: 'Successfully unarchived payment record.' }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = "/RGDC/adminFinance";
                         afterUpdate();
@@ -746,7 +773,6 @@
         return null;
     }
 
-    // --- Appointment listing: load scheduled appointments for admin table ---
     $scope.loadAdminScheduledAppointments = function () {
         RGDCWebApplicationService.getAdminScheduledAppointments()
             .then(function (response) {
@@ -834,7 +860,7 @@
             var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_occupation && $scope.signUp_religion && $scope.signUp_nationality && $scope.signUp_currentPhysician && $scope.signUp_lastVisit ) {
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_occupation && $scope.signUp_religion && $scope.signUp_nationality && $scope.signUp_currentPhysician ) {
                 Swal.fire({
                     icon: 'question',
                     title: 'Confirm Sign Up',
@@ -898,6 +924,8 @@
                                     occupation: $scope.signUp_occupation,
                                     accID: accID
                                 };
+
+                                console.log(patientData)
 
                                 var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
                                 signUpPatient.then(function () {
@@ -1830,18 +1858,30 @@
     };
 
     $scope.getPayments = function () {
-        if ($scope.userAuthorization != 3) {
-            var getPayments = RGDCWebApplicationService.getPayments();
-            getPayments.then(function (paymentList) {
-                $scope.paymentsArray = paymentList.data;
-                $scope.paymentsArray.forEach(function (payment) {
+
+        RGDCWebApplicationService.getPayments()
+            .then(function (paymentList) {
+
+                let data = paymentList.data || [];
+
+                data.forEach(function (payment) {
                     if (payment.paymentDate) {
-                        payment.paymentDate = formatDateToMDY(payment.paymentDate)
+                        payment.paymentDate = formatDateToMDY(payment.paymentDate);
                     }
                 });
+                $scope.archivedPayments = data.filter(function (p) {
+                    return Number(p.isArchived) === 1;
+                });
+
+                $scope.unarchivedPayments = data.filter(function (p) {
+                    return Number(p.isArchived) === 0;
+                });
+
+                $scope.paymentsArray = $scope.unarchivedPayments;
+
             });
-        }
-    }
+    };
+   
     function initializeDatepicker() {
         $timeout(function () {
             var birthDateElem = document.getElementById('birthDate');
@@ -3873,7 +3913,7 @@
             return;
         }
 
-        $scope.paymentDue = $scope.paymentCost - ($scope.paymentDiscount || 0) - ($scope.paymentPaid || 0);
+        $scope.paymentDue = $scope.paymentCost - ($scope.paymentPaid || 0);
 
         var paymentData = {
             patientID: $scope.selectedPatientID,
@@ -3884,7 +3924,6 @@
             reference: $scope.paymentReference,
             cost: parseFloat($scope.paymentCost) || 0,
             paymentDate: $scope.paymentDate,
-            discount: parseFloat($scope.paymentDiscount) || 0,
             paid: parseFloat($scope.paymentPaid) || 0,
             balance: parseFloat($scope.paymentDue) || 0,
             description: $scope.paymentDescription,
@@ -3930,14 +3969,18 @@
             return;
         }
 
-        $scope.paymentInfo.balance = $scope.paymentInfo.cost - ($scope.paymentInfo.discount || 0) - ($scope.paymentInfo.paid || 0)
+        $scope.paymentInfo.balance = $scope.paymentInfo.cost - ($scope.paymentInfo.paid || 0)
+
+        if ($scope.paymentInfo.balance < 0) {
+            Swal.fire({ icon: 'error', title: 'Invalid Inputs', text: 'Payment should not be greater than the cost.' });
+            return;
+        }
 
         var data = {
             paymentID: $scope.paymentInfo.paymentID,
             paymentMethod: $scope.paymentInfo.paymentMethod,
             cost: $scope.paymentInfo.cost,
             paymentDate: $scope.paymentInfo.paymentDate,
-            discount: $scope.paymentInfo.discount,
             paid: $scope.paymentInfo.paid,
             balance: $scope.paymentInfo.balance,
             reference: $scope.paymentInfo.reference,

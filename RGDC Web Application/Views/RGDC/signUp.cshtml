@@ -389,9 +389,9 @@
                 <div class="col s4" ng-init="getDentists()">
                     <p class="custom-label">Current Physician <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_currentPhysician">
-                        <option disbaled selected>Select your Nationality</option>
+                        <option disabled selected>Select your Nationality</option>
                         <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistName}}">{{dentist.dentistName}}</option>
-                        <option value="Others">Others</option>
+                        <option value="Others/Not Applicable">Others/Not Applicable</option>
                     </select>
                 </div>
                 @*Refferal*@
@@ -405,16 +405,17 @@
                 </div>
                 @*Last visit*@
                 <div class="col s4">
-                    <p class="custom-label">Last Visit <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
-                        <input id="lastVisit"
-                               ng-model="signUp_lastVisit"
-                               type="text"
-                               class="datepicker custom-input"
-                               readonly
-                               ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        <p class="custom-label">
+                            Last Visit </p>
+                            <input id="lastVisit"
+                                   ng-model="signUp_lastVisit"
+                                   type="text"
+                                   class="datepicker custom-input"
+                                   readonly
+                                   ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
+                                   required>
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
 

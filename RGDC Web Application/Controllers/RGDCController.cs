@@ -407,23 +407,6 @@ namespace RGDC_Web_Application.Controllers
                     addUser.tbl_account.Add(newData);
                     addUser.SaveChanges();
 
-                    if (newData.role == 3)
-                    {
-                        var patient = new tblPatientModel()
-                        {
-                            accID = newData.accID,
-                            currentPhysician = string.Empty,
-                            referral = string.Empty,
-                            lastVisit = DateTime.Now,
-                            medicalHistory = string.Empty,
-                            medHistUpdate = DateTime.Now,
-                            lastUpdated = DateTime.Now
-                        };
-
-                        addUser.tbl_patient.Add(patient);
-                        addUser.SaveChanges();
-                    }
-
                     return Json(new
                     {
                         accID = newData.accID
@@ -1308,7 +1291,6 @@ RGDC Dental Clinic Team";
                         medHist = p.medicalHistory,
                         medHistUpdate = p.medHistUpdate,
                         lastVisit = p.lastVisit,
-                        nextVisit = p.nextVisit
                     }
                 ).FirstOrDefault();
 
@@ -1450,7 +1432,6 @@ RGDC Dental Clinic Team";
                                 medHist = p.medicalHistory,
                                 medHistUpdate = p.medHistUpdate,
                                 lastVisit = p.lastVisit,
-                                nextVisit = p.nextVisit
                             }
                         ).FirstOrDefault();
 
@@ -1614,7 +1595,6 @@ RGDC Dental Clinic Team";
                     pat.referral = string.IsNullOrWhiteSpace(profInfo.referral) ? pat.referral : profInfo.referral;
                     pat.lastUpdated = DateTime.Now;
                     if (profInfo.lastVisit.HasValue) pat.lastVisit = profInfo.lastVisit.Value;
-                    if (profInfo.nextVisit.HasValue) pat.nextVisit = profInfo.nextVisit.Value;
 
                     db.SaveChanges();
                 }
@@ -2076,7 +2056,6 @@ RGDC Dental Clinic Team";
                                         photoLink = pa.photoLink,
                                         guardian = p.guardian,
                                         guardianNumber = p.guardianNumber,
-                                        nextVisit = p.nextVisit,
                                         lastVisit = p.lastVisit,
 
                                         // Dentist info
@@ -2093,11 +2072,11 @@ RGDC Dental Clinic Team";
                                         paymentDate = pay.paymentDate,
                                         reference = pay.reference,
                                         cost = pay.cost,
-                                        discount = pay.discount,
                                         toothNumber = pay.toothNumber,
                                         procedures = pay.procedures,
                                         paid = pay.paid,
-                                        balance = pay.balance
+                                        balance = pay.balance,
+                                        isArchived = pay.isArchived
                                     };
 
 
@@ -2163,7 +2142,7 @@ RGDC Dental Clinic Team";
                                         photoLink = pa.photoLink,
                                         guardian = p.guardian,
                                         guardianNumber = p.guardianNumber,
-                                        nextVisit = p.nextVisit,
+
                                         lastVisit = p.lastVisit,
 
                                         // Dentist info
@@ -2180,7 +2159,6 @@ RGDC Dental Clinic Team";
                                         paymentDate = pay.paymentDate,
                                         reference = pay.reference,
                                         cost = pay.cost,
-                                        discount = pay.discount,
                                         toothNumber = pay.toothNumber,
                                         procedures = pay.procedures,
                                         paid = pay.paid,
@@ -2865,7 +2843,6 @@ RGDC Dental Clinic Team";
                         cost = pay.cost,
                         toothNumber = pay.toothNumber,
                         procedures = pay.procedures,
-                        discount = pay.discount,
                         balance = pay.balance,
                         paid = pay.paid,
                         reference = pay.reference,
@@ -3408,7 +3385,6 @@ RGDC Dental Clinic Team";
                 {
                     payment.paymentMethod = model.paymentMethod;
                     payment.cost = model.cost;
-                    payment.discount = model.discount;
                     payment.toothNumber = model.toothNumber;
                     payment.procedures = model.procedures;
                     payment.reference = model.reference;
@@ -3572,7 +3548,23 @@ RGDC Dental Clinic Team";
 
                 if (payment != null)
                 {
-                    db.tbl_payment.Remove(payment);
+                    payment.isArchived = 1;
+                    db.SaveChanges();
+                }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult undeletePayment(tblPaymentModel model)
+        {
+            using (var db = new RGDCContext())
+            {
+                var payment = db.tbl_payment
+                                .FirstOrDefault(x => x.paymentID == model.paymentID);
+
+                if (payment != null)
+                {
+                    payment.isArchived = 0;
                     db.SaveChanges();
                 }
 
