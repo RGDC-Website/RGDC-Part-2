@@ -39,7 +39,7 @@
             </div>
 
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img" ng-click="goToProfile()"/>
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" />
             </div>
 
             @*user name and role*@
@@ -74,14 +74,6 @@
                     <li><a href="~/RGDC/adminFinance" ng-show="!isUserPatient" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">bar_chart</i>Finance</a></li>
                     <li><a href="~/RGDC/faqPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">question_answer</i>FAQs</a></li>
                     <li><a href="~/RGDC/contactUsPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact</a></li>
-                    <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                        <li>
-                            <a href="#!" class="white-text">one</a>
-                        </li>
-                        <li>
-                            <a href="#!" class="white-text">two</a>
-                        </li>
-                    </ul>
                 </ul>
             </div>
 
@@ -107,9 +99,6 @@
                         </li>
                     </ul>
                     <ul class="right m-0">
-                        <li>
-                            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">refresh</i></a>
-                        </li>
                         <li ng-show="isUserAdmin">
                         <li>
                             <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">print</i></a>
@@ -153,14 +142,6 @@
                 <span>Month DD, YYYY | </span>
                 <span>00:00 AM</span>
             </div>
-            <ul id="contactDropdown" class="dropdown-content brown lighten-1">
-                <li>
-                    <a href="#!" class="white-text">one</a>
-                </li>
-                <li>
-                    <a href="#!" class="white-text">two</a>
-                </li>
-            </ul>
         </ul>
 
         @*content*@
@@ -396,9 +377,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -662,9 +643,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -677,8 +658,8 @@
     </div>
 
     @*Dentist weekly schedule modal (profile edit)*@
-    <div id="modalDentistSchedule" class="modal modal-dentist-schedule">
-        <div class="modal-content">
+    <div id="modalDentistSchedule" class="modal modal-dentist-schedule modal-fixed-footer" style="max-height:90vh;">
+        <div class="modal-content" style="overflow-y:auto;">
             <h5>Weekly Schedule (Availability)</h5>
             <p class="small">Select days and time ranges when you are available. These determine appointment slots.</p>
             <table class="striped schedule-table">
@@ -711,16 +692,16 @@
                 </tbody>
             </table>
         </div>
-        <div class="modal-footer footer-center">
+        <div class="modal-footer footer-center" style="padding: 12px 24px;">
             <button type="button"
                     class="modal-close cancel-btn"
-                    style="font-weight:500;"
+                    style="font-weight:500; margin: 6px 10px;"
                     aria-label="Cancel">
                 CANCEL
             </button>
             <button type="button"
                     class="edit-btn"
-                    style="font-weight:500;"
+                    style="font-weight:500; margin: 6px 10px;"
                     ng-click="saveDentistScheduleFromProfile()"
                     aria-label="Save weekly schedule">
                 SAVE
@@ -971,9 +952,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -1145,10 +1126,6 @@
                 autoClose: true,
                 showClearBtn: true
             });
-                var elems = document.querySelectorAll('.datepicker');
-                M.Datepicker.init(elems, {
-                    format: 'mm/dd/yyyy'
-                });
         });
         //Pop up modals
         document.addEventListener('DOMContentLoaded', function () {
@@ -1242,16 +1219,6 @@
         //new DataTable('#adminRequestedAppointment');
         @* admin past appts table *@
         //new DataTable('#adminPastAppointment');
-
-        //admin clinic staff-owner
-        new DataTable('#adminClinicStaffTabTableOwner');
-        //admin clinic staff-dentist
-        new DataTable('#adminClinicStaffTabTableDentist');
-        //admin clinic staff-staff
-        new DataTable('#adminClinicStaffTabTableStaff');
-        //admin clinic staff-pending
-        new DataTable('#adminClinicStaffTabTablePending');
-
 
 
         //clickeable DataTables

@@ -11,7 +11,6 @@
         @*refresh and logout buttons*@
         <div class="col hide-on-med-and-down l4">
             <span class="right">
-                <div class="col valign-wrapper"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Refresh Dashboard"> <i class="material-icons brown-text lighten-1">refresh</i></a></div>
                 <div class="col valign-wrapper" ng-click="logOut()"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Logout"> <i class="material-icons brown-text lighten-1">logout</i></a></div>
             </span>
         </div>
@@ -49,7 +48,8 @@
                                 <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
-                                <th colspan="2">Status</th>
+                                <th>Status</th>
+                                <th style="text-align:center;">Action</th>
                             </tr>
                         </thead>
                         @*table content*@
@@ -71,28 +71,38 @@
                                 <td>{{appt.dentistName}}</td>
                                 <td>{{appt.patientName}}</td>
                                 <td>{{appt.displayStatus || appt.status}}</td>
-                                <td class="actions-cell" ng-show="!isUserDentist">
+                                <td class="actions-cell" style="text-align:center;">
                                     <div class="appt-action-buttons" role="group" aria-label="Appointment actions">
-                                        <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped redBtn"
-                                           ng-click="openDeleteApptModal(appt, 'scheduled')"
-                                           data-position="bottom" data-tooltip="Cancel Appointment"
-                                           aria-label="Cancel appointment">
-                                            <i class="material-icons brown-text lighten-1">delete</i>
-                                        </a>
-
-                                        <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped"
-                                           ng-click="openEditApptModal(appt, $event)"
-                                           data-position="bottom" data-tooltip="Edit Appointment"
-                                           aria-label="Edit appointment">
-                                            <i class="material-icons brown-text lighten-1">edit</i>
-                                        </a>
-                                        <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped reschedule-btn"
-                                           data-apptid="{{appt.apptID}}"
-                                           data-position="bottom" data-tooltip="Request Reschedule"
-                                           aria-label="Request reschedule">
-                                            <i class="material-icons brown-text lighten-1">autorenew</i>
-                                        </a>
+                                        <div ng-if="isUserDentist || isUserOwner" style="display:flex; justify-content:center; gap:6px;">
+                                            <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped redBtn"
+                                               ng-click="openViewApptModal(appt, $event)"
+                                               data-position="bottom" data-tooltip="View Appointment"
+                                               aria-label="View appointment">
+                                                <i class="material-icons brown-text lighten-1">visibility</i>
+                                            </a>
+                                        </div>
+                                        <div ng-if="!isUserDentist && !isUserOwner" style="display:flex; justify-content:center; gap:6px;">
+                                            <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped redBtn"
+                                               ng-click="openDeleteApptModal(appt, 'scheduled')"
+                                               data-position="bottom" data-tooltip="Cancel Appointment"
+                                               aria-label="Cancel appointment">
+                                                <i class="material-icons brown-text lighten-1">delete</i>
+                                            </a>
+                                            <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped"
+                                               ng-click="openEditApptModal(appt, $event)"
+                                               data-position="bottom" data-tooltip="Edit Appointment"
+                                               aria-label="Edit appointment">
+                                                <i class="material-icons brown-text lighten-1">edit</i>
+                                            </a>
+                                            <a class="btn-floating btn-small brown lighten-4 p-0 smallBtn tooltipped reschedule-btn"
+                                               data-apptid="{{appt.apptID}}"
+                                               data-position="bottom" data-tooltip="Request Reschedule"
+                                               aria-label="Request reschedule">
+                                                <i class="material-icons brown-text lighten-1">autorenew</i>
+                                            </a>
+                                        </div>
                                     </div>
+                                </td>
                             </tr>
                         </tbody>
                         @*table footer*@
@@ -103,7 +113,8 @@
                                 <th>Purpose</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
-                                <th colspan="2">Status</th>
+                                <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -144,14 +155,14 @@
                                 <td>{{appt.displayStatus || appt.status}}</td>
                                 <td style="text-align:center; vertical-align:middle;">
                                     <div ng-if="canActOnRequest(appt)" style="display:flex; flex-direction:column; align-items:center;">
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px" aria-label="Accept requested appointment">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist && !isUserOwner" ng-click="acceptRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom:6px" aria-label="Accept requested appointment">
                                             <i class="material-icons tiny">check</i>
                                         </a>
-                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
+                                        <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist && !isUserOwner" ng-click="denyRequestedAppointment(appt.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
                                             <i class="material-icons tiny">close</i>
                                         </a>
                                     </div>
-                                    <div ng-if="!canActOnRequest(appt) && isRequestCreator(appt) && isRequestedStatus(appt)" style="display:flex; flex-direction:column; align-items:center;">
+                                    <div ng-if="!isUserOwner && !canActOnRequest(appt) && isRequestCreator(appt) && isRequestedStatus(appt)" style="display:flex; flex-direction:column; align-items:center;">
                                         <a href="#"
                                            class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped"
                                            ng-click="cancelRequestedAppointment(appt)"
@@ -161,7 +172,7 @@
                                             <i class="material-icons tiny">cancel</i>
                                         </a>
                                     </div>
-                                    <div ng-if="!isUserDentist && !canActOnRequest(appt) && isRequestCreator(appt) && isDeniedStatus(appt)" style="display:flex; flex-direction:column; align-items:center; margin-top:6px;">
+                                    <div ng-if="!isUserDentist && !isUserOwner && !canActOnRequest(appt) && isRequestCreator(appt) && isDeniedStatus(appt)" style="display:flex; flex-direction:column; align-items:center; margin-top:6px;">
                                         <a href="#"
                                            class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped redBtn"
                                            ng-click="deleteDeniedRequest(appt)"
@@ -169,6 +180,16 @@
                                            data-tooltip="Delete (Move to Past)"
                                            aria-label="Delete denied request">
                                             <i class="material-icons tiny">delete</i>
+                                        </a>
+                                    </div>
+                                    <div ng-if="isUserDentist || isUserOwner" style="display:flex; flex-direction:column; align-items:center;">
+                                        <a href="#"
+                                           class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped redBtn"
+                                           ng-click="openViewApptModal(appt, $event)"
+                                           data-position="right"
+                                           data-tooltip="View Appointment"
+                                           aria-label="View requested appointment">
+                                            <i class="material-icons tiny">visibility</i>
                                         </a>
                                     </div>
                                     <!-- Creator (sender) can cancel their own request; others see accept/deny based on role -->
@@ -259,7 +280,7 @@
                     <div class="datepicker-wrapper">
                         <input id="addApptDate"
                                type="text"
-                               class="datepicker custom-input"
+                               class="datepicker appt-datepicker custom-input"
                                ng-model="newApptRequest.dateTime"
                                ng-change="updateTimeOptions()"
                                placeholder="MM/DD/YYYY"
@@ -446,7 +467,7 @@
                     <option value="">Select Status</option>
                 </select>
                 <span class="helper-text" ng-if="isUserPatient" style="color: #666; font-size:0.9rem;">
-                    Status can only be changed by clinic staff.
+                    Status can only be changed by dentist/clinic staff.
                 </span>
             </div>
 
@@ -520,7 +541,7 @@
                     <div class="datepicker-wrapper">
                         <input id="rescheduleDate"
                                type="text"
-                               class="datepicker custom-input"
+                               class="datepicker appt-datepicker custom-input"
                                ng-model="rescheduleRequest.dateTime"
                                placeholder="MM/DD/YYYY"
                                min="{{minApptDate}}"
