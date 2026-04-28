@@ -58,12 +58,13 @@
                            ng-blur="active = ''"
                            ng-model="signUp_password"
                            type="password"
+                           ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
                            placeholder="Password*"
                            maxlength="50"
                            ng-change="checkPasswordStrength()"
                            ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
                            required>
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                    <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
                         {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
                     </i>
                 </div>
@@ -91,6 +92,7 @@
                            ng-focus="active='confPassword'"
                            ng-blur="active = ''"
                            ng-model="signUp_confPassword"
+                           ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
                            type="password"
                            placeholder="Confirm password*"
                            maxlength="50"
@@ -280,7 +282,7 @@
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_nationality">
-                        <option disbaled selected>Select your Nationality</option>
+                        <option disabled selected>Select your Nationality</option>
                         <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
                     </select>
                 </div>
@@ -375,6 +377,7 @@
                     <p class="custom-label">Specialization <span class="required-mark">*</span></p>
                     <input type="text"
                            ng-model="signUp_specialization"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                            class="custom-input"
                            maxlength="50">
                 </div>
@@ -386,6 +389,7 @@
                     <p class="custom-label">Clinic Role <span class="required-mark">*</span></p>
                     <input type="text"
                            ng-model="signUp_staffRole"
+                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
                            class="custom-input"
                            maxlength="50">
                 </div>

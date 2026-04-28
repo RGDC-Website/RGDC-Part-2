@@ -16,7 +16,7 @@ namespace RGDC_Web_Application
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "RGDC", action = "signUp", id = UrlParameter.Optional }
+                defaults: new { controller = "RGDC", action = "logIn", id = UrlParameter.Optional }
             );
         }
     }

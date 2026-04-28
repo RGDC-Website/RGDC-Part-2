@@ -460,6 +460,7 @@ namespace RGDC_Web_Application.Controllers
                         accID = accDetails.accID,
                         currentPhysician = accDetails.currentPhysician,
                         referral = accDetails.referral,
+                        occupation = accDetails.occupation,
                         lastVisit = accDetails.lastVisit,
                         medicalHistory = accDetails.medicalHistory,
                         medHistUpdate = DateTime.Now,
@@ -1012,33 +1013,28 @@ RGDC Dental Clinic Team";
         [HttpPost]
         public JsonResult verifyOTP(string otpCode)
         {
-            // 1. Check if session exists
             if (Session["RESET_OTP"] == null || Session["RESET_OTP_EXPIRY"] == null)
             {
                 return Json(new { success = false, message = "No active reset request found. Please resend OTP." });
             }
 
-            // 2. Check Expiry
             DateTime expiry = (DateTime)Session["RESET_OTP_EXPIRY"];
             if (DateTime.Now > expiry)
             {
-                // Clear session if expired
                 Session["RESET_OTP"] = null;
                 return Json(new { success = false, message = "OTP has expired. Please request a new one." });
             }
 
-            // 3. Compare OTP
             string storedOtp = Session["RESET_OTP"].ToString();
             if (storedOtp == otpCode)
             {
-                // Optional: Set a flag that the user is verified to proceed to the actual reset
                 Session["IS_OTP_VERIFIED"] = true;
 
                 return Json(new { success = true, message = "OTP verified successfully." });
             }
             else
             {
-                return Json(new { success = false, message = "Invalid OTP code. Please try again." });
+                return Json(new { success = false, message = storedOtp });
             }
         }
 
@@ -3899,6 +3895,7 @@ RGDC Dental Clinic Team";
                 {
                     success = true,
                     message = "Dentist inserted successfully.",
+                    dentistID = newDentist.dentistID
                 }, JsonRequestBehavior.AllowGet);
             }
         }

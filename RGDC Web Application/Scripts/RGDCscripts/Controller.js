@@ -11,10 +11,10 @@
     $scope.currentUserPhoto = "";
     $scope.currentUserSignature = "";
     const STRENGTH = {
-        WEAK: 'Weak',
-        FAIR: 'Fair',
-        GOOD: 'Good',
-        STRONG: 'Strong'
+        WEAK: 'Invalid',
+        FAIR: 'Invalid',
+        GOOD: 'Invalid',
+        STRONG: 'Good'
     };
     $scope.staff;
     $scope.showPatientForm = false;
@@ -829,92 +829,103 @@
             var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password) {
-                var accountData = {
-                    firstName: $scope.signUp_firstName,
-                    middleName: $scope.signUp_middleName,
-                    lastName: $scope.signUp_lastName,
-                    genderID: $scope.signUp_genderID,
-                    birthDate: birthDate,
-                    email: $scope.signUp_email,
-                    contactNumber: $scope.signUp_contactNumber,
-                    role: 2,
-                    permission: 3,
-                    nationality: $scope.signUp_nationality,
-                    religion: $scope.signUp_religion,
-                    occupation: $scope.signUp_occupation,
-                    line1: $scope.signUp_line1,
-                    line2: $scope.signUp_line2,
-                    state: $scope.signUp_state,
-                    country: $scope.signUp_country,
-                    city: $scope.signUp_city,
-                    postal: $scope.signUp_postal,
-                    civilStatus: $scope.signUp_civilStatus,
-                    password: $scope.signUp_password,
-                    lastLogin: new Date(),
-                    accCreatedAt: new Date(),
-                    accUpdatedAt: new Date(),
-                };
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_occupation && $scope.signUp_religion && $scope.signUp_nationality && $scope.signUp_currentPhysician && $scope.signUp_lastVisit ) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Confirm Sign Up',
 
-                accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
-
-                if ($scope.signUp_agreement == true) {
-                    // show progress modal
-                    Swal.fire({
-                        title: 'Creating account...',
-                        allowOutsideClick: false,
-                        didOpen: function () {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    var signUp = RGDCWebApplicationService.signUp(accountData);
-                    signUp.then(function (signUpID) {
-                        var accID = signUpID && signUpID.data && signUpID.data.accID;
-                        if (!accID) {
-                            Swal.close();
-                            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
-                            return;
-                        }
-
-                        var patientData = {
-                            currentPhysician: $scope.signUp_currentPhysician,
-                            referral: $scope.signUp_referral,
-                            lastVisit: $scope.signUp_lastVisit,
-                            medicalHistory: "",
-                            accID: accID
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm & Sign Up',
+                    cancelButtonText: 'Edit'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var accountData = {
+                            firstName: $scope.signUp_firstName,
+                            middleName: $scope.signUp_middleName,
+                            lastName: $scope.signUp_lastName,
+                            genderID: $scope.signUp_genderID,
+                            birthDate: birthDate,
+                            email: $scope.signUp_email,
+                            contactNumber: $scope.signUp_contactNumber,
+                            role: 2,
+                            permission: 3,
+                            nationality: $scope.signUp_nationality,
+                            religion: $scope.signUp_religion,
+                            line1: $scope.signUp_line1,
+                            line2: $scope.signUp_line2,
+                            state: $scope.signUp_state,
+                            country: $scope.signUp_country,
+                            city: $scope.signUp_city,
+                            postal: $scope.signUp_postal,
+                            civilStatus: $scope.signUp_civilStatus,
+                            password: $scope.signUp_password,
+                            lastLogin: new Date(),
+                            accCreatedAt: new Date(),
+                            accUpdatedAt: new Date(),
                         };
 
-                        var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
-                        signUpPatient.then(function () {
-                            try { $scope.signUpRemove(); } catch (e) { }
+                        accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
 
+                        if ($scope.signUp_agreement == true) {
+                            // show progress modal
                             Swal.fire({
-                                icon: 'success',
-                                title: 'Account Created',
-                                text: 'Your account has been created successfully.',
-                                confirmButtonText: 'Go to Login'
-                            }).then(function () {
-                                window.location.href = "/RGDC/logIn";
+                                title: 'Creating account...',
+                                allowOutsideClick: false,
+                                didOpen: function () {
+                                    Swal.showLoading();
+                                }
                             });
-                        }).catch(function (err) {
-                            Swal.close();
-                            console.error('signUpPatient failed', err);
-                            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save patient information. Contact support.' });
-                        });
-                    }).catch(function (err) {
-                        Swal.close();
-                        console.error('signUp failed', err);
-                        var message = (err && err.data && err.data.message) || 'Failed to create account. Please try again.';
-                        Swal.fire({ icon: 'error', title: 'Error', text: message });
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Read and Accept the Following:",
-                        text: "Terms and Conditions & Data Privacy Policy",
-                    });
-                }
+
+                            var signUp = RGDCWebApplicationService.signUp(accountData);
+                            signUp.then(function (signUpID) {
+                                var accID = signUpID && signUpID.data && signUpID.data.accID;
+                                if (!accID) {
+                                    Swal.close();
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
+                                    return;
+                                }
+
+                                var patientData = {
+                                    currentPhysician: $scope.signUp_currentPhysician,
+                                    referral: $scope.signUp_referral,
+                                    lastVisit: $scope.signUp_lastVisit,
+                                    medicalHistory: "",
+                                    occupation: $scope.signUp_occupation,
+                                    accID: accID
+                                };
+
+                                var signUpPatient = RGDCWebApplicationService.signUpPatient(patientData);
+                                signUpPatient.then(function () {
+                                    try { $scope.signUpRemove(); } catch (e) { }
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Account Created',
+                                        text: 'Your account has been created successfully.',
+                                        confirmButtonText: 'Go to Login'
+                                    }).then(function () {
+                                        window.location.href = "/RGDC/logIn";
+                                    });
+                                }).catch(function (err) {
+                                    Swal.close();
+                                    console.error('signUpPatient failed', err);
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to save patient information. Contact support.' });
+                                });
+                            }).catch(function (err) {
+                                Swal.close();
+                                console.error('signUp failed', err);
+                                var message = (err && err.data && err.data.message) || 'Failed to create account. Please try again.';
+                                Swal.fire({ icon: 'error', title: 'Error', text: message });
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Read and Accept the Following:",
+                                text: "Terms and Conditions & Data Privacy Policy",
+                            });
+                        }
+                    }
+                });
             }
             else {
                 Swal.fire({
@@ -933,39 +944,6 @@
     $scope.signUpClinicStaff = function () {
 
         try {
-            //function buildFullAddressFromParts() {
-            //    // Build signUp_address from separated inputs (skip blanks)
-            //    var parts = [
-            //        $scope.address_houseNo,
-            //        $scope.address_street,
-            //        $scope.address_barangay,
-            //        $scope.address_city,
-            //        $scope.address_province
-            //    ].map(function (p) { return (p || '').toString().trim(); }).filter(Boolean);
-            //    $scope.signUp_address = parts.join(', ');
-            //}
-
-            // Expose a helper so the view can force-sync on keystroke
-            if (typeof $scope.syncSignUpAddress !== 'function') {
-                $scope.syncSignUpAddress = function () {
-                    try {
-                        buildFullAddressFromParts();
-                        // ensure digest picks up hidden field updates
-                        $timeout(function () { }, 0);
-                    } catch (_) { }
-                };
-            }
-
-            // Keep the combined address always in sync (so submit sees latest typing)
-            try {
-                //if (!$scope._addressWatchBound) {
-                //    $scope._addressWatchBound = true;
-                //    $scope.$watchGroup(
-                //        ['address_houseNo', 'address_street', 'address_barangay', 'address_city', 'address_province'],
-                //        function () { try { buildFullAddressFromParts(); } catch (_) { } }
-                //    );
-                //}
-            } catch (_) { }
 
             function normalizeTimeToHHMM(value) {
                 if (value === null || typeof value === 'undefined') return null;
@@ -1047,137 +1025,172 @@
                     $scope.signUp_branchID = isNaN(b) ? null : b;
                 }
             } catch (_) { }
-
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password) {
-                var accountData = {
-                    firstName: $scope.signUp_firstName,
-                    middleName: $scope.signUp_middleName,
-                    lastName: $scope.signUp_lastName,
-                    genderID: $scope.signUp_genderID,
-                    birthDate: birthDate,
-                    email: $scope.signUp_email,
-                    contactNumber: $scope.signUp_contactNumber,
-                    role: $scope.signUp_role,
-                    permission: $scope.signUp_permission,
-                    nationality: $scope.signUp_nationality,
-                    religion: $scope.signUp_religion,
-                    occupation: $scope.signUp_occupation,
-                    line1: $scope.signUp_line1,
-                    line2: $scope.signUp_line2,
-                    state: $scope.signUp_state,
-                    country: $scope.signUp_country,
-                    city: $scope.signUp_city,
-                    postal: $scope.signUp_postal,
-                    civilStatus: $scope.signUp_civilStatus,
-                    password: $scope.signUp_password,
-                    lastLogin: new Date(),
-                    accCreatedAt: new Date(),
-                    accUpdatedAt: new Date(),
-                };
-                console.log(accountData)
-
-                accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
-
-                if ($scope.signUp_agreement == true) {
-                    // Dentist must configure weekly schedule before we create the account
-                    if (parseInt($scope.signUp_permission, 10) === 1) {
-                        try {
-                            validateDentistScheduleOrThrow();
-                        } catch (e) {
-                            Swal.fire({ icon: 'error', title: 'Weekly Schedule Required', text: e.message || 'Please set your weekly availability first.' });
-                            try { $scope.openScheduleModal(); } catch (_) { }
-                            return;
-                        }
-                    }
-
-                    // show progress modal
-                    Swal.fire({
-                        title: 'Creating account...',
-                        allowOutsideClick: false,
-                        didOpen: function () {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    var signUp = RGDCWebApplicationService.signUp(accountData);
-                    signUp.then(function (signUpID) {
-                        var accID = signUpID && signUpID.data && signUpID.data.accID;
-                        if (!accID) {
-                            Swal.close();
-                            Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
-                            return;
-                        }
-                        // Chain role-specific creation and (for dentists) schedule persistence.
-                        var rolePromise = null;
-
-                        if ($scope.signUp_permission == 0) {
-                            var ownerData = {
-                                accID: accID,
-                                specialization: $scope.signUp_specialization,
-                            }
-                            rolePromise = RGDCWebApplicationService.signUpOwner(ownerData);
-                        } else if ($scope.signUp_permission == 1) {
-                            var dentistData = {
-                                accID: accID,
-                                specialization: $scope.signUp_specialization,
-                                branchID: $scope.signUp_branchID
-                            }
-                            rolePromise = RGDCWebApplicationService
-                                .signUpDentist(dentistData)
-                                .then(function (respDent) {
-                                    var dentistID = respDent && respDent.data ? (respDent.data.dentistID || null) : null;
-                                    dentistID = parseInt(dentistID, 10);
-                                    if (!dentistID || isNaN(dentistID)) throw new Error('Failed to resolve dentistID for schedule saving.');
-                                    // required: persist schedule before finishing signup UX
-                                    return $scope.persistDentistScheduleAfterSignup(dentistID);
-                                });
-                        } else if ($scope.signUp_permission == 2) {
-                            var staffData = {
-                                accID: accID,
-                                staffRole: $scope.signUp_staffRole,
-                                branchID: $scope.signUp_branchID
-                            }
-                            rolePromise = RGDCWebApplicationService.signUpStaff(staffData);
-                        }
-
-                        Promise.resolve(rolePromise)
-                            .then(function () {
-                                // remove from queue (best effort)
-                                try {
-                                    var emailQueue = { email: $scope.signUp_email };
-                                    RGDCWebApplicationService.removeFromQueue(emailQueue);
-                                } catch (_) { }
-
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Account Created',
-                                    text: 'Your account has been created successfully.',
-                                    confirmButtonText: 'Go to Login'
-                                }).then(function () {
-                                    window.location.href = "/RGDC/logIn";
-                                });
-                            })
-                            .catch(function (err) {
-                                Swal.close();
-                                console.error('Role creation/schedule persistence failed', err);
-                                var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Failed to save account information. Please try again.';
-                                Swal.fire({ icon: 'error', title: 'Error', text: msg });
-                            });
-                    }).catch(function (err) {
-                        Swal.close();
-                        console.error('signUp failed', err);
-                        var message = (err && err.data && err.data.message) || 'Failed to create account. Please try again.';
-                        Swal.fire({ icon: 'error', title: 'Error', text: message });
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Read and Accept the Following:",
-                        text: "Terms and Conditions & Data Privacy Policy",
-                    });
-                }
+          
+            if ($scope.signUpStaff && !$scope.signUp_staffRole && !$scope.signUp_branchID) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Incomplete Inputs",
+                    text: "Ensure all fields are filled up with valid information.",
+                });
+                return;
             }
-            else {
+            if ($scope.signUpDentist && !$scope.signUp_specialization && !$scope.signUp_branchID) {
+                Swal.fire({
+
+                    icon: "error",
+                    title: "Incomplete Inputs",
+                    text: "Ensure all fields are filled up with valid information.",
+                });
+                return;
+            }
+            if ($scope.signUpOwner && (!$scope.signUp_specialization)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Incomplete Inputs",
+                    text: "Ensure all fields are filled up with valid information.",
+                });
+                return;
+            }
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_religion && $scope.signUp_nationality) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Confirm Sign Up',
+
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirm & Sign Up',
+                    cancelButtonText: 'Edit'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var accountData = {
+                            firstName: $scope.signUp_firstName,
+                            middleName: $scope.signUp_middleName,
+                            lastName: $scope.signUp_lastName,
+                            genderID: $scope.signUp_genderID,
+                            birthDate: birthDate,
+                            email: $scope.signUp_email,
+                            contactNumber: $scope.signUp_contactNumber,
+                            role: $scope.signUp_role,
+                            permission: $scope.signUp_permission,
+                            nationality: $scope.signUp_nationality,
+                            religion: $scope.signUp_religion,
+                            line1: $scope.signUp_line1,
+                            line2: $scope.signUp_line2,
+                            state: $scope.signUp_state,
+                            country: $scope.signUp_country,
+                            city: $scope.signUp_city,
+                            postal: $scope.signUp_postal,
+                            civilStatus: $scope.signUp_civilStatus,
+                            password: $scope.signUp_password,
+                            lastLogin: new Date(),
+                            accCreatedAt: new Date(),
+                            accUpdatedAt: new Date(),
+                        };
+
+                        accountData.photoLink = $scope._uploadedSignUpPhotoPath || "";
+
+                        if ($scope.signUp_agreement == true) {
+                            // Dentist must configure weekly schedule before we create the account
+                            if (parseInt($scope.signUp_permission, 10) === 1) {
+                                try {
+                                    validateDentistScheduleOrThrow();
+                                } catch (e) {
+                                    Swal.fire({ icon: 'error', title: 'Weekly Schedule Required', text: e.message || 'Please set your weekly availability first.' });
+                                    try { $scope.openScheduleModal(); } catch (_) { }
+                                    return;
+                                }
+                            }
+
+                            // show progress modal
+                            Swal.fire({
+                                title: 'Creating account...',
+                                allowOutsideClick: false,
+                                didOpen: function () {
+                                    Swal.showLoading();
+                                }
+                            });
+
+                            var signUp = RGDCWebApplicationService.signUp(accountData);
+                            signUp.then(function (signUpID) {
+                                var accID = signUpID && signUpID.data && signUpID.data.accID;
+                                if (!accID) {
+                                    Swal.close();
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to create account. Please try again.' });
+                                    return;
+                                }
+
+                                var rolePromise = null;
+
+                                if ($scope.signUp_permission == 0) {
+                                    var ownerData = {
+                                        accID: accID,
+                                        specialization: $scope.signUp_specialization,
+                                    }
+                                    rolePromise = RGDCWebApplicationService.signUpOwner(ownerData);
+                                } else if ($scope.signUp_permission == 1) {
+                                    var dentistData = {
+                                        accID: accID,
+                                        specialization: $scope.signUp_specialization,
+                                        branchID: $scope.signUp_branchID
+                                    }
+                                    rolePromise = RGDCWebApplicationService
+                                        .signUpDentist(dentistData)
+                                        .then(function (respDent) {
+                                            var dentistID = respDent && respDent.data ? (respDent.data.dentistID || null) : null;
+                                            dentistID = parseInt(dentistID, 10); 
+                                            console.log(dentistID)
+                                            if (!dentistID || isNaN(dentistID)) throw new Error('Failed to resolve dentistID for schedule saving.');
+                                            // required: persist schedule before finishing signup UX
+                                            return $scope.persistDentistScheduleAfterSignup(dentistID);
+                                        });
+                                } else if ($scope.signUp_permission == 2) {
+                                    var staffData = {
+                                        accID: accID,
+                                        staffRole: $scope.signUp_staffRole,
+                                        branchID: $scope.signUp_branchID
+                                    }
+                                    rolePromise = RGDCWebApplicationService.signUpStaff(staffData);
+                                }
+
+                                Promise.resolve(rolePromise)
+                                    .then(function () {
+                                        // remove from queue (best effort)
+                                        try {
+                                            var emailQueue = { email: $scope.signUp_email };
+                                            RGDCWebApplicationService.removeFromQueue(emailQueue);
+                                        } catch (_) { }
+
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Account Created',
+                                            text: 'Your account has been created successfully.',
+                                            confirmButtonText: 'Go to Login'
+                                        }).then(function () {
+                                            window.location.href = "/RGDC/logIn";
+                                        });
+                                    })
+                                    .catch(function (err) {
+                                        Swal.close();
+                                        console.error('Role creation/schedule persistence failed', err);
+                                        var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Failed to save account information. Please try again.';
+                                        Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                                    });
+                            }).catch(function (err) {
+                                Swal.close();
+                                console.error('signUp failed', err);
+                                var message = (err && err.data && err.data.message) || 'Failed to create account. Please try again.';
+                                Swal.fire({ icon: 'error', title: 'Error', text: message });
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Read and Accept the Following:",
+                                text: "Terms and Conditions & Data Privacy Policy",
+                            });
+                        }
+
+                    }
+                });
+            } else {
                 // Show which fields are missing to avoid guesswork
                 var missing = [];
                 if (!$scope.signUp_firstName) missing.push('First Name');
@@ -1373,9 +1386,10 @@
 
     $scope.verifyOTP = function () {
         var otpCode = {
-            otpCode: $scope.forget_OTP
+            otpCode: $scope.forgot_otp
         }
         var verifyOTP = RGDCWebApplicationService.verifyOTP(otpCode);
+        console.log(otpCode)
         verifyOTP.then(function (response) {
             if (response.data.success) {
                 Swal.fire({
@@ -1383,16 +1397,18 @@
                     title: 'Verification Failed',
                     text: response.data.message || 'The OTP you entered is incorrect.',
                     confirmButtonColor: '#d33'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var resetElem = document.getElementById('modalPasswordReset');
+                        var resetInstance = M.Modal.getInstance(resetElem);
+                        resetInstance.open();
+                    }
                 });
-                // 1. Get the instance of the OTP modal and close it
-                var otpElem = document.getElementById('modalOTP');
+
+                var otpElem = document.getElementById('modal-password');
                 var otpInstance = M.Modal.getInstance(otpElem);
                 otpInstance.close();
 
-                // 2. Get the instance of the Reset modal and open it
-                var resetElem = document.getElementById('modalPasswordReset');
-                var resetInstance = M.Modal.getInstance(resetElem);
-                resetInstance.open();
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -2428,8 +2444,19 @@
     };
 
     $scope.logOut = function () {
-        RGDCWebApplicationService.logOut();
-        window.location.href = "/RGDC/logIn";
+        Swal.fire({
+            icon: 'question',
+            title: 'Logging Out?',
+
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                RGDCWebApplicationService.logOut();
+                window.location.href = "/RGDC/logIn";
+            }
+        });
     }
 
     $scope.goHome = function () {

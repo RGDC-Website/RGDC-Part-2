@@ -378,7 +378,7 @@
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_nationality">
-                        <option disbaled selected>Select your Nationality</option>
+                        <option disabled selected>Select your Nationality</option>
                         <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
                     </select>
                 </div>
@@ -386,14 +386,13 @@
 
             <div class="row">
                 @*Current physician*@
-                <div class="col s4">
+                <div class="col s4" ng-init="getDentists()">
                     <p class="custom-label">Current Physician <span class="required-mark">*</span></p>
-                    <input type="text"
-                           ng-model="signUp_currentPhysician"
-                           class="custom-input"
-                           maxlength="150"
-                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
-                           ng-class="{ 'input-valid': isCurrentPhysicianValid(), 'input-invalid': signUp_currentPhysician && !isCurrentPhysicianValid() }">
+                    <select class="browser-default custom-input" ng-model="signUp_currentPhysician">
+                        <option disbaled selected>Select your Nationality</option>
+                        <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistName}}">{{dentist.dentistName}}</option>
+                        <option value="Others">Others</option>
+                    </select>
                 </div>
                 @*Refferal*@
                 <div class="col s4">
