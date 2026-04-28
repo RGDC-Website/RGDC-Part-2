@@ -140,7 +140,7 @@
 </div>
 
 @*Information form*@
-<div id="modalInfoForm" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh">
+<div id="modalInfoForm" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:90vh">
     <div>
         <h5 class="modal-form-title">{{whatStaffForm}} Information Form</h5>
 
@@ -368,16 +368,6 @@
                            class="custom-input"
                            maxlength="50">
                 </div>
-
-                <div class="row" ng-show="signUpDentist">
-                    <div class="col s12 center-align" style="margin-top: .5rem;">
-                        <button type="button" class="btn-small edit-btn schedule-btn"
-                                ng-click="openScheduleModal()">
-                            Set Weekly Schedule
-                        </button>
-                        <div class="helper-text schedule-helper">(Configure your weekly availability for appointments)</div>
-                    </div>
-                </div>
             </div>
 
             <div class="row" ng-show="signUpStaff">
@@ -417,32 +407,37 @@
     </div>
 
     @*Submit or cancel*@
-    <div class="modal-footer footer-center" style="margin-top:1.5vh">
-        <button type="submit" class="edit-btn left" style="font-weight:500;" ng-click="pickSignUpPhoto()">UPLOAD PHOTO</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh">CANCEL</button>
-        <button type="button"
-                class="edit-btn"
-                ng-if="signUpDentist"
-                ng-click="openScheduleModal()"
-                style="font-weight:500;">
-            SET SCHEDULE
-        </button>
+<div class="modal-footer" style="margin-top:1.5vh">
+    <button class="modal-close cancel-btn left" style="font-weight:500; margin-right:.5vh">CANCEL</button>
 
-        <button type="button"
-                class="edit-btn"
-                ng-click="signUpClinicStaff()"
-                style="font-weight:500;">
-            CREATE ACCOUNT
-        </button>
-    </div>
+    <button type="submit"
+            class="edit-btn right"
+            style="font-weight:500; margin-right:0.5vh"
+            ng-click="pickSignUpPhoto()">
+        UPLOAD PHOTO
+    </button>
+    <button type="submit"
+            class="edit-btn modal-trigger right"
+            data-target="modalSchedule"
+            ng-if="signUpDentist"
+            style="font-weight: 500; margin-right:0.5vh">
+        SET SCHEDULE
+    </button>
+    <button type="button"
+            class="edit-btn"
+            ng-click="signUpClinicStaff()"
+            style="font-weight:500;">
+        CREATE ACCOUNT
+    </button>
+</div>
 </div>
 
 
 @*schedule modal*@
-<div id="modalSchedule" class="modal">
+<div id="modalSchedule" class="modal schedule-modal">
     <div class="modal-content">
-        <h5>Weekly Schedule (Availability)</h5>
-        <p class="small">Select days and time ranges when you are available. These determine appointment slots.</p>
+        <h5 class="modal-form-title">Weekly Schedule (Availability)</h5>
+        <p class="custom-label">Select days and time ranges when you are available. These determine appointment slots.</p>
         <table class="striped">
             <thead>
                 <tr>
@@ -475,8 +470,16 @@
             </tbody>
         </table>
     </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0)" class="btn-flat" ng-click="closeScheduleModal()">Done</a>
+
+    <div class="modal-footer" style="margin:0 0 2vh 0">
+        <button class="modal-close cancel-btn left" style="font-weight:500; margin-left:2vh">CANCEL</button>
+
+        <button type="button"
+                class="edit-btn right"
+                ng-click="closeScheduleModal()"
+                style="font-weight:500; margin-right:2vh">
+            DONE
+        </button>
     </div>
 </div>
 
