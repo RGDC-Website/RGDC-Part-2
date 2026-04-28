@@ -19,7 +19,7 @@
 
     @*create new appointment button*@
     <div class="row m-0">
-        <a ng-show="!isUserDentist" class="edit-btn modal-trigger left white-text" data-target="modalAddAppt"><i class="material-icons left">add</i>Schedule Appointment</a>
+        <a ng-show="!isUserDentist" ng-click="prepareNewAppointmentRequest()" class="edit-btn modal-trigger left white-text" data-target="modalAddAppt"><i class="material-icons left">add</i>Schedule Appointment</a>
     </div>
 
     <div class="card grey lighten-2" style="margin-top:5vh;">
@@ -151,7 +151,27 @@
                                             <i class="material-icons tiny">close</i>
                                         </a>
                                     </div>
-                                    <!-- Creator (sender) will see no buttons but will still see the row and status -->
+                                    <div ng-if="!canActOnRequest(appt) && isRequestCreator(appt) && isRequestedStatus(appt)" style="display:flex; flex-direction:column; align-items:center;">
+                                        <a href="#"
+                                           class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped"
+                                           ng-click="cancelRequestedAppointment(appt)"
+                                           data-position="right"
+                                           data-tooltip="Cancel Request"
+                                           aria-label="Cancel requested appointment">
+                                            <i class="material-icons tiny">cancel</i>
+                                        </a>
+                                    </div>
+                                    <div ng-if="!canActOnRequest(appt) && isRequestCreator(appt) && isDeniedStatus(appt)" style="display:flex; flex-direction:column; align-items:center; margin-top:6px;">
+                                        <a href="#"
+                                           class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped redBtn"
+                                           ng-click="deleteDeniedRequest(appt)"
+                                           data-position="right"
+                                           data-tooltip="Delete (Move to Past)"
+                                           aria-label="Delete denied request">
+                                            <i class="material-icons tiny">delete</i>
+                                        </a>
+                                    </div>
+                                    <!-- Creator (sender) can cancel their own request; others see accept/deny based on role -->
                                 </td>
                             </tr>
                         </tbody>
@@ -241,6 +261,7 @@
                                type="text"
                                class="datepicker custom-input"
                                ng-model="newApptRequest.dateTime"
+                               ng-change="updateTimeOptions()"
                                placeholder="MM/DD/YYYY"
                                min="{{minApptDate}}"
                                required />
@@ -282,6 +303,7 @@
                                 class="custom-input browser-default"
                                 ng-model="newApptRequest.dentistID"
                                 ng-options="d.dentistID as d.dentistName for d in dentistArray"
+                                ng-change="updateTimeOptions()"
                                 required>
                             <option value="">Select Dentist</option>
                         </select>
@@ -295,13 +317,24 @@
                 <div class="col s12 m6">
                     <label class="custom-label" for="addApptPatient">Patient <span class="required-mark">*</span></label>
 
-                    <select id="addApptPatient"
-                            class="custom-input browser-default"
-                            ng-model="newApptRequest.patientID"
-                            ng-options="p.patientID as p.patientName for p in patientArray"
-                            required>
-                        <option value="">Select Patient</option>
-                    </select>
+                    <div ng-if="isUserPatient">
+                        <input id="addApptPatient"
+                               type="text"
+                               class="custom-input"
+                               ng-model="currentPatient.patientName"
+                               placeholder="Patient"
+                               readonly />
+                    </div>
+                    <div ng-if="!isUserPatient">
+                        <select id="addApptPatient"
+                                class="custom-input browser-default"
+                                ng-model="newApptRequest.patientID"
+                                ng-options="p.patientID as p.patientName for p in patientArray"
+                                ng-change="updateTimeOptions()"
+                                required>
+                            <option value="">Select Patient</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -315,13 +348,9 @@
 
 
             <div class="row">
-                <div class="col s12 m6">
+                <div class="col s12">
                     <label class="custom-label" for="addApptContact">Contact Number</label>
                     <input id="addApptContact" type="text" class="custom-input" ng-model="newApptRequest.contactNumber" placeholder="09#########" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
-                </div>
-                <div class="col s12 m6">
-                    <label class="custom-label" for="addApptRequester">Requester Name</label>
-                    <input id="addApptRequester" type="text" class="custom-input" ng-model="newApptRequest.requesterName" ng-init="newApptRequest.requesterName = currentUserFullName" />
                 </div>
             </div>
 
