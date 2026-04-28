@@ -20,6 +20,7 @@
     $scope.showPatientForm = false;
     $scope.isUserOwner = false;
     $scope.isUserAdmin = false;
+    $scope.isUserSAdmin = false;
     $scope.isUserStaff = false;
     $scope.isUserPatient = false;
     $scope.signUpDentist = false;

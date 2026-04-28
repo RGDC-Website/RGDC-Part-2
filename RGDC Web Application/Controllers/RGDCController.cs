@@ -3826,13 +3826,6 @@ RGDC Dental Clinic Team";
     </p>
   </div>
 
-  <div style='margin-bottom: 1rem;'>
-    <p>
-      Thank you,<br/>
-      RGDC Dental Clinic Team
-    </p>
-  </div>
-
 </div>
 
 <div style='border-top:1px solid rgba(0,0,0,0.14); padding-top:1rem; margin: 0 15%;'>
@@ -3954,12 +3947,6 @@ RGDC Dental Clinic Team";
     </p>
   </div>
 
-  <div style='margin-bottom: 1rem;'>
-    <p>
-      Thank you,<br/>
-      RGDC Dental Clinic Team
-    </p>
-  </div>
 
 </div>
 
@@ -4097,13 +4084,6 @@ RGDC Dental Clinic Team";
     <p>
       Do not share this code with anyone. If you did not request this signup,
       you may safely ignore this email.
-    </p>
-  </div>
-
-  <div style='margin-bottom: 1rem;'>
-    <p>
-      Thank you,<br/>
-      RGDC Dental Clinic Team
     </p>
   </div>
 
