@@ -39,7 +39,7 @@
             </div>
 
             <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
-                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img" ng-click="goToProfile()"/>
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" />
             </div>
 
             @*user name and role*@
@@ -396,9 +396,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -662,9 +662,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -677,8 +677,8 @@
     </div>
 
     @*Dentist weekly schedule modal (profile edit)*@
-    <div id="modalDentistSchedule" class="modal modal-dentist-schedule">
-        <div class="modal-content">
+    <div id="modalDentistSchedule" class="modal modal-dentist-schedule modal-fixed-footer" style="max-height:90vh;">
+        <div class="modal-content" style="overflow-y:auto;">
             <h5>Weekly Schedule (Availability)</h5>
             <p class="small">Select days and time ranges when you are available. These determine appointment slots.</p>
             <table class="striped schedule-table">
@@ -711,16 +711,16 @@
                 </tbody>
             </table>
         </div>
-        <div class="modal-footer footer-center">
+        <div class="modal-footer footer-center" style="padding: 12px 24px;">
             <button type="button"
                     class="modal-close cancel-btn"
-                    style="font-weight:500;"
+                    style="font-weight:500; margin: 6px 10px;"
                     aria-label="Cancel">
                 CANCEL
             </button>
             <button type="button"
                     class="edit-btn"
-                    style="font-weight:500;"
+                    style="font-weight:500; margin: 6px 10px;"
                     ng-click="saveDentistScheduleFromProfile()"
                     aria-label="Save weekly schedule">
                 SAVE
@@ -971,9 +971,9 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-                </div>
+                @*<div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    </div>*@
             </form>
         </div>
 
@@ -1145,10 +1145,6 @@
                 autoClose: true,
                 showClearBtn: true
             });
-                var elems = document.querySelectorAll('.datepicker');
-                M.Datepicker.init(elems, {
-                    format: 'mm/dd/yyyy'
-                });
         });
         //Pop up modals
         document.addEventListener('DOMContentLoaded', function () {

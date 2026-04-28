@@ -20,7 +20,6 @@
     $scope.showPatientForm = false;
     $scope.isUserOwner = false;
     $scope.isUserAdmin = false;
-    $scope.isUserSAdmin = false;
     $scope.isUserStaff = false;
     $scope.isUserPatient = false;
     $scope.signUpDentist = false;
@@ -61,10 +60,6 @@
             { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 }
         ];
     })();
-
-    $scope.goToProfile = function () {
-        window.location.href = '/RGDC/patientProfile'; 
-    };
 
     $scope.nationalities = [
         "Afghan", "Albanian", "Algerian", "American", "Andorran", "Angolan",
@@ -834,7 +829,7 @@
             var birthDate = new Date($scope.signUp_birthDate);
             birthDate.setHours(0, 0, 0, 0); // 00:00:00
 
-            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_occupation && $scope.signUp_religion && $scope.signUp_nationality && $scope.signUp_currentPhysician && $scope.signUp_lastVisit ) {
+            if ($scope.signUp_firstName && $scope.signUp_lastName && $scope.signUp_genderID && $scope.signUp_birthDate && $scope.signUp_email && $scope.signUp_contactNumber && $scope.signUp_civilStatus && $scope.signUp_password && $scope.signUp_line1 && $scope.signUp_line2 && $scope.signUp_state && $scope.signUp_postal && $scope.signUp_country && $scope.signUp_city && $scope.signUp_occupation && $scope.signUp_religion && $scope.signUp_nationality && $scope.signUp_currentPhysician && $scope.signUp_lastVisit) {
                 Swal.fire({
                     icon: 'question',
                     title: 'Confirm Sign Up',
@@ -1030,7 +1025,7 @@
                     $scope.signUp_branchID = isNaN(b) ? null : b;
                 }
             } catch (_) { }
-          
+
             if ($scope.signUpStaff && !$scope.signUp_staffRole && !$scope.signUp_branchID) {
                 Swal.fire({
                     icon: "error",
@@ -1141,7 +1136,7 @@
                                         .signUpDentist(dentistData)
                                         .then(function (respDent) {
                                             var dentistID = respDent && respDent.data ? (respDent.data.dentistID || null) : null;
-                                            dentistID = parseInt(dentistID, 10); 
+                                            dentistID = parseInt(dentistID, 10);
                                             console.log(dentistID)
                                             if (!dentistID || isNaN(dentistID)) throw new Error('Failed to resolve dentistID for schedule saving.');
                                             // required: persist schedule before finishing signup UX
@@ -4071,6 +4066,7 @@
                         format: 'mmmm dd, yyyy',
                         autoClose: true,
                         minDate: minDateObj,
+                        yearRange: [new Date().getFullYear(), new Date().getFullYear() + 3],
                         onSelect: function (date) {
                             $scope.$apply(function () {
                                 // store ISO string so later new Date(...) parses reliably
@@ -6770,7 +6766,7 @@
                                     render: function (data, type, row, meta) {
                                         // data == apptID
                                         var id = data || '';
-                                        if ($scope.isUserDentist) {
+                                        if ($scope.isUserDentist || $scope.isUserOwner) {
                                             var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
                                                 '<a class="btn-view-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="View Appointment" role="button" aria-label="View appointment"><i class="material-icons brown-text lighten-1">visibility</i></a>' +
                                                 '</div>';
