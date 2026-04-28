@@ -544,8 +544,8 @@
                             <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
                         </select>
                         @*<input type="text" class="custom-input" ng-model="dentist.nationality"
-                placeholder="Filipino" maxlength="50"
-                ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editDentistSubmitted && !dentist.nationality}">*@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.nationality">Nationality is required.</span>
                     </div>
                 </div>
@@ -711,9 +711,20 @@
                 </tbody>
             </table>
         </div>
-        <div class="modal-footer">
-            <a href="javascript:void(0)" class="modal-close btn-flat">Cancel</a>
-            <a href="javascript:void(0)" class="btn-flat" ng-click="saveDentistScheduleFromProfile()">Save</a>
+        <div class="modal-footer footer-center">
+            <button type="button"
+                    class="modal-close cancel-btn"
+                    style="font-weight:500;"
+                    aria-label="Cancel">
+                CANCEL
+            </button>
+            <button type="button"
+                    class="edit-btn"
+                    style="font-weight:500;"
+                    ng-click="saveDentistScheduleFromProfile()"
+                    aria-label="Save weekly schedule">
+                SAVE
+            </button>
         </div>
     </div>
 
@@ -840,8 +851,8 @@
                         </select>
 
                         @*<input type="text" class="custom-input" ng-model="staff.religion"
-                placeholder="Roman-Catholic" maxlength="50"
-                ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
+                            placeholder="Roman-Catholic" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.religion}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.religion">Religion is required.</span>
                     </div>
                     @*Nationality*@
@@ -853,8 +864,8 @@
                         </select>
 
                         @*<input type="text" class="custom-input" ng-model="staff.nationality"
-                placeholder="Filipino" maxlength="50"
-                ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
+                            placeholder="Filipino" maxlength="50"
+                            ng-class="{'invalid-input': editStaffSubmitted && !staff.nationality}">*@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.nationality">Nationality is required.</span>
                     </div>
                 </div>
