@@ -19,7 +19,8 @@
             <form>
 
                 @*Email*@
-                <div class="input-field lbl-required">
+                <div class="input-field">
+                    <p class="custom-label" style="text-align:left">Email <span class="required-mark">*</span></p>
                     <input id="email"
                            ng-focus="active='email'"
                            ng-blur="active = ''"
@@ -51,68 +52,71 @@
                 </div>
 
                 @* Password Field *@
-            <div class="input-field password-field">
-                <div class="password-wrapper">
-                    <input id="password"
-                           ng-focus="active='password'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_password"
-                           type="password"
-                           ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
-                           placeholder="Password*"
-                           maxlength="50"
-                           ng-change="checkPasswordStrength()"
-                           ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
-                           required>
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
-                        {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
-                </div>
+                <div class="input-field password-field">
+                    <p class="custom-label" style="text-align:left">Password <span class="required-mark">*</span></p>
+                    <div class="password-wrapper">
+                        <input id="password"
+                               ng-focus="active='password'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_password"
+                               type="password"
+                               ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
+                               placeholder="Password*"
+                               maxlength="50"
+                               ng-change="checkPasswordStrength()"
+                               ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
+                               required>
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
+                            {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
-                <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
-                    Strength: <strong>{{ passwordStrength }}</strong>
-                </span>
+                    <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
+                        Strength: <strong>{{ passwordStrength }}</strong>
+                    </span>
 
-                <div class="password-requirements" ng-show="(active=='password') && signUp_password">
-                    <small>Password must include:</small>
-                    <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
-                        <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
-                    </ul>
+                    <div class="password-requirements" ng-show="(active=='password') && signUp_password">
+                        <small>Password must include:</small>
+                        <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
+                            <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
                 @* Confirm Password Field *@
-            <div class="input-field password-field">
-                <div class="password-wrapper">
-                    <input id="confPassword"
-                           ng-focus="active='confPassword'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_confPassword"
-                           ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
-                           type="password"
-                           placeholder="Confirm password*"
-                           maxlength="50"
-                           ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
-                           required>
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
-                        {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
-                </div>
+                <div class="input-field password-field">
+                    <p class="custom-label" style="text-align:left">Confirm Password <span class="required-mark">*</span></p>
+                    <div class="password-wrapper">
+                        <input id="confPassword"
+                               ng-focus="active='confPassword'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_confPassword"
+                               ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
+                               type="password"
+                               placeholder="Confirm password*"
+                               maxlength="50"
+                               ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
+                               required>
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                            {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
-                <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
-                    Passwords do not match
-                </span>
-                <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
-                    Passwords matched
-                </span>
-            </div>
+                    <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
+                        Passwords do not match
+                    </span>
+                    <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
+                        Passwords matched
+                    </span>
+                </div>
 
                 @*Code*@
                 <div class="input-field lbl-required">
+                    <p class="custom-label left">Code <span class="required-mark">*</span></p>
                     <input id="code"
                            type="text"
                            ng-model="signUp_code"
@@ -127,8 +131,16 @@
         <span>Already have an account?</span>
         <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
     </div>-->
+                @*Sign up BTN*@
+                <button class="logSignBtn"
+                        data-target="modalInfoForm"
+                        type="button"
+                        ng-click="signUpStaffInitial()">
+                    Sign Up
+                </button>
+
                 @*Already have an account*@
-                <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
+                <div class="container" style="margin-top: 1.3vh; font-size: 0.95rem;">
                     <span>Already have an account?</span>
                     <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
                 </div>
@@ -139,13 +151,6 @@
                     <a href="~/RGDC/signUp" class="signup-link" style="display:inline-block">Patient Sign Up</a>
                 </div>
 
-                @*Sign up BTN*@
-                <button class="logSignBtn"
-                        data-target="modalInfoForm"
-                        type="button"
-                        ng-click="signUpStaffInitial()">
-                    Sign Up
-                </button>
             </form>
         </div>
     </div>
@@ -378,6 +383,7 @@
                     <input type="text"
                            ng-model="signUp_specialization"
                            oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                           placeholder="specialization"
                            class="custom-input"
                            maxlength="50">
                 </div>
@@ -405,6 +411,23 @@
                 </div>
             </div>
 
+           <div class="row">
+               <div class="col s12">
+                   <p class="custom-label">Schedule Availability <span class="required-mark">*</span></p>
+                   <div class="datepicker-wrapper">
+                       <input id="scheduleAvialability"
+                              ng-if="signUpDentist"
+                              type="text"
+                              class="custom-input modal-trigger"
+                              data-target="modalSchedule"
+                              placeholder="set your schedule availabillity here"
+                              readonly
+                              required>
+                       <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                   </div>
+               </div>
+           </div>
+
             @*Agreementz*@
             <div class="row agreement-section center-align">
                 <label class="agreement-label">
@@ -422,21 +445,16 @@
 
     @*Submit or cancel*@
 <div class="modal-footer" style="margin-top:1.5vh">
-    <button class="modal-close cancel-btn left" style="font-weight:500; margin-right:.5vh">CANCEL</button>
 
     <button type="submit"
-            class="edit-btn right"
-            style="font-weight:500; margin-right:0.5vh"
+            class="edit-btn left"
+            style="font-weight:500;"
             ng-click="pickSignUpPhoto()">
         UPLOAD PHOTO
     </button>
-    <button type="submit"
-            class="edit-btn modal-trigger right"
-            data-target="modalSchedule"
-            ng-if="signUpDentist"
-            style="font-weight: 500; margin-right:0.5vh">
-        SET SCHEDULE
-    </button>
+
+    <button class="modal-close cancel-btn right" style="font-weight:500; margin-right:.5vh">CANCEL</button>
+
     <button type="button"
             class="edit-btn"
             ng-click="signUpClinicStaff()"
@@ -515,7 +533,9 @@
                 <p>
                     Welcome to the Reyes-Guansing Dental Clinic (RGDC) Dental Management System. These Terms and Conditions ("Terms", "T&C", or "Agreement") constitute a legally binding agreement between you ("User") and Reyes-Guansing Dental Clinic ("RGDC") governing your access to and use of the RGDC Dental Management System website and all associated services (collectively, the "System").
                 </p>
-                <p>By creating an account, you explicitly agree to be bound by these Terms. During account registration, you must check the acknowledgment box confirming that you have read, understood, and agreed to these Terms before your account can be activated. If you do not agree to these Terms, you cannot create an account or use the System.</p>
+                <p>
+                    By creating an account, you explicitly agree to be bound by these Terms. During account registration, you must check the acknowledgment box confirming that you have read, understood, and agreed to these Terms before your account can be activated. If you do not agree to these Terms, you cannot create an account or use the System.
+                </p>
                 <p class="bold">For Minor Patients:</p>
                 <p>
                     If you are registering on behalf of a patient under 18 years of age, you represent that you are the parent or legal guardian of the minor and have authority to agree to these Terms on their behalf. Moreover, you accept full responsibility for the minor's use of the System.
@@ -548,14 +568,13 @@
                 <ul class="browser-default">
                     <li class="justified">Clinical record management and patient account oversight.</li>
                     <li class="justified">Access and modify dental records for assigned patients; document treatments; manage personal appointment calendar.</li>
-                    <li class="justified">Approve or disapprove appointment requests submitted to them through the appointment scheduling interface.</li>
-                    <li class="justified">Initiate rescheduling of appointments and communicate directly with affected patients, providing a written reason for any schedule change.</li>
+                    <li class="justified">Can view appointment schedule  </li>
                 </ul>
                 <p class="bold">Dental Staff</p>
                 <ul class="browser-default">
                     <li class="justified">Administrative support: schedule and coordinate appointments, assist with patient registration, and process billing entries.</li>
                     <li class="justified">View and manage appointment calendars; relay rescheduling notices on behalf of dentists where authorized.</li>
-                    <li class="justified">Cannot approve or disapprove appointments independently. </li>
+                    <li class="justified">Can initiate rescheduling of appointments and communicate directly with affected patients, providing a written reason for any schedule change in coordination with the dentist.</li>
                 </ul>
                 <p class="bold">Patient</p>
                 <ul class="browser-default">
@@ -596,11 +615,11 @@
                 </ul>
                 <p class="bold">Appointment Approval and Disapproval</p>
                 <ul class="browser-default">
-                    <li>Dentists review pending appointment requests through their calendar dashboard and may approve or disapprove requests based on the Dentist’s availability.</li>
+                    <li>Staff must review pending appointment requests through the Dentist’s time schedule and may approve or disapprove requests based on the Dentist’s availability.</li>
                     <li>Owners and authorized Staff may also act on appointment requests where appropriate.</li>
                     <li>A disapproved appointment request includes a reason or note visible to the patient.</li>
-                    <li>If a dentist needs to reschedule an existing appointment, the dentist must use the rescheduling function in the System.</li>
-                    <li>The patient may accept the new schedule, propose a different time, or contact the clinic by phone to discuss rescheduling options.</li>
+                    <li>If a Dentist needs to reschedule an existing appointment, then the Dentist must communicate with the dental staff, who uses the rescheduling function in the System.</li>
+                    <li>The Patient may accept the new schedule, propose a different time, or contact the clinic by phone to discuss rescheduling options.</li>
                 </ul>
                 <p class="bold">Phone Rescheduling Option</p>
                 <p>Patients who are unable to use the online scheduling system may contact the clinic directly by phone to request rescheduling. Clinic contact information is provided in Section 14 of these Terms. Staff will update the System to reflect any changes agreed upon by phone.</p>
@@ -771,7 +790,7 @@
                         Location: 1191 Velarde Bldg, Del Pilar St., Cabanatuan City
                     </li>
                     <li>
-                        General Inquiries: Dentalclinicreyesguansing@gmail.com
+                        General Inquiries: dentalclinicreyesguansing@gmail.com
                     </li>
                     <li>
                         Contact: 0963-220-1556
@@ -807,7 +826,7 @@
                 <p class="centered-text">
                     Your acceptance of these terms and conditions is required to fully use the system.
                 </p>
-                <p class="centered-text">Effective Date: December 17, 2025   |   Last Updated: April 26, 2026</p>
+                <p class="centered-text">Effective Date: December 17, 2025   |   Last Updated: April 27, 2026</p>
                 <p class="centered-text">© 2026 Reyes-Guansing Dental Clinic. All Rights Reserved.</p>
             </div>
 
@@ -857,7 +876,7 @@
                 <p class="bold">
                     2.2 Sensitive Personal Information
                 </p>
-                <p>As  healthcare providers, we collect and process sensitive personal information necessary for delivering quality dental care:</p>
+                <p>As healthcare providers, we collect and process sensitive personal information necessary for delivering quality dental care:</p>
                 <ul class="browser-default">
                     <li>Complete dental history, including previous treatments, procedures, and outcomes.</li>
                     <li>
@@ -969,7 +988,9 @@
                 <p><span class="bold">Right to Withdraw Consent:</span> For data processing activities based on your consent rather than legal obligation, you may withdraw your consent at any time. However, withdrawal does not affect the lawfulness of processing that occurred before withdrawal, and we may need to continue processing certain information to fulfill our legal and professional obligations.</p>
                 <p><span class="bold">Right to File a Complaint:</span> If you believe your data privacy rights have been violated, you have the right to file a complaint with RGDC's Data Privacy Officer and/or directly with the National Privacy Commission. We are committed to resolving your concerns promptly and transparently.</p>
                 <p><span class="bold">Right to Damages:</span> Under Republic Act No. 10173, you may be entitled to compensation if you suffer damage due to inaccurate, incomplete, outdated, false, unlawfully obtained, or unauthorized use of your personal data.</p>
-                <p>To exercise any of these rights, please see our contact list below using the contact information provided in Sections 13 & 14 of this Privacy Policy. We will respond to your request within the timeframes required by law, typically within 15 business days for straightforward requests.</p>
+                <p>
+                    In response to the user’s request, we will respond within a reasonable period as required under the Data Privacy Act of 2012 and its implementing Rules and Regulations, typically within fifteen (15) business days for straightforward requests, in accordance with guidance from the National Privacy Commission.
+                </p>
             </div>
 
             <div class="section">
@@ -989,7 +1010,7 @@
                     9. THIRD-PARTY SERVICES AND LINKS
                 </h5>
                 <p>The RGDC Dental Management System integrates with third-party services to provide enhanced functionality:</p>
-                <p><span class="bold">Google Calendar API:</span> We use Google Calendar API to synchronize your dental appointments with your personal Google Calendar, allowing you to manage your schedule across multiple devices and receive reminders through your preferred calendar application. When you enable this integration, we share your appointment date, time, and clinic location with Google's services.</p>
+                <p><span class="bold">Google Calendar API:</span>We use Google Calendar API to synchronize your dental appointments with your personal Google Calendar, allowing you to manage your schedule across multiple devices and receive reminders through your preferred calendar application. When you enable this integration, we share your appointment date, time, and clinic location with Google's services.</p>
                 <p><span class="bold">Gmail API:</span> We utilize Gmail API to send automated email notifications, including appointment confirmations, reminders, treatment updates, system announcements, and password reset requests. This integration allows for reliable, timely delivery of important communications.</p>
 
             </div>
@@ -1008,7 +1029,7 @@
                 <p><span class="bold">Notification of Changes:</span> When we make significant changes that materially affect how we collect, use, or protect your personal information, we will notify you through:</p>
                 <ul class="browser-default">
                     <li>Email notification sent to the address associated with your account using our Gmail API integration</li>
-                    <li>A prominent notice displayed on your dashboard when you log into the system</li>
+                    <li>A prominent notice is displayed on your dashboard when you log into the system</li>
                     <li>An updated "Last Updated" date at the top of this Privacy Policy.</li>
                 </ul>
                 <p><span class="bold">Acceptance of Changes:</span> By continuing to use the RGDC Dental Management System after the effective date of the updated Privacy Policy, you acknowledge that you have read, understood, and agree to be bound by the revised terms. Your continued use constitutes acceptance of the changes.</p>
@@ -1033,7 +1054,7 @@
                         Location: 1191 Velarde Bldg, Del Pilar St., Cabanatuan City
                     </li>
                     <li>
-                        General Inquiries: Dentalclinicreyesguansing@gmail.com
+                        General Inquiries: dentalclinicreyesguansing@gmail.com
                     </li>
                     <li>
                         Contact: 0963-220-1556

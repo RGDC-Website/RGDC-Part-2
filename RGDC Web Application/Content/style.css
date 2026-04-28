@@ -19,6 +19,7 @@
 }
 
 
+
 /*small*/
 @media only screen and (max-width: 600px) {
     .main-content {
@@ -46,6 +47,19 @@
 
     .responsive-btn-roundedSquare{
         margin-left: 0;
+    }
+}
+
+/*phone portrait*/
+@media only screen and (max-width: 600px) and (orientation: portrait) {
+    .content-patient-row > .col{
+        float: none !important;
+        width: 100% !important;
+    }
+
+    .patient-tabs-container .patient-right{
+        float: none !important;
+        width: 100% !important;
     }
 }
 
@@ -212,7 +226,7 @@ a:hover {
 
 .containerOverflow-2 {
     min-height: 12rem;
-    max-height: 46.3rem;
+    max-height: calc(100vh-200px);
     overflow-y: auto;
     overflow-x: auto;
 }
@@ -1562,7 +1576,7 @@ css.validation-msg {
     /* Use top:0; bottom:0; margin:auto to vertically center against the input height */
     .password-field .password-toggle {
         position: absolute;
-        right: 10px;
+        right: 1vh;
         top: 0 !important;
         bottom: 0 !important;
         margin: auto !important;
