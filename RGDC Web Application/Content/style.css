@@ -61,6 +61,14 @@
         float: none !important;
         width: 100% !important;
     }
+
+    .finance-table-responsive {
+        min-height: 12rem;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }
 
 /*medium*/
@@ -226,7 +234,7 @@ a:hover {
 
 .containerOverflow-2 {
     min-height: 12rem;
-    max-height: calc(100vh-200px);
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: auto;
 }
