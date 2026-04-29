@@ -16,32 +16,85 @@
     </div>
 
     @*create new finance record button*@
-<div class="row m-0" ng-show="!isUserPatient">
-    <div class="row">
+    <div class="row m-0" ng-show="!isUserPatient">
         <a class="edit-btn modal-trigger left white-text" data-target="modalAddPayrec"><i class="material-icons left">add</i>Create New Payment Record</a>
-    </div>
 
-    @*admin finance table*@
-    <div class="row finance-table-responsive" style="padding: 2rem">
-        <table id="adminFinance" class="hover tableClk" ng-init="getPayments()">
+        <a class="edit-btn left white-text" ng-show="!showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchive()"><i class="material-icons left">archive</i>Show Archived</a>
+        <a class="edit-btn left white-text" ng-show="showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchiveF()"><i class="material-icons left">archive</i>Show Unarchived</a>
+        @*admin finance table*@
+        <div class="row" style="padding: 2rem" ng-show="!showFinanceArchived">
+            <table id="adminFinance" class="hover tableClk" ng-init="getPayments()">
+                @*table headers*@
+                <thead>
+                    <tr class="brown-text lighten-1">
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Dentist</th>
+                        <th>Procedures</th>
+                        <th>Tooth #</th>
+                        <th>Amount</th>
+                        <th>Paid</th>
+                        <th colspan="2">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="payment in paymentsArray track by payment.paymentID" on-finish-render>
+                        <td>{{payment.paymentDate}}</td>
+                        <td>{{payment.patientName}}</td>
+                        <td>{{payment.dentistName}}</td>
+                        <td>{{payment.procedures}}</td>
+                        <td>{{payment.toothNumber}}</td>
+                        <td>{{payment.cost}}</td>
+                        <td>{{payment.paid}}</td>
+                        <td>{{payment.balance}}</td>
+                        <td>
+                            <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
+                                <i class="material-icons brown-text lighten-1">visibility</i>
+                            </a>
+                            <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Archive Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
+                                <i class="material-icons brown-text lighten-1">archive</i>
+                            </a>
+                            <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="brown-text lighten-1">
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Dentist</th>
+                        <th>Procedures</th>
+                        <th>Tooth #</th>
+                        <th>Amount</th>
+                        <th>Paid</th>
+                        <th colspan="2">Balance</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="row" style="padding: 2rem" ng-show="showFinanceArchived">
+        <table id="adminFinanceArchive" class="hover tableClk">
             @*table headers*@
             <thead>
                 <tr class="brown-text lighten-1">
                     <th>Date</th>
+                    <th>Patient</th>
+                    <th>Dentist</th>
                     <th>Procedures</th>
                     <th>Tooth #</th>
-                    <th>Dentist</th>
                     <th>Amount</th>
                     <th>Paid</th>
                     <th colspan="2">Balance</th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="payment in paymentsArray track by payment.paymentID">
+                <tr ng-repeat="payment in archivedPayments track by payment.paymentID" on-finish-render>
                     <td>{{payment.paymentDate}}</td>
+                    <td>{{payment.patientName}}</td>
+                    <td>{{payment.dentistName}}</td>
                     <td>{{payment.procedures}}</td>
                     <td>{{payment.toothNumber}}</td>
-                    <td>{{payment.dentistName}}</td>
                     <td>{{payment.cost}}</td>
                     <td>{{payment.paid}}</td>
                     <td>{{payment.balance}}</td>
@@ -49,8 +102,8 @@
                         <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
                             <i class="material-icons brown-text lighten-1">visibility</i>
                         </a>
-                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
-                            <i class="material-icons brown-text lighten-1">delete</i>
+                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrecNo" data-position="bottom" data-tooltip="Unarchive Payment Record" ng-click="undeletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
+                            <i class="material-icons brown-text lighten-1">archive</i>
                         </a>
                         <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                     </td>
@@ -59,18 +112,18 @@
             <tfoot>
                 <tr class="brown-text lighten-1">
                     <th>Date</th>
+                    <th>Patient</th>
+                    <th>Dentist</th>
                     <th>Procedures</th>
                     <th>Tooth #</th>
-                    <th>Dentist</th>
                     <th>Amount</th>
                     <th>Paid</th>
-                    <th>Balance</th>
+                    <th colspan="2">Balance</th>
                 </tr>
             </tfoot>
         </table>
     </div>
 </div>
-
 @*ADD Payment Record*@
 <div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()">
     <div class="modal-content">
@@ -154,7 +207,7 @@
                 @*Reference*@
                 <label class="custom-label">
                     Reference
-                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50"/>
+                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50" />
                 </label>
             </div>
         </div>
@@ -171,31 +224,22 @@
                 <span class="validation-msg" ng-show="addSubmitted && !paymentCost">Cost is required.</span>
             </div>
             <div class="col s6">
-                @*Discount*@
-                <label class="custom-label">
-                    Discount
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" ng-model="paymentDiscount" placeholder="Discount..."
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col s6">
                 @*Paid*@
                 <label class="custom-label">
-                    Total Amount Paid
+                    Paid
                     <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentPaid" placeholder="Total amount paid..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
                            ng-class="{'invalid-input': addSubmitted && !paymentPaid}">
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentPaid">Total amount paid is required.</span>
-            </div><div class="col s6">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s6">
                 @*Balance*@
                 <label class="custom-label">
                     Balance
-                    <span class="required-mark">*</span>
                     <input type="text" class="custom-input"
                            ng-value="(paymentCost || 0) - (paymentDiscount || 0) - (paymentPaid || 0)"
                            placeholder="Balance..."
@@ -213,8 +257,7 @@
                 <label class="custom-label">
                     Description
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
-                              placeholder="Description..." ng-model="paymentDescription"
-                             ></textarea>
+                              placeholder="Description..." ng-model="paymentDescription"></textarea>
                 </label>
             </div>
         </div>
@@ -336,28 +379,19 @@
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
             </div>
             <div class="col s6">
-                @*Discount*@
+                @*Paid*@
                 <label class="custom-label">
-                    Discount
+                    Total Amount Paid
                     <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount"
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
+                    <input type="text" class="custom-input" ng-model="paymentInfo.paid" placeholder="Total amount paid..."
+                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                           ng-class="{'invalid-input': addSubmitted && !paymentInfo.paid}">
                 </label>
+                <span class="validation-msg" ng-show="addSubmitted && !paymentInfo.paid">Total amount paid is required.</span>
             </div>
         </div>
 
         <div class="row">
-            <div class="col s6">
-                @*Paid*@
-                <label class="custom-label">
-                    Paid
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.paid"
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paid  === null}">
-                </label>
-                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paid  === null">Amount paid is required.</span>
-            </div>
             <div class="col s6">
                 @*Total*@
                 <label class="custom-label">
@@ -378,10 +412,8 @@
                 @*Description*@
                 <label class="custom-label">
                     Description
-                    <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
-                              placeholder="Description..." ng-model="paymentInfo.description"
-                        ></textarea>  
+                              placeholder="Description..." ng-model="paymentInfo.description"></textarea>
                 </label>
             </div>
         </div>
@@ -498,13 +530,27 @@
 @*Archive Peyment Record*@
 <div id="modalDeletePayrec" class="modal payrec-modal" style="width:30% !important">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Payment Record</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Arhive Payment Record</h5>
 
         <p class="custom-label">Are you sure you want to archive this payment record?</p>
     </div>
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePaymentThis()">DELETE</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deletePaymentThis()">ARCHIVE</button>
+    </div>
+</div>
+
+@*Unrchive Peyment Record*@
+<div id="modalDeletePayrecNo" class="modal payrec-modal" style="width:30% !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Arhive Payment Record</h5>
+
+        <p class="custom-label">Are you sure you want to unarchive this payment record?</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="undeletePaymentThis()">UNARCHIVE</button>
     </div>
 </div>

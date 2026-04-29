@@ -141,8 +141,11 @@
     };
 
     this.deletePayment = function (id) {
-        console.log(id)
         return $http.post('/RGDC/deletePayment', id);
+    };
+
+    this.undeletePayment = function (id) {
+        return $http.post('/RGDC/undeletePayment', id);
     };
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");

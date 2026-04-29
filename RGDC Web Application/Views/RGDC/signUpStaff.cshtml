@@ -19,7 +19,8 @@
             <form>
 
                 @*Email*@
-                <div class="input-field lbl-required">
+                <div class="input-field">
+                    <p class="custom-label" style="text-align:left">Email <span class="required-mark">*</span></p>
                     <input id="email"
                            ng-focus="active='email'"
                            ng-blur="active = ''"
@@ -51,68 +52,71 @@
                 </div>
 
                 @* Password Field *@
-            <div class="input-field password-field">
-                <div class="password-wrapper">
-                    <input id="password"
-                           ng-focus="active='password'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_password"
-                           type="password"
-                           ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
-                           placeholder="Password*"
-                           maxlength="50"
-                           ng-change="checkPasswordStrength()"
-                           ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
-                           required>
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
-                        {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
-                </div>
+                <div class="input-field password-field">
+                    <p class="custom-label" style="text-align:left">Password <span class="required-mark">*</span></p>
+                    <div class="password-wrapper">
+                        <input id="password"
+                               ng-focus="active='password'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_password"
+                               type="password"
+                               ng-attr-type="{{ showSignUpPassword ? 'text' : 'password' }}"
+                               placeholder="Password*"
+                               maxlength="50"
+                               ng-change="checkPasswordStrength()"
+                               ng-class="{ 'input-valid': isPasswordFieldValid(), 'input-invalid': signUp_password && !isPasswordFieldValid() }"
+                               required>
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpPassword()" title="Show/Hide password">
+                            {{ showSignUpPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
-                <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
-                    Strength: <strong>{{ passwordStrength }}</strong>
-                </span>
+                    <span class="helper-text" ng-class="strengthColor" ng-show="passwordStrength">
+                        Strength: <strong>{{ passwordStrength }}</strong>
+                    </span>
 
-                <div class="password-requirements" ng-show="(active=='password') && signUp_password">
-                    <small>Password must include:</small>
-                    <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
-                        <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
-                        <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
-                    </ul>
+                    <div class="password-requirements" ng-show="(active=='password') && signUp_password">
+                        <small>Password must include:</small>
+                        <ul style="list-style: none; padding-left: 0; text-align: left; margin: 5px 0;">
+                            <li ng-class="{'requirement-complete': pwdChecks.length, 'requirement-pending': !pwdChecks.length}">• At least 8 characters</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.upper, 'requirement-pending': !pwdChecks.upper}">• One uppercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.lower, 'requirement-pending': !pwdChecks.lower}">• One lowercase letter</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.number, 'requirement-pending': !pwdChecks.number}">• One number</li>
+                            <li ng-class="{'requirement-complete': pwdChecks.special, 'requirement-pending': !pwdChecks.special}">• One special character</li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
 
                 @* Confirm Password Field *@
-            <div class="input-field password-field">
-                <div class="password-wrapper">
-                    <input id="confPassword"
-                           ng-focus="active='confPassword'"
-                           ng-blur="active = ''"
-                           ng-model="signUp_confPassword"
-                           ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
-                           type="password"
-                           placeholder="Confirm password*"
-                           maxlength="50"
-                           ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
-                           required>
-                    <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
-                        {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
-                    </i>
-                </div>
+                <div class="input-field password-field">
+                    <p class="custom-label" style="text-align:left">Confirm Password <span class="required-mark">*</span></p>
+                    <div class="password-wrapper">
+                        <input id="confPassword"
+                               ng-focus="active='confPassword'"
+                               ng-blur="active = ''"
+                               ng-model="signUp_confPassword"
+                               ng-attr-type="{{ showSignUpConfPassword ? 'text' : 'password' }}"
+                               type="password"
+                               placeholder="Confirm password*"
+                               maxlength="50"
+                               ng-class="{ 'input-valid': isConfirmFieldValid(), 'input-invalid': signUp_confPassword && !isConfirmFieldValid() }"
+                               required>
+                        <i class="material-icons password-toggle" ng-click="toggleSignUpConfPassword()" title="Show/Hide password">
+                            {{ showSignUpConfPassword ? 'visibility_off' : 'visibility' }}
+                        </i>
+                    </div>
 
-                <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
-                    Passwords do not match
-                </span>
-                <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
-                    Passwords matched
-                </span>
-            </div>
+                    <span class="helper-text" style="color: #d32f2f;" ng-show="!passwordsMatch && signUp_confPassword">
+                        Passwords do not match
+                    </span>
+                    <span class="helper-text" style="color: #388e3c;" ng-show="passwordsMatch && signUp_confPassword">
+                        Passwords matched
+                    </span>
+                </div>
 
                 @*Code*@
                 <div class="input-field lbl-required">
+                    <p class="custom-label left">Code <span class="required-mark">*</span></p>
                     <input id="code"
                            type="text"
                            ng-model="signUp_code"
@@ -127,8 +131,16 @@
         <span>Already have an account?</span>
         <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
     </div>-->
+                @*Sign up BTN*@
+                <button class="logSignBtn"
+                        data-target="modalInfoForm"
+                        type="button"
+                        ng-click="signUpStaffInitial()">
+                    Sign Up
+                </button>
+
                 @*Already have an account*@
-                <div class="container" style="margin-top: -1vh; font-size: 0.95rem;">
+                <div class="container" style="margin-top: 1.3vh; font-size: 0.95rem;">
                     <span>Already have an account?</span>
                     <a href="~/RGDC/logIn" class="signup-link" style="display:inline-block">Login</a>
                 </div>
@@ -139,13 +151,6 @@
                     <a href="~/RGDC/signUp" class="signup-link" style="display:inline-block">Patient Sign Up</a>
                 </div>
 
-                @*Sign up BTN*@
-                <button class="logSignBtn"
-                        data-target="modalInfoForm"
-                        type="button"
-                        ng-click="signUpStaffInitial()">
-                    Sign Up
-                </button>
             </form>
         </div>
     </div>
@@ -378,6 +383,7 @@
                     <input type="text"
                            ng-model="signUp_specialization"
                            oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')"
+                           placeholder="specialization"
                            class="custom-input"
                            maxlength="50">
                 </div>
@@ -405,6 +411,23 @@
                 </div>
             </div>
 
+           <div class="row">
+               <div class="col s12">
+                   <p class="custom-label">Schedule Availability <span class="required-mark">*</span></p>
+                   <div class="datepicker-wrapper">
+                       <input id="scheduleAvialability"
+                              ng-if="signUpDentist"
+                              type="text"
+                              class="custom-input modal-trigger"
+                              data-target="modalSchedule"
+                              placeholder="set your schedule availabillity here"
+                              readonly
+                              required>
+                       <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                   </div>
+               </div>
+           </div>
+
             @*Agreementz*@
             <div class="row agreement-section center-align">
                 <label class="agreement-label">
@@ -422,21 +445,16 @@
 
     @*Submit or cancel*@
 <div class="modal-footer" style="margin-top:1.5vh">
-    <button class="modal-close cancel-btn left" style="font-weight:500; margin-right:.5vh">CANCEL</button>
 
     <button type="submit"
-            class="edit-btn right"
-            style="font-weight:500; margin-right:0.5vh"
+            class="edit-btn left"
+            style="font-weight:500;"
             ng-click="pickSignUpPhoto()">
         UPLOAD PHOTO
     </button>
-    <button type="submit"
-            class="edit-btn modal-trigger right"
-            data-target="modalSchedule"
-            ng-if="signUpDentist"
-            style="font-weight: 500; margin-right:0.5vh">
-        SET SCHEDULE
-    </button>
+
+    <button class="modal-close cancel-btn right" style="font-weight:500; margin-right:.5vh">CANCEL</button>
+
     <button type="button"
             class="edit-btn"
             ng-click="signUpClinicStaff()"
