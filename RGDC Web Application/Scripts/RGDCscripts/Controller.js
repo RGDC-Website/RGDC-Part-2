@@ -35,6 +35,7 @@
     $scope.currentUserAuthorization;
     $scope.paymentsArray = [];
     $scope.allPayments = [];
+    $scope.archivedPayments = [];
     $scope.paymentID;
     $scope.showFinanceArchived = false;
 
@@ -149,6 +150,8 @@
     $scope.strengthColor = '';
     $scope.passwordsMatch = true;
     $scope._emailLocked = false;
+    $scope.patientArrayData = [];
+    $scope.patientArrayDataDeact = [];
 
     $scope.checkPasswordStrength = function () {
         const pwd = $scope.signUp_password || '';
@@ -618,13 +621,7 @@
         });
     }
 
-    $scope.toggleFinanceArchive = function () {
-        $scope.showFinanceArchived = true;
-    };
 
-    $scope.toggleFinanceArchiveF = function () {
-        $scope.showFinanceArchived = false;
-    };
 
     $scope.deletePayRec = function (paymentID) {
         $scope.deletePayment = paymentID
@@ -670,7 +667,7 @@
         var deletePatient = RGDCWebApplicationService.deletePatient(patAcc);
         deletePatient.then(function (returnedData) {
             if (returnedData.data.success) {
-                Swal.fire({ icon: 'success', title: 'Delete Patient', text: 'Successfully deleted patient account.' }).then((result) => {
+                Swal.fire({ icon: 'success', title: 'Deactivate Patient', text: 'Successfully deactivated patient account.' }).then((result) => {
                     if (result.isConfirmed) {
 
                         window.location.href = "/RGDC/adminPatientsTab";
@@ -1488,36 +1485,38 @@
         });
     };
 
-    $scope.getPatients = function () {
-        if ($scope.userAuthorization != 3) {
-            var getPatientList = RGDCWebApplicationService.getPatientList();
-            getPatientList.then(function (patientList) {
-                $scope.patientArrayData = (patientList.data || []).map(function (patient) {
-                    return Object.assign({}, patient, {
-                        lastVisitDisplay: patient.lastVisit ? formatDateToMDY(patient.lastVisit) : "No visit yet"
+$scope.getPatients = function () {
+    if ($scope.userAuthorization != 3) {
+
+        RGDCWebApplicationService.getPatientList()
+            .then(function (patientList) {
+
+                const data = patientList.data || [];
+                $scope.patientArrayData = data
+                    .filter(p => p.isArchived == 0)
+                    .map(function (patient) {
+                        return {
+                            ...patient,
+                            lastVisitDisplay: patient.lastVisit
+                                ? formatDateToMDY(patient.lastVisit)
+                                : "No visit yet"
+                        };
                     });
-                });
 
-                $timeout(function () {
-                    try {
-                        // If we previously created an instance, try to destroy it first
-                        if (window._adminPatientsDataTableInstance && typeof window._adminPatientsDataTableInstance.destroy === 'function') {
-                            try { window._adminPatientsDataTableInstance.destroy(); } catch (e) { console.warn('destroy DataTable failed', e); }
-                        }
+                $scope.patientArrayDataDeact = data
+                    .filter(p => p.isArchived == 1)
+                    .map(function (patient) {
+                        return {
+                            ...patient,
+                            lastVisitDisplay: patient.lastVisit
+                                ? formatDateToMDY(patient.lastVisit)
+                                : "No visit yet"
+                        };
+                    });
 
-                        // Create DataTable instance after rows are rendered
-                        if (window && typeof DataTable === 'function') {
-                            window._adminPatientsDataTableInstance = new DataTable('#adminPatientsTabTable');
-                        } else {
-                            console.warn('DataTable constructor not found.');
-                        }
-                    } catch (e) {
-                        console.error('Failed to init admin patients DataTable:', e);
-                    }
-                }, 0);
             });
-        }
     }
+};
 
     $scope.getDentists = function () {
         // Always load dentist list for appointment selection (patients need it too)
@@ -1863,6 +1862,7 @@
             .then(function (paymentList) {
 
                 let data = paymentList.data || [];
+                console.log(data)
 
                 data.forEach(function (payment) {
                     if (payment.paymentDate) {
@@ -1878,8 +1878,20 @@
                 });
 
                 $scope.paymentsArray = $scope.unarchivedPayments;
-
+                console.log($scope.paymentsArray);
+                console.log($scope.archivedPayments)
             });
+
+    };
+
+    $scope.toggleFinanceArchive = function () {
+        $scope.showFinanceArchived = true;
+        console.log($scope.paymentsArray);
+    };
+
+    $scope.toggleFinanceArchiveF = function () {
+        $scope.showFinanceArchived = false;
+        console.log($scope.archivedPayments)
     };
    
     function initializeDatepicker() {
@@ -1945,6 +1957,7 @@
         return age;
     }
 
+    //Formats Date String from Database to "Month Day, Year" format
     function formatDateToMDY(dateString) {
         const match = String(dateString).match(/\d+/);
         if (!match) return dateString;
@@ -2705,7 +2718,6 @@
         window.location.href = "/RGDC/patientProfile"
     }
 
-    app.controller('YourController', function ($scope, $sce) {
 
         $scope.getPostOpContent = function () {
             return $sce.trustAsHtml(
@@ -2713,7 +2725,6 @@
             );
         };
 
-    });
 
     $scope.fillMedicalHistoryForm = function (medHistString) {
         var medHistObj = {};
@@ -5876,6 +5887,13 @@
                 });
         }, 350);
     };
+    $scope.showActivePatients = true;
+    $scope.toggleShowActivePatients = function () {
+        $scope.showActivePatients = true;
+    }
+    $scope.toggleShowActivePatientsF = function () {
+        $scope.showActivePatients = false;
+    }
 
     $scope.checkAddOwnerContact = function () {
         const pattern = /^09\d{9}$/;

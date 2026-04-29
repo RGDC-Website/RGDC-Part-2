@@ -985,6 +985,7 @@ RGDC Dental Clinic Team";
                         accID = p.accID,
                         patientName = a.firstName + " " + a.lastName,
                         lastVisit = p.lastVisit,
+                        isArchived = a.isArchived,
 
                         // count upcoming/pending appointments for this patient
                         appointmentsScheduled = db.tbl_appointment.Count(ap => ap.patientID == p.patientID && (ap.status == "Requested" || ap.status == "Scheduled"))
@@ -1291,6 +1292,7 @@ RGDC Dental Clinic Team";
                         medHist = p.medicalHistory,
                         medHistUpdate = p.medHistUpdate,
                         lastVisit = p.lastVisit,
+                        isArchived = a.isArchived
                     }
                 ).FirstOrDefault();
 
@@ -2081,7 +2083,9 @@ RGDC Dental Clinic Team";
 
 
 
-                    var resultList = baseQuery.OrderBy(x => x.paymentDate).ToList();
+                    var resultList = baseQuery
+             .OrderBy(x => x.paymentDate)
+             .ToList();
 
 
                     return Json(resultList, JsonRequestBehavior.AllowGet);
@@ -4608,23 +4612,23 @@ RGDC Dental Clinic Team";
         {
             using (var db = new RGDCContext())
             {
-                var existing = db.tbl_patient.Find(patMod.patientID);
-                if (existing == null)
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Patient not found."
-                    }, JsonRequestBehavior.AllowGet);
-                db.tbl_patient.Remove(existing);
 
                 var existingAcc = db.tbl_account.Find(patMod.accID);
-                if (existing == null)
+                if (existingAcc == null)
                     return Json(new
                     {
                         success = false,
                         message = "Patient not found."
                     }, JsonRequestBehavior.AllowGet);
-                db.tbl_account.Remove(existingAcc);
+                if (existingAcc.isArchived == 0)
+                {
+                    existingAcc.isArchived = 1;
+
+                } else if (existingAcc.isArchived == 1)
+                {
+                    existingAcc.isArchived = 0;
+
+                }
                 db.SaveChanges();
 
                 return Json(new { success = true, message = "Patient deleted successfully." },
@@ -5333,145 +5337,7 @@ RGDC Dental Clinic Team";
             }
         }
 
-        //for adding of forms
-        [HttpPost]
-        public JsonResult AddForm(tblFormModel model)
-        {
-            if (model == null)
-                return Json(new { success = false, message = "Invalid payload." }, JsonRequestBehavior.AllowGet);
-
-            if (model.patientID <= 0)
-            {
-                try
-                {
-                    if (Session["selectedPatientID"] != null)
-                        model.patientID = Convert.ToInt32(Session["selectedPatientID"]);
-                }
-                catch { }
-            }
-
-            if (model.patientID <= 0)
-                return Json(new { success = false, message = "No patient selected." }, JsonRequestBehavior.AllowGet);
-
-            if (string.IsNullOrWhiteSpace(model.formLink))
-                return Json(new { success = false, message = "No file provided." }, JsonRequestBehavior.AllowGet);
-
-            try
-            {
-                model.formCreatedAt = DateTime.Now;
-                model.formUpdatedAt = DateTime.Now;
-                try
-                {
-                    model.createdBy = Session["userID"] != null ? Convert.ToInt32(Session["userID"]) : 0;
-                }
-                catch { model.createdBy = 0; }
-
-                if (model.formatID == 0) model.formatID = 1;
-
-                using (var db = new Models.Context.RGDCContext())
-                {
-                    db.tblFormModels.Add(model);
-                    db.SaveChanges();
-                }
-
-                return Json(new { success = true, message = "Form saved.", formID = model.formID }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Server error: " + ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-
-        //displaying of forms in the table
-        [HttpGet]
-        public JsonResult GetPatientForms()
-        {
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var sessionVal = Session["SelectedPatientID"];
-                    if (sessionVal == null) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-                    if (!int.TryParse(sessionVal.ToString(), out int pid)) return Json(new List<object>(), JsonRequestBehavior.AllowGet);
-
-                    var result = (
-                        from f in db.tblFormModels
-                        join d in db.tbl_dentist on f.dentistID equals d.dentistID into dj
-                        from d in dj.DefaultIfEmpty()
-                        join da in db.tbl_account on (d != null ? d.accID : 0) equals da.accID into daj
-                        from da in daj.DefaultIfEmpty()
-                        where f.patientID == pid
-                        orderby f.formCreatedAt descending
-                        select new
-                        {
-                            formID = f.formID,
-                            formLink = f.formLink,
-                            date = f.formCreatedAt,
-                            dentistName = da != null ? (da.firstName + " " + da.lastName) : null,
-                            createdBy = f.createdBy,
-                            formatID = f.formatID
-                        }
-                    ).ToList();
-
-                    return Json(result, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [HttpPost]
-        public JsonResult SaveForm(tblFormModel model)
-        {
-            if (model == null || model.formID <= 0)
-                return Json(new { success = false, message = "Invalid payload." }, JsonRequestBehavior.AllowGet);
-
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var existing = db.tblFormModels.FirstOrDefault(x => x.formID == model.formID);
-                    if (existing == null)
-                        return Json(new { success = false, message = "Form not found." }, JsonRequestBehavior.AllowGet);
-
-                    existing.dentistID = model.dentistID > 0 ? model.dentistID : existing.dentistID;
-                    existing.formLink = string.IsNullOrWhiteSpace(model.formLink) ? existing.formLink : model.formLink;
-                    existing.formatID = model.formatID > 0 ? model.formatID : existing.formatID;
-                    existing.formUpdatedAt = DateTime.Now;
-                    db.SaveChanges();
-
-                    return Json(new { success = true, message = "Form updated.", formID = existing.formID }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [HttpPost]
-        public JsonResult DeleteForm(int formID)
-        {
-            if (formID <= 0) return Json(new { success = false, message = "Invalid formID" });
-            try
-            {
-                using (var db = new RGDCContext())
-                {
-                    var existing = db.tblFormModels.FirstOrDefault(f => f.formID == formID);
-                    if (existing == null) return Json(new { success = false, message = "Form not found" });
-                    db.tblFormModels.Remove(existing);
-                    db.SaveChanges();
-                    return Json(new { success = true, message = "Form deleted." });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
-        }
+    
 
         [HttpPost]
         public JsonResult SaveDentistSignature(string imagePath)

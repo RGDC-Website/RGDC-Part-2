@@ -7,12 +7,12 @@ using System.Web;
 
 namespace RGDC_Web_Application.Models.Map
 {
-    public class tblFormatMap : EntityTypeConfiguration<tblFormatModel>
+    public class tblFormMap : EntityTypeConfiguration<tblFormModel>
     {
-        public tblFormatMap()
+        public tblFormMap()
         {
-            HasKey(t => t.formatID);
-            ToTable("tbl_formformat");
+            HasKey(t => t.formID);
+            ToTable("tbl_form");
         }
     }
 }

@@ -18,38 +18,81 @@
     <div class="row m-0 ">
         <a class="edit-btn modal-trigger left white-text"
            style="margin-bottom:1.8vh"
-           data-target="patientInformationFormAdd"
-           ng-show="isUserSAdmin">
-            <i class="material-icons left">group_add</i>ADD PATIENT
+           ng-show="!showActivePatients"
+           ng-click="toggleShowActivePatients()">
+            <i class="material-icons left">group_add</i>SHOW ACTIVE
+        </a>
+    </div>
+    <div class="row m-0 ">
+        <a class="edit-btn modal-trigger left white-text"
+           style="margin-bottom:1.8vh"
+           ng-show="showActivePatients"
+           ng-click="toggleShowActivePatientsF()">
+            <i class="material-icons left">group_add</i>SHOW INACTIVE
         </a>
     </div>
 
-    @*patients*@
-    <table id="adminPatientsTabTable" class="hover tableClk" ng-init="getPatients()">
-        <thead>
-            <tr class="brown-text lighten-1">
-                <th>Patient Name</th>
-                <th>Last Visit</th>
-                <th>Appointments Scheduled</th>
 
-            </tr>
-        </thead>
-        @*table content*@
-        <tbody>
-            <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArrayData" ng-click="goToPatientInfo(patient)">
-                <td>{{patient.patientName}}</td>
-                <td>{{patient.lastVisitDisplay}}</td>
-                <td>{{patient.appointmentsScheduled || '0'}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr class="brown-text lighten-1">
-                <th>Patient Name</th>
-                <th>Last Visit</th>
-                <th>Appointments Scheduled</th>
-            </tr>
-        </tfoot>
-    </table>
+    @*patients*@
+    <div  ng-show="showActivePatients">
+        <table id="adminPatientsTabTable" class="hover tableClk" ng-init="getPatients()">
+            <thead>
+                <tr class="brown-text lighten-1">
+                    <th>Patient Name</th>
+                    <th>Last Visit</th>
+                    <th>Appointments Scheduled</th>
+
+                </tr>
+            </thead>
+            @*table content*@
+            <tbody>
+                <tr data-href="#" title="View patient record"
+                    class="clkPointer"
+                    table-id="adminPatientsTabTable"
+                    ng-repeat="patient in patientArrayData"
+                    ng-click="goToPatientInfo(patient)"
+                    on-finish-render>
+                    <td>{{patient.patientName}}</td>
+                    <td>{{patient.lastVisitDisplay}}</td>
+                    <td>{{patient.appointmentsScheduled || '0'}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="brown-text lighten-1">
+                    <th>Patient Name</th>
+                    <th>Last Visit</th>
+                    <th>Appointments Scheduled</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div  ng-show="!showActivePatients">
+        <table id="adminPatientsTabTableDeact" class="hover tableClk"">
+            <thead>
+                <tr class="brown-text lighten-1">
+                    <th>Patient Name</th>
+                    <th>Last Visit</th>
+                    <th>Appointments Scheduled</th>
+
+                </tr>
+            </thead>
+            @*table content*@
+            <tbody>
+                <tr data-href="#" title="View patient record" class="clkPointer" ng-repeat="patient in patientArrayDataDeact" ng-click="goToPatientInfo(patient)" on-finish-render table-id="adminPatientsTabTableDeact">
+                    <td>{{patient.patientName}}</td>
+                    <td>{{patient.lastVisitDisplay}}</td>
+                    <td>{{patient.appointmentsScheduled || '0'}} Appointment{{patient.appointmentsScheduled == 1 ? '' : 's'}} Scheduled</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr class="brown-text lighten-1">
+                    <th>Patient Name</th>
+                    <th>Last Visit</th>
+                    <th>Appointments Scheduled</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
 </div>
 
