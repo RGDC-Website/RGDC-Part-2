@@ -60,7 +60,7 @@
 
                         @*last and next visit*@
                         <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
-                        <button class="edit-btn right modal-trigger" ng-show="isUserAdmin && !isUserStaff" data-target="modalDeletePatient">{{selectedPatient.isArchived == 0 ? "DEACTIVATE" : "ACTIVATE"}}</button>
+                        <button class="btn brown lighten-1 white-text right modal-trigger" ng-show="isUserAdmin && !isUserStaff" data-target="modalDeletePatient">{{selectedPatient.isArchived == 0 ? "DEACTIVATE" : "ACTIVATE"}}</button>
                     </div>
                 </div>
             </div>
@@ -137,367 +137,369 @@
         </div>
 
         @*right column------------------------------------------------------------------------------------------------------------------------------------*@
-    <div class="patient-tabs-container">
-        <div class="col m8 l8 p-0 patient-right" style="padding-right: 0">
-            <div class="card grey lighten-2">
-                <nav class="nav-extended grey lighten-2 z-depth-0">
-                    <div class="nav-content p-1">
-                        <ul class="tabs tabs-transparent center-tabs">
-                            <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
-                            <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
-                            <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
-                            @*<li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>*@
-                            <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
-                        </ul>
-                    </div>
-                </nav>
-                <div class="card-content">
+        <div class="patient-tabs-container">
+            <div class="col m8 l8 p-0 patient-right" style="padding-right: 0">
+                <div class="card grey lighten-2">
+                    <nav class="nav-extended grey lighten-2 z-depth-0">
+                        <div class="nav-content p-1">
+                            <ul class="tabs tabs-transparent center-tabs">
+                                <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
+                                <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
+                                <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
+                                <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
+                                <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <div class="card-content">
 
-                    @*medical history*@
-                    <div id="med" class="containerOverflow-2 row m-0">
-                        <div class="medhis-container" style="padding:0 2vh 0 2vh">
-                            <div class="form-header">
-                                @*previous physician info*@
-                                <div class="physician-info">
-                                    <p class="medInfo">
-                                        Name of previous physician:
-                                        <span style="font-weight:bold"> {{selectedPatient.prevPhy || '---'}}</span>
-                                    </p>
-                                    <p>
-                                        Physician's Office:
-                                        <span style="font-weight:bold"> {{selectedPatient.prevPhyOffice || '---'}}</span>
-                                    </p>
-                                    <p>
-                                        Physician's Contacts:
-                                        <span style="font-weight:bold"> {{selectedPatient.prevPhyContact || '---'}}</span>
-                                    </p>
-                                </div>
-                                @*update button and last updated*@
-                                <div class="col">
-                                    <div class="row">
-                                        <button class="update-btn right modal-trigger" ng-show="!isUserPatient" data-target="modalMedHis">UPDATE</button>
+                        @*medical history*@
+                        <div id="med" class="containerOverflow-2 row m-0">
+                            <div class="medhis-container" style="padding:0 2vh 0 2vh">
+                                <div class="form-header">
+                                    @*previous physician info*@
+                                    <div class="physician-info">
+                                        <p class="medInfo">
+                                            Name of previous physician:
+                                            <span style="font-weight:bold"> {{selectedPatient.prevPhy || '---'}}</span>
+                                        </p>
+                                        <p>
+                                            Physician's Office:
+                                            <span style="font-weight:bold"> {{selectedPatient.prevPhyOffice || '---'}}</span>
+                                        </p>
+                                        <p>
+                                            Physician's Contacts:
+                                            <span style="font-weight:bold"> {{selectedPatient.prevPhyContact || '---'}}</span>
+                                        </p>
                                     </div>
-                                    <div class="row" style="margin-top:-15px">
-                                        <p class="last-update">Last Update: {{selectedPatient.medHistUpdate || '...'}}</p>
+                                    @*update button and last updated*@
+                                    <div class="col">
+                                        <div class="row">
+                                            <button class="btn brown lighten-1 white-text right modal-trigger" ng-show="!isUserPatient" data-target="modalMedHis">UPDATE</button>
+                                        </div>
+                                        <div class="row" style="margin-top:-15px">
+                                            <p class="last-update">Last Update: {{selectedPatient.medHistUpdate || '...'}}</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <hr class="form-divider" style="margin-bottom:10px;">
+
+                                @*medical history*@
+                                <ol class="medical-questions">
+                                    <li>
+                                        Are you in good health?*
+                                        <span class="placeholder-text">{{medical.history.goodHealth }}</span>
+                                    </li>
+                                    <li>
+                                        Are you under medical treatment now?*
+                                        <span class="placeholder-text">{{medical.history.underTreatment }}</span>
+                                    </li>
+                                    <li>
+                                        Have you ever had a serious illness or surgical operation?*
+                                        <span class="placeholder-text">{{medical.history.seriousIllness }}</span>
+                                    </li>
+                                    <li>
+                                        Have you ever been hospitalized?*
+                                        <span class="placeholder-text">{{medical.history.hospitalized }}</span>
+                                    </li>
+                                    <li>
+                                        Are you taking prescription/non-prescription medication?*
+                                        <span class="placeholder-text">{{medical.history.prescription }}</span>
+                                    </li>
+                                    <li>
+                                        Are you taking tobacco products?
+                                        <span class="placeholder-text">{{medical.history.tobacco }}</span>
+                                    </li>
+                                    <li>
+                                        Do you use alcohol, cocaine, or other dangerous drugs?*
+                                        <span class="placeholder-text">{{medical.history.drugs }}</span>
+                                    </li>
+                                    <li>
+                                        Allergies:*
+                                        <span class="placeholder-text">{{medical.history.allergies || '---'}}</span>
+                                    </li>
+                                    <li>
+                                        Bleeding Time:*
+                                        <span class="placeholder-text">{{medical.history.bleedingTime || '---'}}</span>
+                                    </li>
+
+                                    <li ng-show="selectedPatient.genderID == 1">
+                                        For women only:
+                                        <div class="women-only-options view-only">
+                                            <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
+                                            <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
+                                            <label><input type="checkbox" ng-model="medical.history.pills" class="filled-in" /><span>Are you taking birth control pills?</span></label>
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        Blood type:*
+                                        <span class="placeholder-text">{{medical.history.bloodType || '---'}}</span>
+                                    </li>
+                                    <li>
+                                        Blood pressure:*
+                                        <span class="placeholder-text">{{medical.history.bloodPressure || '---'}}</span>
+                                    </li>
+                                    <li>Do you have or have had any of the following?*</li>
+                                </ol>
+
+                                <div class="checkbox-grid view-only">
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.highBloodPressure" /><span>High Blood Pressure</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.lowBloodPressure" /><span>Low Blood Pressure</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.epilepsy" /><span>Epilepsy / Convulsions</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hiv" /><span>AIDS or HIV Infection</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.std" /><span>Sexually Transmitted Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stomachUlcer" /><span>Stomach Troubles / Ulcer</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.faintingSeizure" /><span>Fainting Seizure</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rapidWeightLoss" /><span>Rapid Weight Loss</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.radiationTherapy" /><span>Radiation Therapy</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.jointReplacement" /><span>Joint Replacement / Implant</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartSurgery" /><span>Heart Surgery</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartAttack" /><span>Heart Attack</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.thyroidProblem" /><span>Thyroid Problem</span></label>
+
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartDisease" /><span>Heart Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartMurmur" /><span>Heart Murmur</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.liverDisease" /><span>Hepatitis / Liver Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rheumaticFever" /><span>Rheumatic Fever</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.allergies" /><span>Hay Fever / Allergies</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.respiratoryProblems" /><span>Respiratory Problems</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hepatitisJaundice" /><span>Hepatitis / Jaundice</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.tuberculosis" /><span>Tuberculosis</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.swollenAnkles" /><span>Swollen Ankles</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.kidneyDisease" /><span>Kidney Disease</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.diabetes" /><span>Diabetes</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.chestPain" /><span>Chest Pain</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stroke" /><span>Stroke</span></label>
+
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.cancer" /><span>Cancer / Tumors</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.anemia" /><span>Anemia</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.angina" /><span>Angina</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.asthma" /><span>Asthma</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.emphysema" /><span>Emphysema</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bleedingProblems" /><span>Bleeding Problems</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bloodDiseases" /><span>Blood Diseases</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.headInjuries" /><span>Head Injuries</span></label>
+                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.arthritis" /><span>Arthritis / Rheumatism</span></label>
+
+                                    <div class="other-section">
+                                        <label>
+                                            <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
+                                            <span>Other/s:</span>
+                                        </label>
+                                        <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
                                     </div>
                                 </div>
 
-                            </div>
-                            <hr class="form-divider" style="margin-bottom:10px;">
-
-                            @*medical history*@
-                            <ol class="medical-questions">
-                                <li>
-                                    Are you in good health?*
-                                    <span class="placeholder-text">{{medical.history.goodHealth }}</span>
-                                </li>
-                                <li>
-                                    Are you under medical treatment now?*
-                                    <span class="placeholder-text">{{medical.history.underTreatment }}</span>
-                                </li>
-                                <li>
-                                    Have you ever had a serious illness or surgical operation?*
-                                    <span class="placeholder-text">{{medical.history.seriousIllness }}</span>
-                                </li>
-                                <li>
-                                    Have you ever been hospitalized?*
-                                    <span class="placeholder-text">{{medical.history.hospitalized }}</span>
-                                </li>
-                                <li>
-                                    Are you taking prescription/non-prescription medication?*
-                                    <span class="placeholder-text">{{medical.history.prescription }}</span>
-                                </li>
-                                <li>
-                                    Are you taking tobacco products?
-                                    <span class="placeholder-text">{{medical.history.tobacco }}</span>
-                                </li>
-                                <li>
-                                    Do you use alcohol, cocaine, or other dangerous drugs?*
-                                    <span class="placeholder-text">{{medical.history.drugs }}</span>
-                                </li>
-                                <li>
-                                    Allergies:*
-                                    <span class="placeholder-text">{{medical.history.allergies || '---'}}</span>
-                                </li>
-                                <li>
-                                    Bleeding Time:*
-                                    <span class="placeholder-text">{{medical.history.bleedingTime || '---'}}</span>
-                                </li>
-
-                                <li ng-show="selectedPatient.genderID == 1">
-                                    For women only:
-                                    <div class="women-only-options view-only">
-                                        <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
-                                        <label><input type="checkbox" ng-model="medical.history.nursing" class="filled-in" /><span>Are you nursing?</span></label>
-                                        <label><input type="checkbox" ng-model="medical.history.pills" class="filled-in" /><span>Are you taking birth control pills?</span></label>
+                                @*signature*@
+                                <div class="signature-container">
+                                    <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                                        <img ng-if="selectedPatient.signatureLink || signaturePreview" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature" style="max-width:250px; max-height:100px; object-fit:contain;" />
+                                        <i ng-if="!(selectedPatient.signatureLink || signaturePreview)" class="material-icons">image</i>
                                     </div>
-                                </li>
-
-                                <li>
-                                    Blood type:*
-                                    <span class="placeholder-text">{{medical.history.bloodType || '---'}}</span>
-                                </li>
-                                <li>
-                                    Blood pressure:*
-                                    <span class="placeholder-text">{{medical.history.bloodPressure || '---'}}</span>
-                                </li>
-                                <li>Do you have or have had any of the following?*</li>
-                            </ol>
-
-                            <div class="checkbox-grid view-only">
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.highBloodPressure" /><span>High Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.lowBloodPressure" /><span>Low Blood Pressure</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.epilepsy" /><span>Epilepsy / Convulsions</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hiv" /><span>AIDS or HIV Infection</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.std" /><span>Sexually Transmitted Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stomachUlcer" /><span>Stomach Troubles / Ulcer</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.faintingSeizure" /><span>Fainting Seizure</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rapidWeightLoss" /><span>Rapid Weight Loss</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.radiationTherapy" /><span>Radiation Therapy</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.jointReplacement" /><span>Joint Replacement / Implant</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartSurgery" /><span>Heart Surgery</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartAttack" /><span>Heart Attack</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.thyroidProblem" /><span>Thyroid Problem</span></label>
-
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartDisease" /><span>Heart Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartMurmur" /><span>Heart Murmur</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.liverDisease" /><span>Hepatitis / Liver Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rheumaticFever" /><span>Rheumatic Fever</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.allergies" /><span>Hay Fever / Allergies</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.respiratoryProblems" /><span>Respiratory Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hepatitisJaundice" /><span>Hepatitis / Jaundice</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.tuberculosis" /><span>Tuberculosis</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.swollenAnkles" /><span>Swollen Ankles</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.kidneyDisease" /><span>Kidney Disease</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.diabetes" /><span>Diabetes</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.chestPain" /><span>Chest Pain</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stroke" /><span>Stroke</span></label>
-
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.cancer" /><span>Cancer / Tumors</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.anemia" /><span>Anemia</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.angina" /><span>Angina</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.asthma" /><span>Asthma</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.emphysema" /><span>Emphysema</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bleedingProblems" /><span>Bleeding Problems</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bloodDiseases" /><span>Blood Diseases</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.headInjuries" /><span>Head Injuries</span></label>
-                                <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.arthritis" /><span>Arthritis / Rheumatism</span></label>
-
-                                <div class="other-section">
-                                    <label>
-                                        <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
-                                        <span>Other/s:</span>
-                                    </label>
-                                    <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
+                                    <div class="signature-line"></div>
+                                    <span class="signature-label">Signature</span>
                                 </div>
                             </div>
+                        </div>
 
-                            @*signature*@
-                            <div class="signature-container">
-                                <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
-                                    <img ng-if="selectedPatient.signatureLink || signaturePreview" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature" style="max-width:250px; max-height:100px; object-fit:contain;" />
-                                    <i ng-if="!(selectedPatient.signatureLink || signaturePreview)" class="material-icons">image</i>
-                                </div>
-                                <div class="signature-line"></div>
-                                <span class="signature-label">Signature</span>
+                        @*Progress Notes*@
+
+                        <div id="prog" class="row m-0">
+                            <div class="row">
+                                <a ng-show="isUserAdmin && !isUserStaff" class="btn right modal-trigger brown lighten-1 white-text" data-target="modalAddPayrec">ADD NOTE</a>
+                            </div>
+                            <div class="row m-0 containerOverflow-2">
+                                <table id="progressNotes" class="hover">
+                                <thead>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Procedures</th>
+                                        <th>Tooth #</th>
+                                        <th>Dentist</th>
+                                        <th>Amount</th>
+                                        <th>Paid</th>
+                                        <th colspan="2">Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="payment in paymentsArray track by payment.paymentID">
+                                        <td>{{payment.paymentDate}}</td>
+                                        <td>{{payment.procedures}}</td>
+                                        <td>{{payment.toothNumber}}</td>
+                                        <td>{{payment.dentistName}}</td>
+                                        <td>{{payment.cost}}</td>
+                                        <td>{{payment.paid}}</td>
+                                        <td>{{payment.balance}}</td>
+                                        <td>
+                                            <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
+                                                <i class="material-icons brown-text lighten-1">visibility</i>
+                                            </a>
+                                            <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
+                                                <i class="material-icons brown-text lighten-1">delete</i>
+                                            </a>
+                                            <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Procedures</th>
+                                        <th>Tooth #</th>
+                                        <th>Dentist</th>
+                                        <th>Amount</th>
+                                        <th>Paid</th>
+                                        <th>Balance</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                             </div>
                         </div>
-                    </div>
 
-                    @*Progress Notes*@
-                    <div id="prog" class="row m-0 containerOverflow-2">
+                        @*Dental Chart*@
+                        <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
 
-                        <div class="row">
-                            <a ng-show="isUserAdmin && !isUserStaff" class="update-btn right modal-trigger" data-target="modalAddPayrec">ADD NOTE</a>
+                            <div class="row">
+                                <a ng-show="isUserAdmin" class="btn brown lighten-1 right modal-trigger white-text" data-target="modalDentalChart">UPLOAD CHART</a>
+                            </div>
+
+                            <table id="patientDentalChartTable" class="hover tableClk">
+                                <thead>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                @*table content*@
+                                <tbody>
+                                    <tr ng-if="!patientImages || patientImages.length === 0">
+                                        <td colspan="3" class="center-align">No image uploaded yet.</td>
+                                    </tr>
+                                    <tr ng-repeat="img in patientImages track by img.patientImageID">
+                                        <td>{{img.createdAt | date:'MM/dd/yyyy'}}</td>
+                                        <td>{{img.imageType}}</td>
+                                        <td>
+                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
+                                               data-target="modalDentalChart"
+                                               data-position="bottom"
+                                               data-tooltip="View"
+                                               style="margin-right: 0.5rem !important"
+                                               ng-click="viewPatientImage(img)">
+                                                <i class="material-icons brown-text lighten-1">visibility</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+
+
+                            @*change into modal
+                                    <div class="row m-0 center">
+                                    <img id="dentalChartMain"
+                                         ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
+                                         alt="Dental Chart"
+                                         class="materialboxed responsive-img" />
+                                </div>*@
+
                         </div>
 
-                        <table id="progressNotes" class="hover">
-                            <thead>
-                                <tr class="brown-text lighten-1">
-                                    <th>Date</th>
-                                    <th>Procedures</th>
-                                    <th>Tooth #</th>
-                                    <th>Dentist</th>
-                                    <th>Amount</th>
-                                    <th>Paid</th>
-                                    <th colspan="2">Balance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr ng-repeat="payment in paymentsArray track by payment.paymentID">
-                                    <td>{{payment.paymentDate}}</td>
-                                    <td>{{payment.procedures}}</td>
-                                    <td>{{payment.toothNumber}}</td>
-                                    <td>{{payment.dentistName}}</td>
-                                    <td>{{payment.cost}}</td>
-                                    <td>{{payment.paid}}</td>
-                                    <td>{{payment.balance}}</td>
-                                    <td>
-                                        <a ng-show="isUserPatient" ng-click="viewPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalViewPayrec" data-position="bottom" data-tooltip="View Payment Record" style="margin-right: 0.5rem !important">
-                                            <i class="material-icons brown-text lighten-1">visibility</i>
-                                        </a>
-                                        <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
-                                            <i class="material-icons brown-text lighten-1">delete</i>
-                                        </a>
-                                        <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr class="brown-text lighten-1">
-                                    <th>Date</th>
-                                    <th>Procedures</th>
-                                    <th>Tooth #</th>
-                                    <th>Dentist</th>
-                                    <th>Amount</th>
-                                    <th>Paid</th>
-                                    <th>Balance</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                        @*Forms*@
+                        <div id="forms" class="row m-0">
+                            <div class="row">
+                                <a ng-show="isUserAdmin && !isUserStaff" class="btn brown lighten-1 white-text right modal-trigger" data-target="modalAddForm">ADD FORM</a>
+                            </div>
 
-                    @*Dental Chart*@
-                    <div id="dent" class="row m-0 containerOverflow-2" style="padding:5px 20px 0 0;">
-
-                        <div class="row">
-                            <a ng-show="isUserAdmin" class="update-btn right modal-trigger white-text" data-target="modalDentalChart">UPLOAD CHART</a>
+                            @*di pa toh nakainitiate*@
+                            <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
+                                @*table headers*@
+                                <thead>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Form</th>
+                                        <th colspan="2">Dentist</th>
+                                    </tr>
+                                </thead>
+                                @*table content*@
+                                <tbody>
+                                    <tr ng-repeat="f in patientForms track by f.formID">
+                                        <td>{{f.date}}</td>
+                                        <td>
+                                            <a ng-href="{{f.formLink}}" target="_blank" rel="noopener">View Form</a>
+                                        </td>
+                                        <td>{{f.dentistName || '---'}}</td>
+                                        <td>
+                                            <a ng-show="isUserAdmin && !isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger"
+                                               ng-click="selectDeleteForm && selectDeleteForm(f.formID)" data-target="modalDeleteForm" data-position="bottom" data-tooltip="Delete Form">
+                                                <i class="material-icons brown-text lighten-1">delete</i>
+                                            </a>
+                                            <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
+                                               ng-click="selectEditForm && selectEditForm(f.formID)" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important">
+                                                <i class="material-icons brown-text lighten-1">edit</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                @*table footer*@
+                                <tfoot>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Form</th>
+                                        <th>Dentist</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
+                        @*post op*@
+                        <div id="postOp" class="row m-0 ">
 
-                        <table id="patientDentalChartTable" class="hover tableClk">
-                            <thead>
-                                <tr class="brown-text lighten-1">
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            @*table content*@
-                            <tbody>
-                                <tr ng-if="!patientImages || patientImages.length === 0">
-                                    <td colspan="3" class="center-align">No image uploaded yet.</td>
-                                </tr>
-                                <tr ng-repeat="img in patientImages track by img.patientImageID">
-                                    <td>{{img.createdAt | date:'MM/dd/yyyy'}}</td>
-                                    <td>{{img.imageType}}</td>
-                                    <td>
-                                        <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
-                                           data-target="modalDentalChart"
-                                           data-position="bottom"
-                                           data-tooltip="View"
-                                           style="margin-right: 0.5rem !important"
-                                           ng-click="viewPatientImage(img)">
-                                            <i class="material-icons brown-text lighten-1">visibility</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr class="brown-text lighten-1">
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-
-
-                        @*change into modal
-                                <div class="row m-0 center">
-                                <img id="dentalChartMain"
-                                     ng-src="{{selectedPatient.dentalChartLink || 'https://placehold.co/2550x3300'}}"
-                                     alt="Dental Chart"
-                                     class="materialboxed responsive-img" />
-                            </div>*@
-
-                    </div>
-
-                    @*Forms*@
-                    <!--<div id="forms" class="row m-0">
-                        <div class="row">
-                            <a ng-show="isUserAdmin && !isUserStaff" class="edit-btn right modal-trigger" data-target="modalAddForm">ADD FORM</a>
-                        </div>
-
-                        <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">-->
-                    @*table headers*@
-                    <!--<thead>
-                        <tr class="brown-text lighten-1">
-                            <th>Date</th>
-                            <th>Form</th>
-                            <th colspan="2">Dentist</th>
-                        </tr>
-                    </thead>-->
-                    @*table content*@
-                    <!--<tbody>
-                        <tr ng-repeat="f in patientForms track by f.formID">
-                            <td>{{f.date}}</td>
-                            <td>
-                                <a ng-href="{{f.formLink}}" target="_blank" rel="noopener">View Form</a>
-                            </td>
-                            <td>{{f.dentistName || '---'}}</td>
-                            <td>
-                                <a ng-show="isUserAdmin && !isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger"
-                                   ng-click="selectDeleteForm && selectDeleteForm(f.formID)" data-target="modalDeleteForm" data-position="bottom" data-tooltip="Delete Form">
-                                    <i class="material-icons brown-text lighten-1">delete</i>
-                                </a>
-                                <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
-                                   ng-click="selectEditForm && selectEditForm(f.formID)" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important">
+                            <div class="row">
+                                <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
+                                    <div class="card-content brown-text lighten-1">
+                                        @*post op title*@
+                                        <span class="card-title bold">Post OP</span>
+                                        <div class="divider"></div>
+                                        @*post op content*@
+                                        <div ng-bind-html="getPostOpContent()"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*edit and delete buttons*@
+                            <div class="row m-0 left">
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped modal-trigger"
+                                   data-target="modalEditPostOp"
+                                   data-position="bottom"
+                                   data-tooltip="Edit Post Op"
+                                   ng-show="isUserAdmin"
+                                   style="margin-right: 0.5rem !important">
                                     <i class="material-icons brown-text lighten-1">edit</i>
                                 </a>
-                            </td>
-                        </tr>
-                    </tbody>-->
-                    @*table footer*@
-                    <!--<tfoot>
-                                <tr class="brown-text lighten-1">
-                                    <th>Date</th>
-                                    <th>Form</th>
-                                    <th>Dentist</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>-->
-                    @*post op*@
-                    <div id="postOp" class="row m-0 ">
 
-                        <div class="row">
-                            <div class="card white z-depth-0" style="max-height: 47rem; overflow-y: auto">
-                                <div class="card-content brown-text lighten-1">
-                                    @*post op title*@
-                                    <span class="card-title bold">Post OP</span>
-                                    <div class="divider"></div>
-                                    @*post op content*@
-                                    <div ng-bind-html="getPostOpContent()"></div>
-                                </div>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger"
+                                   data-target="modalDeletePostOp"
+                                   data-position="bottom"
+                                   ng-show="isUserAdmin"
+                                   data-tooltip="Remove Post Op">
+                                    <i class="material-icons brown-text lighten-1">close</i>
+                                </a>
                             </div>
-                        </div>
-                        @*edit and delete buttons*@
-                        <div class="row m-0 left">
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped modal-trigger"
-                               data-target="modalEditPostOp"
-                               data-position="bottom"
-                               data-tooltip="Edit Post Op"
-                               ng-show="isUserAdmin"
-                               style="margin-right: 0.5rem !important">
-                                <i class="material-icons brown-text lighten-1">edit</i>
-                            </a>
-
-                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped redBtn modal-trigger"
-                               data-target="modalDeletePostOp"
-                               data-position="bottom"
-                               ng-show="isUserAdmin"
-                               data-tooltip="Delete Post Op">
-                                <i class="material-icons brown-text lighten-1">delete</i>
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    
+
+
     </div>
 </div>
 
@@ -1359,10 +1361,10 @@
 
 
 
-@*ADD Payment Record*@
-<div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()">
+@*ADD progress note*@
+<div id="modalAddPayrec" class="modal payrec-modal" ng-init="getPatientsNDentist()" style="overflow-y:auto !important; max-height:90%;">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:1.5vh;">Add New Payment Record</h5>
+        <h5 class="modal-form-title" style="margin-bottom:1.5vh;">Add Progress Note</h5>
 
         <div class="row">
             <div class="col s6">
@@ -1479,7 +1481,8 @@
                            ng-class="{'invalid-input': addSubmitted && !paymentPaid}">
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentPaid">Total amount paid is required.</span>
-            </div><div class="col s6">
+            </div>
+            <div class="col s6">
                 @*Balance*@
                 <label class="custom-label">
                     Balance
@@ -1503,6 +1506,52 @@
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentDescription"></textarea>
                 </label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <h5 class="modal-form-title" style="margin-bottom:1.5vh;">Schedule Next Appointment</h5>
+
+                <div class="m-0 row">
+
+                    <div class="col s12">
+                        @*set button; nahihide pag nakaset na*@
+                        <a class="btn white-text brown lighten-1 waves-effect waves-light modal-trigger" href="#modalAddApptProgNotes">Set Next Appointment</a>
+
+                        @*nakahide to normally, magpapakita lang pag nakapagset na ng next appt*@
+                        @*edit next appointment*@
+                        <button class="btn white-text brown lighten-1 waves-effect waves-light modal-trigger" href="#modalAddApptProgNotes">Edit Next Appointment</button>
+                        @*delete next appointment*@
+                        <button class="btn white-text brown lighten-1 waves-effect waves-light modal-trigger" href="#modalAddApptProgNotes">Delete Next Appointment</button>
+                    </div>
+                    <div class="col s12">
+                        @*next appt details; hidden pag wala pang nakaset*@
+                        <div class="row m-0">
+                            <div class="col s4 m12 l12">
+                                <span>
+                                    <span class="bold">Date:</span>
+                                    <span>Mon DD, YYYY</span>
+                                </span>
+                            </div>
+                            <div class="col s4 m12 l12">
+                                <span>
+                                    <span class="bold">Time:</span>
+                                    <span>XX:XX AM PM</span>
+                                </span>
+                            </div>
+                            <div class="col s4 m12 l12">
+                                <span>
+                                    <span class="bold">Purpose:</span>
+                                    <span>Purpose</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
             </div>
         </div>
     </div>
@@ -1558,6 +1607,8 @@
     </div>
 
 
+
+
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"
                 ng-click="addSubmitted = false">
@@ -1570,11 +1621,136 @@
     </div>
 </div>
 
+@*Add Next Appointment*@
+<div id="modalAddApptProgNotes" class="modal appt-modal">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Schedule Next Appointment</h5>
 
-@*EDIT Payment Record*@
+        <form novalidate>
+            <div class="row">
+                @*Date*@
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptDate">Date <span class="required-mark">*</span></label>
+                    <div class="datepicker-wrapper">
+                        <input id="addApptDate"
+                               type="text"
+                               class="datepicker appt-datepicker custom-input"
+                               ng-model="newApptRequest.dateTime"
+                               ng-change="updateTimeOptions()"
+                               placeholder="MM/DD/YYYY"
+                               min="{{minApptDate}}"
+                               required />
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                    </div>
+                </div>
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptTime">Time <span class="required-mark">*</span></label>
+
+                    <select id="addApptTime"
+                            class="custom-input browser-default"
+                            ng-model="newApptRequest.time"
+                            ng-options="t for t in timeOptions"
+                            required>
+                        <option value="">Select Time</option>
+
+                    </select>
+
+
+                    <span class="helper-text" style="color:#d32f2f;"
+                          ng-if="(timeOptions && timeOptions.length === 0) && newApptRequest.dentistID && newApptRequest.dateTime">
+                        Dentist is not available on the selected date. Please choose another date or dentist.
+                    </span>
+
+                    <!-- If no dentist or date selected yet, show guidance -->
+                    <span class="helper-text" style="color:#9e9e9e;"
+                          ng-if="!(newApptRequest.dentistID && newApptRequest.dateTime)">
+                        Select a dentist and date to see available time slots.
+                    </span>
+                </div>
+            </div>
+
+            <div class="row">
+                @*Dentist*@
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptDentist">Dentist <span class="required-mark">*</span></label>
+                    <div ng-if="!(currentUserAuthorization === '2' && currentUserPermission === '1')">
+                        <select id="addApptDentist"
+                                class="custom-input browser-default"
+                                ng-model="newApptRequest.dentistID"
+                                ng-options="d.dentistID as d.dentistName for d in dentistArray"
+                                ng-change="updateTimeOptions()"
+                                required>
+                            <option value="">Select Dentist</option>
+                        </select>
+                    </div>
+                    <div ng-if="(currentUserAuthorization === '2' && currentUserPermission === '1')">
+                        @*current dentist dapat*@
+                        <input type="text" class="custom-input" ng-model="currentDentist.dentistName" readonly />
+                    </div>
+                </div>
+
+                @*Patient*@
+                <div class="col s12 m6">
+                    <label class="custom-label" for="addApptPatient">Patient <span class="required-mark">*</span></label>
+
+                    <div ng-if="isUserPatient">
+                        <input id="addApptPatient"
+                               type="text"
+                               class="custom-input"
+                               ng-model="currentPatient.patientName"
+                               placeholder="Patient"
+                               readonly />
+                    </div>
+                    <div ng-if="!isUserPatient">
+                        <select id="addApptPatient"
+                                class="custom-input browser-default"
+                                ng-model="newApptRequest.patientID"
+                                ng-options="p.patientID as p.patientName for p in patientArray"
+                                ng-change="updateTimeOptions()"
+                                required>
+                            <option value="">Select Patient</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                @*Purpose*@
+                <div class="col s12">
+                    <label class="custom-label" for="addApptPurpose">Purpose <span class="required-mark">*</span></label>
+                    <input id="addApptPurpose" type="text" class="custom-input" ng-model="newApptRequest.reason" placeholder="Purpose" required />
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col s12">
+                    <label class="custom-label" for="addApptContact">Contact Number</label>
+                    <input id="addApptContact" type="text" class="custom-input" ng-model="newApptRequest.contactNumber" placeholder="09#########" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col s12">
+                    <label class="custom-label" for="addApptNotes">Notes (optional)</label>
+                    <textarea id="addApptNotes" class="materialize-textarea custom-input" ng-model="newApptRequest.notes" placeholder="Additional notes (optional)"></textarea>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight:500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" ng-click="createNewAppointmentRequest()" style="font-weight:500; margin: -.8vh 2.3vh -1.2vh 0">ADD</button>
+    </div>
+</div>
+
+
+@*EDIT Prrgress note*@
 <div id="modalEditPayrec" class="modal payrec-modal">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Payment Record</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Edit Progress Note</h5>
 
         <div class="row">
             <div class="col s6">
@@ -1673,15 +1849,6 @@
                 </label>
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
             </div>
-            <div class="col s6">
-                @*Discount*@
-                <label class="custom-label">
-                    Discount
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Discount..." ng-model="paymentInfo.discount"
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                </label>
-            </div>
         </div>
 
         <div class="row">
@@ -1716,7 +1883,6 @@
                 @*Description*@
                 <label class="custom-label">
                     Description
-                    <span class="required-mark">*</span>
                     <textarea style="flex: 1; height: 10vh; padding: 1vh; background-color:white; border:none;"
                               placeholder="Description..." ng-model="paymentInfo.description"></textarea>
                 </label>

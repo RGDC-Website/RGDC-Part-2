@@ -1084,6 +1084,15 @@
             });
         });
 
+        //pushpin
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('.toc-wrapper');
+            M.Pushpin.init(elems, {
+                top: 100,   
+                offset: 0
+            });
+        });
+
         //scrollspy
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.scrollspy');
