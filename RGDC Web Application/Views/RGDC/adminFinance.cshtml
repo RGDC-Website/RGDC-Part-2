@@ -17,12 +17,12 @@
 
     @*create new finance record button*@
     <div class="row m-0" ng-show="!isUserPatient">
-        <a class="edit-btn modal-trigger left white-text" data-target="modalAddPayrec"><i class="material-icons left">add</i>Create New Payment Record</a>
+        <a class="btn brown lighten-1 modal-trigger left white-text" data-target="modalAddPayrec" style="margin: 0 1rem 1rem 0 !important;"><i class="material-icons left">add</i>Create New Payment Record</a>
 
-        <a class="edit-btn left white-text" ng-show="!showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchive()"><i class="material-icons left">archive</i>Show Archived</a>
-        <a class="edit-btn left white-text" ng-show="showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchiveF()"><i class="material-icons left">archive</i>Show Unarchived</a>
+        <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="!showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchive()"><i class="material-icons left">archive</i>Show Archived</a>
+        <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="showFinanceArchived && !isUserPatient" ng-click="toggleFinanceArchiveF()"><i class="material-icons left">archive</i>Show Unarchived</a>
         @*admin finance table*@
-        <div class="row" style="padding: 2rem" ng-show="!showFinanceArchived">
+        <div class="row finance-table-responsive" style="padding: 2rem" ng-show="!showFinanceArchived">
             <table id="adminFinance" class="hover tableClk" ng-init="getPayments()">
                 @*table headers*@
                 <thead>
@@ -73,7 +73,7 @@
             </table>
         </div>
     </div>
-    <div class="row" style="padding: 2rem" ng-show="showFinanceArchived">
+    <div class="row finance-table-responsive" style="padding: 2rem" ng-show="showFinanceArchived">
         <table id="adminFinanceArchive" class="hover tableClk">
             @*table headers*@
             <thead>
