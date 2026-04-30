@@ -187,6 +187,10 @@
         return $http.get("/RGDC/GetAdminScheduledAppointments");
     };
 
+    this.getNextAppointmentForPatient = function (patientID) {
+        return $http.get("/RGDC/GetNextAppointmentForPatient?patientID=" + encodeURIComponent(patientID));
+    };
+
     this.updateAppointment = function (appointmentData) {
         return $http({
             method: 'POST',
@@ -650,7 +654,15 @@
         });
     };
 
-    // delete appointment (send form urlencoded so MVC binds primitive apptID)
+
+    this.createScheduledAppointment = function (appointmentData) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/CreateScheduledAppointment',
+            data: appointmentData
+        });
+    };
+
     this.deleteAppointment = function (apptID) {
         var payload = (typeof apptID === 'object') ? apptID : { apptID: apptID };
         return $http({

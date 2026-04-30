@@ -377,7 +377,7 @@
                     </div>
                 </div>
 
- \
+                \
 
             </form>
         </div>
@@ -625,7 +625,7 @@
 
                 <div class="row">
                     <div class="col s12">
-                        <button type="button"  class="btn-small edit-btn modal-trigger schedule-btn" ng-click="openDentistScheduleModal()">
+                        <button type="button" class="btn-small edit-btn schedule-btn" ng-click="openDentistScheduleModal()">
                             Edit Weekly Schedule
                         </button>
                         <span class="helper-text schedule-helper">(Update your weekly availability used for appointment slots)</span>
@@ -642,18 +642,36 @@
                     </div>
                 </div>
 
-                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                @*Signature preview (dentist only)*@
+                <div class="row">
+                    <div class="col s12">
+                        <p class="custom-label">Signature</p>
+                        <div class="signature-pad" style="margin-top: 10px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
+                            <img ng-if="accountSignaturePreview || dentist.signature"
+                                 ng-src="{{ accountSignaturePreview || dentist.signature }}"
+                                 alt="Signature Preview"
+                                 style="max-width:250px; max-height:100px; object-fit:contain;" />
+                            <i ng-if="!(accountSignaturePreview || dentist.signature)" class="material-icons">image</i>
+                        </div>
                     </div>
+                </div>
+
+                <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                </div>
             </form>
         </div>
 
         @*Footer Actions*@
         <div class="modal-footer footer-center" style="margin-top:2.5vh">
-            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
+            <div class="left" style="display:flex; gap:12px; align-items:center;">
+                <button type="button" class="edit-btn" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
+                <button type="button" class="edit-btn" style="font-weight:500;" ng-click="uploadDentistSignature()">UPLOAD SIGNATURE</button>
+            </div>
             <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editDentistSubmitted = false">CANCEL</button>
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">SAVE</button>
         </div>
+    </div>
     </div>
 
     @*Dentist weekly schedule modal (profile edit)*@
@@ -952,7 +970,7 @@
                 </div>
 
                 <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-                        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+                    <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
                 </div>
             </form>
         </div>
@@ -1088,7 +1106,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             var elems = document.querySelectorAll('.toc-wrapper');
             M.Pushpin.init(elems, {
-                top: 100,   
+                top: 100,
                 offset: 0
             });
         });
