@@ -32,6 +32,7 @@
         },
         conditions: {}
     };
+    $scope.selectedDentistProgNote;
     $scope.pendingAccounts = [];
     $scope.currentUserAuthorization;
     $scope.paymentsArray = [];
@@ -1720,14 +1721,21 @@ $scope.getPatients = function () {
                 console.log("here")
                 var getPayments = RGDCWebApplicationService.getOwnPayments();
                 getPayments.then(function (paymentList) {
-                    var data = paymentList ? paymentList.data : null;
-                    // API can return { success:false, message:"..." } when no patient is selected
-                    $scope.paymentsArray = Array.isArray(data) ? data : [];
-                    $scope.paymentsArray.forEach(function (payment) {
-                        if (payment && payment.paymentDate) {
+                    let data = paymentList.data || [];
+                    data.forEach(function (payment) {
+                        if (payment.paymentDate) {
                             payment.paymentDate = formatDateToMDY(payment.paymentDate);
                         }
                     });
+                    $scope.archivedPayments = data.filter(function (p) {
+                        return Number(p.isArchived) === 1;
+                    });
+
+                    $scope.unarchivedPayments = data.filter(function (p) {
+                        return Number(p.isArchived) === 0;
+                    });
+
+                    $scope.paymentsArray = $scope.unarchivedPayments;
 
 
                     $timeout(function () {
@@ -1840,13 +1848,21 @@ $scope.getPatients = function () {
                 });
                 var getPayments = RGDCWebApplicationService.getOwnPayments();
                 getPayments.then(function (paymentList) {
-                    $scope.paymentsArray = paymentList.data;
-                    $scope.paymentsArray.forEach(function (payment) {
-                        console.log($scope.paymentsArray)
+                    let data = paymentList.data || [];
+                    data.forEach(function (payment) {
                         if (payment.paymentDate) {
-                            payment.paymentDate = formatDateToMDY(payment.paymentDate)
+                            payment.paymentDate = formatDateToMDY(payment.paymentDate);
                         }
-                    })
+                    });
+                    $scope.archivedPayments = data.filter(function (p) {
+                        return Number(p.isArchived) === 1;
+                    });
+
+                    $scope.unarchivedPayments = data.filter(function (p) {
+                        return Number(p.isArchived) === 0;
+                    });
+
+                    $scope.paymentsArray = $scope.unarchivedPayments;
 
 
                     $timeout(function () {
@@ -1858,6 +1874,27 @@ $scope.getPatients = function () {
             }
         });
     };
+
+    $scope.getNextVisit = function () {
+        console.log("a")
+        RGDCWebApplicationService.getAdminScheduledAppointments()
+            .then(function (response) {
+
+                var data = response.data || [];
+                console.log(data)
+                if (data.length > 0) {
+                    var nextVisit = data[0];
+
+                    $scope.nextVisitFull = formatDateToMDY(nextVisit.dateTime);
+
+                } else {
+                    $scope.nextVisitTime = "";
+                }
+            })
+            .catch(function (error) {
+                console.error("Error fetching appointments:", error);
+            });
+    }
 
     $scope.getPayments = function () {
 
@@ -3998,6 +4035,78 @@ $scope.getPatients = function () {
 
     }
 
+    $scope.addProgNotes = function () {
+
+        var parts = $scope.selectedDentistProgNote.trim().split(' ');
+        var idPart = parts[parts.length - 1];
+
+        var id = parseInt(idPart);
+        $scope.selectedDentistID = isNaN(id) ? null : id;
+
+        console.log($scope.selectedPatient.patientID)
+        if ($scope.selectedPatient.patientID === null && $scope.selectedDentistID === null) {
+            Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
+            return;
+        }
+
+        if (!$scope.paymentCost || !$scope.paymentPaid) {
+            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
+            return;
+        }
+
+        if (!$scope.paymentDate) {
+            Swal.fire({ icon: "error", title: "Error", text: "Select Proper Date." });
+            return;
+        }
+
+        $scope.paymentDue = $scope.paymentCost - ($scope.paymentPaid || 0);
+
+        var paymentData = {
+            patientID: $scope.selectedPatientID,
+            dentistID: $scope.selectedDentistID,
+            paymentMethod: $scope.paymentMethod,
+            procedures: $scope.paymentProcedures,
+            toothNumber: $scope.paymentToothNumber,
+            reference: $scope.paymentReference,
+            cost: parseFloat($scope.paymentCost) || 0,
+            paymentDate: $scope.paymentDate,
+            paid: parseFloat($scope.paymentPaid) || 0,
+            balance: parseFloat($scope.paymentDue) || 0,
+            description: $scope.paymentDescription,
+            createdBy: $scope.currentUserID
+        };
+
+
+        $scope.addSubmitted = true;
+
+        if ($scope.selectedPatient === null || $scope.selectedDentist === null || !$scope.paymentDate ||
+            !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
+            $scope.paymentPaid === null) {
+            return;
+        }
+        if (parseFloat($scope.paymentDue) < 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Amount',
+                text: 'Total amount due should not go below 0.',
+                confirmButtonColor: '#795548'
+            });
+            return;
+        }
+
+        RGDCWebApplicationService.addProgNotes(paymentData).then(function (response) {
+            if (response.data.success) {
+                Swal.fire({ icon: 'success', title: 'Added', text: 'Successfully added progress notes.' }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/RGDC/patientProfile";
+                        afterUpdate();
+                    }
+                });
+            }
+        })
+
+    }
+
     $scope.editPayment = function () {
 
 
@@ -5455,6 +5564,7 @@ $scope.getPatients = function () {
             Swal.fire({ icon: 'error', title: 'No account selected', text: 'Select a patient first.' });
             return;
         }
+
 
         Swal.fire({
             title: 'Uploading...',

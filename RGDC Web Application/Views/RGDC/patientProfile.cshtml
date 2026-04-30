@@ -25,7 +25,7 @@
     @*DELETE PATIENT Record*@
     <div id="modalDeletePatient" class="modal payrec-modal" style="width:30% !important">
         <div class="modal-content">
-            <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Patient Record</h5>
+            <h5 class="modal-form-title" style="margin-bottom:15px;">{{selectedPatient.isArchived == 0 ? "Deactivate" : "Activate"}} Patient Record</h5>
 
             <p class="custom-label">Are you sure you want to {{selectedPatient.isArchived == 0 ? "deactivate" : "activate"}} this patient record?</p>
         </div>
@@ -39,7 +39,7 @@
     <div class="row content-patient-row" style="padding: 0 1rem 0 1rem;" ng-init="getSelectedPatientDetails()">
 
         @*left column*@
-        <div class="col m4 l4" style="padding-left:0">
+        <div class="col m4 l4" style="padding-left:0" >
             @*user name, img, visit*@
             <div class="card grey lighten-2">
                 <div class="card-content">
@@ -54,14 +54,16 @@
                     </div>
 
                     @*user name and role*@
-                    <div class="row center">
-                        <h5 class="bold brown-text lighten-1">{{selectedPatient.patientName}}</h5>
-                        <h6 class="bold brown-text lighten-1">ID: {{selectedPatient.patientID}}</h6>
+                <div class="row center"  ng-init="getNextVisit()">
+                    <h5 class="bold brown-text lighten-1">{{selectedPatient.patientName}}</h5>
+                    <h6 class="bold brown-text lighten-1">ID: {{selectedPatient.patientID}}</h6>
 
-                        @*last and next visit*@
-                        <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
-                        <button class="btn brown lighten-1 white-text right modal-trigger" ng-show="isUserAdmin && !isUserStaff" data-target="modalDeletePatient">{{selectedPatient.isArchived == 0 ? "DEACTIVATE" : "ACTIVATE"}}</button>
-                    </div>
+                    @*last and next visit*@
+                    <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
+                    <p class="brown-text lighten-1">Next Visit/Appt: {{nextVisitFull}}</p>
+                    <button class="btn brown lighten-1 white-text right modal-trigger" ng-show="isUserAdmin && !isUserStaff" data-target="modalDeletePatient">{{selectedPatient.isArchived == 0 ? "DEACTIVATE" : "ACTIVATE"}}</button>
+                    <button class="edit-btn right modal-trigger" ng-show="isUserPatient" data-target="modalEditPatientInfo">EDIT</button>
+                </div>
                 </div>
             </div>
             @*user info*@
@@ -146,7 +148,7 @@
                                 <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
                                 <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
                                 <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
-                                <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
+                                @*<li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>*@
                                 <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
                             </ul>
                         </div>
@@ -337,7 +339,7 @@
                                                 <i class="material-icons brown-text lighten-1">visibility</i>
                                             </a>
                                             <a ng-show="!isUserPatient" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeletePayrec" data-position="bottom" data-tooltip="Delete Payment Record" ng-click="deletePayRec(payment.paymentID)" style="margin-right: 0.5rem !important">
-                                                <i class="material-icons brown-text lighten-1">delete</i>
+                                                <i class="material-icons brown-text lighten-1">archive</i>
                                             </a>
                                             <a ng-show="!isUserPatient" ng-click="editPayRec(payment.paymentID)" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger" data-target="modalEditPayrec" data-position="bottom" data-tooltip="Edit Payment Record" style="margin-right: 0.5rem !important"><i class="material-icons brown-text lighten-1">edit</i></a>
                                         </td>
@@ -414,23 +416,23 @@
                         </div>
 
                         @*Forms*@
-                        <div id="forms" class="row m-0">
+                        <!--<div id="forms" class="row m-0">
                             <div class="row">
                                 <a ng-show="isUserAdmin && !isUserStaff" class="btn brown lighten-1 white-text right modal-trigger" data-target="modalAddForm">ADD FORM</a>
-                            </div>
+                            </div>-->
 
                             @*di pa toh nakainitiate*@
-                            <table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">
+                            <!--<table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">-->
                                 @*table headers*@
-                                <thead>
+                                <!--<thead>
                                     <tr class="brown-text lighten-1">
                                         <th>Date</th>
                                         <th>Form</th>
                                         <th colspan="2">Dentist</th>
                                     </tr>
-                                </thead>
+                                </thead>-->
                                 @*table content*@
-                                <tbody>
+                                <!--<tbody>
                                     <tr ng-repeat="f in patientForms track by f.formID">
                                         <td>{{f.date}}</td>
                                         <td>
@@ -448,9 +450,9 @@
                                             </a>
                                         </td>
                                     </tr>
-                                </tbody>
+                                </tbody>-->
                                 @*table footer*@
-                                <tfoot>
+                                <!--<tfoot>
                                     <tr class="brown-text lighten-1">
                                         <th>Date</th>
                                         <th>Form</th>
@@ -459,7 +461,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                        </div>
+                        </div>-->
                         @*post op*@
                         <div id="postOp" class="row m-0 ">
 
@@ -1370,11 +1372,9 @@
             <div class="col s6">
                 @*Patient*@
                 <label class="custom-label">Patient <span class="required-mark">*</span></label>
-                <select class="custom-input browser-default" ng-model="selectedPatient"
-                        ng-class="{'invalid-input': addSubmitted && !selectedPatient}">
-                    <option value="" disabled selected>Select patient...</option>
-                    <option ng-repeat="patient in patientArray" value="{{patient.patientID}}">{{patient.patientName}}</option>
-                </select>
+                <input type="text" class="custom-input browser-default" value="{{selectedPatient.patientName}}" disabled
+                       ng-class="" />
+
                 <span class="validation-msg" ng-show="addSubmitted && !selectedPatient">Patient is required.</span>
             </div>
 
@@ -1394,7 +1394,7 @@
             <div class="col s6">
                 @*Dentist*@
                 <label class="custom-label">Dentist <span class="required-mark">*</span></label>
-                <select class="custom-input browser-default" ng-model="selectedDentist"
+                <select class="custom-input browser-default" ng-model="selectedDentistProgNote"
                         ng-class="{'invalid-input': addSubmitted && !selectedDentist}">
                     <option value="" disabled selected>Select dentist...</option>
                     <option ng-repeat="dentist in dentistArray" value="{{dentist.dentistID}}">{{dentist.dentistName}}</option>
@@ -1461,20 +1461,9 @@
                 <span class="validation-msg" ng-show="addSubmitted && !paymentCost">Cost is required.</span>
             </div>
             <div class="col s6">
-                @*Discount*@
-                <label class="custom-label">
-                    Discount
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" ng-model="paymentDiscount" placeholder="Discount..."
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
-                </label>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col s6">
                 @*Paid*@
                 <label class="custom-label">
-                    Total Amount Paid
+                    Paid
                     <span class="required-mark">*</span>
                     <input type="text" class="custom-input" ng-model="paymentPaid" placeholder="Total amount paid..."
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
@@ -1482,6 +1471,10 @@
                 </label>
                 <span class="validation-msg" ng-show="addSubmitted && !paymentPaid">Total amount paid is required.</span>
             </div>
+
+        </div>
+        <div class="row">
+           
             <div class="col s6">
                 @*Balance*@
                 <label class="custom-label">
@@ -1555,67 +1548,13 @@
             </div>
         </div>
     </div>
-    <h5 class="modal-form-title" style="margin-bottom:15px;">Set Next Appointment</h5>
-    <div class="row">
-        @*Date*@
-        <div class="col s12 m6">
-            <label class="custom-label" for="addApptDate">Date <span class="required-mark">*</span></label>
-            <div class="datepicker-wrapper">
-                <input id="addApptDate"
-                       type="text"
-                       class="datepicker appt-datepicker custom-input"
-                       ng-model="newApptRequest.dateTime"
-                       ng-change="updateTimeOptions()"
-                       placeholder="MM/DD/YYYY"
-                       min="{{minApptDate}}"
-                       required />
-                <i class="material-icons datepicker-icon datepicker-trigger">event</i>
-            </div>
-        </div>
-        <div class="col s12 m6">
-            <label class="custom-label" for="addApptTime">Time <span class="required-mark">*</span></label>
-
-            <select id="addApptTime"
-                    class="custom-input browser-default"
-                    ng-model="newApptRequest.time"
-                    ng-options="t for t in timeOptions"
-                    required>
-                <option value="">Select Time</option>
-
-            </select>
-
-
-            <span class="helper-text" style="color:#d32f2f;"
-                  ng-if="(timeOptions && timeOptions.length === 0) && newApptRequest.dentistID && newApptRequest.dateTime">
-                Dentist is not available on the selected date. Please choose another date or dentist.
-            </span>
-
-            <!-- If no dentist or date selected yet, show guidance -->
-            <span class="helper-text" style="color:#9e9e9e;"
-                  ng-if="!(newApptRequest.dentistID && newApptRequest.dateTime)">
-                Select a dentist and date to see available time slots.
-            </span>
-        </div>
-    </div>
-
-    <div class="row">
-        @*Purpose*@
-        <div class="col s12">
-            <label class="custom-label" for="addApptPurpose">Purpose <span class="required-mark">*</span></label>
-            <input id="addApptPurpose" type="text" class="custom-input" ng-model="newApptRequest.reason" placeholder="Purpose" required />
-        </div>
-    </div>
-
-
-
-
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"
                 ng-click="addSubmitted = false">
             CANCEL
         </button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0"
-                ng-click="addPayment()">
+                ng-click="addProgNotes()">
             ADD
         </button>
     </div>
@@ -1850,19 +1789,19 @@
                 <span class="validation-msg" ng-show="editSubmitted && !paymentInfo.cost">Cost is required.</span>
             </div>
         </div>
-
+        <div class="col s6">
+            @*Paid*@
+            <label class="custom-label">
+                Paid
+                <span class="required-mark">*</span>
+                <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.paid"
+                       oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
+                       ng-class="{'invalid-input': editSubmitted && paymentInfo.paid  === null}">
+            </label>
+            <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paid  === null">Amount paid is required.</span>
+        </div>
         <div class="row">
-            <div class="col s6">
-                @*Paid*@
-                <label class="custom-label">
-                    Paid
-                    <span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Total amount paid..." ng-model="paymentInfo.paid"
-                           oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
-                           ng-class="{'invalid-input': editSubmitted && paymentInfo.paid  === null}">
-                </label>
-                <span class="validation-msg" ng-show="editSubmitted && paymentInfo.paid  === null">Amount paid is required.</span>
-            </div>
+
             <div class="col s6">
                 @*Total*@
                 <label class="custom-label">
@@ -2001,7 +1940,7 @@
 @*Archive Peyment Record*@
 <div id="modalDeletePayrec" class="modal payrec-modal" style="width:30% !important">
     <div class="modal-content">
-        <h5 class="modal-form-title" style="margin-bottom:15px;">Delete Payment Record</h5>
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Archive Payment Record</h5>
 
         <p class="custom-label">Are you sure you want to archive this payment record?</p>
     </div>

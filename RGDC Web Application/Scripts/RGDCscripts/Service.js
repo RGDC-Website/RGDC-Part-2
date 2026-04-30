@@ -474,11 +474,11 @@
         });
     };
 
-    this.addProgNotes = function (progressNotes) {
+    this.addProgNotes = function (paymentData) {
         return $http({
             method: "post",
             url: "/RGDC/addProgNotes",
-            data: progressNotes
+            data: paymentData
         });
     };
 

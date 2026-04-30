@@ -2181,7 +2181,8 @@ RGDC Dental Clinic Team";
                                         toothNumber = pay.toothNumber,
                                         procedures = pay.procedures,
                                         paid = pay.paid,
-                                        balance = pay.balance
+                                        balance = pay.balance,
+                                        isArchived = pay.isArchived
                                     };
 
 
@@ -3036,6 +3037,28 @@ RGDC Dental Clinic Team";
 
             return Json(new { success = true });
         }
+        public JsonResult addProgNotes(tblPaymentModel model)
+        {
+            if (model == null)
+                return Json(new { success = false, message = "Invalid data" });
+
+            var sessionVal = Session["SelectedPatientID"];
+            if (!int.TryParse(sessionVal.ToString(), out int patientID))
+                return Json(new { success = false, message = "Invalid user ID." });
+
+
+            using (var db = new RGDCContext())
+            {
+                model.patientID = patientID;
+                model.payCreatedAt = DateTime.Now;
+                model.payUpdatedAt = DateTime.Now;
+
+                db.tbl_payment.Add(model);
+                db.SaveChanges();
+            }
+
+            return Json(new { success = true });
+        }
 
         [HttpPost]
         public JsonResult getPaymentInfo(tblPaymentModel paymod)
@@ -3077,6 +3100,7 @@ RGDC Dental Clinic Team";
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
         }
+
 
         [HttpPost]
         public JsonResult AcceptAppointment(int apptID)
