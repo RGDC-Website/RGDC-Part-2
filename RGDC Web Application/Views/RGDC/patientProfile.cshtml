@@ -1506,6 +1506,57 @@
             </div>
         </div>
     </div>
+    <h5 class="modal-form-title" style="margin-bottom:15px;">Set Next Appointment</h5>
+    <div class="row">
+        @*Date*@
+        <div class="col s12 m6">
+            <label class="custom-label" for="addApptDate">Date <span class="required-mark">*</span></label>
+            <div class="datepicker-wrapper">
+                <input id="addApptDate"
+                       type="text"
+                       class="datepicker appt-datepicker custom-input"
+                       ng-model="newApptRequest.dateTime"
+                       ng-change="updateTimeOptions()"
+                       placeholder="MM/DD/YYYY"
+                       min="{{minApptDate}}"
+                       required />
+                <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <label class="custom-label" for="addApptTime">Time <span class="required-mark">*</span></label>
+
+            <select id="addApptTime"
+                    class="custom-input browser-default"
+                    ng-model="newApptRequest.time"
+                    ng-options="t for t in timeOptions"
+                    required>
+                <option value="">Select Time</option>
+
+            </select>
+
+
+            <span class="helper-text" style="color:#d32f2f;"
+                  ng-if="(timeOptions && timeOptions.length === 0) && newApptRequest.dentistID && newApptRequest.dateTime">
+                Dentist is not available on the selected date. Please choose another date or dentist.
+            </span>
+
+            <!-- If no dentist or date selected yet, show guidance -->
+            <span class="helper-text" style="color:#9e9e9e;"
+                  ng-if="!(newApptRequest.dentistID && newApptRequest.dateTime)">
+                Select a dentist and date to see available time slots.
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        @*Purpose*@
+        <div class="col s12">
+            <label class="custom-label" for="addApptPurpose">Purpose <span class="required-mark">*</span></label>
+            <input id="addApptPurpose" type="text" class="custom-input" ng-model="newApptRequest.reason" placeholder="Purpose" required />
+        </div>
+    </div>
+
 
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh"

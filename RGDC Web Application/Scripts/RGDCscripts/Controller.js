@@ -1575,7 +1575,7 @@ $scope.getPatients = function () {
         }
         var patientID = { patientID: String(pid) };
 
-        if ($scope.currentUserAuthorization != "2") {
+        if ($scope.currentUserPermission != "3") {
             RGDCWebApplicationService.goToPatient(patientID)
                 .then(function (response) {
                     if (response.data && response.data.success) {
@@ -6891,7 +6891,9 @@ $scope.getPatients = function () {
                                         var id = data || '';
                                         if ($scope.isUserDentist || $scope.isUserOwner) {
                                             var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
-                                                '<a class="btn-view-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="View Appointment" role="button" aria-label="View appointment"><i class="material-icons brown-text lighten-1">visibility</i></a>' +
+                                                '<a class="btn-delete-appt btn-floating btn-small brown lighten-4 p-0 smallBtn redBtn" data-apptid="' + id + '" data-tooltip="Delete Appointment" role="button" aria-label="Delete appointment"><i class="material-icons brown-text lighten-1">archive</i></a>' +
+                                                '<a class="btn-edit-appt btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Edit Appointment" role="button" aria-label="Edit appointment"><i class="material-icons brown-text lighten-1">edit</i></a>' +
+                                                '<a class="reschedule-btn btn-floating btn-small brown lighten-4 p-0 smallBtn" data-apptid="' + id + '" data-tooltip="Request Reschedule" role="button" aria-label="Request reschedule"><i class="material-icons brown-text lighten-1">autorenew</i></a>' +
                                                 '</div>';
                                         } else {
                                             var btns = '<div class="appt-action-buttons" style="display:flex; gap:6px;">' +
