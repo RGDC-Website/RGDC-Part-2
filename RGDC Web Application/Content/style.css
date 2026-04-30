@@ -156,6 +156,14 @@ a {
     border-radius: 15px;
 }
 
+.contacts-page a {
+    color: #795548 !important;
+}
+
+/*.toc-wrapper{
+    position: sticky !important;
+    top: 0;
+}*/
 
 nav {
     background-color: #8d6e63 !important;

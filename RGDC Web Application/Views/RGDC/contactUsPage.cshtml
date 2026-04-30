@@ -1,7 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_adminLayout.cshtml";
 }
-<div class="dashContainer">
+<div class="dashContainer contacts-page">
     @*top part (welcome, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*user name*@
@@ -71,32 +71,30 @@
         <div class="col s12 m12 l12">
             <div class="card grey lighten-2 center">
                 <div class="card-content brown-text lighten-1">
-                    <div class="row m-0 valign-wrapper hide-on-med-and-down">
-                        <div class="col s12 m6 l6 ">
-                            @*insert gmaps kayo na bahala jan hehe*@
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d240.30282883058445!2d120.9727415!3d15.4927533!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x339729705358d8cd%3A0x9d190a180b8bf331!2sReyes-Guansing%20Dental%20Clinic!5e0!3m2!1sen!2sph!4v1774454099419!5m2!1sen!2sph" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"/></iframe>
-                        </div>
-                        <div class="col s12 m6 l6">
-                            <a href="https://tinyurl.com/RGDentalClinic" target="_blank"> 
-                                <i class="material-icons large">location_on</i>
-                                <p class="bold">Our Main Branch</p>
-                                <p>1191 Velarde Bldg., Del Pilar St., Cabanatuan City </p>
-                            </a>
-                        </div>
-                    </div>
+                    <div class="row m-0">
 
-                    @*mobile responsive maps*@
-                    <div class="row m-0 valign-wrapper show-on-medium-and-down hide-on-large-only">
-                        <div class="col s12 m6 l6 ">
-                            @*insert gmaps kayo na bahala jan hehe*@
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d240.30282883058445!2d120.9727415!3d15.4927533!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x339729705358d8cd%3A0x9d190a180b8bf331!2sReyes-Guansing%20Dental%20Clinic!5e0!3m2!1sen!2sph!4v1774454099419!5m2!1sen!2sph" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" /></iframe>
-                            <a href="https://tinyurl.com/RGDentalClinic" target="_blank">
-                                <i class="material-icons large">location_on</i>
-                                <p class="bold">Our Main Branch</p>
-                                <p>1191 Velarde Bldg., Del Pilar St., Cabanatuan City </p>
-                            </a>
-                        
+                        <!-- MAP -->
+                        <div class="col s12 m6 l6">
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d240.30282883058445!2d120.9727415!3d15.4927533!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x339729705358d8cd%3A0x9d190a180b8bf331!2sReyes-Guansing%20Dental%20Clinic!5e0!3m2!1sen!2sph!4v1774454099419!5m2!1sen!2sph"
+                                    width="100%"
+                                    height="300"
+                                    style="border:0;"
+                                    allowfullscreen=""
+                                    loading="lazy">
+                            </iframe>
                         </div>
+
+                        <!-- TEXT -->
+                        <div class="col s12 m6 l6 valign-wrapper" style="height:300px;">
+                            <div class="center-align" style="width:100%;">
+                                <a href="https://tinyurl.com/RGDentalClinic" target="_blank">
+                                    <i class="material-icons large">location_on</i>
+                                    <p class="bold">Our Main Branch</p>
+                                    <p>1191 Velarde Bldg., Del Pilar St., Cabanatuan City</p>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
