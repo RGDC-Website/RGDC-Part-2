@@ -17,6 +17,7 @@ app.directive('onFinishRender', function ($timeout) {
                     }
 
                     $(tableId).DataTable({
+                        noRows: "No data found",
                         paging: true,
                         searching: true,
                         ordering: true,

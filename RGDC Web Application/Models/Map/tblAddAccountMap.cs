@@ -13,7 +13,6 @@ namespace RGDC_Web_Application.Models.Map
         {
             HasKey(t => t.addID);
             ToTable("tbl_addAccount");
-            ToTable("tbl_addAccount");
         }
     }
 }

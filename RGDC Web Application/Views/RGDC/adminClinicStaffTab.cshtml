@@ -22,7 +22,7 @@
                     <li class="tab px-1"><a class="brown-text p-0" href="#Owner">Owner</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Dentist">Dentist</a></li>
                     <li class="tab px-1"><a class="brown-text p-0" href="#Staff">Staff</a></li>
-                    @*<li class="tab px-1"><a class="brown-text p-0" href="#Pending">Pending</a></li>*@
+                    <li class="tab px-1"><a class="brown-text p-0" href="#Pending" ng-show="isUserOwner">Pending</a></li>
                 </ul>
             </div>
         </nav>
@@ -33,10 +33,6 @@
                 <div class="row m-0 hide-on-small-only">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
-                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="Active" selected>Active</option>
-                            <option value="Inactive" selected>Inactive</option>
-                        </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="btn brown lighten-1  modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="ownerInformationFormAdd">
@@ -48,51 +44,75 @@
                 <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
                     <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Owner</p>
-                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="Active" selected>Active</option>
-                            <option value="Inactive" selected>Inactive</option>
-                        </select>*@
                         <a class="btn brown lighten-1 modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="ownerInformationFormAdd">
                             <i class="material-icons left white-text">group_add</i>Add Owner
                         </a>
                     </div>
                 </div>
+
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="!showOwnerArchived" ng-click="toggleOwnerArchive()"><i class="material-icons left">archive</i>Show Inactive</a>
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="showOwnerArchived" ng-click="toggleOwnerArchiveF()"><i class="material-icons left">archive</i>Show Active</a>
                 @*Owner Table*@
-                <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
-                    <thead>
-                        <tr class="brown-text lighten-1">
-                            <th>Name</th>
-                            <th colspan="2">Specialization</th>
-                        </tr>
-                    </thead>
-                    @*table content*@
-                    <tbody>
-                        <tr data-href="#"  ng-repeat="owner in clinicOwners track by owner.ownerID">
-                            <td>{{owner.fullName}}</td>
-                            <td>{{owner.specialization}}</td>
-                            <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveOwner(owner.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="ownerInformationFormEdit" title="View Account Details" ng-click="selectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="brown-text lighten-1">
-                            <th>Dentist Name</th>
-                            <th colspan="2">Specialization</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div ng-show="!showOwnerArchived">
+                    <table id="adminClinicStaffTabTableOwner" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th colspan="2">Specialization</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="owner in clinicOwners track by owner.ownerID" on-finish-render table-id="adminClinicStaffTabTableOwner">
+                                <td>{{owner.fullName}}</td>
+                                <td>{{owner.specialization}}</td>
+                                <td>
+                                    <a ng-show="isUserSAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveOwner(owner.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="ownerInformationFormEdit" title="View Account Details" ng-click="selectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Dentist Name</th>
+                                <th colspan="2">Specialization</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div ng-show="showOwnerArchived">
+                    <table id="adminClinicStaffTabTableOwnerD" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th colspan="2">Specialization</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="owner in clinicOwnersD track by owner.ownerID" on-finish-render table-id="adminClinicStaffTabTableOwnerD">
+                                <td>{{owner.fullName}}</td>
+                                <td>{{owner.specialization}}</td>
+                                <td>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteOwner" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveOwner(owner.accID)" ng-show="isUserSAdmin">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="ownerInformationFormEdit" title="View Account Details" ng-click="selectOwner(owner.ownerID)"><i class="material-icons brown-text lighten-1">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Dentist Name</th>
+                                <th colspan="2">Specialization</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
 
             <div id="Dentist" class="containerOverflow-2 row m-0">
                 <div class="row m-0 hide-on-small-only">
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
-                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                    <option value="Active" selected>Active</option>
-                    <option value="Inactive" selected>Inactive</option>
-                </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="btn brown lighten-1 modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="dentistInformationFormAdd">
@@ -104,44 +124,74 @@
                 <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
                     <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Dentist</p>
-                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                    <option value="Active" selected>Active</option>
-                    <option value="Inactive" selected>Inactive</option>
-                </select>*@
-                    <a class="btn brown lighten-1 modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="dentistInformationFormAdd">
-                        <i class="material-icons left white-text">group_add</i>Add Dentist
-                    </a>
+                        <a class="btn brown lighten-1 modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="dentistInformationFormAdd">
+                            <i class="material-icons left white-text">group_add</i>Add Dentist
+                        </a>
                     </div>
                 </div>
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="!showDentistArchived" ng-click="toggleDentistArchive()"><i class="material-icons left">archive</i>Show Inactive</a>
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="showDentistArchived" ng-click="toggleDentistArchiveF()"><i class="material-icons left">archive</i>Show Active</a>
                 @*Dentist Table*@
-                <table id="adminClinicStaffTabTableDentist" class="hover tableClk">
-                    <thead>
-                        <tr class="brown-text lighten-1">
-                            <th>Name</th>
-                            <th>Specialization</th>
-                            <th colspan="2">Branch</th>
-                        </tr>
-                    </thead>
-                    @*table content*@
-                    <tbody>
-                        <tr data-href="#" ng-repeat="dentist in clinicDentists track by dentist.dentistID">
-                            <td>{{dentist.fullName}}</td>
-                            <td>{{dentist.specialization}}</td>
-                            <td>{{dentist.description}}</td>
-                            <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="brown-text lighten-1">
-                            <th>Name</th>
-                            <th>Specialization</th>
-                            <th>Branch</th>
-                        </tr>
-                    </tfoot>
-                </table>
+                <div ng-show="!showDentistArchived">
+                    <table id="adminClinicStaffTabTableDentist" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th colspan="2">Branch</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="dentist in clinicDentists track by dentist.dentistID" on-finish-render table-id="adminClinicStaffTabTableDentist">
+                                <td>{{dentist.fullName}}</td>
+                                <td>{{dentist.specialization}}</td>
+                                <td>{{dentist.description}}</td>
+                                <td>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Branch</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div ng-show="showDentistArchived">
+                    <table id="adminClinicStaffTabTableDentistD" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th colspan="2">Branch</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="dentist in clinicDentistsD track by dentist.dentistID" on-finish-render table-id="adminClinicStaffTabTableDentistD">
+                                <td>{{dentist.fullName}}</td>
+                                <td>{{dentist.specialization}}</td>
+                                <td>{{dentist.description}}</td>
+                                <td>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Branch</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
 
             <div id="Staff" class="containerOverflow-2 row m-0">
@@ -149,9 +199,9 @@
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
                         @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="Active" selected>Active</option>
-                            <option value="Inactive" selected>Inactive</option>
-                        </select>*@
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive" selected>Inactive</option>
+                </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="btn brown lighten-1 modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="staffInformationFormAdd">
@@ -163,77 +213,108 @@
                 <div class="row m-0 show-on-small clinicStaff-HeaderBtn">
                     <div class="col s12 m6 l6 mobileRes-headerBtn p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
-                        @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                            <option value="Active" selected>Active</option>
-                            <option value="Inactive" selected>Inactive</option>
-                        </select>*@
                         <a class="btn brown lighten-1 modal-trigger white-text" style="margin-bottom: -1rem !important" data-target="staffInformationFormAdd">
                             <i class="material-icons left white-text">group_add</i>Add Staff
                         </a>
                     </div>
                 </div>
+
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="!showStaffArchived" ng-click="toggleStaffArchive()"><i class="material-icons left">archive</i>Show Inactive</a>
+                <a class="btn brown lighten-1 waves-light waves-effect white-text" ng-show="showStaffArchived" ng-click="toggleStaffArchiveF()"><i class="material-icons left">archive</i>Show Active</a>
                 @*Staff Table*@
-                <table id="adminClinicStaffTabTableStaff" class="hover tableClk">
+                <div ng-show="!showStaffArchived">
+                    <table id="adminClinicStaffTabTableStaff" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th colspan="2">Branch</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="staff in clinicStaff track by staff.staffID" on-finish-render table-id="adminClinicStaffTabTableStaff">
+                                <td>{{staff.fullName}}</td>
+                                <td>{{staff.staffRole}}</td>
+                                <td>{{staff.description}}</td>
+                                <td>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Branch</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <div ng-show="showStaffArchived">
+                    <table id="adminClinicStaffTabTableStaffD" class="hover tableClk">
+                        <thead>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th colspan="2">Branch</th>
+                            </tr>
+                        </thead>
+                        @*table content*@
+                        <tbody>
+                            <tr data-href="#" ng-repeat="staff in clinicStaffD track by staff.staffID" on-finish-render table-id="adminClinicStaffTabTableStaffD">
+                                <td>{{staff.fullName}}</td>
+                                <td>{{staff.staffRole}}</td>
+                                <td>{{staff.description}}</td>
+                                <td>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="brown-text lighten-1">
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Branch</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            
+            @*pending*@
+            <div id="Pending" class="containerOverflow-2 row m-0" ng-init="getPending()" ng-show="isUserOwner">
+                <div class="row m-0">
+                    <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Pending</p>
+                </div>
+                @*pending Table*@
+                <table id="adminClinicStaffTabTablePending" class="hover tableClk">
                     <thead>
                         <tr class="brown-text lighten-1">
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th colspan="2">Branch</th>
+                            <th>Email</th>
+                            <th colspan="2">Role</th>
                         </tr>
                     </thead>
                     @*table content*@
                     <tbody>
-                        <tr data-href="#" ng-repeat="staff in clinicStaff track by staff.staffID">
-                            <td>{{staff.fullName}}</td>
-                            <td>{{staff.staffRole}}</td>
-                            <td>{{staff.description}}</td>
+                        <tr ng-repeat="pendingAcc in pendingAccounts track by pendingAcc.addID" on-finish-render table-id="adminClinicStaffTabTablePending">
+                            <td>{{pendingAcc.email}}</td>
+                            <td>{{pendingAcc.permission == "0" ? "Owner" : pendingAcc.permission == "1" ? "Dentist" : "Staff"}}</td>
                             <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
+                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn " data-target="modalDeleteStaff" title="Delete Request"><i class="material-icons brown-text lighten-1" ng-click="selectRemove(pendingAcc.addID)">delete</i></a>
                             </td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr class="brown-text lighten-1">
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>Branch</th>
+                            <th>Email</th>
+                            <th colspan="2">Role</th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
-            
-            @*pending*@
-            <!--<div id="Pending" class="containerOverflow-2 row m-0">
-                <div class="row m-0">
-                    <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Pending</p>
-                </div>-->
-                @*pending Table*@
-                <!--<table id="adminClinicStaffTabTablePending" class="hover tableClk">
-                    <thead>
-                        <tr class="brown-text lighten-1">
-                            <th>Email</th>
-                            <th colspan="2">Role</th>
-                        </tr>
-                    </thead>-->
-                    @*table content*@
-                    <!--<tbody>
-                        <tr data-href="#">
-                            <td>email@gmail.com</td>
-                            <td>Role</td>
-                            <td>
-                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Delete Request"><i class="material-icons brown-text lighten-1" ng-click="selectDeleteStaff(staff.staffID, staff.accID)">delete</i></a>
-                            </td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr class="brown-text lighten-1">
-                            <th>Email</th>
-                            <th colspan="2">Role</th>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>-->
 
 
         </div>

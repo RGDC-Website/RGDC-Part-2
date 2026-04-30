@@ -511,39 +511,10 @@ namespace RGDC_Web_Application.Controllers
                     var hashedPassword = passwordHash(password);
                     var user = db.tbl_account.FirstOrDefault(u =>
                         u.email == email && u.password == hashedPassword);
-
-                    if (user != null)
-                    {
-                        // Set session variables
-                        Session.Remove(failKey);
-                        Session.Remove(lockKey);
-                        Session["UserID"] = user.accID;
-                        Session["UserName"] = user.firstName;
-                        Session["UserFullName"] = user.firstName + " " + user.lastName;
-                        Session["UserAuthorization"] = user.role;
-                        // <-- store permission so server methods can filter by dentist/staff/patient
-                        Session["UserPermission"] = user.permission;
-                        Session["IsLoggedIn"] = true;
-                        Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
-                        if (user.permission == 3)
-                        {
-                            var patient = db.tbl_patient.FirstOrDefault(u => u.accID == user.accID);
-                            Session["SelectedPatientID"] = patient.patientID;
-                        }
-                        return Json(new
-                        {
-                            success = true,
-                            message = "Login successful",
-                            firstName = Session["UserName"].ToString(),
-                            fullName = Session["UserFullName"].ToString(),
-                            authorization = user.role,
-                            permission = user.permission,
-                            photoLink = Session["UserPhoto"].ToString()
-                        }, JsonRequestBehavior.AllowGet);
-                    }
-                    else
+                    if (user == null)
                     {
                         int failedAttempts = 0;
+
                         if (Session[failKey] != null)
                         {
                             int.TryParse(Session[failKey].ToString(), out failedAttempts);
@@ -561,15 +532,59 @@ namespace RGDC_Web_Application.Controllers
                             return Json(new
                             {
                                 success = false,
-                                message = $"Account locked due to {MAX_FAILED_ATTEMPTS} failed attempts. Try again after {lockedUntil.ToString("g")}"
+                                message = $"Account locked due to {MAX_FAILED_ATTEMPTS} failed attempts. Try again after {lockedUntil:g}"
                             }, JsonRequestBehavior.AllowGet);
                         }
-                        else
+
+                        int remaining = MAX_FAILED_ATTEMPTS - failedAttempts;
+
+                        return Json(new
                         {
-                            int remaining = MAX_FAILED_ATTEMPTS - failedAttempts;
-                            return Json(new { success = false, message = $"Invalid email or password. {remaining} attempt(s) left." }, JsonRequestBehavior.AllowGet);
+                            success = false,
+                            message = $"Invalid email or password. {remaining} attempt(s) left."
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    if (user.isArchived == 1)
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Your account was deactivated"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    Session.Remove(failKey);
+                    Session.Remove(lockKey);
+
+                    Session["UserID"] = user.accID;
+                    Session["UserName"] = user.firstName;
+                    Session["UserFullName"] = user.firstName + " " + user.lastName;
+                    Session["UserAuthorization"] = user.role;
+                    Session["UserPermission"] = user.permission;
+                    Session["IsLoggedIn"] = true;
+                    Session["UserPhoto"] = string.IsNullOrEmpty(user.photoLink) ? "" : user.photoLink;
+
+                    if (user.permission == 3)
+                    {
+                        var patient = db.tbl_patient.FirstOrDefault(p => p.accID == user.accID);
+
+                        if (patient != null)
+                        {
+                            Session["SelectedPatientID"] = patient.patientID;
                         }
                     }
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Login successful",
+                        firstName = Session["UserName"].ToString(),
+                        fullName = Session["UserFullName"].ToString(),
+                        authorization = user.role,
+                        permission = user.permission,
+                        photoLink = Session["UserPhoto"].ToString()
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
             catch (Exception ex)
@@ -4037,20 +4052,19 @@ RGDC Dental Clinic Team";
 
                 var owners = (from o in db.tbl_owner
                               join a in db.tbl_account on o.accID equals a.accID
-                              where a.isArchived == 0
                               select new
                               {
                                   o.ownerID,
                                   o.accID,
                                   fullName = a.firstName + " " + a.lastName,
                                   o.specialization,
-                                  o.signature
+                                  o.signature,
+                                  a.isArchived
                               }).ToList();
 
                 var dentists = (from d in db.tbl_dentist
                                 join a in db.tbl_account on d.accID equals a.accID
                                 join g in db.tbl_branch on d.branchID equals g.branchID
-                                where a.isArchived == 0
                                 select new
                                 {
                                     d.dentistID,
@@ -4059,13 +4073,13 @@ RGDC Dental Clinic Team";
                                     d.specialization,
                                     d.branchID,
                                     g.description,
-                                    d.signature
+                                    d.signature,
+                                    a.isArchived
                                 }).ToList();
 
                 var staff = (from s in db.tbl_staff
                              join a in db.tbl_account on s.accID equals a.accID
                              join g in db.tbl_branch on s.branchID equals g.branchID
-                             where a.isArchived == 0
                              select new
                              {
                                  s.staffID,
@@ -4074,7 +4088,8 @@ RGDC Dental Clinic Team";
                                  s.staffRole,
                                  s.branchID,
                                  g.description,
-                                 s.signature
+                                 s.signature,
+                                 a.isArchived
                              }).ToList();
 
                 return Json(new
@@ -4087,6 +4102,51 @@ RGDC Dental Clinic Team";
             }
         }
 
+        public ActionResult getPending()
+        {
+            using (var db = new RGDCContext())
+            {
+                var accounts = db.tbl_addAccount
+                    .Select(a => new
+                    {
+                        a.addID,
+                        a.email,
+                        a.permission
+                    })
+                    .ToList();
+
+                return Json(new
+                {
+                    pendingAccounts = accounts,
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        [HttpPost]
+        public ActionResult selectRemove(int addID)
+        {
+            using (var db = new RGDCContext())
+            {
+                var account = db.tbl_addAccount.FirstOrDefault(a => a.addID == addID);
+
+                if (account == null)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Account not found."
+                    });
+                }
+
+                db.tbl_addAccount.Remove(account);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Account removed successfully."
+                });
+            }
+        }
         [HttpPost]
         public JsonResult addAccount(tblAccountModel accmod)
         {
@@ -4544,7 +4604,15 @@ RGDC Dental Clinic Team";
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                existingAcc.isArchived = 1;
+
+                if (existingAcc.isArchived == 0)
+                {
+                    existingAcc.isArchived = 1;
+                }
+                else if (existingAcc.isArchived == 1)
+                {
+                    existingAcc.isArchived = 0;
+                }
 
                 db.SaveChanges();
 
@@ -4570,7 +4638,15 @@ RGDC Dental Clinic Team";
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                existingAcc.isArchived = 1;
+
+                if (existingAcc.isArchived == 0)
+                {
+                    existingAcc.isArchived = 1;
+                }
+                else if (existingAcc.isArchived == 1)
+                {
+                    existingAcc.isArchived = 0;
+                }
 
                 db.SaveChanges();
 
@@ -4596,7 +4672,15 @@ RGDC Dental Clinic Team";
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                existingAcc.isArchived = 1;
+                if (existingAcc.isArchived == 0)
+                {
+                    existingAcc.isArchived = 1;
+                }
+                else if (existingAcc.isArchived == 1)
+                {
+                    existingAcc.isArchived = 0;
+                }
+
 
                 db.SaveChanges();
 

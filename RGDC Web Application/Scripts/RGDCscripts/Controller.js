@@ -32,13 +32,16 @@
         },
         conditions: {}
     };
+    $scope.pendingAccounts = [];
     $scope.currentUserAuthorization;
     $scope.paymentsArray = [];
     $scope.allPayments = [];
     $scope.archivedPayments = [];
     $scope.paymentID;
     $scope.showFinanceArchived = false;
-
+    $scope.showOwnerArchived = false;
+    $scope.showStaffArchived = false;
+    $scope.showDentistArchived = false;
     $scope.modalScheduleDays = [
         { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
         { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
@@ -1886,14 +1889,35 @@ $scope.getPatients = function () {
 
     $scope.toggleFinanceArchive = function () {
         $scope.showFinanceArchived = true;
-        console.log($scope.paymentsArray);
     };
 
     $scope.toggleFinanceArchiveF = function () {
         $scope.showFinanceArchived = false;
-        console.log($scope.archivedPayments)
     };
-   
+
+    $scope.toggleOwnerArchive = function () {
+        $scope.showOwnerArchived = true;
+    };
+
+    $scope.toggleOwnerArchiveF = function () {
+        $scope.showOwnerArchived = false;
+    };
+
+    $scope.toggleStaffArchive = function () {
+        $scope.showStaffArchived = true;
+    };
+
+    $scope.toggleStaffArchiveF = function () {
+        $scope.showStaffArchived = false;
+    };
+
+    $scope.toggleDentistArchive = function () {
+        $scope.showDentistArchived = true;
+    };
+
+    $scope.toggleDentistArchiveF = function () {
+        $scope.showDentistArchived = false;
+    };
     function initializeDatepicker() {
         $timeout(function () {
             var birthDateElem = document.getElementById('birthDate');
@@ -4288,55 +4312,85 @@ $scope.getPatients = function () {
     $scope.getClinicStaff = function () {
         var getClinicStaff = RGDCWebApplicationService.getClinicStaff();
         getClinicStaff.then(function (returnedData) {
-            $scope.clinicOwners = returnedData.data.owners;
-            $scope.clinicDentists = returnedData.data.dentists;
-            $scope.clinicStaff = returnedData.data.staff;
-
-            $timeout(function () {
-                try {
-                    initClinicStaffTables();
-                } catch (e) {
-                    console.warn('initClinicStaffTables failed', e);
-                }
-            }, 0);
+            $scope.clinicOwners = returnedData.data.owners.filter(p => p.isArchived == 0);
+            $scope.clinicDentists = returnedData.data.dentists.filter(p => p.isArchived == 0);
+            $scope.clinicStaff = returnedData.data.staff.filter(p => p.isArchived == 0);
+            $scope.clinicOwnersD = returnedData.data.owners.filter(p => p.isArchived == 1);
+            $scope.clinicDentistsD = returnedData.data.dentists.filter(p => p.isArchived == 1);
+            $scope.clinicStaffD = returnedData.data.staff.filter(p => p.isArchived == 1);
         });
     }
 
-    function initClinicStaffTables() {
-        if (typeof window.DataTable !== 'function') return;
-
-        var cfg = {
-            searchable: true,
-            fixedHeight: false,
-            perPage: 10,
-            perPageSelect: [5, 10, 25, 50],
-            labels: {
-                placeholder: "Search...",
-                perPage: "{select} entries per page",
-                noRows: "No rows found",
-                info: "Showing {start} to {end} of {rows} entries"
-            }
-        };
-
-        function reinit(selector, key) {
-            try {
-                if (window[key] && typeof window[key].destroy === 'function') {
-                    window[key].destroy();
-                }
-            } catch (_) { }
-
-            var el = null;
-            try { el = document.querySelector(selector); } catch (_) { el = null; }
-            if (!el) return;
-
-            window[key] = new DataTable(selector, cfg);
-        }
-
-        reinit('#adminClinicStaffTabTableOwner', '_adminClinicStaffOwnerDT');
-        reinit('#adminClinicStaffTabTableDentist', '_adminClinicStaffDentistDT');
-        reinit('#adminClinicStaffTabTableStaff', '_adminClinicStaffStaffDT');
-        reinit('#adminClinicStaffTabTablePending', '_adminClinicStaffPendingDT');
+    $scope.getPending = function () {
+        var getPending = RGDCWebApplicationService.getPending();
+        getPending.then(function (returnedData) {
+            $scope.pendingAccounts = returnedData.data.pendingAccounts;
+        });
     }
+
+    $scope.selectRemove = function (id) {
+        console.log(id)
+        Swal.fire({
+            title: 'Remove Pending Account?',
+            text: 'This action will remove the pending account. Continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, remove it',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                RGDCWebApplicationService.selectRemove(id).then(function (response) {
+                    if (response.data.success) {
+                          window.location.href = "/RGDC/adminClinicStaffTab";
+                        Swal.fire(
+                            'Removed!',
+                            'The pending account has been removed.',
+                            'success'
+                        );
+                    }
+                });
+            }
+        });
+        
+    }
+    //function initClinicStaffTables() {
+    //    if (typeof window.DataTable !== 'function') return;
+
+    //    var cfg = {
+    //        searchable: true,
+    //        fixedHeight: false,
+    //        perPage: 10,
+    //        perPageSelect: [5, 10, 25, 50],
+    //        labels: {
+    //            placeholder: "Search...",
+    //            perPage: "{select} entries per page",
+    //            noRows: "No rows found",
+    //            info: "Showing {start} to {end} of {rows} entries"
+    //        }
+    //    };
+
+    //    function reinit(selector, key) {
+    //        try {
+    //            if (window[key] && typeof window[key].destroy === 'function') {
+    //                window[key].destroy();
+    //            }
+    //        } catch (_) { }
+
+    //        var el = null;
+    //        try { el = document.querySelector(selector); } catch (_) { el = null; }
+    //        if (!el) return;
+
+    //        window[key] = new DataTable(selector, cfg);
+    //    }
+
+    //    reinit('#adminClinicStaffTabTableOwner', '_adminClinicStaffOwnerDT');
+    //    reinit('#adminClinicStaffTabTableDentist', '_adminClinicStaffDentistDT');
+    //    reinit('#adminClinicStaffTabTableStaff', '_adminClinicStaffStaffDT');
+    //    reinit('#adminClinicStaffTabTablePending', '_adminClinicStaffPendingDT');
+    //}
     $scope.addOwner = function () {
         var ownerEmail = {
             email: $scope.owner_email

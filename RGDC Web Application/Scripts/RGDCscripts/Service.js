@@ -128,11 +128,18 @@
     };
 
     this.getPaymentInfo = function (paymentData) {
-        console.log(paymentData)
         return $http({
             method: "post",
             url: "/RGDC/getPaymentInfo",
             data: paymentData
+        });
+    };
+
+    this.selectRemove = function (addID) {
+        return $http({
+            method: "post",
+            url: "/RGDC/selectRemove",
+            data: { addID: addID }
         });
     };
 
@@ -149,6 +156,9 @@
     };
     this.getSelectedPatientDetails = function () {
         return $http.get("/RGDC/getSelectedPatientDetails");
+    }
+    this.getPending = function () {
+        return $http.get("/RGDC/getPending");
     }
 
     this.saveDentalChart = function (payload) {
