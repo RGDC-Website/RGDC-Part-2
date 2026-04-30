@@ -1876,7 +1876,6 @@ $scope.getPatients = function () {
     };
 
     $scope.getNextVisit = function () {
-        console.log("a")
         RGDCWebApplicationService.getAdminScheduledAppointments()
             .then(function (response) {
 
@@ -1888,7 +1887,7 @@ $scope.getPatients = function () {
                     $scope.nextVisitFull = formatDateToMDY(nextVisit.dateTime);
 
                 } else {
-                    $scope.nextVisitTime = "";
+                    $scope.nextVisitFull = "N/A";
                 }
             })
             .catch(function (error) {
