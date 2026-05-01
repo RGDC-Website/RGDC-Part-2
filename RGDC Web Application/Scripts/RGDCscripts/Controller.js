@@ -4306,79 +4306,84 @@
     }
 
     $scope.addProgNotes = function () {
-
+        var dentID = null;
         if ($scope.selectedDentistProgNote != null) {
             var parts = $scope.selectedDentistProgNote.trim().split(' ');
             var idPart = parts[parts.length - 1];
 
             var id = parseInt(idPart);
             $scope.selectedDentistID = isNaN(id) ? null : id;
+            proceed();
         } else {
             RGDCWebApplicationService.getDentistID().then(function (response) {
-                $scope.selectedDentistID = response.data.ID;
-                console.log(response.data)
+                dentID = response.data.ID;
+                console.log(dentID)
+                proceed();
+            })
+            
+        }
+        function proceed() {
+            console.log(dentID)
+            if ($scope.selectedPatient.patientID === null && $scope.selectedDentistID === null) {
+                Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
+                return;
+            }
+
+            if (!$scope.paymentCost || !$scope.paymentPaid) {
+                Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
+                return;
+            }
+
+            if (!$scope.paymentDate) {
+                Swal.fire({ icon: "error", title: "Error", text: "Select Proper Date." });
+                return;
+            }
+
+            $scope.paymentDue = $scope.paymentCost - ($scope.paymentPaid || 0);
+            var paymentData = {
+                patientID: $scope.selectedPatientID,
+                dentistID: $scope.selectedDentistID || dentID,
+                paymentMethod: $scope.paymentMethod,
+                procedures: $scope.paymentProcedures,
+                toothNumber: $scope.paymentToothNumber,
+                reference: $scope.paymentReference,
+                cost: parseFloat($scope.paymentCost) || 0,
+                paymentDate: new Date($scope.paymentDate).toISOString(),
+                paid: parseFloat($scope.paymentPaid) || 0,
+                balance: parseFloat($scope.paymentDue) || 0,
+                description: $scope.paymentDescription,
+                createdBy: $scope.currentUserID
+            };
+            console.log(paymentData)
+
+            $scope.addSubmitted = true;
+
+            if (!$scope.paymentDate ||
+                !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
+                $scope.paymentPaid === null) {
+                return;
+            }
+            if (parseFloat($scope.paymentDue) < 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Amount',
+                    text: 'Total amount due should not go below 0.',
+                    confirmButtonColor: '#795548'
+                });
+                return;
+            }
+
+            RGDCWebApplicationService.addProgNotes(paymentData).then(function (response) {
+                if (response.data.success) {
+                    Swal.fire({ icon: 'success', title: 'Added', text: 'Successfully added progress notes.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/RGDC/patientProfile";
+                            afterUpdate();
+                        }
+                    });
+                }
             })
         }
-        if ($scope.selectedPatient.patientID === null && $scope.selectedDentistID === null) {
-            Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
-            return;
-        }
-
-        if (!$scope.paymentCost || !$scope.paymentPaid) {
-            Swal.fire({ icon: "error", title: "Error", text: "Input payment cost and paid amount." });
-            return;
-        }
-
-        if (!$scope.paymentDate) {
-            Swal.fire({ icon: "error", title: "Error", text: "Select Proper Date." });
-            return;
-        }
-
-        $scope.paymentDue = $scope.paymentCost - ($scope.paymentPaid || 0);
-        var paymentData = {
-            patientID: $scope.selectedPatientID,
-            dentistID: $scope.selectedDentistID,
-            paymentMethod: $scope.paymentMethod,
-            procedures: $scope.paymentProcedures,
-            toothNumber: $scope.paymentToothNumber,
-            reference: $scope.paymentReference,
-            cost: parseFloat($scope.paymentCost) || 0,
-            paymentDate: new Date($scope.paymentDate).toISOString(),
-            paid: parseFloat($scope.paymentPaid) || 0,
-            balance: parseFloat($scope.paymentDue) || 0,
-            description: $scope.paymentDescription,
-            createdBy: $scope.currentUserID
-        };
-
-
-        $scope.addSubmitted = true;
-
-        if (!$scope.paymentDate ||
-            !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
-            $scope.paymentPaid === null) {
-            return;
-        }
-        if (parseFloat($scope.paymentDue) < 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Amount',
-                text: 'Total amount due should not go below 0.',
-                confirmButtonColor: '#795548'
-            });
-            return;
-        }
-
-        RGDCWebApplicationService.addProgNotes(paymentData).then(function (response) {
-            if (response.data.success) {
-                Swal.fire({ icon: 'success', title: 'Added', text: 'Successfully added progress notes.' }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "/RGDC/patientProfile";
-                        afterUpdate();
-                    }
-                });
-            }
-        })
-
     }
 
     $scope.editPayment = function () {
