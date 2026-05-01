@@ -4307,12 +4307,18 @@
 
     $scope.addProgNotes = function () {
 
-        var parts = $scope.selectedDentistProgNote.trim().split(' ');
-        var idPart = parts[parts.length - 1];
+        if ($scope.selectedDentistProgNote != null) {
+            var parts = $scope.selectedDentistProgNote.trim().split(' ');
+            var idPart = parts[parts.length - 1];
 
-        var id = parseInt(idPart);
-        $scope.selectedDentistID = isNaN(id) ? null : id;
-
+            var id = parseInt(idPart);
+            $scope.selectedDentistID = isNaN(id) ? null : id;
+        } else {
+            RGDCWebApplicationService.getDentistID().then(function (response) {
+                $scope.selectedDentistID = response.data.ID;
+                console.log(response.data)
+            })
+        }
         if ($scope.selectedPatient.patientID === null && $scope.selectedDentistID === null) {
             Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
             return;
@@ -4347,7 +4353,7 @@
 
         $scope.addSubmitted = true;
 
-        if ($scope.selectedDentist === null || !$scope.paymentDate ||
+        if (!$scope.paymentDate ||
             !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
             $scope.paymentPaid === null) {
             return;

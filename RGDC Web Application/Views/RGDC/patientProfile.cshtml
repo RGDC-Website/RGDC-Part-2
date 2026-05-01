@@ -1404,7 +1404,7 @@
         </div>
 
         <div class="row">
-            <div class="col s6">
+            <div class="col s6" ng-show="!isUserDentist">
                 @*Dentist*@
                 <label class="custom-label">Dentist <span class="required-mark">*</span></label>
                 <select class="custom-input browser-default" ng-model="selectedDentistProgNote"
@@ -1414,7 +1414,12 @@
                 </select>
                 <span class="validation-msg" ng-show="addSubmitted && !selectedDentist">Dentist is required.</span>
             </div>
-
+            <div class="col s6" ng-show="isUserDentist">
+                @*Dentist*@
+                <label class="custom-label">Dentist <span class="required-mark">*</span></label>
+                <input type="text" class="custom-input browser-default" ng-value="currentUserFullName"
+                       ng-class="" disabled/>
+            </div>
             <div class="col s6">
                 @*Tooth Number*@
                 <label class="custom-label">Tooth Number/s <span class="required-mark">*</span></label>

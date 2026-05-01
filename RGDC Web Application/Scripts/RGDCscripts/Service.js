@@ -182,6 +182,9 @@
     this.getOwnPatientDetails = function () {
         return $http.get("/RGDC/getOwnPatientDetails");
     }
+    this.getDentistID = function () {
+        return $http.get("/RGDC/getDentistID");
+    }
 
     this.getAdminScheduledAppointments = function () {
         return $http.get("/RGDC/GetAdminScheduledAppointments");

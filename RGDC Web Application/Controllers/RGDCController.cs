@@ -3247,7 +3247,28 @@ RGDC Dental Clinic Team";
             return Json(new { success = true });
         }
 
-        [HttpPost]
+        public JsonResult getDentistID(tblDentistModel model)
+        {
+            var userSession = Session["UserID"];
+            if (userSession == null || !int.TryParse(userSession.ToString(), out int accID))
+                return Json(new { success = false, message = "Invalid account ID." });
+
+            using (var db = new RGDCContext())
+            {
+                var dentist = db.tbl_dentist
+                                .FirstOrDefault(d => d.accID == accID);
+
+                if (dentist == null)
+                    return Json(new { success = false, message = "Dentist not found." });
+
+                return Json(new
+                {
+                    success = true,
+                    ID = dentist.dentistID
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+            [HttpPost]
         public JsonResult getPaymentInfo(tblPaymentModel paymod)
         {
             using (var db = new RGDCContext())
