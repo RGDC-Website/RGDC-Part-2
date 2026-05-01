@@ -4267,7 +4267,7 @@
             toothNumber: $scope.paymentToothNumber,
             reference: $scope.paymentReference,
             cost: parseFloat($scope.paymentCost) || 0,
-            paymentDate: $scope.paymentDate,
+            paymentDate: new Date($scope.paymentDate).toISOString(),
             paid: parseFloat($scope.paymentPaid) || 0,
             balance: parseFloat($scope.paymentDue) || 0,
             description: $scope.paymentDescription,
@@ -4313,7 +4313,6 @@
         var id = parseInt(idPart);
         $scope.selectedDentistID = isNaN(id) ? null : id;
 
-        console.log($scope.selectedPatient.patientID)
         if ($scope.selectedPatient.patientID === null && $scope.selectedDentistID === null) {
             Swal.fire({ icon: "error", title: "Error", text: "Select patient and dentist." });
             return;
@@ -4330,7 +4329,6 @@
         }
 
         $scope.paymentDue = $scope.paymentCost - ($scope.paymentPaid || 0);
-
         var paymentData = {
             patientID: $scope.selectedPatientID,
             dentistID: $scope.selectedDentistID,
@@ -4339,7 +4337,7 @@
             toothNumber: $scope.paymentToothNumber,
             reference: $scope.paymentReference,
             cost: parseFloat($scope.paymentCost) || 0,
-            paymentDate: $scope.paymentDate,
+            paymentDate: new Date($scope.paymentDate).toISOString(),
             paid: parseFloat($scope.paymentPaid) || 0,
             balance: parseFloat($scope.paymentDue) || 0,
             description: $scope.paymentDescription,
@@ -4349,7 +4347,7 @@
 
         $scope.addSubmitted = true;
 
-        if ($scope.selectedPatient === null || $scope.selectedDentist === null || !$scope.paymentDate ||
+        if ($scope.selectedDentist === null || !$scope.paymentDate ||
             !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
             $scope.paymentPaid === null) {
             return;
@@ -4396,7 +4394,7 @@
             paymentID: $scope.paymentInfo.paymentID,
             paymentMethod: $scope.paymentInfo.paymentMethod,
             cost: $scope.paymentInfo.cost,
-            paymentDate: $scope.paymentInfo.paymentDate,
+            paymentDate: new Date($scope.paymentInfo.paymentDate).toISOString(),
             paid: $scope.paymentInfo.paid,
             balance: $scope.paymentInfo.balance,
             reference: $scope.paymentInfo.reference,
