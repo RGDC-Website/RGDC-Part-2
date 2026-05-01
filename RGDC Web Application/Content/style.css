@@ -1351,6 +1351,17 @@ select.browser-default.custom-input {
 .modal-overlay {
     background-color: rgba(0,0,0,0.5) !important;
     opacity: 1 !important;
+    z-index: 1002;
+}
+
+.modal.modal-dentist-schedule {
+    width: 90% !important;
+    max-width: 100vh !important;
+    max-height: 90vh !important;
+    position: fixed !important;
+    inset: 0 !important;
+    margin: auto !important;
+    overflow: hidden;
 }
 
 .appt-modal {
