@@ -201,6 +201,19 @@
             data: appointmentData
         });
     };
+    this.createPrescription = function (date, content) {
+        return $http({
+            method: 'POST',
+            url: '/RGDC/createPrescription',
+            data: {
+                date: date,
+                content: content
+            }
+        });
+    };
+    this.getForms = function () {
+        return $http.get('/RGDC/GetForms');
+    };
 
     this.updatePatient = function (patientData) {
         return $http({

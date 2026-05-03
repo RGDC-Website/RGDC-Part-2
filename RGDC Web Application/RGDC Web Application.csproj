@@ -263,6 +263,7 @@
     <Content Include="Content\images\google.png" />
     <Content Include="Content\images\instagram.png" />
     <Content Include="Content\images\RGDCLoginBGImage.png" />
+    <Content Include="Content\images\rx.png" />
     <Content Include="Content\style.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />

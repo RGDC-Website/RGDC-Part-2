@@ -59,7 +59,7 @@
                         <h6 class="bold brown-text lighten-1">ID: {{selectedPatient.patientID}}</h6>
 
                         @*last and next visit*@
-                        <p class="brown-text lighten-1">Last Visit: {{lastVisitFull}}</p>
+                        <p class="brown-text lighten-1">Last Visit: {{selectedPatient.lastVisit}}</p>
                         <p class="brown-text lighten-1">Next Visit/Appt: {{nextVisitFull}}</p>
                         <button class="btn brown lighten-1 white-text right modal-trigger" ng-show="isUserAdmin && !isUserStaff" data-target="modalDeletePatient">{{selectedPatient.isArchived == 0 ? "DEACTIVATE" : "ACTIVATE"}}</button>
                         <button class="edit-btn right modal-trigger" ng-show="isUserPatient" data-target="modalEditPatientInfo">EDIT</button>
@@ -148,7 +148,7 @@
                                 <li class="tab px-1"><a class="active brown-text p-0" href="#med">Medical History</a></li>
                                 <li class="tab px-1"><a class="brown-text p-0" href="#prog">Progress Notes</a></li>
                                 <li class="tab px-1"><a class="brown-text p-0" href="#dent">Dental Chart</a></li>
-                                @*<li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>*@
+                                <li class="tab px-1"><a class="brown-text p-0" href="#forms">Forms</a></li>
                                 <li class="tab px-1"><a class="brown-text p-0" href="#postOp">Post Op</a></li>
                             </ul>
                         </div>
@@ -324,7 +324,7 @@
 
                         <div id="prog" class="row m-0">
                             <div class="row">
-                                <a ng-show="isUserAdmin && !isUserStaff" class="btn right modal-trigger brown lighten-1 white-text" data-target="modalAddPayrec">ADD NOTE</a>
+                                <a ng-show="isUserSAdmin || isUserDentist" class="btn right modal-trigger brown lighten-1 white-text" data-target="modalAddPayrec">ADD NOTE</a>
                             </div>
                             <div class="row m-0 containerOverflow-2">
                                 <table id="progressNotes" class="hover">
@@ -399,7 +399,7 @@
                                         <td>{{img.imageType}}</td>
                                         <td>
                                             <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
-                                               data-target="modalDentalChart"
+                                               data-target="viewModalDentalChart"
                                                data-position="bottom"
                                                data-tooltip="View"
                                                style="margin-right: 0.5rem !important"
@@ -430,42 +430,42 @@
                         </div>
 
                         @*Forms*@
-                        <!--<div id="forms" class="row m-0">
+                        <div id="forms" class="row m-0">
                             <div class="row">
                                 <a ng-show="isUserAdmin && !isUserStaff" class="btn brown lighten-1 white-text right modal-trigger" data-target="modalAddForm">ADD FORM</a>
-                            </div>-->
-                        @*di pa toh nakainitiate*@
-                        <!--<table id="patientForms" class="hover tableClk" ng-if="patientFormsReady">-->
-                        @*table headers*@
-                        <!--<thead>
-                            <tr class="brown-text lighten-1">
-                                <th>Date</th>
-                                <th>Form</th>
-                                <th colspan="2">Dentist</th>
-                            </tr>
-                        </thead>-->
-                        @*table content*@
-                        <!--<tbody>
-                            <tr ng-repeat="f in patientForms track by f.formID">
-                                <td>{{f.date}}</td>
-                                <td>
-                                    <a ng-href="{{f.formLink}}" target="_blank" rel="noopener">View Form</a>
-                                </td>
-                                <td>{{f.dentistName || '---'}}</td>
-                                <td>
-                                    <a ng-show="isUserAdmin && !isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn modal-trigger"
-                                       ng-click="selectDeleteForm && selectDeleteForm(f.formID)" data-target="modalDeleteForm" data-position="bottom" data-tooltip="Delete Form">
-                                        <i class="material-icons brown-text lighten-1">delete</i>
-                                    </a>
-                                    <a ng-show="isUserAdmin" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
-                                       ng-click="selectEditForm && selectEditForm(f.formID)" data-target="modal-edit-form" data-position="bottom" data-tooltip="Edit Form" style="margin-right: 0.5rem !important">
-                                        <i class="material-icons brown-text lighten-1">edit</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>-->
-                        @*table footer*@
-                        <!--<tfoot>
+                            </div>
+                            @*di pa toh nakainitiate*@
+                            <table id="patientForms" class="hover tableClk" ng-init="getForms()">
+
+                                <thead>
+                                    <tr class="brown-text lighten-1">
+                                        <th>Date</th>
+                                        <th>Form</th>
+                                        <th colspan="2">Dentist</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr ng-repeat="form in formsList track by form.formID" on-finish-render table-id="patientForms">
+                                        <td>{{form.formCreatedAt}}</td>
+                                        <td>
+                                            Prescription
+                                        </td>
+                                        <td>{{form.dentistName}}</td>
+                                        <td>
+                                            <a ng-show="!isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn"
+                                               data-position="bottom" ng-click="viewForm(form.formID)" data-tooltip="View Form">
+                                                <i class="material-icons brown-text lighten-1">visibility</i>
+                                            </a>
+                                            <a ng-show="!isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                               data-position="bottom" ng-click="downloadForm(form.formID)" data-tooltip="Print Form" style="margin-right: 0.5rem !important">
+                                                <i class="material-icons brown-text lighten-1">print</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+
+                                <tfoot>
                                     <tr class="brown-text lighten-1">
                                         <th>Date</th>
                                         <th>Form</th>
@@ -474,7 +474,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
-                        </div>-->
+                        </div>
                         @*post op*@
                         <div id="postOp" class="row m-0 ">
 
@@ -1418,7 +1418,7 @@
                 @*Dentist*@
                 <label class="custom-label">Dentist <span class="required-mark">*</span></label>
                 <input type="text" class="custom-input browser-default" ng-value="currentUserFullName"
-                       ng-class="" disabled/>
+                       ng-class="" disabled />
             </div>
             <div class="col s6">
                 @*Tooth Number*@
@@ -1461,7 +1461,7 @@
             <div class="col s6">
                 @*Reference*@
                 <label class="custom-label">
-                    Reference
+                    Reference No.
                     <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50" />
                 </label>
             </div>
@@ -1792,7 +1792,7 @@
             <div class="col s6">
                 @*Reference*@
                 <label class="custom-label">
-                    Reference
+                    Reference No.
                     <span class="required-mark">*</span>
                     <input type="text" class="custom-input" placeholder="Cost..." ng-model="paymentInfo.reference"
                            oninput="this.value = this.value.replace(/[^0-9.]/g, '')"
@@ -2011,6 +2011,26 @@
     </div>
 </div>
 
+@*Dental Chart modal*@
+<div id="viewModalDentalChart" class="modal dentalChart-modal containerOverflow-2">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:3.5vh;">Viewing Image</h5>
+
+        <div class="row" style="margin-top:3.5vh;">
+            <div class="row m-0 center">
+                <img id="viewDentalChartModalImg"
+                     img src="https://placehold.co/2550x3300"
+                     alt="Dental Chart"
+                     style="max-height: 40rem" />
+            </div>
+        </div>
+    </div>
+
+    @*upload, save, cancel buttons*@
+    <div class="modal-footer" style="margin:0 0 0 0 !important">
+        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">EXIT</button>
+    </div>
+</div>
 
 @*ADD form *@
 <div id="modalAddForm" class="modal form-modal">
@@ -2021,7 +2041,9 @@
             <div class="col s6">
                 <label class="custom-label">
                     Form Type<span class="required-mark">*</span>
-                    <input type="text" class="custom-input" placeholder="Type of Form" />
+                    <select class="browser-default custom-input" ng-value="1" ng-model="form.type">
+                        <option value="1">Prescription</option>
+                    </select>
                 </label>
             </div>
 
@@ -2030,7 +2052,7 @@
                     Date<span class="required-mark">*</span>
                 </label>
                 <div class="datepicker-wrapper">
-                    <input id="date" type="text" class="datepicker custom-input" placeholder="Date" ng-model="progNote_date">
+                    <input id="date" type="text" class="datepicker custom-input" ng-model="form.date" placeholder="Date">
                     <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                 </div>
             </div>
@@ -2041,7 +2063,7 @@
                 @*Content*@
                 <label class="custom-label">
                     Content<span class="required-mark">*</span>
-                    <textarea style="flex: 1; height: 30vh; padding: 1vh; background-color:white; border:none;"
+                    <textarea style="flex: 1;  height: 30vh; padding: 1vh; background-color:white; border:none; " ng-model="form.content"
                               placeholder="Description..."></textarea>
                 </label>
             </div>
@@ -2051,7 +2073,7 @@
 
     <div class="modal-footer" style="margin:-2vh 0 3vh 0 !important">
         <button type="button" class="cancel-btn left modal-close" style="font-weight: 500; margin: 0 0 -6vh 2vh">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight: 500; margin: 0 2vh -6vh 0">ADD</button>
+        <button type="button" class="edit-btn" style="font-weight: 500;  margin: 0 2vh -6vh 0" ng-click="addForm()">ADD</button>
     </div>
 </div>
 

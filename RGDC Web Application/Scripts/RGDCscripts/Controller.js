@@ -37,6 +37,7 @@
     $scope.currentUserAuthorization;
     $scope.paymentsArray = [];
     $scope.allPayments = [];
+    $scope.formsList = [];
     $scope.archivedPayments = [];
     $scope.paymentID;
     $scope.showFinanceArchived = false;
@@ -44,13 +45,13 @@
     $scope.showStaffArchived = false;
     $scope.showDentistArchived = false;
     $scope.modalScheduleDays = [
-        { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 4, dayName: 'Thursday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 5, dayName: 'Friday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 },
-        { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: '08:00', endTime: '12:00', slotMinutes: 30 }
+        { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 4, dayName: 'Thursday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 5, dayName: 'Friday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
+        { dayOfWeek: 6, dayName: 'Saturday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 }
     ];
 
     // Same shape as signup schedule, but Date objects for <input type="time"> in profile modal.
@@ -1385,8 +1386,7 @@
     };
 
     $scope.sendOTP = function () {
-
-        if (!$scope.reset_email) {
+        if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
             Swal.fire({
                 icon: "error",
                 title: "Email is Required",
@@ -1395,8 +1395,9 @@
             return;
         }
         var forgot_email = {
-            email: $scope.reset_email
+            email: $scope.reset_email || $scope.owner.email || $scope.staff.email || $scope.dentist.email
         }
+        
 
         var sendOTP = RGDCWebApplicationService.sendOTP(forgot_email);
         sendOTP.then(function (response) {
@@ -1465,7 +1466,7 @@
             return;
         }
         var forgot_info = {
-            email: $scope.reset_email,
+            email: $scope.reset_email || $scope.owner.email || $scope.staff.email || $scope.dentist.email,
             password: $scope.forgot_newPassword,
             otp: $scope.forgot_otp
         }
@@ -2480,7 +2481,7 @@
         try {
             if (!img) return;
             $scope.dentalUploadType = img.imageType || $scope.dentalUploadType || "";
-            var modalImg = document.getElementById('dentalChartModalImg');
+            var modalImg = document.getElementById('viewDentalChartModalImg');
             if (modalImg && img.imagePath) {
                 modalImg.src = img.imagePath + '?t=' + new Date().getTime();
             }
@@ -6629,6 +6630,91 @@
     $scope.isValidAddFormContact = function (num) {
         if (!num) return false;
         return /^09\d{9}$/.test(String(num));
+    };
+
+    $scope.addForm = function () {
+        if ($scope.form.type && $scope.form.date && $scope.form.content) {
+            if ($scope.form.type == "1") {
+                RGDCWebApplicationService.createPrescription($scope.form.date, $scope.form.content).then(function (response) {
+                    var docDefinition = response.data;
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Form Created Successfully!',
+                        text: 'The prescription form has been created and saved.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#6d4c41',
+                        didClose: (result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '/RGDC/patientProfile';
+                            }
+                        }
+                    });
+
+
+                });
+            }
+        }
+    }
+
+    $scope.getForms = function () {
+        var getFormsRequest = RGDCWebApplicationService.getForms();
+
+        getFormsRequest.then(function (response) {
+            if (response && response.data) {
+                $scope.formsList = response.data.map(function (form) {
+                    var parsedContent = null;
+                    if (form.formContent && typeof form.formContent === 'string') {
+                        try {
+                            parsedContent = JSON.parse(form.formContent);
+                        } catch (e) {
+                            console.error("Error parsing formContent:", e);
+                            parsedContent = null;
+                        }
+                    } else {
+                        parsedContent = form.formContent;
+                    }
+
+                    return {
+                        formID: form.formID,
+                        patientID: form.patientID,
+                        dentistID: form.dentistID,
+                        dentistName: form.dentistName,
+                        formatType: form.formatType,
+                        formContent: parsedContent,
+                        isArchived: form.isArchived,
+                        formCreatedAt: formatDateToMDY(form.formCreatedAt)
+                    };
+                });
+            } else {
+                $scope.formsList = [];
+            }
+        }, function (error) {
+            console.log("Error fetching forms:", error);
+            $scope.formsList = [];
+        });
+    };
+
+
+    $scope.viewForm = function (formID) {
+
+        var form = $scope.formsList.find(f => f.formID === formID);
+        console.log(form)
+        if (form && form.formContent) {
+
+            pdfMake.createPdf(form.formContent)
+                .open();
+        }
+    };
+
+    $scope.downloadForm = function (formID) {
+
+        var form = $scope.formsList.find(f => f.formID === formID);
+
+        if (form && form.formContent) {
+
+            pdfMake.createPdf(form.formContent)
+                .download("Form_" + formID + ".pdf");
+        }
     };
     //function initPatientFormsDataTable(opts) {
     //    opts = opts || {};

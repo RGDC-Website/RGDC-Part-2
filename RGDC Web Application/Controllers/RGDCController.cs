@@ -1033,10 +1033,274 @@ RGDC Dental Clinic Team";
             }
             else
             {
-                return Json(new { success = false, message = storedOtp });
+                return Json(new { success = false, message = "Please enter the correct OTP!" });
             }
         }
 
+        public JsonResult createPrescription(string date, string content)
+        {
+            using (var db = new RGDCContext())
+            {
+                int? patientID = null;
+                int? dentistID = null;
+
+                var selectedObj = Session["SelectedPatientID"];
+                if (selectedObj != null && int.TryParse(selectedObj.ToString(), out int selectedPid) && selectedPid > 0)
+                {
+                    patientID = selectedPid;
+                }
+                selectedObj = Session["UserID"];
+                if (selectedObj != null && int.TryParse(selectedObj.ToString(), out int selectedDid) && selectedDid > 0)
+                {
+                    dentistID = selectedDid;
+                }
+                var dentistData = (from d in db.tbl_dentist
+                                   join a in db.tbl_account
+                                       on d.accID equals a.accID
+                                   select new
+                                   {
+                                       dentistID = d.dentistID,
+                                       dentistName = a.firstName + " " + a.lastName,
+                                       signatureLink = d.signature,
+                                   })
+                     .FirstOrDefault();
+
+                var patientData = (from p in db.tbl_patient
+                                   join a in db.tbl_account
+                                       on p.accID equals a.accID
+                                   join g in db.tbl_gender on a.genderID equals g.genderID
+                                   where p.patientID == patientID
+                                   select new
+                                   {
+                                       patientName = a.firstName + " " + a.lastName,
+                                       birthDate = a.birthDate,
+                                       gender = g.description
+                                   })
+                   .FirstOrDefault();
+
+                var age = DateTime.Now.Year - patientData.birthDate.Year;
+
+                if (patientData.birthDate > DateTime.Now.AddYears(-age))
+                    age--;
+
+                var docDefinition = new
+                {
+                    pageSize = new
+                    {
+                        width = 595,
+                        height = 421
+                    },
+
+                    pageMargins = new[] { 30, 40, 30, 40 },
+
+                    content = new object[]
+                    {
+                new
+                {
+                    columns = new object[]
+                    {
+                        new
+                        {
+                            width = "*",
+                            stack = new object[]
+                            {
+                                new { text = "Alyssa Mae R. Guansing, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
+                                new { text = "Amelia T. Po, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
+                                new { text = "General Dentist • Orthodontist & TMJ Management • Oral Surgeon • Cosmetics Dentistry", fontSize = 8 }
+                            }
+                        },
+                        new
+                       {
+                            width = "auto",
+                            image = "logo",
+                            fit = new[] { 60, 60 },
+                            alignment = "center"
+                        },
+                        new
+                        {
+                            width = "*",
+                            alignment = "right",
+                            stack = new object[]
+                            {
+                                new { text = "REYES-GUANSING DENTAL CLINIC", bold = true, color = "#6d4c41", fontSize = 10 },
+                                new { text = "1191 Velarde Bldg, Del Pilar St., Sanguitan Cabanatuan City", fontSize = 8 },
+                                new { text = "Mon-Sat, 8AM-5PM", fontSize = 8 },
+                                new
+                                {
+                                    text = new object[]
+                                    {
+                                        "Sundays, ",
+                                        new { text = "by appointment", italics = true }
+                                    },
+                                    fontSize = 8
+                                },
+                                new { text = "0963 220 1556", fontSize = 8 }
+                            }
+                        }
+                    },
+                    margin = new[] { 0, 0, 0, 5 }
+                },
+
+                new
+                {
+                    canvas = new object[]
+                    {
+                        new
+                        {
+                            type = "line",
+                            x1 = 0, y1 = 0,
+                            x2 = 515, y2 = 0,
+                            lineWidth = 3,
+                            lineColor = "#6d4c41"
+                        }
+                    },
+                    margin = new[] { 0, 0, 0, 10 }
+                },
+
+                new
+                {
+                    columns = new object[]
+                    {
+                        new
+                        {
+                            width = "30%",
+                            stack = new object[]
+                            {
+                                new { text = "Name: " + patientData.patientName, margin = new[] { 0, 3 } },
+                                new { text = "Age: " + age, margin = new[] { 0, 3 } },
+                                new { text = "Gender: " + patientData.gender, margin = new[] { 0, 3 } },
+                            }
+                        },
+
+                        new
+                        {
+                            width = "70%",
+                            stack = new object[]
+                            {
+                                new
+{
+    image = "rx",
+    width = 25,
+    margin = new[] { 0, 0, 0, 5 }
+},
+
+                                new
+                                {
+                                    text = content, margin = new[] { 0, 3 }
+                                }
+                            },
+                            margin = new[] { 10, 0, 0, 0 }
+                        },
+
+
+                    }
+                },new
+{
+    margin = new[] { 0, 30, 0, 0 },
+    alignment = "center",
+    stack = new object[]
+    {
+        new
+        {
+            image = "signature",
+            width = 100,
+            alignment = "center"
+        },
+
+        new
+        {
+            text = dentistData != null ? dentistData.dentistName : "",
+            bold = true,
+            fontSize = 10
+        },
+
+        new
+        {
+            text = "Date: " + date,
+            fontSize = 8
+        }
+    }
+}
+
+                    },
+
+                    images = new
+                    {
+                        logo = GetBase64Image("~/Content/images/dentalAppLogo.png"),
+                        signature = GetBase64Image(dentistData.signatureLink),
+                        rx = GetBase64Image("~/Content/images/rx.png")
+                    }
+                };
+
+                var prescription = new tblFormModel
+                {
+                    patientID = patientID ?? 0,
+                    dentistID = dentistData.dentistID,
+                    formatType = 1,
+                    formContent = JsonConvert.SerializeObject(docDefinition),
+                    isArchived = 0,
+                    formCreatedAt = DateTime.Now,
+                    formUpdatedAt = DateTime.Now
+                };
+                db.tbl_form.Add(prescription);
+                db.SaveChanges();
+                return Json(new{success = true}, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public JsonResult GetForms()
+        {
+            int? patientID = null;
+            var selectedObj = Session["SelectedPatientID"];
+
+            if (selectedObj != null && int.TryParse(selectedObj.ToString(), out int selectedPid) && selectedPid > 0)
+            {
+                patientID = selectedPid;
+            }
+
+            using (var db = new RGDCContext())
+            {
+                var forms = (from f in db.tbl_form
+                             join d in db.tbl_dentist on f.dentistID equals d.dentistID
+                             join a in db.tbl_account on d.accID equals a.accID
+                             where f.patientID == patientID
+                             select new
+                             {
+                                 f.formID,
+                                 f.patientID,
+                                 f.dentistID,
+                                 dentistName = a.firstName + " " + a.lastName,
+                                 f.formatType,
+                                 f.formContent,
+                                 f.isArchived,
+                                 f.formCreatedAt
+                             })
+                    .ToList()
+                    .Select(f => new
+                    {
+                        f.formID,
+                        f.patientID,
+                        f.dentistID,
+                        f.dentistName,
+                        f.formatType,
+
+                        formContent = f.formContent,
+                        f.isArchived,
+                        f.formCreatedAt
+                    })
+                    .ToList();
+
+                return Json(forms, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        private string GetBase64Image(string relativePath)
+        {
+            var path = Server.MapPath(relativePath);
+            var bytes = System.IO.File.ReadAllBytes(path);
+            var base64 = Convert.ToBase64String(bytes);
+            return $"data:image/png;base64,{base64}";
+        }
         public JsonResult GetPastAppointments()
         {
             try
