@@ -1386,7 +1386,9 @@
     };
 
     $scope.sendOTP = function () {
-        if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
+        if ($scope.reset_email) {
+
+        }else if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
             Swal.fire({
                 icon: "error",
                 title: "Email is Required",
