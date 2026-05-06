@@ -45,7 +45,6 @@
     $scope.showStaffArchived = false;
     $scope.showDentistArchived = false;
     $scope.modalScheduleDays = [
-        { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
         { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
         { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
         { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: '08:00', endTime: '17:00', slotMinutes: 30 },
@@ -59,7 +58,6 @@
     (function initDentistScheduleDaysEarly() {
         function dsT(h, m) { return new Date(1970, 0, 1, h, m, 0, 0); }
         $scope.dentistScheduleDays = [
-            { dayOfWeek: 0, dayName: 'Sunday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
             { dayOfWeek: 1, dayName: 'Monday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
             { dayOfWeek: 2, dayName: 'Tuesday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
             { dayOfWeek: 3, dayName: 'Wednesday', enabled: false, startTime: dsT(8, 0), endTime: dsT(12, 0), slotMinutes: 30 },
@@ -367,6 +365,20 @@
             });
     };
 
+    $scope.resetClinicStaffSignUpContext = function () {
+        try {
+            $scope.signUpOwner = false;
+            $scope.signUpDentist = false;
+            $scope.signUpStaff = false;
+            $scope.signUp_permission = null;
+            $scope.whatStaffForm = "";
+        } catch (_) { /* ignore */ }
+    };
+
+    $scope.isDentistClinicSignup = function () {
+        return parseInt($scope.signUp_permission, 10) === 1;
+    };
+
     $scope.signUpStaffInitial = function () {
         if (!$scope.signUp_email || !$scope.hasValidEmail($scope.signUp_email)) {
             Swal.fire({ icon: "error", title: "Invalid Email", text: "Enter a valid email address" });
@@ -409,21 +421,24 @@
                                         $scope.signUpDentist = false;
                                         $scope.signUpStaff = false;
 
-                                        if (data.permission == 0) {
+                                        var perm = parseInt(data.permission, 10);
+                                        if (isNaN(perm)) perm = -1;
+                                        $scope.signUp_permission = perm;
+
+                                        if (perm === 0) {
                                             $scope.signUpOwner = true;
                                             $scope.signUp_role = 1;
                                             $scope.whatStaffForm = "Owner";
-                                        } else if (data.permission == 1) {
+                                        } else if (perm === 1) {
                                             $scope.signUpDentist = true;
                                             $scope.signUp_role = 2;
                                             $scope.whatStaffForm = "Dentist";
-                                        } else if (data.permission == 2) {
+                                        } else if (perm === 2) {
                                             $scope.signUpStaff = true;
                                             $scope.whatStaffForm = "Staff";
                                             $scope.signUp_role = 2;
                                         }
 
-                                        $scope.signUp_permission = data.permission;
 
                                         $timeout(function () {
                                             if (!elem) return;
@@ -776,6 +791,25 @@
         return null;
     }
 
+    function pickJsonField(o, camelKey, pascalKey) {
+        if (o == null) return undefined;
+        if (o[camelKey] !== undefined && o[camelKey] !== null) return o[camelKey];
+        if (o[pascalKey] !== undefined && o[pascalKey] !== null) return o[pascalKey];
+        return undefined;
+    }
+
+    function isDeniedAppointmentRow(appt) {
+        if (!appt) return false;
+        try {
+            var s = String(appt.status != null ? appt.status : "").trim().toLowerCase();
+            var d = String(appt.displayStatus != null ? appt.displayStatus : "").trim().toLowerCase();
+            if (s === "denied" || d === "denied") return true;
+            var notes = String(appt.remarks || appt.notes || "").toLowerCase();
+            if (notes.indexOf("denied by:") >= 0) return true;
+        } catch (_) { /* ignore */ }
+        return false;
+    }
+
     $scope.loadAdminScheduledAppointments = function () {
         RGDCWebApplicationService.getAdminScheduledAppointments()
             .then(function (response) {
@@ -922,7 +956,7 @@
                                 var patientData = {
                                     currentPhysician: $scope.signUp_currentPhysician,
                                     referral: $scope.signUp_referral,
-                                    lastVisit: $scope.signUp_lastVisit,
+                                    lastVisit: $scope.signUp_lastVisit || null,
                                     medicalHistory: "",
                                     occupation: $scope.signUp_occupation,
                                     accID: accID
@@ -1041,6 +1075,11 @@
                     if (sMin === null || eMin === null) throw new Error("Invalid time format for " + (d.dayName || "a day") + ".");
                     if (eMin <= sMin) throw new Error((d.dayName || "A day") + ": end time must be after start time.");
                     if (isNaN(sm) || sm < 5) throw new Error((d.dayName || "A day") + ": slot minutes must be at least 5.");
+
+                    // Clinic hours: 08:00–5:00 only
+                    var openMin = 8 * 60, closeMin = 17 * 60;
+                    if (sMin < openMin || sMin > closeMin) throw new Error((d.dayName || "A day") + ": start time must be within clinic hours (08:00–17:00).");
+                    if (eMin < openMin || eMin > closeMin) throw new Error((d.dayName || "A day") + ": end time must be within clinic hours (08:00–17:00).");
                 });
                 return true;
             }
@@ -1338,9 +1377,12 @@
                 $scope.currentUserPermission = returnedData.data.userPermission || "";
                 $scope.currentUserFullName = returnedData.data.fullName || "";
 
-                if (returnedData.data.userPhoto) {
-                    $scope.currentUserPhoto = returnedData.data.userPhoto;
-                    sessionStorage.setItem('currentUserPhoto', returnedData.data.userPhoto);
+                if (returnedData.data && Object.prototype.hasOwnProperty.call(returnedData.data, 'userPhoto')) {
+                    var ph = returnedData.data.userPhoto;
+                    $scope.currentUserPhoto = (ph != null && ph !== '') ? String(ph).trim() : '';
+                    try {
+                        if ($scope.currentUserPhoto) sessionStorage.setItem('currentUserPhoto', $scope.currentUserPhoto);
+                    } catch (e) { /* ignore */ }
                 }
 
                 // Google Calendar flags
@@ -1388,7 +1430,7 @@
     $scope.sendOTP = function () {
         if ($scope.reset_email) {
 
-        }else if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
+        } else if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
             Swal.fire({
                 icon: "error",
                 title: "Email is Required",
@@ -1399,7 +1441,7 @@
         var forgot_email = {
             email: $scope.reset_email || $scope.owner.email || $scope.staff.email || $scope.dentist.email
         }
-        
+
 
         var sendOTP = RGDCWebApplicationService.sendOTP(forgot_email);
         sendOTP.then(function (response) {
@@ -1511,9 +1553,9 @@
                         .map(function (patient) {
                             return {
                                 ...patient,
-                                lastVisitDisplay: patient.lastVisit
+                                lastVisitDisplay: (!isPlaceholderLastVisit(patient.lastVisit))
                                     ? formatDateToMDY(patient.lastVisit)
-                                    : "No visit yet"
+                                    : ""
                             };
                         });
 
@@ -1522,9 +1564,9 @@
                         .map(function (patient) {
                             return {
                                 ...patient,
-                                lastVisitDisplay: patient.lastVisit
+                                lastVisitDisplay: (!isPlaceholderLastVisit(patient.lastVisit))
                                     ? formatDateToMDY(patient.lastVisit)
-                                    : "No visit yet"
+                                    : ""
                             };
                         });
 
@@ -1602,9 +1644,23 @@
         }
     };
 
+    function normalizePatientApiPayload(p) {
+        if (!p || typeof p !== 'object') return p;
+        if (p.photoLink == null || p.photoLink === '') {
+            if (p.PhotoLink != null && p.PhotoLink !== '') p.photoLink = p.PhotoLink;
+        }
+        if (p.postOpInstructions == null && p.PostOpInstructions != null) {
+            p.postOpInstructions = p.PostOpInstructions;
+        }
+        if (p.postOpID == null && p.PostOpID != null) {
+            p.postOpID = p.PostOpID;
+        }
+        return p;
+    }
+
     $scope.getSelectedPatientDetails = function () {
         $scope.getSessionVariables().then(function (auth) {
-            if ($scope.currentUserPermission != 3) {
+            if (!$scope.isUserPatient) {
                 var getPatientInfo = RGDCWebApplicationService.getSelectedPatientDetails();
                 getPatientInfo.then(function (patientInfo) {
                     console.log(patientInfo)
@@ -1616,7 +1672,7 @@
                         return;
                     }
 
-                    var p = patientInfo.data;
+                    var p = normalizePatientApiPayload(patientInfo.data);
 
                     try {
                         var resolvedPhoto = '';
@@ -1706,12 +1762,7 @@
                     $scope.selectedPatient = p;
                     try { $scope.refreshNextAppointmentForSelectedPatient(); } catch (e) { /* ignore */ }
 
-                    // load dental chart/xray history table
-                    try {
-                        if ($scope.selectedPatient && $scope.selectedPatient.patientID && typeof $scope.loadPatientImages === 'function') {
-                            $scope.loadPatientImages($scope.selectedPatient.patientID);
-                        }
-                    } catch (e) { }
+                    try { $scope.getPostOp(); } catch (e) { /* ignore */ }
 
                     // load dental chart/xray history table
                     try {
@@ -1733,6 +1784,8 @@
                     if (!$scope.genderArray || $scope.genderArray.length === 0) {
                         $scope.getGender();
                     }
+
+                    try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
 
                     initializeDatepicker();
                 });
@@ -1770,7 +1823,7 @@
 
                     if (!patientInfo || !patientInfo.data) return;
 
-                    var p = patientInfo.data;
+                    var p = normalizePatientApiPayload(patientInfo.data);
 
                     try {
                         var resolvedPhoto = '';
@@ -1781,6 +1834,9 @@
                         else if (p && p.account && p.account.photoLink) resolvedPhoto = p.account.photoLink;
                         else if (p && p.acc && p.acc.photoLink) resolvedPhoto = p.acc.photoLink;
                         p.photoLink = (typeof resolvedPhoto === 'string') ? resolvedPhoto.trim() : (resolvedPhoto || '');
+                        if (!p.photoLink && $scope.currentUserPhoto) {
+                            p.photoLink = String($scope.currentUserPhoto).trim();
+                        }
                     } catch (e) {
                         p.photoLink = p.photoLink || '';
                     }
@@ -1845,6 +1901,27 @@
                     }
 
                     $scope.selectedPatient = p;
+                    try { $scope.refreshNextAppointmentForSelectedPatient(); } catch (e) { /* ignore */ }
+
+                    try {
+                        if ($scope.selectedPatient && $scope.selectedPatient.patientID && typeof $scope.loadPatientImages === 'function') {
+                            $scope.loadPatientImages($scope.selectedPatient.patientID);
+                        }
+                    } catch (e) { }
+
+                    try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
+                    $timeout(function () {
+                        try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
+                    }, 0);
+
+                    try {
+                        $scope.getPostOp().then(function () {
+                            try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
+                            $timeout(function () {
+                                try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
+                            }, 0);
+                        });
+                    } catch (e) { /* ignore */ }
 
                     $scope.editPatientEmailValid = $scope.hasValidEmail(($scope.selectedPatient && $scope.selectedPatient.email) ? $scope.selectedPatient.email.trim() : '');
                     $scope.editPatientEmailTaken = false;
@@ -2227,6 +2304,23 @@
         });
     }
 
+    function isPlaceholderLastVisit(dateString) {
+        try {
+            if (!dateString) return true;
+            const match = String(dateString).match(/\d+/);
+            if (!match) return true;
+            const timestamp = parseInt(match[0], 10);
+            const d = new Date(timestamp);
+            if (isNaN(d.getTime())) return true;
+            const y = d.getFullYear();
+            if (y >= 3000) return true;
+            if (y <= 1900) return true;
+            return false;
+        } catch (_) {
+            return true;
+        }
+    }
+
     function formatDateToMDYTime(dateString) {
         const match = String(dateString).match(/\d+/);
         if (!match) return dateString;
@@ -2248,6 +2342,14 @@
     $scope.updatePatientProfile = function () {
         if (!$scope.selectedPatient) return;
 
+        function isValidPHContactNumber(num) {
+            if (num == null) return false;
+            return /^09\d{9}$/.test(String(num).trim());
+        }
+        function isNonEmpty(v) {
+            return v != null && String(v).trim() !== '';
+        }
+
         if ($scope.selectedPatient.email) {
             // ensure format checked at least once
             if (!$scope.editPatientEmailValid) {
@@ -2258,6 +2360,35 @@
                 Swal.fire({ icon: 'error', title: 'Email Taken', text: 'This email is already in use by another account.' });
                 return;
             }
+        }
+
+        // Contact number validation (Philippines: 11 digits starting with 09)
+        if (!isValidPHContactNumber($scope.selectedPatient.contactNumber)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid contact number',
+                text: 'Contact number must be 11 digits and start with 09.',
+                confirmButtonColor: '#6d4c41'
+            });
+            return;
+        }
+
+        // Required address fields (do not allow save with empty address)
+        var missing = [];
+        if (!isNonEmpty($scope.selectedPatient.line1)) missing.push('Address Line 1');
+        if (!isNonEmpty($scope.selectedPatient.line2)) missing.push('Address Line 2');
+        if (!isNonEmpty($scope.selectedPatient.city)) missing.push('City');
+        if (!isNonEmpty($scope.selectedPatient.state)) missing.push('State/Province/Region');
+        if (!isNonEmpty($scope.selectedPatient.postal)) missing.push('Zip/Postal Code');
+        if (!isNonEmpty($scope.selectedPatient.country)) missing.push('Country');
+        if (missing.length) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing required fields',
+                text: 'Please fill out: ' + missing.join(', ') + '.',
+                confirmButtonColor: '#6d4c41'
+            });
+            return;
         }
 
         var profInfo = {
@@ -2273,13 +2404,13 @@
             })(),
             birthDate: $scope.selectedPatient.birthDateRaw ? new Date($scope.selectedPatient.birthDateRaw) : null,
             email: $scope.selectedPatient.email,
-            contactNumber: $scope.selectedPatient.contactNumber,
-            line1: $scope.selectedPatient.line1,
-            line2: $scope.selectedPatient.line2,
-            state: $scope.selectedPatient.state,
-            country: $scope.selectedPatient.country,
-            city: $scope.selectedPatient.city,
-            postal: $scope.selectedPatient.postal,
+            contactNumber: String($scope.selectedPatient.contactNumber).trim(),
+            line1: String($scope.selectedPatient.line1).trim(),
+            line2: String($scope.selectedPatient.line2).trim(),
+            state: String($scope.selectedPatient.state).trim(),
+            country: String($scope.selectedPatient.country).trim(),
+            city: String($scope.selectedPatient.city).trim(),
+            postal: String($scope.selectedPatient.postal).trim(),
             civilStatus: $scope.selectedPatient.civilStatus,
             occupation: $scope.selectedPatient.occupation,
             religion: $scope.selectedPatient.religion,
@@ -2291,9 +2422,50 @@
             referral: $scope.selectedPatient.referral
         };
         console.log(profInfo)
-        var updateData = RGDCWebApplicationService.updatePatient(profInfo);
-        updateData.then(function (response) {
-            if (response.data.success) {
+
+        // If patient picked a new photo, upload it first (keep preview visible until SAVE finishes).
+        var uploadPromise = Promise.resolve(null);
+        try {
+            if ($scope._pendingPatientPhotoFile && $scope.selectedPatient && $scope.selectedPatient.accID) {
+                uploadPromise = RGDCWebApplicationService.uploadUserPhoto($scope._pendingPatientPhotoFile, $scope.selectedPatient.accID)
+                    .then(function (resp) {
+                        var data = resp && resp.data ? resp.data : {};
+                        if (!data.success) throw new Error(data.message || 'Failed to upload photo.');
+                        $scope.selectedPatient.photoLink = data.filePath;
+                        if ($scope.isUserPatient) {
+                            $scope.currentUserPhoto = data.filePath;
+                            try { sessionStorage.setItem('currentUserPhoto', data.filePath); } catch (e) { /* ignore */ }
+                        }
+                        return data.filePath;
+                    });
+            }
+        } catch (e) {
+            uploadPromise = Promise.reject(e);
+        }
+
+        Swal.fire({
+            title: 'Saving…',
+            allowOutsideClick: false,
+            didOpen: function () { Swal.showLoading(); }
+        });
+
+        uploadPromise
+            .then(function () {
+                return RGDCWebApplicationService.updatePatient(profInfo);
+            })
+            .then(function (response) {
+                var ok = response && response.data && response.data.success;
+                if (!ok) {
+                    throw new Error((response && response.data && response.data.message) ? response.data.message : 'Failed to update profile.');
+                }
+
+                // Now that save is successful, finalize photo state
+                try {
+                    if ($scope.selectedPatient) $scope.selectedPatient._photoPreview = null;
+                    $scope._pendingPatientPhotoFile = null;
+                } catch (_) { }
+
+                // close modal
                 var modal = document.getElementById("modalEditPatientInfo");
                 if (modal) {
                     if (typeof M !== 'undefined' && M.Modal) {
@@ -2304,34 +2476,27 @@
                     }
                 }
 
-                Swal.fire({
+                return Swal.fire({
                     icon: "success",
                     title: "Success!",
-                    text: response.data.message || "Profile updated."
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if ($scope.isUserPatient || $scope.currentUserPermission == 3) {
-                            window.location.href = "/RGDC/patientProfile";
-                        } else {
-                            window.location.href = "/RGDC/adminPatientsTab";
-                        }
-                    }
+                    text: (response && response.data && response.data.message) ? response.data.message : "Profile updated.",
+                    confirmButtonColor: '#6d4c41'
                 });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error!",
-                    text: response.data.message || "Failed to update profile."
-                });
-            }
-        }, function (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: "Failed to update profile"
+            })
+            .then(function () {
+                // Refresh UI to reflect latest values (including new photo)
+                try { $scope.getSelectedPatientDetails(); } catch (_) { }
+                if ($scope.isUserPatient || String($scope.currentUserPermission) === '3') {
+                    window.location.href = "/RGDC/patientProfile";
+                } else {
+                    window.location.href = "/RGDC/adminPatientsTab";
+                }
+            })
+            .catch(function (error) {
+                console.error('updatePatientProfile error', error);
+                var msg = (error && error.data && error.data.message) ? error.data.message : (error && error.message) ? error.message : "Failed to update profile";
+                Swal.fire({ icon: "error", title: "Error!", text: msg, confirmButtonColor: '#6d4c41' });
             });
-            console.error(error);
-        });
     };
 
     $scope.uploadFile = function () {
@@ -2488,6 +2653,59 @@
                 modalImg.src = img.imagePath + '?t=' + new Date().getTime();
             }
         } catch (_) { }
+    };
+
+    $scope.archivePatientImage = function (img, $event) {
+        try {
+            if ($event && $event.stopPropagation) $event.stopPropagation();
+            if (!img || !img.patientImageID) return;
+            if ($scope.isUserPatient === true) {
+                return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'Patients can only view dental charts.' });
+            }
+            if (!$scope.isUserAdmin) {
+                return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'You do not have permission to archive dental charts.' });
+            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Archive this chart?',
+                text: 'This will remove the image from the patient\'s dental chart history. This cannot be undone.',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, archive',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#795548',
+                reverseButtons: true
+            }).then(function (result) {
+                if (!result || !result.isConfirmed) return;
+                Swal.fire({ title: 'Archiving...', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+                return RGDCWebApplicationService.archivePatientImage(img.patientImageID)
+                    .then(function (resp) {
+                        var d = resp && resp.data ? resp.data : {};
+                        if (!d.success) throw new Error(d.message || 'Archive failed.');
+                        return RGDCWebApplicationService.getSelectedPatientDetails();
+                    })
+                    .then(function (patientInfo) {
+                        if (patientInfo && patientInfo.data) {
+                            $scope.selectedPatient = patientInfo.data;
+                        }
+                        if ($scope.selectedPatient && $scope.selectedPatient.patientID) {
+                            $scope.loadPatientImages($scope.selectedPatient.patientID);
+                        }
+                        try {
+                            var inst = M.Modal.getInstance(document.getElementById('viewModalDentalChart'));
+                            if (inst) inst.close();
+                        } catch (_) { }
+                        Swal.fire({ icon: 'success', title: 'Archived', text: 'The dental chart has been removed.' });
+                    })
+                    .catch(function (err) {
+                        console.error('archivePatientImage error', err);
+                        var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Could not archive.';
+                        Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                    });
+            });
+        } catch (e) {
+            console.error('archivePatientImage error', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message || 'Could not archive.' });
+        }
     };
 
     $scope.pickDentalChartFile = function () {
@@ -3014,49 +3232,130 @@
 
 
     $scope.postArray = [];
+    $scope.postOpDisplayHtml = '';
 
+    $scope.syncPostOpDisplay = function () {
+        var html = '';
+        var sp = $scope.selectedPatient;
+        if (sp) {
+            normalizePatientApiPayload(sp);
+            var direct = sp.postOpInstructions;
+            if (direct == null || direct === '') direct = sp.PostOpInstructions;
+            if (direct != null && String(direct).trim() !== '') {
+                html = String(direct);
+            } else {
+                var rawId = sp.postOpID != null && sp.postOpID !== '' ? sp.postOpID : sp.PostOpID;
+                var poId = rawId != null ? Number(rawId) : 0;
+                if (!isNaN(poId) && poId > 0 && $scope.postArray && $scope.postArray.length) {
+                    for (var i = 0; i < $scope.postArray.length; i++) {
+                        var row = $scope.postArray[i];
+                        if (!row) continue;
+                        var rid = row.postOpID != null ? row.postOpID : row.PostOpID;
+                        if (Number(rid) === poId) {
+                            var c = row.content != null ? row.content : row.Content;
+                            html = c ? String(c) : '';
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        $scope.postOpDisplayHtml = $sce.trustAsHtml(html || '');
+    };
 
     $scope.getPostOp = function () {
-        RGDCWebApplicationService.getPostOp()
+        return RGDCWebApplicationService.getPostOp()
             .then(function (returnedData) {
                 $scope.postArray = returnedData.data || [];
-
-
+                try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
             })
             .catch(function (err) {
                 console.error('Failed to load postOp Array', err);
                 $scope.postArray = [];
+                try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
             });
     }
-
-    $scope.getPostOpContent = function () {
-        return $sce.trustAsHtml(
-            $scope.selectedPatient.postOpInstructions || $scope.postOp.instructions
-        );
-    };
 
     $scope.deletePostOp = function () {
         RGDCWebApplicationService.deletePostOp();
         window.location.href = "/RGDC/patientProfile"
     }
+
+    $scope.setPostOp = function (postOpID) {
+        try {
+            if (!$scope.selectedPatient) $scope.selectedPatient = {};
+            $scope.selectedPatient.postOpID = postOpID;
+            $scope.selectedPatient.postOpInstructions = null;
+            $scope.syncPostOpDisplay();
+        } catch (e) {
+        }
+    };
+
     $scope.savePostOp = function () {
-        var postOp = {
-            postOpID: $scope.selectedPatient.postOpID
+        try {
+            var id = $scope.selectedPatient ? $scope.selectedPatient.postOpID : null;
+            if (id == null || id === '' || isNaN(Number(id)) || Number(id) <= 0) {
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'Missing template',
+                    text: 'Please select a post-op template.',
+                    confirmButtonColor: '#6d4c41'
+                });
+            }
+
+            Swal.fire({
+                title: 'Saving…',
+                allowOutsideClick: false,
+                didOpen: function () { Swal.showLoading(); }
+            });
+
+            RGDCWebApplicationService.savePostOp({ postOpID: Number(id) })
+                .then(function (resp) {
+                    var d = resp && resp.data ? resp.data : {};
+                    if (d.success === false) throw new Error(d.message || 'Failed to update post-op.');
+
+                    // Refresh selected patient details so postOpInstructions is correct for this patient.
+                    return RGDCWebApplicationService.getSelectedPatientDetails()
+                        .then(function (patientInfo) {
+                            if (patientInfo && patientInfo.data && typeof patientInfo.data === 'object') {
+                                var p = normalizePatientApiPayload(patientInfo.data);
+                                $scope.selectedPatient = p;
+                            }
+                            try { $scope.syncPostOpDisplay(); } catch (_) { }
+                        });
+                })
+                .then(function () {
+                    // Close modal then show success
+                    try {
+                        var modal = document.getElementById('modalEditPostOp');
+                        if (modal && typeof M !== 'undefined' && M.Modal) {
+                            var inst = M.Modal.getInstance(modal);
+                            if (inst) inst.close();
+                        }
+                    } catch (_) { }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Updated',
+                        text: 'Post operation instructions updated successfully.',
+                        confirmButtonColor: '#6d4c41'
+                    });
+                })
+                .catch(function (err) {
+                    console.error('savePostOp error', err);
+                    var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Failed to update post-op.';
+                    Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#6d4c41' });
+                });
+        } catch (e) {
+            console.error('savePostOp error', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message || 'Failed to update post-op.', confirmButtonColor: '#6d4c41' });
         }
-        RGDCWebApplicationService.savePostOp(postOp);
-        var modal = document.getElementById('modalEditPostOp');
-        if (modal && typeof M !== 'undefined' && M.Modal) {
-            var inst = M.Modal.getInstance(modal);
-            if (inst) inst.close();
-        }
-        window.location.href = "/RGDC/patientProfile"
     }
 
 
     $scope.getPostOpContent = function () {
-        return $sce.trustAsHtml(
-            $scope.selectedPatient.postOpInstructions || $scope.postOp.instructions
-        );
+        try { $scope.syncPostOpDisplay(); } catch (e) { /* ignore */ }
+        return $scope.postOpDisplayHtml;
     };
 
 
@@ -3756,43 +4055,56 @@
                 }
 
                 var mapped = data.map(function (a) {
-                    var jsDate = parseJsonDateToJsDate(a.dateTime);
-                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : (a.date || "");
-                    var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : (a.time || "");
+                    var dtRaw = pickJsonField(a, "dateTime", "DateTime");
+                    var jsDate = parseJsonDateToJsDate(dtRaw);
+                    var dateFallback = pickJsonField(a, "date", "Date");
+                    var timeFallback = pickJsonField(a, "time", "Time");
+                    var dateStr = jsDate ? jsDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : (dateFallback || "");
+                    var timeStr = jsDate ? jsDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }) : (timeFallback || "");
 
-                    var status = (a.status || "");
+                    var status = (pickJsonField(a, "status", "Status") || "");
+                    var remarksRaw = pickJsonField(a, "remarks", "Remarks");
+                    var notesRaw = pickJsonField(a, "notes", "Notes");
                     // Prefer server-provided notes/remarks. For denied requests, always show denial remarks (includes reason).
                     var notes = "";
                     if (String(status).toLowerCase() === "denied") {
-                        notes = a.remarks || a.notes || "";
+                        notes = notesRaw || remarksRaw || "";
                     } else {
-                        // prefer returned notes field; fallback to building notes from requester/contact
-                        notes = a.notes || a.remarks || "";
+                        notes = notesRaw || remarksRaw || "";
                         if (!notes || String(notes).trim() === "") {
                             var parts = [];
-                            if (a.requesterName) parts.push("Requested by: " + a.requesterName + ".");
-                            if (a.contactNumber) parts.push("In case of further questions kindly contact this number: " + a.contactNumber + ".");
+                            var reqName = pickJsonField(a, "requesterName", "RequesterName");
+                            var contact = pickJsonField(a, "contactNumber", "ContactNumber");
+                            if (reqName) parts.push("Requested by: " + reqName + ".");
+                            if (contact) parts.push("In case of further questions kindly contact this number: " + contact + ".");
                             notes = parts.join("\n");
                         }
                     }
 
+                    var apptID = pickJsonField(a, "apptID", "ApptID");
+                    var purpose = pickJsonField(a, "purpose", "Purpose") || pickJsonField(a, "reason", "Reason") || "";
+                    var dentId = pickJsonField(a, "dentistID", "DentistID");
+                    var patId = pickJsonField(a, "patientID", "PatientID");
+                    var createdByVal = pickJsonField(a, "createdBy", "CreatedBy");
+                    var disp = pickJsonField(a, "displayStatus", "DisplayStatus");
+
                     return {
-                        apptID: a.apptID,
+                        apptID: apptID,
                         date: dateStr,
                         time: timeStr,
-                        purpose: a.purpose || a.reason || "",
+                        dateTimeMs: jsDate ? jsDate.getTime() : null,
+                        purpose: purpose,
                         notes: notes,
-                        // show cleaned notes in the table (hide internal tokens like "RescheduleOf:")
                         remarks: notes,
-                        dentistID: (typeof a.dentistID !== 'undefined' && a.dentistID !== null) ? parseInt(a.dentistID, 10) : null,
-                        patientID: (typeof a.patientID !== 'undefined' && a.patientID !== null) ? parseInt(a.patientID, 10) : null,
-                        dentistName: a.dentistName || "",
-                        patientName: a.patientName || "",
-                        contactNumber: a.contactNumber || null,
-                        requesterName: a.requesterName || null,
+                        dentistID: (typeof dentId !== "undefined" && dentId !== null) ? parseInt(dentId, 10) : null,
+                        patientID: (typeof patId !== "undefined" && patId !== null) ? parseInt(patId, 10) : null,
+                        dentistName: pickJsonField(a, "dentistName", "DentistName") || "",
+                        patientName: pickJsonField(a, "patientName", "PatientName") || "",
+                        contactNumber: pickJsonField(a, "contactNumber", "ContactNumber") || null,
+                        requesterName: pickJsonField(a, "requesterName", "RequesterName") || null,
                         status: status,
-                        displayStatus: a.displayStatus || status || "",
-                        createdBy: a.createdBy != null && a.createdBy !== undefined ? a.createdBy : null
+                        displayStatus: disp || status || "",
+                        createdBy: createdByVal != null && createdByVal !== undefined ? createdByVal : null
                     };
                 });
 
@@ -3927,7 +4239,14 @@
 
     function updateDashboardLists() {
         try {
-            $scope.dashboardRequested = Array.isArray($scope.requestedAppointments) ? $scope.requestedAppointments.slice(0) : [];
+            var now = Date.now();
+            var req = Array.isArray($scope.requestedAppointments) ? $scope.requestedAppointments : [];
+            $scope.dashboardRequested = req.filter(function (a) {
+                if (!a || isDeniedAppointmentRow(a)) return false;
+                if (String(a.status || "").trim().toLowerCase() !== "requested") return false;
+                if (a.dateTimeMs != null && !isNaN(Number(a.dateTimeMs)) && Number(a.dateTimeMs) < now) return false;
+                return true;
+            });
 
             var all = Array.isArray($scope.adminAppointments) ? $scope.adminAppointments : [];
             var auth = String($scope.currentUserAuthorization || "");
@@ -4280,9 +4599,13 @@
 
         $scope.addSubmitted = true;
 
+        var refReqPay = ($scope.paymentMethod === 'GCash' || $scope.paymentMethod === 'Card');
+        var refOkPay = String($scope.paymentReference || '').trim().length > 0;
+
         if ($scope.selectedPatient === null || $scope.selectedDentist === null || !$scope.paymentDate ||
             !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
-            $scope.paymentPaid === null) {
+            $scope.paymentPaid === null ||
+            (refReqPay && !refOkPay)) {
             return;
         }
         if (parseFloat($scope.paymentDue) < 0) {
@@ -4323,7 +4646,7 @@
                 console.log(dentID)
                 proceed();
             })
-            
+
         }
         function proceed() {
             console.log(dentID)
@@ -4361,9 +4684,13 @@
 
             $scope.addSubmitted = true;
 
+            var refRequired = ($scope.paymentMethod === 'GCash' || $scope.paymentMethod === 'Card');
+            var refOk = String($scope.paymentReference || '').trim().length > 0;
+
             if (!$scope.paymentDate ||
                 !$scope.paymentMethod || !$scope.paymentCost || $scope.paymentDue === null ||
-                $scope.paymentPaid === null) {
+                $scope.paymentPaid === null ||
+                (refRequired && !refOk)) {
                 return;
             }
             if (parseFloat($scope.paymentDue) < 0) {
@@ -5016,6 +5343,36 @@
         });
     }
 
+    $scope.deactivateStaff = function () {
+        var staffAcc = { accID: $scope.accArchived };
+        RGDCWebApplicationService.deleteStaff(staffAcc)
+            .then(function (returnedData) {
+                if (returnedData.data.success) {
+                    Swal.fire({ icon: 'success', title: 'Deactivate Staff', text: 'Successfully deactivated staff account.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/RGDC/adminClinicStaffTab";
+                            afterUpdate();
+                        }
+                    });
+                }
+            });
+    };
+
+    $scope.activateStaff = function () {
+        var staffAcc = { accID: $scope.accArchived };
+        RGDCWebApplicationService.deleteStaff(staffAcc)
+            .then(function (returnedData) {
+                if (returnedData.data.success) {
+                    Swal.fire({ icon: 'success', title: 'Activate Staff', text: 'Successfully activated staff account.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/RGDC/adminClinicStaffTab";
+                            afterUpdate();
+                        }
+                    });
+                }
+            });
+    };
+
     $scope.selectArchiveDentist = function (accID) {
         $scope.accArchived = accID;
     }
@@ -5038,6 +5395,36 @@
             }
         });
     }
+
+    $scope.deactivateDentist = function () {
+        var dentistAcc = { accID: $scope.accArchived };
+        RGDCWebApplicationService.deleteDentist(dentistAcc)
+            .then(function (returnedData) {
+                if (returnedData.data.success) {
+                    Swal.fire({ icon: 'success', title: 'Deactivate Dentist', text: 'Successfully deactivated dentist account.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/RGDC/adminClinicStaffTab";
+                            afterUpdate();
+                        }
+                    });
+                }
+            });
+    };
+
+    $scope.activateDentist = function () {
+        var dentistAcc = { accID: $scope.accArchived };
+        RGDCWebApplicationService.deleteDentist(dentistAcc)
+            .then(function (returnedData) {
+                if (returnedData.data.success) {
+                    Swal.fire({ icon: 'success', title: 'Activate Dentist', text: 'Successfully activated dentist account.' }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/RGDC/adminClinicStaffTab";
+                            afterUpdate();
+                        }
+                    });
+                }
+            });
+    };
 
     $scope.selectOwner = function (ownerID) {
         var ownerAcc = { ownerID: ownerID };
@@ -5295,6 +5682,16 @@
             return;
         }
 
+        if (!$scope.ownerContactValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact Number',
+                text: 'Contact number must be 11 digits starting with 09.',
+                confirmButtonColor: '#6d4c41'
+            });
+            return;
+        }
+
         if (!$scope.ownerEmailFormatValid) {
             Swal.fire({
                 icon: 'error',
@@ -5388,6 +5785,9 @@
                     Swal.close();
 
                     $scope.editOwnerSubmitted = false;
+
+                    try { if (typeof $scope.getOwnerData === 'function') $scope.getOwnerData(); } catch (_) { }
+                    try { if (typeof $scope.getSessionVariables === 'function') $scope.getSessionVariables(); } catch (_) { }
 
                     Swal.fire({
                         icon: 'success',
@@ -5847,32 +6247,9 @@
             Swal.fire({ icon: 'error', title: 'No account selected', text: 'Select a patient first.' });
             return;
         }
-
-
-        Swal.fire({
-            title: 'Uploading...',
-            text: 'Please wait while we upload the image.',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
-        RGDCWebApplicationService.uploadUserPhoto(file, $scope.selectedPatient.accID)
-            .then(function (resp) {
-                var data = resp && resp.data ? resp.data : {};
-                if (data.success) {
-                    // update client model so UI reflects new photo immediately
-                    $scope.selectedPatient.photoLink = data.filePath;
-                    $scope.selectedPatient._photoPreview = null;
-                    $scope.getSelectedPatientDetails();
-                    Swal.fire({ icon: 'success', title: 'Uploaded', text: data.message || 'Photo uploaded.' });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Upload failed', text: data.message || 'Failed to upload photo.' });
-                }
-            })
-            .catch(function (err) {
-                console.error('uploadUserPhoto error', err);
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to upload photo.' });
-            });
+        // IMPORTANT: Patient photo selection is PREVIEW-ONLY.
+        // We upload only when the user clicks SAVE in modalEditPatientInfo.
+        $scope._pendingPatientPhotoFile = file;
     };
 
     // Dentists
@@ -6113,6 +6490,35 @@
             return;
         }
 
+        if (!$scope.staffContactValid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact Number',
+                text: 'Contact number must be 11 digits starting with 09.',
+                confirmButtonColor: '#6d4c41'
+            });
+            return;
+        }
+
+        // Ensure all required address fields are filled
+        function _nonEmpty(v) { return v != null && String(v).trim() !== ''; }
+        var missingAddr = [];
+        if (!_nonEmpty($scope.staff.line1)) missingAddr.push('Address Line 1');
+        if (!_nonEmpty($scope.staff.line2)) missingAddr.push('Address Line 2');
+        if (!_nonEmpty($scope.staff.city)) missingAddr.push('City');
+        if (!_nonEmpty($scope.staff.state)) missingAddr.push('State/Province/Region');
+        if (!_nonEmpty($scope.staff.postal)) missingAddr.push('Zip/Postal Code');
+        if (!_nonEmpty($scope.staff.country)) missingAddr.push('Country');
+        if (missingAddr.length) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing required fields',
+                text: 'Please fill out: ' + missingAddr.join(', ') + '.',
+                confirmButtonColor: '#6d4c41'
+            });
+            return;
+        }
+
         if (!$scope.staffEmailFormatValid) {
             Swal.fire({
                 icon: 'error',
@@ -6169,13 +6575,13 @@
                 genderID: $scope.staff.genderID,
                 birthDate: $scope.staff.birthDate,
                 email: $scope.staff.email,
-                contactNumber: $scope.staff.contactNumber,
-                line1: $scope.staff.line1,
-                line2: $scope.staff.line2,
-                state: $scope.staff.state,
-                country: $scope.staff.country,
-                city: $scope.staff.city,
-                postal: $scope.staff.postal,
+                contactNumber: ($scope.staff.contactNumber || '').trim(),
+                line1: ($scope.staff.line1 || '').trim(),
+                line2: ($scope.staff.line2 || '').trim(),
+                state: ($scope.staff.state || '').trim(),
+                country: ($scope.staff.country || '').trim(),
+                city: ($scope.staff.city || '').trim(),
+                postal: ($scope.staff.postal || '').trim(),
                 civilStatus: $scope.staff.civilStatus,
                 nationality: $scope.staff.nationality,
                 religion: $scope.staff.religion
@@ -6635,28 +7041,85 @@
     };
 
     $scope.addForm = function () {
-        if ($scope.form.type && $scope.form.date && $scope.form.content) {
-            if ($scope.form.type == "1") {
-                RGDCWebApplicationService.createPrescription($scope.form.date, $scope.form.content).then(function (response) {
-                    var docDefinition = response.data;
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Form Created Successfully!',
-                        text: 'The prescription form has been created and saved.',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#6d4c41',
-                        didClose: (result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = '/RGDC/patientProfile';
-                            }
-                        }
-                    });
-
-
-                });
-            }
+        if (!$scope.form || !$scope.form.type || !$scope.form.date || !$scope.form.content) {
+            return Swal.fire({
+                icon: 'error',
+                title: 'Missing fields',
+                text: 'Please complete form type, date, and content.',
+                confirmButtonColor: '#6d4c41'
+            });
         }
-    }
+        if ($scope.form.type != "1") return;
+
+        Swal.fire({
+            title: 'Saving…',
+            allowOutsideClick: false,
+            didOpen: function () { Swal.showLoading(); }
+        });
+
+        RGDCWebApplicationService.createPrescription($scope.form.date, $scope.form.content)
+            .then(function (response) {
+                var d = response && response.data ? response.data : {};
+                if (d.success !== true) {
+                    throw new Error(d.message || 'Could not create form.');
+                }
+                try {
+                    var el = document.getElementById('modalAddForm');
+                    if (el && typeof M !== 'undefined' && M.Modal) {
+                        var inst = M.Modal.getInstance(el);
+                        if (inst) inst.close();
+                    }
+                } catch (_) { }
+                Swal.close();
+                window.location.href = '/RGDC/patientProfile';
+            })
+            .catch(function (err) {
+                console.error('addForm error', err);
+                var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Could not create form.';
+                Swal.fire({ icon: 'error', title: 'Error', text: msg, confirmButtonColor: '#6d4c41' });
+            });
+    };
+
+    $scope.archivePatientForm = function (form, $event) {
+        try {
+            if ($event && $event.stopPropagation) $event.stopPropagation();
+            if (!form || !form.formID) return;
+            if ($scope.isUserPatient === true) {
+                return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'Patients cannot archive forms.' });
+            }
+            if (!$scope.isUserAdmin) {
+                return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'You do not have permission to archive forms.' });
+            }
+            Swal.fire({
+                icon: 'warning',
+                title: 'Archive this form?',
+                text: 'This will remove the prescription from the active list. This cannot be undone.',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, archive',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#795548',
+                reverseButtons: true
+            }).then(function (result) {
+                if (!result || !result.isConfirmed) return;
+                Swal.fire({ title: 'Archiving…', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+                return RGDCWebApplicationService.archiveForm(form.formID)
+                    .then(function (resp) {
+                        var d = resp && resp.data ? resp.data : {};
+                        if (!d.success) throw new Error(d.message || 'Archive failed.');
+                        Swal.close();
+                        window.location.href = '/RGDC/patientProfile';
+                    })
+                    .catch(function (err) {
+                        console.error('archivePatientForm error', err);
+                        var msg = (err && err.data && err.data.message) ? err.data.message : (err && err.message) ? err.message : 'Could not archive.';
+                        Swal.fire({ icon: 'error', title: 'Error', text: msg });
+                    });
+            });
+        } catch (e) {
+            console.error('archivePatientForm error', e);
+            Swal.fire({ icon: 'error', title: 'Error', text: e.message || 'Could not archive.' });
+        }
+    };
 
     $scope.getForms = function () {
         var getFormsRequest = RGDCWebApplicationService.getForms();
@@ -6697,13 +7160,27 @@
     };
 
 
+    // pdfMake mutates header nodes during layout; a plain JSON header object is only drawn once.
+    // Returning a fresh copy per page makes letterhead + patient block repeat on every page.
+    function preparePdfMakeDocDefinition(docDefinition) {
+        if (!docDefinition || typeof docDefinition !== 'object') return docDefinition;
+        var out = angular.copy(docDefinition);
+        if (out.header != null && typeof out.header === 'object' && typeof out.header !== 'function') {
+            var headerJson = JSON.stringify(out.header);
+            out.header = function () {
+                return JSON.parse(headerJson);
+            };
+        }
+        return out;
+    }
+
     $scope.viewForm = function (formID) {
 
         var form = $scope.formsList.find(f => f.formID === formID);
         console.log(form)
         if (form && form.formContent) {
 
-            pdfMake.createPdf(form.formContent)
+            pdfMake.createPdf(preparePdfMakeDocDefinition(form.formContent))
                 .open();
         }
     };
@@ -6714,7 +7191,7 @@
 
         if (form && form.formContent) {
 
-            pdfMake.createPdf(form.formContent)
+            pdfMake.createPdf(preparePdfMakeDocDefinition(form.formContent))
                 .download("Form_" + formID + ".pdf");
         }
     };
@@ -7742,6 +8219,9 @@
         var placeholder = 'https://placehold.co/400';
         try {
             var p = ($scope.selectedPatient && $scope.selectedPatient.photoLink) ? String($scope.selectedPatient.photoLink).trim() : '';
+            if (!p && $scope.isUserPatient && $scope.currentUserPhoto) {
+                p = String($scope.currentUserPhoto).trim();
+            }
             if (!p) return placeholder;
             if (/^https?:\/\//i.test(p)) return p;
             if (p.charAt(0) === '/') return window.location.origin + p;
@@ -8275,8 +8755,19 @@
     };
 
     $scope.isDeniedStatus = function (appt) {
+        return isDeniedAppointmentRow(appt);
+    };
+
+    // Archive denied row to Past: patients may only archive their own; staff/dentist/owner/superadmin may archive any denied row.
+    $scope.canArchiveDeniedRequest = function (appt) {
         try {
-            return String((appt && appt.status) || '').toLowerCase() === 'denied';
+            if (!appt || !$scope.isDeniedStatus(appt)) return false;
+            if ($scope.isUserPatient === true) return $scope.isRequestCreator(appt);
+            var auth = String($scope.currentUserAuthorization || "");
+            var perm = String($scope.currentUserPermission || "");
+            if (auth === "0" || auth === "1") return true;
+            if (auth === "2" && (perm === "1" || perm === "2")) return true;
+            return false;
         } catch (_) {
             return false;
         }
@@ -8290,17 +8781,19 @@
         return $scope.cancelAppointment(appt);
     };
 
-    // For denied requests: creator can "delete" which archives it into Past Appointments.
+    // For denied requests: archive into Past Appointments (see canArchiveDeniedRequest for who may act).
     $scope.deleteDeniedRequest = function (appt) {
         try {
             if (!appt || !appt.apptID) return Swal.fire({ icon: 'error', title: 'Error', text: 'No appointment selected.' });
-            if (!$scope.isRequestCreator(appt)) return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'Only the creator can delete this request.' });
             if (!$scope.isDeniedStatus(appt)) {
-                return Swal.fire({ icon: 'info', title: 'Not Denied', text: 'Only denied requests can be deleted from this list.' });
+                return Swal.fire({ icon: 'info', title: 'Not Denied', text: 'Only denied requests can be archived from this list.' });
+            }
+            if (!$scope.canArchiveDeniedRequest(appt)) {
+                return Swal.fire({ icon: 'error', title: 'Not allowed', text: 'You are not allowed to archive this request.' });
             }
 
             Swal.fire({
-                title: 'Delete Denied Request?',
+                title: 'Archive Denied Request?',
                 text: 'This will remove it from Requested and move it to Past Appointments.',
                 icon: 'warning',
                 showCancelButton: true,
@@ -8508,12 +9001,32 @@
                 var st = formatTimeToHHMM(d.startTime);
                 var et = formatTimeToHHMM(d.endTime);
                 d.startTime = st || '08:00';
-                d.endTime = et || '12:00';
+                d.endTime = et || '17:00';
                 d.slotMinutes = (typeof d.slotMinutes === 'number') ? d.slotMinutes : parseInt(d.slotMinutes, 10) || 30;
             } catch (e) {
                 console.warn('initModalScheduleDays normalize failed for', d, e);
             }
         });
+    };
+
+
+    $scope.clampClinicHoursTime = function (d, field) {
+        try {
+            if (!d || !field) return;
+            var openMin = 8 * 60, closeMin = 17 * 60;
+            var raw = (field === 'start') ? d.startTime : d.endTime;
+            var hhmm = formatTimeToHHMM(raw);
+            if (!hhmm) return;
+            var mins = hhmmToMinutes(hhmm);
+            if (mins === null) return;
+            if (mins < openMin) mins = openMin;
+            if (mins > closeMin) mins = closeMin;
+            var hh = Math.floor(mins / 60);
+            var mm = mins % 60;
+            var clamped = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+            if (field === 'start') d.startTime = clamped;
+            else d.endTime = clamped;
+        } catch (_) { /* ignore */ }
     };
 
     try { $scope.initModalScheduleDays(); } catch (e) { /* safe fallback */ }

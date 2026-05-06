@@ -207,8 +207,18 @@
                 @*Reference*@
                 <label class="custom-label">
                     Reference No.
-                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50" />
+                    <span class="required-mark" ng-show="paymentMethod === 'GCash' || paymentMethod === 'Card'">*</span>
+                    <input type="text"
+                           class="custom-input"
+                           ng-model="paymentReference"
+                           placeholder="Reference Number..."
+                           maxlength="50"
+                           ng-class="{'invalid-input': addSubmitted && (paymentMethod === 'GCash' || paymentMethod === 'Card') && !(paymentReference && paymentReference.trim())}" />
                 </label>
+                <span class="validation-msg"
+                      ng-show="addSubmitted && (paymentMethod === 'GCash' || paymentMethod === 'Card') && !(paymentReference && paymentReference.trim())">
+                    Reference number is required for GCash or Card.
+                </span>
             </div>
         </div>
         <div class="row">

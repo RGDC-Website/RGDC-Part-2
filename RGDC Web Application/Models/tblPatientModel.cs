@@ -24,7 +24,7 @@ namespace RGDC_Web_Application.Models
         public string dentalChartLink { get; set; }
         public string dentalChartType { get; set; }
         public string signatureLink { get; set; }
-        public DateTime lastVisit { get; set; }
+        public DateTime? lastVisit { get; set; }
         public DateTime lastUpdated { get; set; }
     }
 }

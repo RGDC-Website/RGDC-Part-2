@@ -397,14 +397,22 @@
                                     <tr ng-repeat="img in patientImages track by img.patientImageID">
                                         <td>{{img.createdAt | date:'MM/dd/yyyy'}}</td>
                                         <td>{{img.imageType}}</td>
-                                        <td>
-                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger"
+                                        <td class="right-align" style="white-space: nowrap;">
+                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 modal-trigger"
                                                data-target="viewModalDentalChart"
                                                data-position="bottom"
                                                data-tooltip="View"
-                                               style="margin-right: 0.5rem !important"
+                                               style="margin-right: 0.5rem !important; vertical-align: middle;"
                                                ng-click="viewPatientImage(img)">
                                                 <i class="material-icons brown-text lighten-1">visibility</i>
+                                            </a>
+                                            <a ng-show="isUserAdmin && !isUserPatient"
+                                               class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                               data-position="bottom"
+                                               data-tooltip="Archive"
+                                               style="margin-right: 0.5rem !important; vertical-align: middle;"
+                                               ng-click="archivePatientImage(img, $event)">
+                                                <i class="material-icons brown-text lighten-1">inventory_2</i>
                                             </a>
                                         </td>
                                     </tr>
@@ -452,14 +460,23 @@
                                             Prescription
                                         </td>
                                         <td>{{form.dentistName}}</td>
-                                        <td>
-                                            <a ng-show="!isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn"
-                                               data-position="bottom" ng-click="viewForm(form.formID)" data-tooltip="View Form">
+                                        <td class="right-align" style="white-space: nowrap;">
+                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn"
+                                               data-position="bottom" ng-click="viewForm(form.formID)" data-tooltip="View Form"
+                                               style="margin-right: 0.5rem !important; vertical-align: middle;">
                                                 <i class="material-icons brown-text lighten-1">visibility</i>
                                             </a>
-                                            <a ng-show="!isUserStaff" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
-                                               data-position="bottom" ng-click="downloadForm(form.formID)" data-tooltip="Print Form" style="margin-right: 0.5rem !important">
+                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                               data-position="bottom" ng-click="downloadForm(form.formID)" data-tooltip="Print Form"
+                                               style="margin-right: 0.5rem !important; vertical-align: middle;">
                                                 <i class="material-icons brown-text lighten-1">print</i>
+                                            </a>
+                                            <a ng-show="isUserAdmin && !isUserPatient"
+                                               class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                               data-position="bottom" data-tooltip="Archive"
+                                               style="margin-right: 0.5rem !important; vertical-align: middle;"
+                                               ng-click="archivePatientForm(form, $event)">
+                                                <i class="material-icons brown-text lighten-1">inventory_2</i>
                                             </a>
                                         </td>
                                     </tr>
@@ -485,7 +502,7 @@
                                         <span class="card-title bold">Post OP</span>
                                         <div class="divider"></div>
                                         @*post op content*@
-                                        <div ng-bind-html="getPostOpContent()"></div>
+                                        <div ng-bind-html="postOpDisplayHtml"></div>
                                     </div>
                                 </div>
                             </div>
@@ -769,7 +786,7 @@
             <div class="row">
                 @*Guradian*@
                 <div class="col s4">
-                    <p class="custom-label">Guradian <span class="required-mark">*</span></p>
+                    <p class="custom-label">Guardian</p>
                     <input type="text"
                            ng-model="selectedPatient.guar"
                            class="custom-input"
@@ -779,12 +796,12 @@
 
                 @*Guradian Number*@
                 <div class="col s4">
-                    <p class="custom-label">Guradian's Contact Number' <span class="required-mark">*</span></p>
+                    <p class="custom-label">Guardian's Contact Number'</p>
                     <input type="text"
                            class="custom-input"
                            ng-model="selectedPatient.guarNum"
                            maxlength="150"
-                           oninput="this.value = this.value.replace(/[^A-Za-z .]/g, '')" />
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                 </div>
 
                 @*Refferal*@
@@ -801,14 +818,20 @@
     </div>
 
     @*Submit , upload, cancel*@
-    <div class="modal-footer" style="margin-top:2.5vh">
-        <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh" ng-click="triggerPatientPhotoInput()">UPLOAD</button>
-        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
-        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="updatePatientProfile()">SAVE</button>
-        @*New Password*@
-        <!--<div class="forgot-password-container right" ng-show="isUserPatient" style="margin: -8vh 0 0 0 !important;" ">
-            <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="margin: 0 3vh 0 0 !important; font-weight:500">Set New Password?</a>
-        </div>-->
+    <div class="modal-footer" style="margin-top:2.5vh; padding: 0.75rem 1.25rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+        <button type="button" class="edit-btn" style="font-weight: 500;" ng-click="triggerPatientPhotoInput()">UPLOAD</button>
+
+        <div style="margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem;">
+            @*New Password*@
+            <div class="forgot-password-container" ng-show="isUserPatient" style="margin-top:0.25rem;">
+                <a href="#" class="forgot-link modal-trigger" data-target="modalOTP" style="font-weight:500">Set New Password?</a>
+            </div>
+
+            <div style="display:flex; gap:0.5rem;">
+                <button class="modal-close cancel-btn" style="font-weight: 500;">CANCEL</button>
+                <button type="submit" class="edit-btn" style="font-weight: 500;" ng-click="updatePatientProfile()">SAVE</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -1462,8 +1485,18 @@
                 @*Reference*@
                 <label class="custom-label">
                     Reference No.
-                    <input type="text" class="custom-input" ng-model="paymentReference" placeholder="Reference Number..." max="50" />
+                    <span class="required-mark" ng-show="paymentMethod === 'GCash' || paymentMethod === 'Card'">*</span>
+                    <input type="text"
+                           class="custom-input"
+                           ng-model="paymentReference"
+                           placeholder="Reference Number..."
+                           maxlength="50"
+                           ng-class="{'invalid-input': addSubmitted && (paymentMethod === 'GCash' || paymentMethod === 'Card') && !(paymentReference && paymentReference.trim())}" />
                 </label>
+                <span class="validation-msg"
+                      ng-show="addSubmitted && (paymentMethod === 'GCash' || paymentMethod === 'Card') && !(paymentReference && paymentReference.trim())">
+                    Reference number is required for GCash or Card.
+                </span>
             </div>
         </div>
         <div class="row">
@@ -2026,9 +2059,8 @@
         </div>
     </div>
 
-    @*upload, save, cancel buttons*@
-    <div class="modal-footer" style="margin:0 0 0 0 !important">
-        <button class="modal-close cancel-btn" style="font-weight:500; margin: 0 .5vh -6vh 0">EXIT</button>
+    <div class="modal-footer" style="padding: 1rem 1.25rem 1.25rem !important; margin: 0 !important; display: flex; justify-content: flex-end;">
+        <button type="button" class="modal-close cancel-btn" style="font-weight:500; margin: 0.25rem 0.5rem;">EXIT</button>
     </div>
 </div>
 
@@ -2078,7 +2110,7 @@
 </div>
 
 @*EDIT form *@
-<div id="modalAddForm" class="modal form-modal">
+<div id="modalEditForm" class="modal form-modal">
     <div class="modal-content">
         <h5 class="modal-form-title" style="margin-bottom:.5vh;">Edit Form</h5>
 

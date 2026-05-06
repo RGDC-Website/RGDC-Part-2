@@ -14,7 +14,7 @@
         <img class="hide-on-large-only" src="@Url.Content("~/Content/images/dentalAppLogo.png")" alt="Logo" style="width: 25rem; height: auto; margin-top: 30px" />
 
         <div style="width: 80%; max-width: 500px; text-align:center;">
-            <h2 class="signup-title" ng-init="getBranch()">Staff Sign Up</h2>
+            <h2 class="signup-title" ng-init="resetClinicStaffSignUpContext(); getBranch()">Staff Sign Up</h2>
 
             <form>
 
@@ -416,25 +416,24 @@
                 </div>
             </div>
 
-            <div class="row" ng-if="signUpDentist">
+            <div class="row" ng-if="isDentistClinicSignup()">
                 <div class="col s12">
                     <p class="custom-label">Schedule Availability <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="scheduleAvialability"
-                               ng-if="signUpDentist"
                                type="text"
-                               class="custom-input modal-trigger"
-                               data-target="modalSchedule"
+                               class="custom-input"
                                placeholder="set your schedule availabillity here"
                                readonly
-                               required>
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                               required
+                               ng-click="openScheduleModal()">
+                        <i class="material-icons datepicker-icon datepicker-trigger" ng-click="openScheduleModal()">event</i>
                     </div>
                 </div>
             </div>
 
             @*Signature preview (dentist only)*@
-            <div class="row" ng-if="signUpDentist">
+            <div class="row" ng-if="isDentistClinicSignup()">
                 <div class="col s12">
                     <p class="custom-label">Signature (Preview)</p>
                     <div class="signature-pad" style="margin-top: 10px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
@@ -476,7 +475,7 @@
             <button type="button"
                     class="edit-btn"
                     style="font-weight:500;"
-                    ng-if="signUpDentist"
+                    ng-if="isDentistClinicSignup()"
                     ng-click="pickSignUpSignature()">
                 UPLOAD SIGNATURE
             </button>
@@ -494,8 +493,7 @@
 </div>
 
 
-@*schedule modal*@
-<div id="modalSchedule" class="modal schedule-modal">
+<div id="modalSchedule" class="modal schedule-modal" ng-if="isDentistClinicSignup()">
     <div class="modal-content">
         <h5 class="modal-form-title">Weekly Schedule (Availability)</h5>
         <p class="custom-label">Select days and time ranges when you are available. These determine appointment slots.</p>
@@ -519,10 +517,24 @@
                         </label>
                     </td>
                     <td>
-                        <input type="time" class="custom-input" ng-model="d.startTime" ng-disabled="!d.enabled" />
+                        <input type="time"
+                               class="custom-input"
+                               ng-model="d.startTime"
+                               ng-disabled="!d.enabled"
+                               min="08:00"
+                               max="17:00"
+                               ng-change="clampClinicHoursTime(d, 'start')"
+                               ng-blur="clampClinicHoursTime(d, 'start')" />
                     </td>
                     <td>
-                        <input type="time" class="custom-input" ng-model="d.endTime" ng-disabled="!d.enabled" />
+                        <input type="time"
+                               class="custom-input"
+                               ng-model="d.endTime"
+                               ng-disabled="!d.enabled"
+                               min="08:00"
+                               max="17:00"
+                               ng-change="clampClinicHoursTime(d, 'end')"
+                               ng-blur="clampClinicHoursTime(d, 'end')" />
                     </td>
                     <td>
                         <input type="number" min="5" step="5" class="custom-input" ng-model="d.slotMinutes" ng-disabled="!d.enabled" />

@@ -173,6 +173,14 @@
         return $http.get("/RGDC/GetPatientImages?patientID=" + encodeURIComponent(patientID));
     };
 
+    this.archivePatientImage = function (patientImageID) {
+        return $http({
+            method: "post",
+            url: "/RGDC/ArchivePatientImage",
+            data: { patientImageID: patientImageID }
+        });
+    };
+
     this.deletePostOp = function () {
         return $http.post('/RGDC/deletePostOp');
     }
@@ -213,6 +221,10 @@
     };
     this.getForms = function () {
         return $http.get('/RGDC/GetForms');
+    };
+
+    this.archiveForm = function (formID) {
+        return $http.post('/RGDC/ArchiveForm', { formID: formID });
     };
 
     this.updatePatient = function (patientData) {
