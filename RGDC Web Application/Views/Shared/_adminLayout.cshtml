@@ -101,12 +101,6 @@
                             <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                         </li>
                     </ul>
-                    <ul class="right m-0">
-                        <li ng-show="isUserAdmin">
-                        <li>
-                            <a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn"> <i class="material-icons brown-text lighten-1">print</i></a>
-                        </li>
-                    </ul>
                 </div>
             </nav>
         </div>
@@ -114,14 +108,21 @@
         <ul class="sidenav brown lighten-1 z-depth-3 white-text p-1" id="mobile-nav">
 
             @*logout*@
-            <div class="row mt-1 mb-2">
-                <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
-            </div>
+
 
             @*user pfp and name*@
-            <div class="row center" style="margin-top: 5rem;">
-                @*lagyan nalang ng src for image source*@
-                <img src="https://placehold.co/400" class="circle responsive-img modal-trigger" data-target="editProfile" style="max-width:10rem" />
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserStaff">
+                <img ng-src="{{ staff.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileStaff" />
+            </div>
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserAdmin && !isUserOwner && !isUserStaff">
+                <img ng-src="{{ dentist.photoLink || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileDentist" />
+            </div>
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserOwner">
+                <img ng-src="{{ owner.photoLink  || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" data-target="modalEditProfileOwner" />
+            </div>
+
+            <div class="row center sidebar-profile" style="margin-top: 2rem;" ng-show="isUserPatient">
+                <img ng-src="{{ currentUserPhoto || 'https://placehold.co/400' }}" alt="Profile" class="sidebar-profile-img modal-trigger" />
             </div>
 
             @*user name and role*@
@@ -142,10 +143,14 @@
 
             @*date and time at the bottom of the screen*@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
-                <span>Month DD, YYYY | </span>
-                <span>00:00 AM</span>
+                <span id="currentDate">Loading date...</span>
+                <span id="currentTime">Loading time...</span>
+            </div>
+            <div class="row mt-1 mb-2">
+                <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
             </div>
         </ul>
+
 
         @*content*@
         @*<div class="col l9 main-content container">*@

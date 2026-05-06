@@ -178,7 +178,7 @@
                                     <div class="col">
                                         <div class="row">
                                             <button class="btn brown lighten-1 white-text right modal-trigger"
-                                                    ng-show="!isUserPatient"
+                                                    ng-show="isUserPatient"
                                                     data-target="modalMedHis"
                                                     ng-click="prepareMedicalHistoryEdit()">
                                                 UPDATE
@@ -231,7 +231,7 @@
                                         <span class="placeholder-text">{{medical.history.bleedingTime || '---'}}</span>
                                     </li>
 
-                                    <li ng-show="selectedPatient.genderID == 1">
+                                    <li ng-show="selectedPatient.genderID != 0">
                                         For women only:
                                         <div class="women-only-options view-only">
                                             <label><input type="checkbox" ng-model="medical.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
@@ -307,15 +307,6 @@
                                     </div>
                                     <div class="signature-line"></div>
                                     <span class="signature-label">Signature</span>
-                                </div>
-
-                                <div style="display:flex; justify-content:flex-end; padding: 0 1vh 1vh 0; margin-top: 10px;">
-                                    <button type="button"
-                                            class="edit-btn"
-                                            style="font-weight:500;"
-                                            ng-click="uploadPatientSignature()">
-                                        UPLOAD SIGNATURE
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1169,7 +1160,7 @@
                     <span class="helper-text" style="color:#d32f2f" ng-show="medHisForm.bleedingTime.$invalid && (medHisForm.bleedingTime.$touched || medHisForm.$submitted)">Bleeding time is required</span>
                 </li>
 
-                <li ng-show="selectedPatient.genderID == 1">
+                <li ng-show="selectedPatient.genderID != 0">
                     For women only:<span class="required-mark">*</span>
                     <div class="women-only-options">
                         <label><input type="checkbox" ng-model="medicalEdit.history.pregnant" class="filled-in" /><span>Are you pregnant?</span></label>
@@ -1372,7 +1363,7 @@
 
                 <div class="other-section">
                     <label><input type="checkbox" class="filled-in" ng-model="medicalEdit.history.checkedd"> <span>Other/s:</span></label>
-                    <input type="text" class="other-input" style="margin-right:25px" ng-disabled="!medicalEdit.history.checkedd" ng-model="medicalEdit.history.text">
+                    <input type="text" class="other-input" style="margin-right:25px" ng-model="medicalEdit.history.text">
                 </div>
             </div>
 
@@ -1389,7 +1380,7 @@
             <div class="modal-footer" style="margin:2vh 0 -5vh 0 !important">
                 <button type="button" class="edit-btn left" style="font-weight: 500; margin: -.8vh 0 -1.2vh -1vh" ng-click="pickSignatureFile()">UPLOAD SIGNATURE</button>
                 <button class="modal-close cancel-btn" type="button" style="font-weight:500; margin: -.8vh .5vh -1.2vh 0">CANCEL</button>
-                <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh -.8vh -1.2vh 0" ng-disabled="medHisForm.$invalid">
+                <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh -.8vh -1.2vh 0" >
                     SAVE
                 </button>
             </div>

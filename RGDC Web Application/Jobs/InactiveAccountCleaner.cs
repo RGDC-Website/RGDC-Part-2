@@ -8,20 +8,16 @@ public class InactiveAccountCleaner : IRegisteredObject
 {
     private static Timer _timer;
     private static readonly object _lock = new object();
-    private const int PATIENT_ROLE = 3; // "3" = Patient based on your auth code
     private const int INACTIVE_YEARS = 10;
 
     public static void Start()
     {
         HostingEnvironment.RegisterObject(new InactiveAccountCleaner());
-
-        // Run once on startup, then every 24 hours
         _timer = new Timer(Run, null, TimeSpan.Zero, TimeSpan.FromHours(24));
     }
 
     private static void Run(object state)
     {
-        // Prevent overlapping runs
         if (!Monitor.TryEnter(_lock)) return;
 
         try
@@ -31,30 +27,32 @@ public class InactiveAccountCleaner : IRegisteredObject
             using (var db = new RGDCContext())
             {
                 DateTime cutoff = DateTime.Now.AddYears(-INACTIVE_YEARS);
-
-                var inactivePatients = db.tbl_patient
-                    .Where(u =>
-                        u.lastUpdated != null &&
-                        u.lastUpdated <= cutoff)
+                var inactiveAccounts = db.tbl_patient
+                    .Where(p =>
+                        p.lastUpdated != null &&
+                        p.lastUpdated <= cutoff)
+                    .Join(db.tbl_account,
+                        patient => patient.accID,
+                        account => account.accID,
+                        (patient, account) => new { patient, account })
                     .ToList();
 
-                if (!inactivePatients.Any())
+                if (!inactiveAccounts.Any())
                 {
                     System.Diagnostics.Debug.WriteLine("[InactiveAccountCleaner] No inactive patients found.");
                     return;
                 }
 
-                System.Diagnostics.Debug.WriteLine($"[InactiveAccountCleaner] Deleting {inactivePatients.Count} inactive patient(s).");
+                System.Diagnostics.Debug.WriteLine($"[InactiveAccountCleaner] Archiving {inactiveAccounts.Count} inactive patient(s).");
 
-                foreach (var patient in inactivePatients)
+                foreach (var item in inactiveAccounts)
                 {
                     System.Diagnostics.Debug.WriteLine(
-                        $"[InactiveAccountCleaner] Deleting: ID={patient.accID}, LastUpdated={patient.lastUpdated}");
+                        $"[InactiveAccountCleaner] Archiving: ID={item.patient.accID}, LastUpdated={item.patient.lastUpdated}");
+                    item.account.isArchived = 1;
                 }
 
-                db.tbl_patient.RemoveRange(inactivePatients);
                 db.SaveChanges();
-
                 System.Diagnostics.Debug.WriteLine("[InactiveAccountCleaner] Done.");
             }
         }

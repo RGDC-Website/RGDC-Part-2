@@ -1430,7 +1430,7 @@
     $scope.sendOTP = function () {
         if ($scope.reset_email) {
 
-        } else if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email) {
+        } else if ($scope.reset_email && $scope.owner.email && $scope.staff.email && $scope.dentist.email && $scope.selectedPatient.email) {
             Swal.fire({
                 icon: "error",
                 title: "Email is Required",
@@ -1439,7 +1439,7 @@
             return;
         }
         var forgot_email = {
-            email: $scope.reset_email || $scope.owner.email || $scope.staff.email || $scope.dentist.email
+            email: $scope.reset_email || $scope.owner.email || $scope.staff.email || $scope.dentist.email || $scope.selectedPatient.email
         }
 
 
@@ -1472,8 +1472,8 @@
             if (response.data.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Verification Failed',
-                    text: response.data.message || 'The OTP you entered is incorrect.',
+                    title: 'Verification Successful',
+                    text: response.data.message || 'Proceed with the password reset.',
                     confirmButtonColor: '#d33'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -3068,9 +3068,165 @@
     };
 
     $scope.medicalHistoryUpdate = function () {
+        if ($scope.medHisForm) {
+            try { $scope.medHisForm.$setSubmitted(); } catch (e) {}
+        }
+
+        if (!$scope.prevPhyEdit || $scope.prevPhyEdit.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter the name of previous physician.'
+            });
+            return;
+        }
+
+        if (!$scope.prevPhyOfficeEdit || $scope.prevPhyOfficeEdit.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter physician\'s office.'
+            });
+            return;
+        }
+
+        if (!$scope.prevPhyContactEdit || $scope.prevPhyContactEdit.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter physician\'s contact.'
+            });
+            return;
+        }
+
+        if (!/^09\d{9}$/.test($scope.prevPhyContactEdit)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Contact',
+                text: 'Please enter a valid contact number (09#########).'
+            });
+            return;
+        }
+        if (!$scope.medicalEdit || !$scope.medicalEdit.history) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Medical History',
+                text: 'Please answer all medical history questions.'
+            });
+            return;
+        }
+
+        var history = $scope.medicalEdit.history;
+
+        if (!history.goodHealth) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Are you in good health?'
+            });
+            return;
+        }
+
+        if (!history.underTreatment) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Are you under medical treatment now?'
+            });
+            return;
+        }
+
+        if (!history.seriousIllness) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Have you ever had a serious illness or surgical operation?'
+            });
+            return;
+        }
+
+        if (!history.hospitalized) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Have you ever been hospitalized?'
+            });
+            return;
+        }
+
+        if (!history.prescription) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Are you taking prescription/non-prescription medication?'
+            });
+            return;
+        }
+
+        if (!history.tobacco) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Are you taking tobacco products?'
+            });
+            return;
+        }
+
+        if (!history.drugs) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Answer',
+                text: 'Please answer: Do you use alcohol, cocaine, or other dangerous drugs?'
+            });
+            return;
+        }
+
+        if (!history.allergies || history.allergies.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter allergies information.'
+            });
+            return;
+        }
+
+
+        if (!history.bleedingTime || history.bleedingTime.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter bleeding time.'
+            });
+            return;
+        }
+
+
+        if (!history.bloodPressure || history.bloodPressure.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter blood pressure.'
+            });
+            return;
+        }
+
+
+        if (!history.bloodType || history.bloodType.trim() === '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Field',
+                text: 'Please enter blood type.'
+            });
+            return;
+        }
+
+
         if ($scope.medHisForm && $scope.medHisForm.$invalid) {
-            try { $scope.medHisForm.$setSubmitted(); } catch (e) { /* ignore */ }
-            Swal.fire({ icon: 'error', title: 'Missing or invalid fields', text: 'Please complete all required medical history fields before saving.' });
+            Swal.fire({
+                icon: 'error',
+                title: 'Invalid Fields',
+                text: 'Please fix all validation errors before saving.'
+            });
             return;
         }
 
