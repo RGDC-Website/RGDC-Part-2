@@ -156,243 +156,245 @@
 
 
     @*Edit Profile Owner*@
-<div id="modalEditProfileOwner" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getOwnerData()">
-    <div>
-        <h5 class="modal-form-title">Edit Profile</h5>
+    <div id="modalEditProfileOwner" class="modal patientInformationForm-modal containerOverflow-2" style="max-height:95vh" ng-init="getOwnerData()">
+        <div>
+            <h5 class="modal-form-title">Edit Profile</h5>
 
-        <form>
-            <div class="row">
-                <div class="col s12 m4 l4">
-                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
-                        <div class="col s12">
-                            <div class="photo-box">
-                                <img ng-if="ownerAccountPhotoPreview || owner.photoLink"
-                                     ng-src="{{ownerAccountPhotoPreview || owner.photoLink}}"
-                                     alt="Profile"
-                                     style="width:100%;height:100%;object-fit:cover;" />
-                                <i ng-if="!ownerAccountPhotoPreview && !owner.photoLink"
-                                   class="material-icons photo-placeholder-icon">image</i>
+            <form>
+                <div class="row">
+                    <div class="col s12 m4 l4">
+                        <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                            <div class="col s12">
+                                <div class="photo-box">
+                                    <img ng-if="ownerAccountPhotoPreview || owner.photoLink"
+                                         ng-src="{{ownerAccountPhotoPreview || owner.photoLink}}"
+                                         alt="Profile"
+                                         style="width:100%;height:100%;object-fit:cover;" />
+                                    <i ng-if="!ownerAccountPhotoPreview && !owner.photoLink"
+                                       class="material-icons photo-placeholder-icon">image</i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col s12 m8 l8">
+                        <div class="row">
+                            @*First name*@
+                            <div class="col s6">
+                                <p class="custom-label">First Name <span class="required-mark">*</span></p>
+                                <input type="text" class="custom-input" ng-model="owner.firstName"
+                                       placeholder="Juan" maxlength="150"
+                                       ng-class="{'invalid-input': editOwnerSubmitted && !owner.firstName}">
+                                <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.firstName">First name is required.</span>
+                            </div>
+                            @*Middle name*@
+                            <div class="col s6">
+                                <p class="custom-label">Middle Name </p>
+                                <input type="text" class="custom-input" ng-model="owner.middleName"
+                                       placeholder="Mercado" maxlength="150"
+                                       ng-class="{'invalid-input': editOwnerSubmitted && !owner.middleName}">
+                                <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.middleName">Middle name is required.</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @*Last name*@
+                            <div class="col s12">
+                                <p class="custom-label">Last Name <span class="required-mark">*</span></p>
+                                <input type="text" class="custom-input" ng-model="owner.lastName"
+                                       placeholder="Dela Cruz" maxlength="150"
+                                       ng-class="{'invalid-input': editOwnerSubmitted && !owner.lastName}">
+                                <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.lastName">Last name is required.</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col s12 m8 l8">
-                    <div class="row">
-                        @*First name*@
-                        <div class="col s6">
-                            <p class="custom-label">First Name <span class="required-mark">*</span></p>
-                            <input type="text" class="custom-input" ng-model="owner.firstName"
-                                   placeholder="Juan" maxlength="150"
-                                   ng-class="{'invalid-input': editOwnerSubmitted && !owner.firstName}">
-                            <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.firstName">First name is required.</span>
-                        </div>
-                        @*Middle name*@
-                        <div class="col s6">
-                            <p class="custom-label">Middle Name </p>
-                            <input type="text" class="custom-input" ng-model="owner.middleName"
-                                   placeholder="Mercado" maxlength="150"
-                                   ng-class="{'invalid-input': editOwnerSubmitted && !owner.middleName}">
-                            <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.middleName">Middle name is required.</span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        @*Last name*@
-                        <div class="col s12">
-                            <p class="custom-label">Last Name <span class="required-mark">*</span></p>
-                            <input type="text" class="custom-input" ng-model="owner.lastName"
-                                   placeholder="Dela Cruz" maxlength="150"
-                                   ng-class="{'invalid-input': editOwnerSubmitted && !owner.lastName}">
-                            <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.lastName">Last name is required.</span>
-                        </div>
+                @*Email*@
+                <div class="row">
+                    <div class="col s12">
+                        <p class="custom-label">Email <span class="required-mark">*</span></p>
+                        <input type="text" class="custom-input" ng-model="owner.email"
+                               disabled
+                               placeholder="juandlc@gmail.com" maxlength="150"
+                               ng-class="{'invalid-input': editOwnerSubmitted && !owner.email}">
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.email">Email is required.</span>
                     </div>
                 </div>
-            </div>
 
-            @*Email*@
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Email <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input" ng-model="owner.email"
-                           disabled
-                           placeholder="juandlc@gmail.com" maxlength="150"
-                           ng-class="{'invalid-input': editOwnerSubmitted && !owner.email}">
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.email">Email is required.</span>
-                </div>
-            </div>
-
-            <div class="row">
-                @*Gender*@
-                <div class="col s12 m3 l3">
-                    <p class="custom-label">Gender <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="owner.genderID" disabled
-                            ng-options="gender.genderID as gender.description for gender in genderArray"
-                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.genderID}">
-                        <option value="" disabled>Select Gender</option>
-                    </select>
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.genderID">Gender is required.</span>
-                </div>
-                @*Birthdate*@
-                <div class="col s12 m3 l3">
-                    <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
-                    <div class="datepicker-wrapper">
-                        <input id="birthDateOwner" type="text" class="datepicker custom-input" ng-model="owner.birthDate"
-                               readonly ng-class="{'invalid-input': editOwnerSubmitted && !owner.birthDate}">
-                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                <div class="row">
+                    @*Gender*@
+                    <div class="col s12 m3 l3">
+                        <p class="custom-label">Gender <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" ng-model="owner.genderID" disabled
+                                ng-options="gender.genderID as gender.description for gender in genderArray"
+                                ng-class="{'invalid-input': editOwnerSubmitted && !owner.genderID}">
+                            <option value="" disabled>Select Gender</option>
+                        </select>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.genderID">Gender is required.</span>
                     </div>
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.birthDate">Birth date is required.</span>
-                </div>
-                @*Civil status*@
-                <div class="col s12 m3 l3">
-                    <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="owner.civilStatus"
-                            ng-class="{'invalid-input': editOwnerSubmitted && !owner.civilStatus}">
-                        <option value="" disabled>Select Status</option>
-                        <option value="1">Single</option>
-                        <option value="2">Married</option>
-                        <option value="3">Widowed</option>
-                    </select>
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.civilStatus">Civil status is required.</span>
-                </div>
-                @*Contact number*@
-                <div class="col s12 m3 l3">
-                    <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input" ng-model="owner.contactNumber"
-                           placeholder="09XX-XXX-XXXX" maxlength="13"
-                           ng-class="{'invalid-input': editOwnerSubmitted && !owner.contactNumber}">
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.contactNumber">Contact number is required.</span>
-                </div>
-            </div>
-
-            <div class="row">
-                @*Religion*@
-                <div class="col s12 m6 l6">
-                    <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="owner.religion">
-                        <option disabled selected>Select your Religion</option>
-                        <option value="Roman Catholic">Roman Catholic</option>
-                        <option value="Islam">Islam</option>
-                        <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
-                        <option value="Others">Others</option>
-                    </select>
-
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
-                </div>
-                @*Nationality*@
-                <div class="col s12 m6 l6">
-                    <p class="custom-label">Nationality <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="owner.nationality">
-                        <option disbaled selected>Select your Nationality</option>
-                        <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
-                    </select>
-                    <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col s6">
-                    @*Address Line 1*@
-                    <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.line1"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
-                           placeholder="street address, p.o. box, company name, c/o"
-                           required>
+                    @*Birthdate*@
+                    <div class="col s12 m3 l3">
+                        <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
+                        <div class="datepicker-wrapper">
+                            <input id="birthDateOwner" type="text" class="datepicker custom-input" ng-model="owner.birthDate"
+                                   readonly ng-class="{'invalid-input': editOwnerSubmitted && !owner.birthDate}">
+                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                        </div>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.birthDate">Birth date is required.</span>
+                    </div>
+                    @*Civil status*@
+                    <div class="col s12 m3 l3">
+                        <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" ng-model="owner.civilStatus"
+                                ng-class="{'invalid-input': editOwnerSubmitted && !owner.civilStatus}">
+                            <option value="" disabled>Select Status</option>
+                            <option value="1">Single</option>
+                            <option value="2">Married</option>
+                            <option value="3">Widowed</option>
+                        </select>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.civilStatus">Civil status is required.</span>
+                    </div>
+                    @*Contact number*@
+                    <div class="col s12 m3 l3">
+                        <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
+                        <input type="text" class="custom-input" ng-model="owner.contactNumber"
+                               placeholder="09XXXXXXXXX" maxlength="11"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               ng-class="{'invalid-input': editOwnerSubmitted && (!owner.contactNumber || !ownerContactValid)}">
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.contactNumber">Contact number is required.</span>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && owner.contactNumber && !ownerContactValid">Contact must be 11 digits starting with 09.</span>
+                    </div>
                 </div>
 
-                <div class="col s6">
-                    @*Address Line 2*@
-                    <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.line2"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           placeholder="appartment, suite, unit, building, floor, etc"
-                           required>
-                </div>
-            </div>
+                <div class="row">
+                    @*Religion*@
+                    <div class="col s12 m6 l6">
+                        <p class="custom-label">Religion <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" ng-model="owner.religion">
+                            <option disabled selected>Select your Religion</option>
+                            <option value="Roman Catholic">Roman Catholic</option>
+                            <option value="Islam">Islam</option>
+                            <option value="Iglesia Ni Cristo">Iglesia Ni Cristo</option>
+                            <option value="Others">Others</option>
+                        </select>
 
-            <div class="row">
-                <div class="col s3">
-                    @*City*@
-                    <p class="custom-label">City <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.city"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           placeholder="city"
-                           required>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.religion">Religion is required.</span>
+                    </div>
+                    @*Nationality*@
+                    <div class="col s12 m6 l6">
+                        <p class="custom-label">Nationality <span class="required-mark">*</span></p>
+                        <select class="browser-default custom-input" ng-model="owner.nationality">
+                            <option disbaled selected>Select your Nationality</option>
+                            <option ng-repeat="n in nationalities" value="{{n}}">{{n}}</option>
+                        </select>
+                        <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.nationality">Nationality is required.</span>
+                    </div>
                 </div>
 
-                <div class="col s3">
-                    @*state/province/region*@
-                    <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.state"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           placeholder="state/province/region"
-                           required>
+                <div class="row">
+                    <div class="col s6">
+                        @*Address Line 1*@
+                        <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.line1"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               ng-class="{ 'input-valid': isAddressFieldValid(), 'input-invalid': signUp_address && !isAddressFieldValid() }"
+                               placeholder="street address, p.o. box, company name, c/o"
+                               required>
+                    </div>
+
+                    <div class="col s6">
+                        @*Address Line 2*@
+                        <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.line2"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               placeholder="appartment, suite, unit, building, floor, etc"
+                               required>
+                    </div>
                 </div>
 
-                <div class="col s3">
-                    @*zip/postal code*@
-                    <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.postal"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           placeholder="zip/postal code"
-                           required>
+                <div class="row">
+                    <div class="col s3">
+                        @*City*@
+                        <p class="custom-label">City <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.city"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               placeholder="city"
+                               required>
+                    </div>
+
+                    <div class="col s3">
+                        @*state/province/region*@
+                        <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.state"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               placeholder="state/province/region"
+                               required>
+                    </div>
+
+                    <div class="col s3">
+                        @*zip/postal code*@
+                        <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.postal"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               placeholder="zip/postal code"
+                               required>
+                    </div>
+
+                    <div class="col s3">
+                        @*country*@
+                        <p class="custom-label">Country <span class="required-mark">*</span></p>
+                        <input id="address"
+                               type="text"
+                               ng-model="owner.country"
+                               class="custom-input"
+                               maxlength="250"
+                               oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
+                               placeholder="country"
+                               required>
+                    </div>
                 </div>
 
-                <div class="col s3">
-                    @*country*@
-                    <p class="custom-label">Country <span class="required-mark">*</span></p>
-                    <input id="address"
-                           type="text"
-                           ng-model="owner.country"
-                           class="custom-input"
-                           maxlength="250"
-                           oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
-                           placeholder="country"
-                           required>
+                <div class="row">
+                    @*Specialization*@
+                    <div class="col s12">
+                        <p class="custom-label">Specialization <span class="required-mark">*</span></p>
+                        <input type="text" class="custom-input" ng-model="owner.specialization" maxlength="50" placeholder="General Dentistry">
+                    </div>
                 </div>
-            </div>
-
-            <div class="row">
-                @*Specialization*@
-                <div class="col s12">
-                    <p class="custom-label">Specialization <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input" ng-model="owner.specialization" maxlength="50" placeholder="General Dentistry">
-                </div>
-            </div>
 
 
 
-        </form>
+            </form>
+        </div>
+        <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
+            <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
+        </div>
+        <div class="modal-footer footer-center" style="margin-top:2.5vh">
+            <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileOwner()">UPLOAD PHOTO</button>
+            <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editOwnerSubmitted = false">CANCEL</button>
+            <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editOwner()">SAVE</button>
+        </div>
     </div>
-    <div class="forgot-password-container right" style="margin:-.5vh 1vh 2.5vh 0;">
-        <a href="#" class="forgot-link modal-trigger right" data-target="modalOTP" style="margin-right:.5vh; font-weight:500">Set New Password?</a>
-    </div>
-    <div class="modal-footer footer-center" style="margin-top:2.5vh">
-        <button type="button" class="edit-btn left" style="font-weight:500;" ng-click="pickAccountPhotoFileOwner()">UPLOAD PHOTO</button>
-        <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editOwnerSubmitted = false">CANCEL</button>
-        <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editOwner()">SAVE</button>
-    </div>
-</div>
 
 
     @*Edit Profile Dentist*@
@@ -835,9 +837,11 @@
                     <div class="col s12 m3 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input id="contactNumber" type="text" class="custom-input" ng-model="staff.contactNumber"
-                               placeholder="09XX-XXX-XXXX" maxlength="13"
-                               ng-class="{'invalid-input': editStaffSubmitted && !staff.contactNumber}">
+                               placeholder="09XXXXXXXXX" maxlength="11"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               ng-class="{'invalid-input': editStaffSubmitted && (!staff.contactNumber || !staffContactValid)}">
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.contactNumber">Contact number is required.</span>
+                        <span class="validation-msg" ng-show="editStaffSubmitted && staff.contactNumber && !staffContactValid">Contact must be 11 digits starting with 09.</span>
                     </div>
                 </div>
 
@@ -884,7 +888,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="street address, p.o. box, company name, c/o"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.line1}">
                     </div>
 
                     <div class="col s6">
@@ -897,7 +902,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="appartment, suite, unit, building, floor, etc"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.line2}">
                     </div>
                 </div>
 
@@ -912,7 +918,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="city"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.city}">
                     </div>
 
                     <div class="col s3">
@@ -925,7 +932,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="state/province/region"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.state}">
                     </div>
 
                     <div class="col s3">
@@ -938,7 +946,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^0-9 ,.-]/g, '')"
                                placeholder="zip/postal code"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.postal}">
                     </div>
 
                     <div class="col s3">
@@ -951,7 +960,8 @@
                                maxlength="250"
                                oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                                placeholder="country"
-                               required>
+                               required
+                               ng-class="{'invalid-input': editStaffSubmitted && !staff.country}">
                     </div>
                 </div>
 

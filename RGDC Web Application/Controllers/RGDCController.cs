@@ -33,6 +33,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -444,7 +445,11 @@ namespace RGDC_Web_Application.Controllers
                         currentPhysician = accDetails.currentPhysician,
                         referral = accDetails.referral,
                         occupation = accDetails.occupation,
-                        lastVisit = accDetails.lastVisit,
+                        lastVisit = (accDetails.lastVisit.HasValue
+                            && accDetails.lastVisit.Value.Year >= 1900
+                            && accDetails.lastVisit.Value.Year <= 2100)
+                                ? accDetails.lastVisit
+                                : null,
                         medicalHistory = accDetails.medicalHistory,
                         medHistUpdate = DateTime.Now,
                         lastUpdated = DateTime.Now
@@ -1091,7 +1096,93 @@ RGDC Dental Clinic Team";
                         height = 421
                     },
 
-                    pageMargins = new[] { 30, 40, 30, 40 },
+                    pageMargins = new[] { 30, 152, 30, 40 },
+
+                    header = new
+                    {
+                        margin = new[] { 30, 20, 30, 0 },
+                        stack = new object[]
+                        {
+                            new
+                            {
+                                columns = new object[]
+                                {
+                                    new
+                                    {
+                                        width = "*",
+                                        stack = new object[]
+                                        {
+                                            new { text = "Alyssa Mae R. Guansing, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
+                                            new { text = "Amelia T. Po, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
+                                            new { text = "General Dentist • Orthodontist & TMJ Management • Oral Surgeon • Cosmetics Dentistry", fontSize = 8 }
+                                        }
+                                    },
+                                    new
+                                    {
+                                        width = "auto",
+                                        image = "logo",
+                                        fit = new[] { 60, 60 },
+                                        alignment = "center"
+                                    },
+                                    new
+                                    {
+                                        width = "*",
+                                        alignment = "right",
+                                        stack = new object[]
+                                        {
+                                            new { text = "REYES-GUANSING DENTAL CLINIC", bold = true, color = "#6d4c41", fontSize = 10 },
+                                            new { text = "1191 Velarde Bldg, Del Pilar St., Sanguitan Cabanatuan City", fontSize = 8 },
+                                            new { text = "Mon-Sat, 8AM-5PM", fontSize = 8 },
+                                            new
+                                            {
+                                                text = new object[]
+                                                {
+                                                    "Sundays, ",
+                                                    new { text = "by appointment", italics = true }
+                                                },
+                                                fontSize = 8
+                                            },
+                                            new { text = "0963 220 1556", fontSize = 8 }
+                                        }
+                                    }
+                                },
+                                margin = new[] { 0, 0, 0, 5 }
+                            },
+                            new
+                            {
+                                canvas = new object[]
+                                {
+                                    new
+                                    {
+                                        type = "line",
+                                        x1 = 0, y1 = 0,
+                                        x2 = 515, y2 = 0,
+                                        lineWidth = 3,
+                                        lineColor = "#6d4c41"
+                                    }
+                                },
+                                margin = new[] { 0, 0, 0, 8 }
+                            },
+                            new
+                            {
+                                columns = new object[]
+                                {
+                                    new
+                                    {
+                                        width = "38%",
+                                        stack = new object[]
+                                        {
+                                            new { text = "Name: " + patientData.patientName, margin = new[] { 0, 2 } },
+                                            new { text = "Age: " + age, margin = new[] { 0, 2 } },
+                                            new { text = "Gender: " + patientData.gender, margin = new[] { 0, 2 } }
+                                        }
+                                    },
+                                    new { width = "*", text = "" }
+                                },
+                                margin = new[] { 0, 0, 0, 6 }
+                            }
+                        }
+                    },
 
                     content = new object[]
                     {
@@ -1101,98 +1192,30 @@ RGDC Dental Clinic Team";
                     {
                         new
                         {
-                            width = "*",
-                            stack = new object[]
-                            {
-                                new { text = "Alyssa Mae R. Guansing, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
-                                new { text = "Amelia T. Po, DMD", bold = true, color = "#6d4c41", fontSize = 12 },
-                                new { text = "General Dentist • Orthodontist & TMJ Management • Oral Surgeon • Cosmetics Dentistry", fontSize = 8 }
-                            }
-                        },
-                        new
-                       {
                             width = "auto",
-                            image = "logo",
-                            fit = new[] { 60, 60 },
-                            alignment = "center"
+                            stack = new object[]
+                            {
+                                new
+                                {
+                                    image = "rx",
+                                    width = 25,
+                                    margin = new[] { 0, 0, 0, 5 }
+                                }
+                            }
                         },
                         new
                         {
                             width = "*",
-                            alignment = "right",
                             stack = new object[]
                             {
-                                new { text = "REYES-GUANSING DENTAL CLINIC", bold = true, color = "#6d4c41", fontSize = 10 },
-                                new { text = "1191 Velarde Bldg, Del Pilar St., Sanguitan Cabanatuan City", fontSize = 8 },
-                                new { text = "Mon-Sat, 8AM-5PM", fontSize = 8 },
                                 new
                                 {
-                                    text = new object[]
-                                    {
-                                        "Sundays, ",
-                                        new { text = "by appointment", italics = true }
-                                    },
-                                    fontSize = 8
-                                },
-                                new { text = "0963 220 1556", fontSize = 8 }
-                            }
-                        }
-                    },
-                    margin = new[] { 0, 0, 0, 5 }
-                },
-
-                new
-                {
-                    canvas = new object[]
-                    {
-                        new
-                        {
-                            type = "line",
-                            x1 = 0, y1 = 0,
-                            x2 = 515, y2 = 0,
-                            lineWidth = 3,
-                            lineColor = "#6d4c41"
-                        }
-                    },
-                    margin = new[] { 0, 0, 0, 10 }
-                },
-
-                new
-                {
-                    columns = new object[]
-                    {
-                        new
-                        {
-                            width = "30%",
-                            stack = new object[]
-                            {
-                                new { text = "Name: " + patientData.patientName, margin = new[] { 0, 3 } },
-                                new { text = "Age: " + age, margin = new[] { 0, 3 } },
-                                new { text = "Gender: " + patientData.gender, margin = new[] { 0, 3 } },
-                            }
-                        },
-
-                        new
-                        {
-                            width = "70%",
-                            stack = new object[]
-                            {
-                                new
-{
-    image = "rx",
-    width = 25,
-    margin = new[] { 0, 0, 0, 5 }
-},
-
-                                new
-                                {
-                                    text = content, margin = new[] { 0, 3 }
+                                    text = content,
+                                    margin = new[] { 0, 3 }
                                 }
                             },
                             margin = new[] { 10, 0, 0, 0 }
-                        },
-
-
+                        }
                     }
                 },new
 {
@@ -1244,26 +1267,22 @@ RGDC Dental Clinic Team";
                 };
                 db.tbl_form.Add(prescription);
                 db.SaveChanges();
-                return Json(new{success = true}, JsonRequestBehavior.AllowGet);
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
             }
         }
 
         public JsonResult GetForms()
         {
-            int? patientID = null;
-            var selectedObj = Session["SelectedPatientID"];
-
-            if (selectedObj != null && int.TryParse(selectedObj.ToString(), out int selectedPid) && selectedPid > 0)
-            {
-                patientID = selectedPid;
-            }
-
             using (var db = new RGDCContext())
             {
+                int pid = ResolveProfilePatientId(db);
+                if (pid <= 0)
+                    return Json(new List<object>(), JsonRequestBehavior.AllowGet);
+
                 var forms = (from f in db.tbl_form
                              join d in db.tbl_dentist on f.dentistID equals d.dentistID
                              join a in db.tbl_account on d.accID equals a.accID
-                             where f.patientID == patientID
+                             where f.patientID == pid && f.isArchived == 0
                              select new
                              {
                                  f.formID,
@@ -1291,6 +1310,45 @@ RGDC Dental Clinic Team";
                     .ToList();
 
                 return Json(forms, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult ArchiveForm(ArchiveFormDto dto)
+        {
+            try
+            {
+                if (dto == null || dto.formID <= 0)
+                    return Json(new { success = false, message = "Invalid form." });
+
+                if (!CanArchivePatientDentalCharts())
+                    return Json(new { success = false, message = "Not authorized to archive forms." });
+
+                using (var db = new RGDCContext())
+                {
+                    int pid = ResolveProfilePatientId(db);
+                    if (pid <= 0)
+                        return Json(new { success = false, message = "No patient selected." });
+
+                    var form = db.tbl_form.FirstOrDefault(f => f.formID == dto.formID);
+                    if (form == null)
+                        return Json(new { success = false, message = "Form not found." });
+                    if (form.patientID != pid)
+                        return Json(new { success = false, message = "Form does not belong to this patient." });
+
+                    if (form.isArchived != 0)
+                        return Json(new { success = true });
+
+                    form.isArchived = 1;
+                    form.formUpdatedAt = DateTime.Now;
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                var inner = ex.InnerException?.InnerException?.Message;
+                return Json(new { success = false, message = inner ?? ex.Message });
             }
         }
 
@@ -1528,8 +1586,9 @@ RGDC Dental Clinic Team";
                     from p in db.tbl_patient
                     join a in db.tbl_account on p.accID equals a.accID
                     join g in db.tbl_gender on a.genderID equals g.genderID into gj
-                    join o in db.tbl_postop on p.postOpID equals o.postOpID
+                    join o in db.tbl_postop on p.postOpID equals o.postOpID into oj
                     from g in gj.DefaultIfEmpty()
+                    from o in oj.DefaultIfEmpty()
                     where p.patientID == pid
                     select new
                     {
@@ -1547,7 +1606,7 @@ RGDC Dental Clinic Team";
                         dentalChartType = p.dentalChartType,
                         signatureLink = p.signatureLink,
                         postOpID = p.postOpID,
-                        postOpInstructions = o.content,
+                        postOpInstructions = o != null ? o.content : null,
                         patientName = a.firstName + " " + a.lastName,
                         firstName = a.firstName,
                         middleName = a.middleName,
@@ -1584,6 +1643,44 @@ RGDC Dental Clinic Team";
             public int patientID { get; set; }
             public string imagePath { get; set; }
             public string imageType { get; set; } // "Xray" | "Dental Chart"
+        }
+
+        public class ArchivePatientImageDto
+        {
+            public int patientImageID { get; set; }
+        }
+
+        public class ArchiveFormDto
+        {
+            public int formID { get; set; }
+        }
+
+        private bool CanArchivePatientDentalCharts()
+        {
+            bool loggedIn = (Session["IsLoggedIn"] != null && (bool)Session["IsLoggedIn"])
+                || (Session["isLoggedIn"] != null && (bool)Session["isLoggedIn"]);
+            if (!loggedIn) return false;
+
+            var auth = Session["UserAuthorization"] != null ? Session["UserAuthorization"].ToString() : null;
+            var perm = Session["UserPermission"] != null ? Session["UserPermission"].ToString() : null;
+
+            if (auth == "0" || auth == "1") return true;
+            if (auth == "2" && (perm == "1" || perm == "2")) return true;
+            return false;
+        }
+
+        private int ResolveProfilePatientId(RGDCContext db)
+        {
+            object sessionVal = Session["SelectedPatientID"];
+            if (sessionVal != null && int.TryParse(sessionVal.ToString(), out int spid) && spid > 0)
+                return spid;
+
+            var sessionUser = Session["UserID"];
+            if (sessionUser == null || !int.TryParse(sessionUser.ToString(), out int accId))
+                return 0;
+
+            var patientByAcc = db.tbl_patient.FirstOrDefault(p => p.accID == accId);
+            return patientByAcc != null ? patientByAcc.patientID : 0;
         }
 
         [HttpPost]
@@ -1660,6 +1757,58 @@ RGDC Dental Clinic Team";
             }
         }
 
+        [HttpPost]
+        public JsonResult ArchivePatientImage(ArchivePatientImageDto dto)
+        {
+            try
+            {
+                if (dto == null || dto.patientImageID <= 0)
+                    return Json(new { success = false, message = "Invalid image." });
+
+                if (!CanArchivePatientDentalCharts())
+                    return Json(new { success = false, message = "Not authorized to archive dental charts." });
+
+                using (var db = new RGDCContext())
+                {
+                    var rec = db.tbl_patient_images.FirstOrDefault(x => x.patientImageID == dto.patientImageID);
+                    if (rec == null)
+                        return Json(new { success = false, message = "Record not found." });
+
+                    int pid = rec.patientID;
+                    db.tbl_patient_images.Remove(rec);
+
+                    var patient = db.tbl_patient.FirstOrDefault(p => p.patientID == pid);
+                    if (patient != null)
+                    {
+                        var now = DateTime.Now;
+                        var latest = db.tbl_patient_images
+                            .Where(x => x.patientID == pid)
+                            .OrderByDescending(x => x.createdAt)
+                            .FirstOrDefault();
+                        if (latest != null)
+                        {
+                            patient.dentalChartLink = latest.imagePath;
+                            patient.dentalChartType = latest.imageType;
+                        }
+                        else
+                        {
+                            patient.dentalChartLink = null;
+                            patient.dentalChartType = null;
+                        }
+                        patient.lastUpdated = now;
+                    }
+
+                    db.SaveChanges();
+                    return Json(new { success = true });
+                }
+            }
+            catch (Exception ex)
+            {
+                var inner = ex.InnerException?.InnerException?.Message;
+                return Json(new { success = false, message = inner ?? ex.Message });
+            }
+        }
+
         public JsonResult getOwnPatientDetails()
         {
             using (var db = new RGDCContext())
@@ -1670,11 +1819,13 @@ RGDC Dental Clinic Team";
                 if (!int.TryParse(sessionVal.ToString(), out int pid))
                     return Json(null, JsonRequestBehavior.AllowGet);
 
-                var result = (
+                var row = (
                             from p in db.tbl_patient
                             join a in db.tbl_account on p.accID equals a.accID
                             join g in db.tbl_gender on a.genderID equals g.genderID into gj
+                            join o in db.tbl_postop on p.postOpID equals o.postOpID into oj
                             from g in gj.DefaultIfEmpty()
+                            from o in oj.DefaultIfEmpty()
                             where p.accID == pid
                             select new
                             {
@@ -1688,7 +1839,10 @@ RGDC Dental Clinic Team";
                                 guarNum = p.guardianNumber,
                                 referral = p.referral,
                                 dentalChartLink = p.dentalChartLink,
+                                dentalChartType = p.dentalChartType,
                                 signatureLink = p.signatureLink,
+                                postOpID = p.postOpID,
+                                postOpInstructions = o != null ? o.content : null,
 
                                 patientName = a.firstName + " " + a.lastName,
                                 firstName = a.firstName,
@@ -1709,12 +1863,64 @@ RGDC Dental Clinic Team";
                                 religion = a.religion,
                                 nationality = a.nationality,
                                 accCreated = a.accCreatedAt,
+                                photoLink = a.photoLink,
+                                isArchived = a.isArchived,
+                                occupation = p.occupation,
 
                                 medHist = p.medicalHistory,
                                 medHistUpdate = p.medHistUpdate,
                                 lastVisit = p.lastVisit,
                             }
                         ).FirstOrDefault();
+
+                if (row == null)
+                    return Json(null, JsonRequestBehavior.AllowGet);
+
+                var sessionPhoto = Session["UserPhoto"] != null ? Session["UserPhoto"].ToString() : null;
+                var mergedPhoto = !string.IsNullOrWhiteSpace(row.photoLink) ? row.photoLink : sessionPhoto;
+
+                var result = new
+                {
+                    row.patientID,
+                    row.accID,
+                    row.currPhy,
+                    row.prevPhy,
+                    row.prevPhyOffice,
+                    row.prevPhyContact,
+                    row.guar,
+                    row.guarNum,
+                    row.referral,
+                    row.dentalChartLink,
+                    row.dentalChartType,
+                    row.signatureLink,
+                    row.postOpID,
+                    row.postOpInstructions,
+                    row.patientName,
+                    row.firstName,
+                    row.middleName,
+                    row.lastName,
+                    row.birthDate,
+                    row.genderID,
+                    row.gender,
+                    row.email,
+                    row.contactNumber,
+                    row.state,
+                    row.city,
+                    row.line1,
+                    row.line2,
+                    row.country,
+                    row.postal,
+                    row.civilStatus,
+                    row.religion,
+                    row.nationality,
+                    row.accCreated,
+                    photoLink = mergedPhoto,
+                    row.isArchived,
+                    row.occupation,
+                    row.medHist,
+                    row.medHistUpdate,
+                    row.lastVisit,
+                };
 
                 return Json(result, JsonRequestBehavior.AllowGet);
             }
@@ -1845,6 +2051,19 @@ RGDC Dental Clinic Team";
                     var acc = db.tbl_account.FirstOrDefault(a => a.accID == profInfo.accID);
                     if (acc == null) return Json(new { success = false, message = "Account not found" });
 
+                    // Required validations (client also validates, but server enforces)
+                    var contact = (profInfo.contactNumber ?? "").Trim();
+                    if (!Regex.IsMatch(contact, @"^09\d{9}$"))
+                        return Json(new { success = false, message = "Contact number must be 11 digits and start with 09." });
+
+                    if (string.IsNullOrWhiteSpace(profInfo.line1)
+                        || string.IsNullOrWhiteSpace(profInfo.line2)
+                        || string.IsNullOrWhiteSpace(profInfo.city)
+                        || string.IsNullOrWhiteSpace(profInfo.state)
+                        || string.IsNullOrWhiteSpace(profInfo.postal)
+                        || string.IsNullOrWhiteSpace(profInfo.country))
+                        return Json(new { success = false, message = "Please complete all required address fields before saving." });
+
                     // update account fields (only update when non-null/empty to avoid overwriting unintentionally)
                     acc.firstName = string.IsNullOrWhiteSpace(profInfo.firstName) ? acc.firstName : profInfo.firstName;
                     acc.middleName = string.IsNullOrWhiteSpace(profInfo.middleName) ? acc.middleName : profInfo.middleName;
@@ -1852,13 +2071,13 @@ RGDC Dental Clinic Team";
                     if (profInfo.genderID.HasValue) acc.genderID = profInfo.genderID.Value;
                     if (profInfo.birthDate.HasValue) acc.birthDate = profInfo.birthDate.Value;
                     acc.email = string.IsNullOrWhiteSpace(profInfo.email) ? acc.email : profInfo.email;
-                    acc.contactNumber = string.IsNullOrWhiteSpace(profInfo.contactNumber) ? acc.contactNumber : profInfo.contactNumber;
-                    acc.line1 = string.IsNullOrWhiteSpace(profInfo.line1) ? acc.line1 : profInfo.line1;
-                    acc.line2 = string.IsNullOrWhiteSpace(profInfo.line2) ? acc.line2 : profInfo.line2;
-                    acc.city = string.IsNullOrWhiteSpace(profInfo.city) ? acc.city : profInfo.city;
-                    acc.state = string.IsNullOrWhiteSpace(profInfo.state) ? acc.state : profInfo.state;
-                    acc.postal = string.IsNullOrWhiteSpace(profInfo.postal) ? acc.postal : profInfo.postal;
-                    acc.country = string.IsNullOrWhiteSpace(profInfo.country) ? acc.country : profInfo.country;
+                    acc.contactNumber = contact;
+                    acc.line1 = (profInfo.line1 ?? "").Trim();
+                    acc.line2 = (profInfo.line2 ?? "").Trim();
+                    acc.city = (profInfo.city ?? "").Trim();
+                    acc.state = (profInfo.state ?? "").Trim();
+                    acc.postal = (profInfo.postal ?? "").Trim();
+                    acc.country = (profInfo.country ?? "").Trim();
                     acc.civilStatus = string.IsNullOrWhiteSpace(profInfo.civilStatus) ? acc.civilStatus : profInfo.civilStatus;
                     acc.religion = string.IsNullOrWhiteSpace(profInfo.religion) ? acc.religion : profInfo.religion;
                     acc.nationality = string.IsNullOrWhiteSpace(profInfo.nationality) ? acc.nationality : profInfo.nationality;
@@ -1878,6 +2097,17 @@ RGDC Dental Clinic Team";
                     if (profInfo.lastVisit.HasValue) pat.lastVisit = profInfo.lastVisit.Value;
 
                     db.SaveChanges();
+
+                    try
+                    {
+                        if (Session["UserID"] != null
+                            && int.TryParse(Session["UserID"].ToString(), out int sessionAccID)
+                            && sessionAccID == acc.accID)
+                        {
+                            Session["UserPhoto"] = acc.photoLink ?? "";
+                        }
+                    }
+                    catch { }
                 }
 
                 return Json(new { success = true });
@@ -3532,7 +3762,7 @@ RGDC Dental Clinic Team";
                 }, JsonRequestBehavior.AllowGet);
             }
         }
-            [HttpPost]
+        [HttpPost]
         public JsonResult getPaymentInfo(tblPaymentModel paymod)
         {
             using (var db = new RGDCContext())
@@ -4517,6 +4747,17 @@ RGDC Dental Clinic Team";
                     }
 
                     db.SaveChanges();
+
+                    try
+                    {
+                        if (Session["UserID"] != null
+                            && int.TryParse(Session["UserID"].ToString(), out int sessionAccID)
+                            && sessionAccID == accID)
+                        {
+                            Session["UserPhoto"] = relativePath;
+                        }
+                    }
+                    catch { }
 
                     return Json(new
                     {
@@ -5510,7 +5751,16 @@ RGDC Dental Clinic Team";
                 existing.genderID = accmod.genderID;
                 existing.birthDate = accmod.birthDate;
                 existing.email = accmod.email;
-                existing.contactNumber = accmod.contactNumber;
+                var contact = (accmod.contactNumber ?? "").Trim();
+                if (!Regex.IsMatch(contact, @"^09\d{9}$"))
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Contact number must be 11 digits starting with 09."
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                existing.contactNumber = contact;
                 existing.line1 = accmod.line1;
                 existing.line2 = accmod.line2;
                 existing.city = accmod.city;
@@ -5527,6 +5777,19 @@ RGDC Dental Clinic Team";
                 existing.accUpdatedAt = DateTime.Now;
 
                 db.SaveChanges();
+
+                try
+                {
+                    if (Session["UserID"] != null
+                        && int.TryParse(Session["UserID"].ToString(), out int sessionAccID)
+                        && sessionAccID == existing.accID)
+                    {
+                        Session["UserName"] = existing.firstName;
+                        Session["UserFullName"] = (existing.firstName ?? "") + " " + (existing.lastName ?? "");
+                        Session["UserPhoto"] = existing.photoLink ?? "";
+                    }
+                }
+                catch { }
 
                 return Json(new
                 {

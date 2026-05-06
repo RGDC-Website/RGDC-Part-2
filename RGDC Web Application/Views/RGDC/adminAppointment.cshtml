@@ -172,13 +172,13 @@
                                             <i class="material-icons tiny">cancel</i>
                                         </a>
                                     </div>
-                                    <div ng-if="!isUserDentist && !isUserOwner && !canActOnRequest(appt) && isRequestCreator(appt) && isDeniedStatus(appt)" style="display:flex; flex-direction:column; align-items:center; margin-top:6px;">
+                                    <div ng-if="canArchiveDeniedRequest(appt)" style="display:flex; flex-direction:column; align-items:center; margin-top:6px;">
                                         <a href="#"
                                            class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped redBtn"
                                            ng-click="deleteDeniedRequest(appt)"
                                            data-position="right"
-                                           data-tooltip="Delete (Move to Past)"
-                                           aria-label="Delete denied request">
+                                           data-tooltip="Archive (move to Past Appointments)"
+                                           aria-label="Archive denied request">
                                             <i class="material-icons tiny">delete</i>
                                         </a>
                                     </div>

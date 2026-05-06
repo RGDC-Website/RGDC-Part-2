@@ -1,4 +1,4 @@
-﻿    @{
+﻿@{
     Layout = "~/Views/Shared/_logInSignInLayout.cshtml";
 }
 
@@ -288,7 +288,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
-                            ng-model="signUp_line2"
+                           ng-model="signUp_line2"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="appartment, suite, unit, building, floor, etc"
@@ -302,7 +302,7 @@
                     <p class="custom-label">City <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
-                            ng-model="signUp_city"
+                           ng-model="signUp_city"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -316,7 +316,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
-                            ng-model="signUp_state"
+                           ng-model="signUp_state"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
                            placeholder="state/province/region"
@@ -329,7 +329,7 @@
                     <input id="address"
                            type="text"
                            class="custom-input"
-                            ng-model="signUp_postal"
+                           ng-model="signUp_postal"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^0-9 ,.-]/g, '')"
                            placeholder="zip/postal code"
@@ -341,7 +341,7 @@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
                     <input id="address"
                            type="text"
-                            ng-model="signUp_country"
+                           ng-model="signUp_country"
                            class="custom-input"
                            maxlength="250"
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')"
@@ -357,7 +357,7 @@
                     <input id="occupation"
                            type="text"
                            class="custom-input"
-                            ng-model="signUp_occupation"
+                           ng-model="signUp_occupation"
                            placeholder="Doctor"
                            maxlength="50"
                            required>
@@ -366,7 +366,7 @@
                 <div class="col s4">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
-                    <select class="browser-default custom-input" ng-model="signUp_religion"> 
+                    <select class="browser-default custom-input" ng-model="signUp_religion">
                         <option disabled selected>Select your Religion</option>
                         <option value="Roman Catholic">Roman Catholic</option>
                         <option value="Islam">Islam</option>
@@ -408,15 +408,16 @@
                 <div class="col s4">
                     <div class="datepicker-wrapper">
                         <p class="custom-label">
-                            Last Visit </p>
-                            <input id="lastVisit"
-                                   ng-model="signUp_lastVisit"
-                                   type="text"
-                                   class="datepicker custom-input"
-                                   readonly
-                                   ng-class="{ 'input-valid': isLastVisitFieldValid(), 'input-invalid': signUp_lastVisit === '' }"
-                                   required>
-                            <i class="material-icons datepicker-icon datepicker-trigger">event</i>
+                            Last Visit (optional)
+                        </p>
+                        <input id="lastVisit"
+                               ng-model="signUp_lastVisit"
+                               type="text"
+                               class="datepicker custom-input"
+                               readonly
+                               ng-class="{ 'input-valid': isLastVisitFieldValid() }"
+                               placeholder="N/A">
+                        <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
 

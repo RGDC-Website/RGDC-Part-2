@@ -6,7 +6,7 @@
     @*top part (welcome, refresh, logout)*@
     <div class="row brown-text lighten-1" style="margin-top: 1rem">
         @*user name*@
-        <div class="col m8 l8"  ng-init="getClinicStaff()"><h4 class="bold">Clinic Staff</h4></div>
+        <div class="col m8 l8" ng-init="getClinicStaff()"><h4 class="bold">Clinic Staff</h4></div>
         @*refresh and logout buttons*@
         <div class="col m4 l4">
             <span class="right hide-on-small-only">
@@ -33,9 +33,9 @@
                     <div class="col s12 m6 l6 valign-wrapper p-0">
                         <p class="bold brown-text lighten-1" style="font-size:1.8rem;">Staff</p>
                         @*<select class=" browser-default" style="width: 30%; margin-left: 1rem">
-                        <option value="Active" selected>Active</option>
-                        <option value="Inactive" selected>Inactive</option>
-                    </select>*@
+                                <option value="Active" selected>Active</option>
+                                <option value="Inactive" selected>Inactive</option>
+                            </select>*@
                     </div>
                     <div class="col s12 m6 l6">
                         <a class="btn brown lighten-1 modal-trigger right white-text" style="margin-top:0.3rem !important" data-target="staffInformationFormAdd">
@@ -72,7 +72,7 @@
                                 <td>{{staff.staffRole}}</td>
                                 <td>{{staff.description}}</td>
                                 <td>
-                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeactivateStaff" title="Deactivate Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
                                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
                                 </td>
                             </tr>
@@ -102,7 +102,7 @@
                                 <td>{{staff.staffRole}}</td>
                                 <td>{{staff.description}}</td>
                                 <td>
-                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteStaff" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalActivateStaff" title="Activate Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveStaff(staff.accID)">archive</i></a>
                                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="staffInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectStaff(staff.staffID)">visibility</i></a>
                                 </td>
                             </tr>
@@ -156,7 +156,7 @@
                                 <td>{{dentist.specialization}}</td>
                                 <td>{{dentist.description}}</td>
                                 <td>
-                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeactivateDentist" title="Deactivate Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
                                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
                                 </td>
                             </tr>
@@ -186,7 +186,7 @@
                                 <td>{{dentist.specialization}}</td>
                                 <td>{{dentist.description}}</td>
                                 <td>
-                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalDeleteDentist" title="Archive Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
+                                    <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 redBtn modal-trigger" data-target="modalActivateDentist" title="Activate Account"><i class="material-icons brown-text lighten-1" ng-click="selectArchiveDentist(dentist.accID)">archive</i></a>
                                     <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped right m-0 modal-trigger responsive-btn-roundedSquare" data-target="dentistInformationFormEdit" title="View Account Details"><i class="material-icons brown-text lighten-1" ng-click="selectDentist(dentist.dentistID)">visibility</i></a>
                                 </td>
                             </tr>
@@ -358,15 +358,15 @@
 
 
     @*Submit or cancel*@
-        <div class="modal-footer" style="margin-top:2.5vh">
-            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-            <button type="submit"
-                    class="edit-btn modal-close"
-                    ng-click="addOwner()"
-                    ng-disabled="!ownerEmailFormatValid">
-                ADD
-            </button>
-        </div>
+    <div class="modal-footer" style="margin-top:2.5vh">
+        <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+        <button type="submit"
+                class="edit-btn modal-close"
+                ng-click="addOwner()"
+                ng-disabled="!ownerEmailFormatValid">
+            ADD
+        </button>
+    </div>
 </div>
 
 @*ADD Denstist Information Form*@
@@ -402,15 +402,15 @@
     </div>
 
     @*Submit or cancel*@
-        <div class="modal-footer" style="margin-top:2.5vh">
-            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-            <button type="submit"
-                    class="edit-btn modal-close"
-                    ng-click="addDentist()"
-                    ng-disabled="!isAddDentistFormValid()">
-                ADD
-            </button>
-        </div>
+    <div class="modal-footer" style="margin-top:2.5vh">
+        <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+        <button type="submit"
+                class="edit-btn modal-close"
+                ng-click="addDentist()"
+                ng-disabled="!isAddDentistFormValid()">
+            ADD
+        </button>
+    </div>
 </div>
 
 @*ADD Staff Information Form*@
@@ -418,45 +418,45 @@
     <div>
         <h5 class="modal-form-title">Add New Staff</h5>
 
-            @*Email*@
-            <div class="row">
-                <div class="col s12">
-                    <p class="custom-label">Email <span class="required-mark">*</span></p>
-                    <input type="text" class="custom-input"
-                           ng-model="staff_email"
-                           maxlength="150"
-                           placeholder="juandlc@gmail.com"
-                           ng-change="checkAddStaffEmail()"
-                           ng-class="{
+        @*Email*@
+        <div class="row">
+            <div class="col s12">
+                <p class="custom-label">Email <span class="required-mark">*</span></p>
+                <input type="text" class="custom-input"
+                       ng-model="staff_email"
+                       maxlength="150"
+                       placeholder="juandlc@gmail.com"
+                       ng-change="checkAddStaffEmail()"
+                       ng-class="{
                    'input-valid': staffEmailFormatValid && !staffEmailTaken,
                    'input-invalid': staff_email && !staffEmailFormatValid
                }"
-                           required>
-                    <p class="helper-text" style="margin-top:.4rem;">
-                        <span ng-show="staff_email"
-                              ng-style="{'color': staffEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
-                            {{ staffEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
-                        </span>
-                        <span ng-show="staffEmailFormatValid && staffEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
-                            Email already taken
-                        </span>
-                    </p>
-                </div>
+                       required>
+                <p class="helper-text" style="margin-top:.4rem;">
+                    <span ng-show="staff_email"
+                          ng-style="{'color': staffEmailFormatValid ? '#2e7d32' : '#d32f2f'}">
+                        {{ staffEmailFormatValid ? 'Email is valid' : 'Enter a valid email address' }}
+                    </span>
+                    <span ng-show="staffEmailFormatValid && staffEmailTaken" style="color:#d32f2f; display:block; margin-top:.2rem;">
+                        Email already taken
+                    </span>
+                </p>
             </div>
+        </div>
 
-            
+
     </div>
 
     @*Submit or cancel*@
-        <div class="modal-footer" style="margin-top:2.5vh">
-            <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
-            <button type="submit"
-                    class="edit-btn modal-close"
-                    ng-click="addStaff()"
-                    ng-disabled="!isAddStaffFormValid()">
-                ADD
-            </button>
-        </div>
+    <div class="modal-footer" style="margin-top:2.5vh">
+        <button class="modal-close cancel-btn left" style="font-weight: 500; margin-right: .5vh">CANCEL</button>
+        <button type="submit"
+                class="edit-btn modal-close"
+                ng-click="addStaff()"
+                ng-disabled="!isAddStaffFormValid()">
+            ADD
+        </button>
+    </div>
 </div>
 
 
@@ -475,7 +475,7 @@
                     <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                         <div class="col s12">
                             <div class="photo-box" style="cursor:pointer;">
-                                <img ng-src="{{owner.photoLink}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />   
+                                <img ng-src="{{owner.photoLink}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
                             </div>
                         </div>
                     </div>
@@ -622,8 +622,8 @@
                 @*Specialization*@
                 <div class="col s12">
                     <p class="custom-label">Specialization</p>
-                    <input type="text" ng-model="owner.specialization" class="custom-input" maxlength="50" disabled/>
-                    
+                    <input type="text" ng-model="owner.specialization" class="custom-input" maxlength="50" disabled />
+
                 </div>
             </div>
         </form>
@@ -650,7 +650,7 @@
                     <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
                         <div class="col s12">
                             <div class="photo-box" style="cursor:pointer;">
-                                <img  ng-src="{{dentist.photoLink}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
+                                <img ng-src="{{dentist.photoLink}}" alt="Preview" style="width:100%; height:100%; object-fit:cover;" />
                             </div>
                         </div>
                     </div>
@@ -671,7 +671,7 @@
                         </div>
                         <div class="col s6">
                             <p class="custom-label">Middle Name <span class="required-mark">*</span></p>
-                            <input type="text" ng-model="dentist.middleName" class="custom-input" maxlength="150" placeholder="Mercado" required disabled/>
+                            <input type="text" ng-model="dentist.middleName" class="custom-input" maxlength="150" placeholder="Mercado" required disabled />
                         </div>
                     </div>
                     <div class="row">
@@ -683,7 +683,7 @@
                                    maxlength="150"
                                    placeholder="Dela Cruz"
                                    required
-                                  disabled />
+                                   disabled />
 
                         </div>
                     </div>
@@ -698,7 +698,7 @@
                            ng-model="dentist.email"
                            maxlength="150"
                            placeholder="juandlc@gmail.com"
-                           required 
+                           required
                            disabled />
                 </div>
             </div>
@@ -1014,5 +1014,57 @@
     <div class="modal-footer">
         <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
         <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="archiveStaff()">ARCHIVE</button>
+    </div>
+</div>
+
+@*DEACTIVATE dentist*@
+<div id="modalDeactivateDentist" class="modal patientInformationForm-modal" style="width:30% !important; padding:0 !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Deactivate Dentist Profile</h5>
+        <p class="custom-label">Are you sure you want to deactivate this dentist profile?</p>
+        <input type="hidden" id="hiddenDentistDeactivate" value="" />
+    </div>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deactivateDentist()">DEACTIVATE</button>
+    </div>
+</div>
+
+@*ACTIVATE dentist*@
+<div id="modalActivateDentist" class="modal patientInformationForm-modal" style="width:30% !important; padding:0 !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Activate Dentist Profile</h5>
+        <p class="custom-label">Are you sure you want to activate this dentist profile?</p>
+        <input type="hidden" id="hiddenDentistActivate" value="" />
+    </div>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="activateDentist()">ACTIVATE</button>
+    </div>
+</div>
+
+@*DEACTIVATE staff*@
+<div id="modalDeactivateStaff" class="modal patientInformationForm-modal" style="width:30% !important; padding:0 !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Deactivate Staff Profile</h5>
+        <p class="custom-label">Are you sure you want to deactivate this staff profile?</p>
+        <input type="hidden" id="hiddenStaffDeactivate" value="" />
+    </div>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="deactivateStaff()">DEACTIVATE</button>
+    </div>
+</div>
+
+@*ACTIVATE staff*@
+<div id="modalActivateStaff" class="modal patientInformationForm-modal" style="width:30% !important; padding:0 !important">
+    <div class="modal-content">
+        <h5 class="modal-form-title" style="margin-bottom:15px;">Activate Staff Profile</h5>
+        <p class="custom-label">Are you sure you want to activate this staff profile?</p>
+        <input type="hidden" id="hiddenStaffActivate" value="" />
+    </div>
+    <div class="modal-footer">
+        <button class="modal-close cancel-btn" style="font-weight: 500; margin: -.8vh 0 -1.2vh 2.3vh">CANCEL</button>
+        <button type="submit" class="edit-btn" style="font-weight: 500; margin: -.8vh 2.3vh -1.2vh 0" ng-click="activateStaff()">ACTIVATE</button>
     </div>
 </div>

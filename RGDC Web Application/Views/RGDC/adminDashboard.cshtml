@@ -110,17 +110,16 @@
 
                                 @*procedure and dateTime (mobile)*@
                                 <div class="col s6 m6 hide-on-large-only">
-                                    <p>{{r.purpose}}</p>YYY
+                                    <p>{{r.purpose}}</p>
                                     <p>{{r.date}}</p>
                                     <p style="white-space: pre-line;">{{r.notes || r.remarks}}</p>
                                 </div>
 
-                                @*yes or no btn*@
-                                <div class="col s6 m6 l1" ng-show="isUserStaff">
-                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="acceptRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem">
+                                <div class="col s6 m6 l1" ng-if="canActOnRequest(r)" style="display:flex; flex-direction:column; align-items:flex-end;">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist && !isUserOwner" ng-click="acceptRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Confirm" style="margin-bottom: 0.25rem" aria-label="Accept requested appointment">
                                         <i class="material-icons tiny">check</i>
                                     </a>
-                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-click="denyRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Deny">
+                                    <a href="#" class="btn-floating btn-small waves-effect waves-light brown lighten-1 tooltipped" ng-show="!isUserDentist && !isUserOwner" ng-click="denyRequestedAppointment(r.apptID)" data-position="right" data-tooltip="Deny" aria-label="Deny requested appointment">
                                         <i class="material-icons tiny">close</i>
                                     </a>
                                 </div>
