@@ -69,6 +69,12 @@
         overflow-x: auto;
         white-space: nowrap;
     }
+
+    .patient-forms-responsive {
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
 }
 
 /*medium*/
