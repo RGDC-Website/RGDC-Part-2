@@ -16,7 +16,7 @@
 }
 
 .containerOverflow-2 {
-    min-height: 12rem;
+/*    min-height: 12rem;*/
     max-height: calc(100vh - 200px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -97,6 +97,10 @@
 
     .containerOverflow-2 {
         overflow-x: auto;
+    }
+
+    .staff-inactive-active-btn{
+        margin-top: 1rem !important;
     }
 }
 
