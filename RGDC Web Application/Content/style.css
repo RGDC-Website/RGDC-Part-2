@@ -8,6 +8,21 @@
     padding: 0 3%;
 }
 
+.containerOverflow {
+    min-height: 12rem;
+    max-height: 20rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.containerOverflow-2 {
+/*    min-height: 12rem;*/
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
 /*medium and up*/
 @media only screen and (min-width: 601px) {
     .responsive-btn-roundedSquare {
@@ -48,6 +63,10 @@
     .responsive-btn-roundedSquare{
         margin-left: 0;
     }
+
+    .containerOverflow-2 {
+        overflow-x: auto;
+    }
 }
 
 /*phone portrait*/
@@ -68,6 +87,20 @@
         overflow-y: auto;
         overflow-x: auto;
         white-space: nowrap;
+    }
+
+    .patient-forms-responsive {
+        overflow-y: auto;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .containerOverflow-2 {
+        overflow-x: auto;
+    }
+
+    .staff-inactive-active-btn{
+        margin-top: 1rem !important;
     }
 }
 
@@ -233,19 +266,6 @@ a:hover {
         color: #fff !important;
     }
 
-.containerOverflow {
-    min-height: 12rem;
-    max-height: 20rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.containerOverflow-2 {
-    min-height: 12rem;
-    max-height: calc(100vh - 200px);
-    overflow-y: auto;
-    overflow-x: auto;
-}
 
     .containerOverflow-2::-webkit-scrollbar {
         width: 8px;

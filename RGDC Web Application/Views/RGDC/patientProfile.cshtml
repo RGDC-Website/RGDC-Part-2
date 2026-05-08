@@ -372,8 +372,8 @@
                             <div class="row">
                                 <a ng-show="isUserAdmin" class="btn brown lighten-1 right modal-trigger white-text" data-target="modalDentalChart">UPLOAD CHART</a>
                             </div>
-
-                            <table id="patientDentalChartTable" class="hover tableClk">
+                            <div >
+                                <table id="patientDentalChartTable" class="hover tableClk">
                                 <thead>
                                     <tr class="brown-text lighten-1">
                                         <th>Date</th>
@@ -417,6 +417,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
+                            </div>
 
 
                             @*change into modal
@@ -430,59 +431,61 @@
                         </div>
 
                         @*Forms*@
-                        <div id="forms" class="row m-0">
-                            <div class="row">
-                                <a ng-show="isUserAdmin && !isUserStaff" class="btn brown lighten-1 white-text right modal-trigger" data-target="modalAddForm">ADD FORM</a>
+                    <div id="forms" class="row m-0">
+                        <div class="row">
+                            <a ng-show="isUserAdmin && !isUserStaff" class="btn brown lighten-1 white-text right modal-trigger" data-target="modalAddForm">ADD FORM</a>
+                        </div>
+                        @*di pa toh nakainitiate*@
+                            <div class="row m-0 containerOverflow-2">
+                                <table id="patientForms" class="hover tableClk" ng-init="getForms()">
+
+                                    <thead>
+                                        <tr class="brown-text lighten-1">
+                                            <th>Date</th>
+                                            <th>Form</th>
+                                            <th colspan="2">Dentist</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr ng-repeat="form in formsList track by form.formID" on-finish-render table-id="patientForms">
+                                            <td>{{form.formCreatedAt}}</td>
+                                            <td>
+                                                Prescription
+                                            </td>
+                                            <td>{{form.dentistName}}</td>
+                                            <td class="right-align" style="white-space: nowrap;">
+                                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn"
+                                                   data-position="bottom" ng-click="viewForm(form.formID)" data-tooltip="View Form"
+                                                   style="margin-right: 0.5rem !important; vertical-align: middle;">
+                                                    <i class="material-icons brown-text lighten-1">visibility</i>
+                                                </a>
+                                                <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                                   data-position="bottom" ng-click="downloadForm(form.formID)" data-tooltip="Print Form"
+                                                   style="margin-right: 0.5rem !important; vertical-align: middle;">
+                                                    <i class="material-icons brown-text lighten-1">print</i>
+                                                </a>
+                                                <a ng-show="isUserAdmin && !isUserPatient"
+                                                   class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
+                                                   data-position="bottom" data-tooltip="Archive"
+                                                   style="margin-right: 0.5rem !important; vertical-align: middle;"
+                                                   ng-click="archivePatientForm(form, $event)">
+                                                    <i class="material-icons brown-text lighten-1">inventory_2</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                    <tfoot>
+                                        <tr class="brown-text lighten-1">
+                                            <th>Date</th>
+                                            <th>Form</th>
+                                            <th>Dentist</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
-                            @*di pa toh nakainitiate*@
-                            <table id="patientForms" class="hover tableClk" ng-init="getForms()">
-
-                                <thead>
-                                    <tr class="brown-text lighten-1">
-                                        <th>Date</th>
-                                        <th>Form</th>
-                                        <th colspan="2">Dentist</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <tr ng-repeat="form in formsList track by form.formID" on-finish-render table-id="patientForms">
-                                        <td>{{form.formCreatedAt}}</td>
-                                        <td>
-                                            Prescription
-                                        </td>
-                                        <td>{{form.dentistName}}</td>
-                                        <td class="right-align" style="white-space: nowrap;">
-                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0 redBtn"
-                                               data-position="bottom" ng-click="viewForm(form.formID)" data-tooltip="View Form"
-                                               style="margin-right: 0.5rem !important; vertical-align: middle;">
-                                                <i class="material-icons brown-text lighten-1">visibility</i>
-                                            </a>
-                                            <a class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
-                                               data-position="bottom" ng-click="downloadForm(form.formID)" data-tooltip="Print Form"
-                                               style="margin-right: 0.5rem !important; vertical-align: middle;">
-                                                <i class="material-icons brown-text lighten-1">print</i>
-                                            </a>
-                                            <a ng-show="isUserAdmin && !isUserPatient"
-                                               class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped m-0"
-                                               data-position="bottom" data-tooltip="Archive"
-                                               style="margin-right: 0.5rem !important; vertical-align: middle;"
-                                               ng-click="archivePatientForm(form, $event)">
-                                                <i class="material-icons brown-text lighten-1">inventory_2</i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-
-                                <tfoot>
-                                    <tr class="brown-text lighten-1">
-                                        <th>Date</th>
-                                        <th>Form</th>
-                                        <th>Dentist</th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
                         </div>
                         @*post op*@
                         <div id="postOp" class="row m-0 ">

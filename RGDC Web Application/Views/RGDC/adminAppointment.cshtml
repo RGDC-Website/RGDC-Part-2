@@ -49,19 +49,13 @@
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th>Status</th>
-                                <th style="text-align:center;">Action</th>
+                                <th></th>
                             </tr>
                         </thead>
                         @*table content*@
                         <tbody>
                             <tr ng-if="(!adminAppointments || adminAppointments.length === 0)">
-                                <td class="center-align">No scheduled appointments found.</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td class="center-align" colspan="8">No scheduled appointments found.</td>
                             </tr>
                             <tr ng-repeat="appt in adminAppointments track by appt.apptID" data-href="#" class="clkPointer">
                                 <td>{{appt.date}}</td>
@@ -111,11 +105,11 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
+                                <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th>Status</th>
-                                <th>Action</th>
-                            </tr>
+                                <th></th>
                         </tfoot>
                     </table>
                 </div>
@@ -138,7 +132,7 @@
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th>Status</th>
-                                <th style="text-align:center;">Action</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -206,7 +200,7 @@
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -255,6 +249,7 @@
                                 <th>Date</th>
                                 <th>Time</th>
                                 <th>Purpose</th>
+                                <th>Notes</th>
                                 <th>Dentist</th>
                                 <th>Patient</th>
                                 <th colspan="2">Status</th>
