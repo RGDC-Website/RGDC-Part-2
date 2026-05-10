@@ -95,19 +95,22 @@
         <div class=" show-on-medium-and-down hide-on-large-only s12 m12 brown lighten-1 z-depth-3 white-text p-0 m-0" style="width: 100% !important">
             <nav>
                 <div class="nav-wrapper px-1">
-                    <h5 class="bold brand-logo center">RGDC</h5>
-                    <ul class="left">
-                        <li>
-                            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                        </li>
-                    </ul>
+                    <span>
+                        <h5 class="bold brand-logo center">RGDC</h5>
+                        <ul class="left">
+                            <li>
+                                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                            </li>
+                        </ul>
+                        @*print report btn*@
+                        <div class="col valign-wrapper right" ng-show="isUserAdmin" style="margin-top: 0.5rem !important; margin-bottom: 0 !important"><a href="#" class="btn-floating btn-medium waves-effect waves-light brown lighten-4 p-0 smallBtn tooltipped" data-position="bottom" data-tooltip="Print Report"> <i class="material-icons brown-text lighten-1" style="margin-top: -0.5rem !important">print</i></a></div>
+                    </span>
                 </div>
             </nav>
         </div>
 
         <ul class="sidenav brown lighten-1 z-depth-3 white-text p-1" id="mobile-nav">
 
-            @*logout*@
 
 
             @*user pfp and name*@
@@ -142,12 +145,13 @@
             <li><a href="~/RGDC/contactUsPage" class="white-text valign-wrapper navText"><i class="material-icons white-text" style="padding-right: 0.5rem;">call</i>Contact Us</a></li>
 
             @*date and time at the bottom of the screen*@
-            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
+            <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem; margin-bottom: 2rem !important;">
                 <span id="currentDate">Loading date...</span>
                 <span id="currentTime">Loading time...</span>
-            </div>
-            <div class="row mt-1 mb-2">
-                <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
+                @*logout*@
+                <div class="row mt-1 mb-2">
+                    <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
+                </div>
             </div>
         </ul>
 
