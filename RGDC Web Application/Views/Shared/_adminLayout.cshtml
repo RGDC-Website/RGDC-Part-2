@@ -143,8 +143,8 @@
 
             @*date and time at the bottom of the screen*@
             <div class="row center" style="margin-top: 5rem; padding-bottom: 2rem;">
-                <span id="currentDate">Loading date...</span>
-                <span id="currentTime">Loading time...</span>
+                <span id="currentDate1">Loading date...</span>
+                <span id="currentTime1">Loading time...</span>
             </div>
             <div class="row mt-1 mb-2">
                 <a href="#" class="waves-effect waves-light btn brown lighten-4 right" ng-click="logOut()"> <span class="brown-text lighten-1 bold"><i class="material-icons brown-text lighten-1 left">logout</i>Logout</span></a>
@@ -1306,6 +1306,29 @@
 
                     var dateEl = document.getElementById('currentDate');
                     var timeEl = document.getElementById('currentTime');
+                    if (dateEl) dateEl.textContent = month + ' ' + day + ', ' + year + ' | ';
+                    if (timeEl) timeEl.textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+                } catch (e) {
+                    console.error('renderDateTime error', e);
+                }
+            }
+
+            function renderDateTime() {
+                try {
+                    var now = new Date();
+                    var month = months[now.getMonth()];
+                    var day = now.getDate();
+                    var year = now.getFullYear();
+
+                    var hours = now.getHours();
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    var minutes = pad(now.getMinutes());
+                    var seconds = pad(now.getSeconds());
+
+                    var dateEl = document.getElementById('currentDate1');
+                    var timeEl = document.getElementById('currentTime1');
                     if (dateEl) dateEl.textContent = month + ' ' + day + ', ' + year + ' | ';
                     if (timeEl) timeEl.textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
                 } catch (e) {

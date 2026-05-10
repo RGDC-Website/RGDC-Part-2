@@ -156,6 +156,152 @@
     $scope.patientArrayData = [];
     $scope.patientArrayDataDeact = [];
 
+    $scope.printReport = async function () {
+
+            try {
+
+                // Replace with your actual API/service calls
+
+                const totalPatientsRes = await RGDCWebApplicationService.getTotalPatients();
+                const newPatientsRes = await RGDCWebApplicationService.getNewPatientsLastMonth();
+                const paymentsRes = await RGDCWebApplicationService.getPaymentsLast7Days();
+                const incomeRes = await RGDCWebApplicationService.getTotalIncome();
+
+                const appointmentRequestRes = await RGDCWebApplicationService.getTotalAppointmentRequests();
+                const scheduledAppointmentsRes = await RGDCWebApplicationService.getTotalScheduledAppointments();
+
+                const totalPatients = totalPatientsRes.data;
+                const newPatients = newPatientsRes.data;
+                const paymentCount = paymentsRes.data.count;
+                const totalIncome = incomeRes.data;
+
+                const totalAppointmentRequests = appointmentRequestRes.data;
+                const totalScheduledAppointments = scheduledAppointmentsRes.data;
+
+                var docDefinition = {
+
+                    pageSize: 'A4',
+
+                    pageMargins: [40, 60, 40, 60],
+
+                    content: [
+
+                        {
+                            text: 'RGDC Dashboard Report',
+                            style: 'header',
+                            alignment: 'center',
+                            margin: [0, 0, 0, 20]
+                        },
+
+                        {
+                            text: 'Generated: ' + new Date().toLocaleString(),
+                            alignment: 'right',
+                            margin: [0, 0, 0, 20]
+                        },
+
+                        {
+                            table: {
+
+                                widths: ['*', '*'],
+
+                                body: [
+
+                                    [
+                                        {
+                                            text: 'Info',
+                                            style: 'tableHeader'
+                                        },
+                                        {
+                                            text: 'Data',
+                                            style: 'tableHeader'
+                                        }
+                                    ],
+
+                                    [
+                                        'Total Patients',
+                                        totalPatients.toString()
+                                    ],
+
+                                    [
+                                        'New Patients (Past Month)',
+                                        newPatients.toString()
+                                    ],
+
+                                    [
+                                        'New Payment Records (Past 7 Days)',
+                                        paymentCount.toString()
+                                    ],
+
+                                    [
+                                        'Total Appointment Requests',
+                                        totalAppointmentRequests.toString()
+                                    ],
+
+                                    [
+                                        'Total Scheduled Appointments',
+                                        totalScheduledAppointments.toString()
+                                    ],
+
+                                    [
+                                        'Total Income',
+                                        '₱ ' + parseFloat(totalIncome || 0)
+                                            .toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            })
+                                    ]
+
+                                ]
+                            },
+
+                            layout: {
+
+                                fillColor: function (rowIndex) {
+                                    return rowIndex === 0 ? '#4F81BD' : null;
+                                },
+
+                                hLineColor: function () {
+                                    return '#CCCCCC';
+                                },
+
+                                vLineColor: function () {
+                                    return '#CCCCCC';
+                                }
+
+                            }
+
+                        }
+
+                    ],
+
+                    styles: {
+
+                        header: {
+                            fontSize: 22,
+                            bold: true
+                        },
+
+                        tableHeader: {
+                            bold: true,
+                            color: 'white',
+                            fontSize: 12
+                        }
+
+                    }
+
+                };
+
+                pdfMake.createPdf(docDefinition).open();
+
+            }
+            catch (err) {
+
+                console.error(err);
+                alert("Error generating report.");
+
+            }
+
+        };
     $scope.checkPasswordStrength = function () {
         const pwd = $scope.signUp_password || '';
         if (!pwd) {
