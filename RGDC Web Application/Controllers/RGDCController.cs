@@ -6390,6 +6390,9 @@ RGDC Dental Clinic Team";
                         db.SaveChanges();
                     }
 
+                    const int OPEN_MIN = 8 * 60;  // 08:00
+                    const int CLOSE_MIN = 17 * 60; // 17:00
+
                     foreach (var s in schedule)
                     {
                         if (s.dentistID != dentistID)
@@ -6412,6 +6415,14 @@ RGDC Dental Clinic Team";
 
                         var slot = s.slotMinutes > 0 ? s.slotMinutes : 30;
 
+                        // enforce clinic hours (08:00 - 17:00) on server side as defensive check
+                        var sMin = (int)startTs.TotalMinutes;
+                        var eMin = (int)endTs.TotalMinutes;
+                        if (sMin < OPEN_MIN || sMin > CLOSE_MIN || eMin < OPEN_MIN || eMin > CLOSE_MIN)
+                        {
+                            return Json(new { success = false, message = "Times must be within clinic hours (08:00–17:00)." });
+                        }
+
                         // New entity (do not reuse DTO / do not set scheduleID — DB generates it)
                         db.tbl_dentist_schedule.Add(new tblDentistScheduleModel
                         {
@@ -6419,7 +6430,8 @@ RGDC Dental Clinic Team";
                             dayOfWeek = s.dayOfWeek,
                             startTime = startTs,
                             endTime = endTs,
-                            slotMinutes = slot
+                            slotMinutes = slot,
+                            createdAt = DateTime.Now
                         });
                     }
                     db.SaveChanges();
