@@ -172,7 +172,7 @@
             <form>
                 <div class="row">
                     <div class="col s12 m4 l4">
-                        <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                        <div class="row s4 center-align" style="margin-top: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
                                     <img ng-if="ownerAccountPhotoPreview || owner.photoLink"
@@ -232,7 +232,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="owner.genderID" disabled
                                 ng-options="gender.genderID as gender.description for gender in genderArray"
@@ -242,7 +242,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDateOwner" type="text" class="datepicker custom-input" ng-model="owner.birthDate"
@@ -252,7 +252,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="owner.civilStatus"
                                 ng-class="{'invalid-input': editOwnerSubmitted && !owner.civilStatus}">
@@ -264,7 +264,7 @@
                         <span class="validation-msg" ng-show="editOwnerSubmitted && !owner.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m12 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="owner.contactNumber"
                                placeholder="09XXXXXXXXX" maxlength="11"
@@ -343,7 +343,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m9 l3">
                         @*state/province/region*@
                         <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
                         <input id="address"
@@ -356,7 +356,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*zip/postal code*@
                         <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
                         <input id="address"
@@ -369,7 +369,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*country*@
                         <p class="custom-label">Country <span class="required-mark">*</span></p>
                         <input id="address"
@@ -415,7 +415,7 @@
                 <div class="row">
                     <div class="col s12 m4 l4">
                         @*Photo display*@
-                        <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                        <div class="row s4 center-align" style="margin-top: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
                                     <img ng-if="dentistAccountPhotoPreview || dentist.photoLink"
@@ -475,7 +475,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray" disabled
@@ -485,7 +485,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDateDentist" type="text" class="datepicker custom-input" ng-model="dentist.birthDate"
@@ -495,7 +495,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="dentist.civilStatus"
                                 ng-class="{'invalid-input': editDentistSubmitted && !dentist.civilStatus}">
@@ -507,7 +507,7 @@
                         <span class="validation-msg" ng-show="editDentistSubmitted && !dentist.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m12 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input type="text" class="custom-input" ng-model="dentist.contactNumber"
                                placeholder="09#########"
@@ -589,7 +589,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m9 l3">
                         @*state/province/region*@
                         <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
                         <input id="address"
@@ -602,7 +602,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*zip/postal code*@
                         <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
                         <input id="address"
@@ -615,7 +615,7 @@
                                required>
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*country*@
                         <p class="custom-label">Country <span class="required-mark">*</span></p>
                         <input id="address"
@@ -644,7 +644,7 @@
                         <button type="button" class="btn-small edit-btn schedule-btn" ng-click="openDentistScheduleModal()">
                             Edit Weekly Schedule
                         </button>
-                        <span class="helper-text schedule-helper">(Update your weekly availability used for appointment slots)</span>
+                        <p style="margin-top: 1rem !important;">(Update your weekly availability used for appointment slots)</p>
                     </div>
                 </div>
                 <div class="row">
@@ -679,14 +679,28 @@
         </div>
 
         @*Footer Actions*@
-        <div class="modal-footer footer-center" style="margin-top:2.5vh">
-            <div class="left" style="display:flex; gap:12px; align-items:center;">
-                <button type="button" class="edit-btn" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
-                <button type="button" class="edit-btn" style="font-weight:500;" ng-click="uploadDentistSignature()">UPLOAD SIGNATURE</button>
-            </div>
-            <button class="modal-close cancel-btn" style="font-weight:500; margin-right:.5vh" ng-click="editDentistSubmitted = false">CANCEL</button>
+    <div class="modal-footer footer-center" style="margin-top:2.5vh">
+        <div class="col m3 l3 hide-on-small-only">
+            <button type="button" class="edit-btn" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
+        </div>
+        <div class="col m3 l3 hide-on-small-only">
+            <button type="button" class="edit-btn" style="font-weight:500;" ng-click="uploadDentistSignature()">UPLOAD SIGNATURE</button>
+        </div>
+        <div class="col m3 l3 hide-on-small-only">
+            <button class="modal-close cancel-btn" style="font-weight:500;" ng-click="editDentistSubmitted = false">CANCEL</button>
+        </div>
+        <div class="col m3 l3 hide-on-small-only">
             <button type="button" class="edit-btn" style="font-weight:500;" ng-click="editDentist()">SAVE</button>
         </div>
+        <div class="show-on-small-only col s12 hide-on-med-and-up">
+            <button type="button" class="edit-btn" style="font-weight:500;" ng-click="pickAccountPhotoFileDentist()">UPLOAD PHOTO</button>
+            <button type="button" class="edit-btn" style="font-weight:500; margin-top: 1rem !important" ng-click="uploadDentistSignature()">UPLOAD SIGNATURE</button>
+        </div>
+        <div class="show-on-small-only col s12 hide-on-med-and-up">
+            <button class="modal-close cancel-btn" style="font-weight:500;" ng-click="editDentistSubmitted = false">CANCEL</button>
+            <button type="button" class="edit-btn mt-1" style="font-weight: 500; margin-top: 1rem !important" ng-click="editDentist()">SAVE</button>
+        </div>
+    </div>
     </div>
     </div>
 
@@ -751,7 +765,7 @@
             <form>
                 <div class="row">
                     <div class="col s12 m4 l4">
-                        <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                        <div class="row s4 center-align" style="margin-top: 2.5vh;">
                             <div class="col s12">
                                 <div class="photo-box">
                                     <img ng-if="staffAccountPhotoPreview || staff.photoLink"
@@ -811,7 +825,7 @@
 
                 <div class="row">
                     @*Gender*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Gender <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="staff.genderID"
                                 ng-options="gender.genderID as gender.description for gender in genderArray" disabled
@@ -821,7 +835,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.genderID">Gender is required.</span>
                     </div>
                     @*Birthdate*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                         <div class="datepicker-wrapper">
                             <input id="birthDate" type="text" class="datepicker custom-input" ng-model="staff.birthDate"
@@ -831,7 +845,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.birthDate">Birth date is required.</span>
                     </div>
                     @*Civil status*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m4 l3">
                         <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                         <select class="browser-default custom-input" ng-model="staff.civilStatus"
                                 ng-class="{'invalid-input': editStaffSubmitted && !staff.civilStatus}">
@@ -843,7 +857,7 @@
                         <span class="validation-msg" ng-show="editStaffSubmitted && !staff.civilStatus">Civil status is required.</span>
                     </div>
                     @*Contact number*@
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m12 l3">
                         <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                         <input id="contactNumber" type="text" class="custom-input" ng-model="staff.contactNumber"
                                placeholder="09XXXXXXXXX" maxlength="11"
@@ -931,7 +945,7 @@
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.city}">
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m9 l3">
                         @*state/province/region*@
                         <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
                         <input id="address"
@@ -945,7 +959,7 @@
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.state}">
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*zip/postal code*@
                         <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
                         <input id="address"
@@ -959,7 +973,7 @@
                                ng-class="{'invalid-input': editStaffSubmitted && !staff.postal}">
                     </div>
 
-                    <div class="col s12 m3 l3">
+                    <div class="col s12 m6 l3">
                         @*country*@
                         <p class="custom-label">Country <span class="required-mark">*</span></p>
                         <input id="address"
