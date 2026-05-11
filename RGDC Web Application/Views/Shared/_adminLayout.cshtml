@@ -1331,6 +1331,29 @@
                 }
             }
 
+            function renderDateTime() {
+                try {
+                    var now = new Date();
+                    var month = months[now.getMonth()];
+                    var day = now.getDate();
+                    var year = now.getFullYear();
+
+                    var hours = now.getHours();
+                    var ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12;
+                    var minutes = pad(now.getMinutes());
+                    var seconds = pad(now.getSeconds());
+
+                    var dateEl = document.getElementById('currentDate1');
+                    var timeEl = document.getElementById('currentTime1');
+                    if (dateEl) dateEl.textContent = month + ' ' + day + ', ' + year + ' | ';
+                    if (timeEl) timeEl.textContent = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+                } catch (e) {
+                    console.error('renderDateTime error', e);
+                }
+            }
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', function () {
                     renderDateTime();

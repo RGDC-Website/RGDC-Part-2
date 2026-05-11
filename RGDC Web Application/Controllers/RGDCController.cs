@@ -608,7 +608,7 @@ namespace RGDC_Web_Application.Controllers
                 return;
             }
             string clientId = ConfigurationManager.AppSettings["GoogleClientId"];
-            string redirectUri = "https://localhost:44357/RGDC/ExternalLoginCallback";
+            string redirectUri = "http://rgdcwebsite.com/RGDC/ExternalLoginCallback";
 
             string googleUrl = $"https://accounts.google.com/o/oauth2/v2/auth?" +
                                $"client_id={clientId}&" +
@@ -628,7 +628,7 @@ namespace RGDC_Web_Application.Controllers
 
             string clientId = ConfigurationManager.AppSettings["GoogleClientId"];
             string clientSecret = ConfigurationManager.AppSettings["GoogleClientSecret"];
-            string redirectUri = "https://localhost:44357/RGDC/ExternalLoginCallback";
+            string redirectUri = "http://rgdcwebsite.com/RGDC/ExternalLoginCallback";
 
             using (HttpClient client = new HttpClient())
             {
@@ -6085,6 +6085,82 @@ RGDC Dental Clinic Team";
         //    }
         //}
 
+        public JsonResult getTotalPatients()
+        {
+            using (RGDCContext db = new RGDCContext())
+            {
+                int totalPatients = db.tbl_patient.Count();
+
+                return Json(totalPatients, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getNewPatientsLastMonth()
+        {
+            using (RGDCContext db = new RGDCContext ())
+            {
+                DateTime lastMonth = DateTime.Now.AddMonths(-1);
+
+
+                int newPatients = (
+                    from p in db.tbl_patient
+                    join a in db.tbl_account
+                        on p.accID equals a.accID
+                    where a.accCreatedAt >= lastMonth
+                    select p
+                ).Count();
+
+                return Json(newPatients, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getPaymentsLast7Days()
+        {
+            using (RGDCContext db = new RGDCContext())
+            {
+                DateTime last7Days = DateTime.Now.AddDays(-7);
+
+                int paymentCount = db.tbl_payment
+                    .Count(x => x.paymentDate >= last7Days);
+
+                return Json(new
+                {
+                    count = paymentCount
+                }, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getTotalIncome()
+        {
+            using (RGDCContext db = new RGDCContext())
+            {
+                DateTime last7Days = DateTime.Now.AddDays(-7);
+                decimal totalIncome = db.tbl_payment
+                          .Where(x => x.paymentDate >= last7Days)
+                          .ToList()
+                          .Sum(x => Convert.ToDecimal(x.paid));
+
+                return Json(totalIncome, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getTotalAppointmentRequests()
+        {
+            using (RGDCContext db = new RGDCContext())
+            {
+                int totalRequests = db.tbl_appointment
+                    .Count(x => x.status == "Requested");
+
+                return Json(totalRequests, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public JsonResult getTotalScheduledAppointments()
+        {
+            using (RGDCContext db = new RGDCContext())
+            {
+                int totalRequests = db.tbl_appointment
+                    .Count(x => x.status == "Scheduled");
+
+                return Json(totalRequests, JsonRequestBehavior.AllowGet);
+            }
+        }
+
         [HttpGet]
         public JsonResult getOverviewData()
         {
@@ -6108,7 +6184,7 @@ RGDC Dental Clinic Team";
                     .Count();
 
                 var unpaidPatients = db.tbl_payment
-                    .Where(t => t.paid != 0)
+                    .Where(t => t.balance != 0)
                     .Select(t => t.patientID)
                     .Distinct()
                     .Count();
@@ -6314,6 +6390,9 @@ RGDC Dental Clinic Team";
                         db.SaveChanges();
                     }
 
+                    const int OPEN_MIN = 8 * 60;  // 08:00
+                    const int CLOSE_MIN = 17 * 60; // 17:00
+
                     foreach (var s in schedule)
                     {
                         if (s.dentistID != dentistID)
@@ -6336,6 +6415,14 @@ RGDC Dental Clinic Team";
 
                         var slot = s.slotMinutes > 0 ? s.slotMinutes : 30;
 
+                        // enforce clinic hours (08:00 - 17:00) on server side as defensive check
+                        var sMin = (int)startTs.TotalMinutes;
+                        var eMin = (int)endTs.TotalMinutes;
+                        if (sMin < OPEN_MIN || sMin > CLOSE_MIN || eMin < OPEN_MIN || eMin > CLOSE_MIN)
+                        {
+                            return Json(new { success = false, message = "Times must be within clinic hours (08:00–17:00)." });
+                        }
+
                         // New entity (do not reuse DTO / do not set scheduleID — DB generates it)
                         db.tbl_dentist_schedule.Add(new tblDentistScheduleModel
                         {
@@ -6343,7 +6430,8 @@ RGDC Dental Clinic Team";
                             dayOfWeek = s.dayOfWeek,
                             startTime = startTs,
                             endTime = endTs,
-                            slotMinutes = slot
+                            slotMinutes = slot,
+                            createdAt = DateTime.Now
                         });
                     }
                     db.SaveChanges();

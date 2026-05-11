@@ -31,6 +31,29 @@
         return $http.get("/RGDC/getGender");
     };
 
+    this.getTotalPatients = function () {
+        return $http.get("/RGDC/getTotalPatients");
+    };
+
+    this.getNewPatientsLastMonth = function () {
+        return $http.get("/RGDC/getNewPatientsLastMonth");
+    };
+
+    this.getPaymentsLast7Days = function () {
+        return $http.get("/RGDC/getPaymentsLast7Days");
+    };
+
+    this.getTotalIncome = function () {
+        return $http.get("/RGDC/getTotalIncome");
+    };
+
+    this.getTotalAppointmentRequests = function () {
+        return $http.get("/RGDC/getTotalAppointmentRequests");
+    };
+
+    this.getTotalScheduledAppointments = function () {
+        return $http.get("/RGDC/getTotalScheduledAppointments");
+    };
     this.getBranch = function () {
         return $http.get("/RGDC/getBranch");
     };
