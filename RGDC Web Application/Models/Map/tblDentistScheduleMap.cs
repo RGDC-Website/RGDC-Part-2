@@ -22,6 +22,7 @@ namespace RGDC_Web_Application.Models.Map
             Property(t => t.startTime).HasColumnName("startTime").IsRequired();
             Property(t => t.endTime).HasColumnName("endTime").IsRequired();
             Property(t => t.slotMinutes).HasColumnName("slotMinutes").IsRequired();
+            Property(t => t.createdAt).HasColumnName("createdAt").IsRequired();
         }
     }
 }
