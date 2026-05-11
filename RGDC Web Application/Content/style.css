@@ -22,6 +22,21 @@
     overflow-x: hidden;
 }
 
+.checkbox-group p {
+    margin-bottom: 1.2rem !important;
+}
+
+.checkbox-group label {
+    display: flex !important;
+    align-items: flex-start !important;
+}
+
+    .checkbox-group label span {
+        display: block !important;
+        white-space: normal !important;
+        line-height: 1.6rem !important;
+        padding-top: 2px !important;
+    }
 
 /*medium and up*/
 @media only screen and (min-width: 601px) {
@@ -370,7 +385,7 @@ a:hover {
 }
 
 .mt-1 {
-    margin-top: 1rem;
+    margin-top: 1rem !important;
 }
 
 .mb-2 {
@@ -1094,7 +1109,7 @@ select.browser-default.custom-input {
 .other-input {
     border-bottom: 1px solid #8D6E63 !important;
     height: 20px !important;
-    margin: 0 !important;
+    margin-bottom: 1rem !important;
 }
 
 .signature-container {

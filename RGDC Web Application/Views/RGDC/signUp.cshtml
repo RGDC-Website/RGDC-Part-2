@@ -162,7 +162,7 @@
             <div class="row">
                 <div class="col s4">
                     @*Photo upload*@
-                    <div class="row s4 center-align" style="margin-top: 2.5vh; margin-left: 2.5vh;">
+                    <div class="row s4 center-align" style="margin-top: 2.5vh;">
                         <div class="col s12">
                             <div class="photo-box">
                                 <img ng-if="signupPhotoPreview || _uploadedSignUpPhotoPath" ng-src="{{ signupPhotoPreview || _uploadedSignUpPhotoPath }}" alt="Profile" />
@@ -219,7 +219,7 @@
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3" ng-init="getGender()">
+                <div class="col s12 m4 l3" ng-init="getGender()">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_genderID" required>
                         <option value="" disabled selected>Select Gender</option>
@@ -227,7 +227,7 @@
                     </select>
                 </div>
                 @*Birthdate*@
-                <div class="col s3">
+                <div class="col s12 m4 l3">
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
@@ -239,8 +239,8 @@
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
-                <div class="col s3">
                     @*Civil status*@
+                <div class="col s12 m4 l3">
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_civilStatus" required>
                         <option value="" disabled selected>Select Status</option>
@@ -252,8 +252,8 @@
                         <option value="6">Divorced</option>
                     </select>
                 </div>
-                <div class="col s3">
                     @*Contact number*@
+                <div class="col s12 m12 l3">
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
                            ng-model="signUp_contactNumber"
@@ -268,7 +268,7 @@
             </div>
 
             <div class="row">
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Address Line 1*@
                     <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
                     <input id="address"
@@ -282,7 +282,7 @@
                            required>
                 </div>
 
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Address Line 2*@
                     <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
                     <input id="address"
@@ -297,7 +297,7 @@
             </div>
 
             <div class="row">
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*City*@
                     <p class="custom-label">City <span class="required-mark">*</span></p>
                     <input id="address"
@@ -310,7 +310,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m9 l3">
                     @*state/province/region*@
                     <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
                     <input id="address"
@@ -323,7 +323,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m6 l3">
                     @*zip/postal code*@
                     <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
                     <input id="address"
@@ -336,7 +336,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m6 l3">
                     @*country*@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
                     <input id="address"
@@ -351,7 +351,7 @@
             </div>
 
             <div class="row">
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Occupation*@
                     <p class="custom-label">Occupation <span class="required-mark">*</span></p>
                     <input id="occupation"
@@ -363,7 +363,7 @@
                            required>
                 </div>
 
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_religion">
@@ -375,7 +375,7 @@
                     </select>
                 </div>
 
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_nationality">
@@ -387,7 +387,7 @@
 
             <div class="row">
                 @*Current physician*@
-                <div class="col s4" ng-init="getDentists()">
+                <div class="col s12 m4 l4" ng-init="getDentists()">
                     <p class="custom-label">Current Physician <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="signUp_currentPhysician">
                         <option disabled selected>Select your Nationality</option>
@@ -396,7 +396,7 @@
                     </select>
                 </div>
                 @*Refferal*@
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     <p class="custom-label">Referral (if any)</p>
                     <input type="text"
                            ng-model="signUp_referral"
@@ -405,7 +405,7 @@
                            oninput="this.value = this.value.replace(/[^A-Za-z0-9 ,.-]/g, '')">
                 </div>
                 @*Last visit*@
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     <div class="datepicker-wrapper">
                         <p class="custom-label">
                             Last Visit (optional)

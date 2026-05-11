@@ -252,56 +252,342 @@
                                     <li>Do you have or have had any of the following?*</li>
                                 </ol>
 
-                                <div class="checkbox-grid view-only">
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.highBloodPressure" /><span>High Blood Pressure</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.lowBloodPressure" /><span>Low Blood Pressure</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.epilepsy" /><span>Epilepsy / Convulsions</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hiv" /><span>AIDS or HIV Infection</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.std" /><span>Sexually Transmitted Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stomachUlcer" /><span>Stomach Troubles / Ulcer</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.faintingSeizure" /><span>Fainting Seizure</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rapidWeightLoss" /><span>Rapid Weight Loss</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.radiationTherapy" /><span>Radiation Therapy</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.jointReplacement" /><span>Joint Replacement / Implant</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartSurgery" /><span>Heart Surgery</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartAttack" /><span>Heart Attack</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.thyroidProblem" /><span>Thyroid Problem</span></label>
+                                <div class="row view-only">
+                                    <div class="col s12 m6 l4 checkbox-group">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.highBloodPressure" />
+                                                <span>High Blood Pressure</span>
+                                            </label>
+                                        </p>
 
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartDisease" /><span>Heart Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.heartMurmur" /><span>Heart Murmur</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.liverDisease" /><span>Hepatitis / Liver Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.rheumaticFever" /><span>Rheumatic Fever</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.allergies" /><span>Hay Fever / Allergies</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.respiratoryProblems" /><span>Respiratory Problems</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.hepatitisJaundice" /><span>Hepatitis / Jaundice</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.tuberculosis" /><span>Tuberculosis</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.swollenAnkles" /><span>Swollen Ankles</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.kidneyDisease" /><span>Kidney Disease</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.diabetes" /><span>Diabetes</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.chestPain" /><span>Chest Pain</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.stroke" /><span>Stroke</span></label>
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.lowBloodPressure" />
+                                                <span>Low Blood Pressure</span>
+                                            </label>
+                                        </p>
 
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.cancer" /><span>Cancer / Tumors</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.anemia" /><span>Anemia</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.angina" /><span>Angina</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.asthma" /><span>Asthma</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.emphysema" /><span>Emphysema</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bleedingProblems" /><span>Bleeding Problems</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.bloodDiseases" /><span>Blood Diseases</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.headInjuries" /><span>Head Injuries</span></label>
-                                    <label><input type="checkbox" class="filled-in" ng-model="medical.conditions.arthritis" /><span>Arthritis / Rheumatism</span></label>
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.epilepsy" />
+                                                <span>Epilepsy / Convulsions</span>
+                                            </label>
+                                        </p>
 
-                                    <div class="other-section">
-                                        <label>
-                                            <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
-                                            <span>Other/s:</span>
-                                        </label>
-                                        <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.hiv" />
+                                                <span>AIDS or HIV Infection</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.std" />
+                                                <span>Sexually Transmitted Disease</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.stomachUlcer" />
+                                                <span>Stomach Troubles / Ulcer</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.faintingSeizure" />
+                                                <span>Fainting Seizure</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.rapidWeightLoss" />
+                                                <span>Rapid Weight Loss</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.radiationTherapy" />
+                                                <span>Radiation Therapy</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.jointReplacement" />
+                                                <span>Joint Replacement / Implant</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.heartSurgery" />
+                                                <span>Heart Surgery</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.heartAttack" />
+                                                <span>Heart Attack</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.thyroidProblem" />
+                                                <span>Thyroid Problem</span>
+                                            </label>
+                                        </p>
+
                                     </div>
+                                    <div class="col s12 m6 l4 checkbox-group">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.heartDisease" />
+                                                <span>Heart Disease</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.heartMurmur" />
+                                                <span>Heart Murmur</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.liverDisease" />
+                                                <span>Hepatitis / Liver Disease</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.rheumaticFever" />
+                                                <span>Rheumatic Fever</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.allergies" />
+                                                <span>Hay Fever / Allergies</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.respiratoryProblems" />
+                                                <span>Respiratory Problems</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.hepatitisJaundice" />
+                                                <span>Hepatitis / Jaundice</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.tuberculosis" />
+                                                <span>Tuberculosis</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.swollenAnkles" />
+                                                <span>Swollen Ankles</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.kidneyDisease" />
+                                                <span>Kidney Disease</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.diabetes" />
+                                                <span>Diabetes</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.chestPain" />
+                                                <span>Chest Pain</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.stroke" />
+                                                <span>Stroke</span>
+                                            </label>
+                                        </p>
+
+                                    </div>
+                                    <div class="col s12 m12 l4 checkbox-group">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.cancer" />
+                                                <span>Cancer / Tumors</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.anemia" />
+                                                <span>Anemia</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.angina" />
+                                                <span>Angina</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.asthma" />
+                                                <span>Asthma</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.emphysema" />
+                                                <span>Emphysema</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.bleedingProblems" />
+                                                <span>Bleeding Problems</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.bloodDiseases" />
+                                                <span>Blood Diseases</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.headInjuries" />
+                                                <span>Head Injuries</span>
+                                            </label>
+                                        </p>
+
+                                        <p>
+                                            <label>
+                                                <input type="checkbox"
+                                                       class="filled-in"
+                                                       ng-model="medical.conditions.arthritis" />
+                                                <span>Arthritis / Rheumatism</span>
+                                            </label>
+                                        </p>
+
+                                    </div>
+
+
+
+                                </div>
+                                <div class="row view-only">
+                                    <p>
+                                        <input type="checkbox" class="filled-in" ng-model="medical.history.checkedd" />
+                                        <span>Other/s:</span>
+                                    </p>
+                                    <input type="text" class="other-input" ng-model="medical.history.text" ng-disabled="!medical.history.checkedd">
                                 </div>
 
                                 @*signature*@
-                                <div class="signature-container">
+                                <div class="row">
                                     <div class="signature-pad" style="margin-top: 20px; width:250px; height:100px; display:flex; align-items:center; justify-content:center; background:white; border:1px solid #ddd;">
                                         <img ng-if="selectedPatient.signatureLink || signaturePreview" ng-src="{{ signaturePreview || selectedPatient.signatureLink }}" alt="Signature" style="max-width:250px; max-height:100px; object-fit:contain;" />
                                         <i ng-if="!(selectedPatient.signatureLink || signaturePreview)" class="material-icons">image</i>
@@ -560,7 +846,7 @@
                 <div class="col s8">
                     <div class="row">
                         @*First name*@
-                        <div class="col s6">
+                        <div class="col s12 m6 l6">
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
@@ -571,7 +857,7 @@
                                    required>
                         </div>
                         @*MIddle name*@
-                        <div class="col s6">
+                        <div class="col s12 m6 l6">
                             <p class="custom-label">Middle Name</p>
                             <input type="text"
                                    class="custom-input"
@@ -611,7 +897,7 @@
 
             <div class="row">
                 @*Gender*@
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     <p class="custom-label">Gender <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input"
                             ng-model="selectedPatient.genderID"
@@ -621,7 +907,7 @@
                     </select>
                 </div>
                 @*Birthdate*@
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     <p class="custom-label">Birth Date <span class="required-mark">*</span></p>
                     <div class="datepicker-wrapper">
                         <input id="birthDate"
@@ -634,7 +920,7 @@
                         <i class="material-icons datepicker-icon datepicker-trigger">event</i>
                     </div>
                 </div>
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*Civil status*@
                     <p class="custom-label">Civil Status <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" required ng-model="selectedPatient.civilStatus">
@@ -647,7 +933,7 @@
                         <option value="6">Divorced</option>
                     </select>
                 </div>
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*Contact number*@
                     <p class="custom-label">Contact Number <span class="required-mark">*</span></p>
                     <input id="contactNumber"
@@ -662,7 +948,7 @@
             </div>
 
             <div class="row">
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Address Line 1*@
                     <p class="custom-label">Address Line 1 <span class="required-mark">*</span></p>
                     <input id="address"
@@ -675,7 +961,7 @@
                            required>
                 </div>
 
-                <div class="col s6">
+                <div class="col s12 m6 l6">
                     @*Address Line 2*@
                     <p class="custom-label">Address Line 2 <span class="required-mark">*</span></p>
                     <input id="address"
@@ -690,7 +976,7 @@
             </div>
 
             <div class="row">
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*City*@
                     <p class="custom-label">City <span class="required-mark">*</span></p>
                     <input id="address"
@@ -703,7 +989,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*state/province/region*@
                     <p class="custom-label">State/Province/Region <span class="required-mark">*</span></p>
                     <input id="address"
@@ -716,7 +1002,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*zip/postal code*@
                     <p class="custom-label">Zip/Postal Code <span class="required-mark">*</span></p>
                     <input id="address"
@@ -729,7 +1015,7 @@
                            required>
                 </div>
 
-                <div class="col s3">
+                <div class="col s12 m3 l3">
                     @*country*@
                     <p class="custom-label">Country <span class="required-mark">*</span></p>
                     <input id="address"
@@ -744,7 +1030,7 @@
             </div>
 
             <div class="row">
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Occupation*@
                     <p class="custom-label">Occupation <span class="required-mark">*</span></p>
                     <input id="occupation"
@@ -756,7 +1042,7 @@
                            required>
                 </div>
 
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Religion*@
                     <p class="custom-label">Religion <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="selectedPatient.religion">
@@ -768,7 +1054,7 @@
                     </select>
                 </div>
 
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Nationality*@
                     <p class="custom-label">Nationality <span class="required-mark">*</span></p>
                     <select class="browser-default custom-input" ng-model="selectedPatient.nationality">
@@ -780,7 +1066,7 @@
 
             <div class="row">
                 @*Guradian*@
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     <p class="custom-label">Guardian</p>
                     <input type="text"
                            ng-model="selectedPatient.guar"
@@ -790,8 +1076,8 @@
                 </div>
 
                 @*Guradian Number*@
-                <div class="col s4">
-                    <p class="custom-label">Guardian's Contact Number'</p>
+                <div class="col s12 m4 l4">
+                    <p class="custom-label">Guardian's Contact Number</p>
                     <input type="text"
                            class="custom-input"
                            ng-model="selectedPatient.guarNum"
@@ -800,7 +1086,7 @@
                 </div>
 
                 @*Refferal*@
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     <p class="custom-label">Referral (if any)</p>
                     <input type="text"
                            ng-model="selectedPatient.referral"
