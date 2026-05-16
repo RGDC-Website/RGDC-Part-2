@@ -372,6 +372,7 @@
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
     <Content Include="Content\images\dentalAppLogo.png" />
+    <Content Include="Content\images\RGDCLoginBGImageRevised.png" />
     <Content Include="Content\images\facebook.png" />
     <Content Include="Content\images\google.png" />
     <Content Include="Content\images\instagram.png" />
