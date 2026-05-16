@@ -45,12 +45,14 @@
                 <div class="card-content">
                     @*user pfp and name*@
                     <div class="row center">
-                        <img ng-if="selectedPatient"
-                             ng-src="{{ getSafePhotoUrl() }}"
-                             class="circle responsive-img"
-                             style="max-width:9rem"
-                             alt="Profile"
-                             onerror="this.onerror=null;this.src='https://placehold.co/400'" />
+                        <div class="profile-img-wrapper">
+                            <img ng-if="selectedPatient"
+                                 ng-src="{{ getSafePhotoUrl() }}"
+                                 class="responsive-img"
+                                 style="max-width:9rem"
+                                 alt="Profile"
+                                 onerror="this.onerror=null;this.src='https://placehold.co/400'" />
+                        </div>
                     </div>
 
                     @*user name and role*@
@@ -81,7 +83,7 @@
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">EMAIL ADDRESS</p>
-                                <p class="brown-text lighten-1">{{selectedPatient.email}}</p>
+                                <p class="brown-text lighten-1 truncate" title={{selectedPatient.email}}>{{selectedPatient.email}}</p>
                             </div>
                             <div class="mb-1">
                                 <p class="bold brown-text lighten-1">ADDRESS</p>
