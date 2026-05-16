@@ -154,15 +154,15 @@
 </div>
 
 @*Patient information form*@
-<div id="modalPatientInformationForm" class="modal patientInformationForm-modal containerOverflow-2">
-    <div>
+<div id="modalPatientInformationForm" class="modal patientInformationForm-modal">
+    <div class="containerOverflow-2">
         <h5 class="modal-form-title">Patient Information Form</h5>
 
         <form>
             <div class="row">
-                <div class="col s4">
+                <div class="col s12 m4 l4">
                     @*Photo upload*@
-                    <div class="row s4 center-align" style="margin-top: 2.5vh;">
+                    <div class="row center-align" style="margin-top: 2.5vh;">
                         <div class="col s12">
                             <div class="photo-box">
                                 <img ng-if="signupPhotoPreview || _uploadedSignUpPhotoPath" ng-src="{{ signupPhotoPreview || _uploadedSignUpPhotoPath }}" alt="Profile" />
@@ -177,10 +177,10 @@
                     </div>
                 </div>
 
-                <div class="col s8">
+                <div class="col s12 m8 l8">
                     <div class="row">
                         @*First name*@
-                        <div class="col s6">
+                        <div class="col s12 m6 l6">
                             <p class="custom-label">First Name <span class="required-mark">*</span></p>
                             <input type="text"
                                    class="custom-input"
@@ -191,7 +191,7 @@
                                    required>
                         </div>
                         @*MIddle name*@
-                        <div class="col s6">
+                        <div class="col s12 m6 l6">
                             <p class="custom-label">Middle Name</p>
                             <input type="text"
                                    class="custom-input"

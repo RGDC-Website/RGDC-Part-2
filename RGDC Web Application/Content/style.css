@@ -2,6 +2,19 @@
 /*body {
     margin-left: 25% !important;
 }*/
+.profile-img-wrapper {
+    width: 9rem;
+    height: 9rem;
+    margin: auto;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 .navTabs {
     margin-top: 2rem;
@@ -80,7 +93,7 @@
     }
 
     .containerOverflow-2 {
-        overflow-x: auto;
+        overflow-y: auto;
     }
 }
 
@@ -111,7 +124,7 @@
     }
 
     .containerOverflow-2 {
-        overflow-x: auto;
+        overflow-y: auto;
     }
 
     .staff-inactive-active-btn{
@@ -629,13 +642,14 @@ html, body {
 .patientInformationForm-modal {
     background-color: #e0e0e0 !important;
     border-radius: 2vh !important;
-    max-width: fit-content;
-    background-color: #e5e5e5;
-    max-height: fit-content;
+/*    max-width: fit-content;*/
+/*    background-color: #e5e5e5;*/
+/*    max-height: fit-content;*/
     padding: 2vh;
-    position: fixed !important;
-    inset: 0 !important;
-    margin: auto !important;
+/*    position: fixed !important;*/
+/*    inset: 0 !important;*/
+/*    margin: auto !important;*/
+    overflow-y: hidden;
 }
 
 #verifyEmail.modal {
